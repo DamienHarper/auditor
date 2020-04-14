@@ -1,0 +1,59 @@
+{
+  "name": "damienharper/auditor",
+  "type": "library",
+  "description": "Audits logs made easy.",
+  "keywords": ["doctrine", "audit", "audit-log", "audit-trail"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Damien Harper",
+      "email": "damien.harper@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.2",
+    "doctrine/annotations": "^1.8",
+    "doctrine/doctrine-bundle": "^1.9|^2.0",
+    "doctrine/orm": "^2.7",
+    "symfony/event-dispatcher": "^3.4|^4.0|^5.0",
+    "symfony/options-resolver": "^3.4|^4.0|^5.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "DH\\Auditor\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "DH\\Auditor\\Tests\\": "tests"
+    }
+  },
+  "require-dev": {
+    "doctrine/doctrine-migrations-bundle": "^1.3|^2.0",
+    "friendsofphp/php-cs-fixer": "^2.16",
+    "gedmo/doctrine-extensions": "^2.4",
+    "korbeil/phpstan-generic-rules": "^0.2",
+    "phpstan/phpstan": "^0.12",
+    "phpstan/phpstan-deprecation-rules": "^0.12",
+    "phpstan/phpstan-doctrine": "^0.12",
+    "phpstan/phpstan-strict-rules": "^0.12",
+    "phpunit/phpunit": "^7.0|^8.0",
+    "symfony/var-dumper": "^4.0|^5.0"
+  },
+  "conflict": {
+    "doctrine/persistence": "<1.3"
+  },
+  "scripts": {
+    "test": "php -d pcov.enabled=1 ./vendor/bin/phpunit",
+    "csfixer": "vendor/bin/php-cs-fixer fix --config=.php_cs --using-cache=no --verbose",
+    "phpstan": "vendor/bin/phpstan analyse src"
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.x-dev"
+    }
+  }
+}
