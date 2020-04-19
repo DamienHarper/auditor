@@ -4,8 +4,8 @@ namespace DH\Auditor\Provider\Doctrine;
 
 use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\Provider\AbstractProvider;
-use DH\Auditor\Provider\Doctrine\Annotation\AnnotationLoader;
-use DH\Auditor\Provider\Doctrine\Helper\DoctrineHelper;
+use DH\Auditor\Provider\Doctrine\Audit\Annotation\AnnotationLoader;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 
 class DoctrineProvider extends AbstractProvider
 {

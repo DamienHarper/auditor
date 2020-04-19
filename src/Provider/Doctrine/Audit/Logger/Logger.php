@@ -1,6 +1,6 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Logger;
+namespace DH\Auditor\Provider\Doctrine\Audit\Logger;
 
 use Doctrine\DBAL\Logging\SQLLogger;
 

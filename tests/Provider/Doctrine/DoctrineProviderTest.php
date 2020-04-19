@@ -2,7 +2,7 @@
 
 namespace DH\Auditor\Tests\Provider\Doctrine;
 
-use DH\Auditor\Provider\Doctrine\Annotation\AnnotationLoader;
+use DH\Auditor\Provider\Doctrine\Audit\Annotation\AnnotationLoader;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Tag;

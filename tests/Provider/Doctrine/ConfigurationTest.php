@@ -2,7 +2,7 @@
 
 namespace DH\Auditor\Tests\Provider\Doctrine;
 
-use DH\Auditor\Provider\Doctrine\Annotation\Security;
+use DH\Auditor\Provider\Doctrine\Audit\Annotation\Security;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation\AuditedEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation\UnauditedEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Comment;

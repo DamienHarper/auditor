@@ -1,6 +1,6 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Helper;
+namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;

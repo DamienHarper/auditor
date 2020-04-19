@@ -2,7 +2,7 @@
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation;
 
-use DH\Auditor\Provider\Doctrine\Annotation as Audit;
+use DH\Auditor\Provider\Doctrine\Audit\Annotation as Audit;
 use Doctrine\ORM\Mapping as ORM;
 
 /**

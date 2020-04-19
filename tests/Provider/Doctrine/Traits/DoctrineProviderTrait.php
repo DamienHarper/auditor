@@ -2,7 +2,7 @@
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
-use DH\Auditor\Provider\Doctrine\Annotation\AnnotationLoader;
+use DH\Auditor\Provider\Doctrine\Audit\Annotation\AnnotationLoader;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Tests\Traits\AuditorTrait;

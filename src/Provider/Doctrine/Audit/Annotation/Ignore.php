@@ -1,6 +1,6 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Annotation;
+namespace DH\Auditor\Provider\Doctrine\Audit\Annotation;
 
 use Doctrine\Common\Annotations\Annotation;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Event;
+namespace DH\Auditor\Provider\Doctrine\Audit\Event;
 
 use DH\Auditor\Provider\Doctrine\DBAL\Logger;
 use DH\Auditor\Provider\Doctrine\DBAL\LoggerChain;

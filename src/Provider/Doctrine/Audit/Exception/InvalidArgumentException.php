@@ -1,6 +1,6 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Exception;
+namespace DH\Auditor\Provider\Doctrine\Audit\Exception;
 
 use Exception;
 

@@ -1,12 +1,13 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Transaction;
+namespace DH\Auditor\Provider\Doctrine\Audit\Transaction;
 
 use DateTime;
 use DateTimeZone;
+use DH\Auditor\Provider\Doctrine\Audit\Transaction\AuditTrait;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\Event\LifecycleEvent;
-use DH\Auditor\Provider\Doctrine\Helper\DoctrineHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;

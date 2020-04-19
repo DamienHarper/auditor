@@ -1,8 +1,8 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Transaction;
+namespace DH\Auditor\Provider\Doctrine\Audit\Transaction;
 
-use DH\Auditor\Provider\Doctrine\Helper\DoctrineHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\User\UserInterface;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
