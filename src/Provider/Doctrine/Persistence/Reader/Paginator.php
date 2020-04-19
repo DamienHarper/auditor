@@ -1,6 +1,6 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Reader;
+namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
 
 use ArrayIterator;
 use Countable;

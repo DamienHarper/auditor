@@ -1,6 +1,8 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Helper;
+namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
+
+use DH\Auditor\Provider\Doctrine\Helper\DoctrineHelper;
 
 final class SchemaHelper
 {

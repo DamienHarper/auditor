@@ -1,10 +1,10 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Command;
+namespace DH\Auditor\Provider\Doctrine\Persistence\Command;
 
 use DateInterval;
 use DateTime;
-use DH\Auditor\Provider\Doctrine\Reader\Reader;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Exception;

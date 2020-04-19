@@ -1,7 +1,8 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Event;
+namespace DH\Auditor\Provider\Doctrine\Persistence\Event;
 
+use DH\Auditor\Provider\Doctrine\Event\LifecycleEvent;
 use DH\Auditor\Provider\Doctrine\Transaction\TransactionManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

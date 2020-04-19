@@ -1,11 +1,11 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Updater;
+namespace DH\Auditor\Provider\Doctrine\Persistence\Updater;
 
 use DH\Auditor\Provider\Doctrine\Configuration;
-use DH\Auditor\Provider\Doctrine\Exception\UpdateException;
-use DH\Auditor\Provider\Doctrine\Helper\SchemaHelper;
-use DH\Auditor\Provider\Doctrine\Reader\Reader;
+use DH\Auditor\Provider\Doctrine\Persistence\Exception\UpdateException;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 use DH\Auditor\Provider\Doctrine\Transaction\TransactionManager;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Schema;

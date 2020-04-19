@@ -1,6 +1,6 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Reader;
+namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
 
 use DateTime;
 use DH\Auditor\Provider\Doctrine\Annotation\Security;
@@ -8,6 +8,7 @@ use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\Exception\AccessDeniedException;
 use DH\Auditor\Provider\Doctrine\Exception\InvalidArgumentException;
 use DH\Auditor\Provider\Doctrine\Model\Entry;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Paginator;
 use DH\Auditor\Provider\Doctrine\User\UserInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
