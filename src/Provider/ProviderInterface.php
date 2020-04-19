@@ -10,4 +10,14 @@ interface ProviderInterface
     public function setAuditor(Auditor $auditor): self;
 
     public function persist(LifecycleEvent $event): void;
+
+    /**
+     * Provider supports audit storage.
+     */
+    public function supportsStorage(): bool;
+
+    /**
+     * Provider support audit events.
+     */
+    public function supportsAuditing(): bool;
 }

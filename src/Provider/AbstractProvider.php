@@ -22,4 +22,9 @@ abstract class AbstractProvider implements ProviderInterface
     {
         return $this->auditor;
     }
+
+    public function isRegistered(): bool
+    {
+        return null !== $this->auditor;
+    }
 }

@@ -4,11 +4,10 @@ namespace DH\Auditor\Provider\Doctrine\Audit\Transaction;
 
 use DateTime;
 use DateTimeZone;
-use DH\Auditor\Provider\Doctrine\Audit\Transaction\AuditTrait;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\Event\LifecycleEvent;
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Exception;

@@ -127,4 +127,14 @@ class DoctrineProvider extends AbstractProvider
 
         return true;
     }
+
+    public function supportsStorage(): bool
+    {
+        return true;
+    }
+
+    public function supportsAuditing(): bool
+    {
+        return true;
+    }
 }

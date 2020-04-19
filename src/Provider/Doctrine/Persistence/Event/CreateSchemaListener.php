@@ -3,8 +3,8 @@
 namespace DH\Auditor\Provider\Doctrine\Persistence\Event;
 
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
-use DH\Auditor\Provider\Doctrine\Transaction\TransactionManager;
 use DH\Auditor\Provider\Doctrine\Persistence\Updater\UpdateManager;
+use DH\Auditor\Provider\Doctrine\Transaction\TransactionManager;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;

@@ -2,8 +2,6 @@
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
-
 final class SchemaHelper
 {
     private function __construct()

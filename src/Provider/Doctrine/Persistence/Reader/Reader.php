@@ -3,12 +3,11 @@
 namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
 
 use DateTime;
+use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Provider\Doctrine\Audit\Annotation\Security;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\Exception\AccessDeniedException;
-use DH\Auditor\Provider\Doctrine\Audit\Exception\InvalidArgumentException;
 use DH\Auditor\Provider\Doctrine\Model\Entry;
-use DH\Auditor\Provider\Doctrine\Persistence\Reader\Paginator;
 use DH\Auditor\Provider\Doctrine\User\UserInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -114,7 +113,7 @@ class Reader
      * @param null|int|string $id
      *
      * @throws AccessDeniedException
-     * @throws \DH\Auditor\Provider\Doctrine\Audit\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getAudits(string $entity, $id = null, ?int $page = null, ?int $pageSize = null, ?string $transactionHash = null, bool $strict = true): array
     {
@@ -134,7 +133,7 @@ class Reader
      * Returns an array of all audited entries/operations for a given transaction hash
      * indexed by entity FQCN.
      *
-     * @throws \DH\Auditor\Provider\Doctrine\Audit\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws \Doctrine\ORM\ORMException
      */
     public function getAuditsByTransactionHash(string $transactionHash): array
@@ -164,7 +163,7 @@ class Reader
      * @param null|DateTime   $endDate   - Expected in configured timezone
      *
      * @throws AccessDeniedException
-     * @throws \DH\Auditor\Provider\Doctrine\Audit\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getAuditsByDate(string $entity, $id = null, ?DateTime $startDate = null, ?DateTime $endDate = null, ?int $page = null, ?int $pageSize = null, ?string $transactionHash = null, bool $strict = true): array
     {
@@ -186,7 +185,7 @@ class Reader
      * @param null|int|string $id
      *
      * @throws AccessDeniedException
-     * @throws \DH\Auditor\Provider\Doctrine\Audit\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getAuditsPager(string $entity, $id = null, int $page = 1, int $pageSize = self::PAGE_SIZE): array
     {
@@ -217,7 +216,7 @@ class Reader
      * @param null|int|string $id
      *
      * @throws AccessDeniedException
-     * @throws \DH\Auditor\Provider\Doctrine\Audit\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getAuditsCount(string $entity, $id = null): int
     {
@@ -237,10 +236,10 @@ class Reader
     /**
      * @param string $id
      *
-     * @return mixed[]
-     *@throws \DH\Auditor\Provider\Doctrine\Audit\Exception\InvalidArgumentException
-     *
+     *@throws InvalidArgumentException
      * @throws AccessDeniedException
+     *
+     * @return mixed[]
      */
     public function getAudit(string $entity, $id): array
     {
@@ -363,7 +362,7 @@ class Reader
      * @param null|int|string $id
      *
      * @throws AccessDeniedException
-     * @throws \DH\Auditor\Provider\Doctrine\Audit\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     private function getAuditsQueryBuilder(string $entity, $id = null, ?int $page = null, ?int $pageSize = null, ?string $transactionHash = null, bool $strict = true, ?DateTime $startDate = null, ?DateTime $endDate = null): QueryBuilder
     {
@@ -415,7 +414,7 @@ class Reader
     /**
      * Throws an InvalidArgumentException if given entity is not auditable.
      *
-     * @throws \DH\Auditor\Provider\Doctrine\Audit\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     private function checkAuditable(string $entity): void
     {

@@ -13,16 +13,23 @@ trait DoctrineProviderTrait
     use EntityManagerInterfaceTrait;
     use ProviderConfigurationTrait;
 
-    private function createDoctrineProvider(Configuration $configuration): DoctrineProvider
+    private function createUnregisteredDoctrineProvider(?Configuration $configuration = null): DoctrineProvider
     {
-        $auditor = $this->createAuditor(
-            $this->createAuditorConfiguration(),
-            new DoctrineProvider(
-                $configuration ?? $this->createProviderConfiguration(),
-                new AnnotationLoader($this->createEntityManager())
-            )
+        return new DoctrineProvider(
+            $configuration ?? $this->createProviderConfiguration(),
+            new AnnotationLoader($this->createEntityManager())
         );
+    }
 
-        return $auditor->getProvider();
+    private function createDoctrineProvider(?Configuration $configuration = null): DoctrineProvider
+    {
+        $auditor = $this->createAuditor();
+        $provider = new DoctrineProvider(
+            $configuration ?? $this->createProviderConfiguration(),
+            new AnnotationLoader($this->createEntityManager())
+        );
+        $auditor->registerProvider($provider);
+
+        return $provider;
     }
 }

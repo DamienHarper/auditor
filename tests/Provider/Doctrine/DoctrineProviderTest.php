@@ -16,6 +16,17 @@ final class DoctrineProviderTest extends TestCase
 {
     use DoctrineProviderTrait;
 
+    public function testIsRegistered(): void
+    {
+        // unregistered provider
+        $provider = $this->createUnregisteredDoctrineProvider();
+        self::assertFalse($provider->isRegistered(), 'Provider is not registered.');
+
+        // registered provider
+        $provider = $this->createDoctrineProvider();
+        self::assertTrue($provider->isRegistered(), 'Provider is registered.');
+    }
+
     public function testIsAudited(): void
     {
         $entities = [

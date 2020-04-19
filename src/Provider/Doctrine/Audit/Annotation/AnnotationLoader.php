@@ -2,9 +2,6 @@
 
 namespace DH\Auditor\Provider\Doctrine\Audit\Annotation;
 
-use DH\Auditor\Provider\Doctrine\Audit\Annotation\Auditable;
-use DH\Auditor\Provider\Doctrine\Audit\Annotation\Ignore;
-use DH\Auditor\Provider\Doctrine\Audit\Annotation\Security;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Entity;

@@ -2,7 +2,6 @@
 
 namespace DH\Auditor\Provider\Doctrine\Audit\Transaction;
 
-use DH\Auditor\Provider\Doctrine\Audit\Transaction\AuditTrait;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use Doctrine\ORM\EntityManagerInterface;

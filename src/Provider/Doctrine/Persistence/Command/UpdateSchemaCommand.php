@@ -3,8 +3,8 @@
 namespace DH\Auditor\Provider\Doctrine\Persistence\Command;
 
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
-use DH\Auditor\Provider\Doctrine\Transaction\TransactionManager;
 use DH\Auditor\Provider\Doctrine\Persistence\Updater\UpdateManager;
+use DH\Auditor\Provider\Doctrine\Transaction\TransactionManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Exception\RuntimeException;
