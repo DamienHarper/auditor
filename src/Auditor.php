@@ -2,6 +2,7 @@
 
 namespace DH\Auditor;
 
+use DH\Auditor\EventSubscriber\AuditEventSubscriber;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Exception\ProviderException;
 use DH\Auditor\Provider\ProviderInterface;
@@ -52,6 +53,9 @@ class Auditor
         $r = new ReflectionMethod($this->dispatcher, 'dispatch');
         $p = $r->getParameters();
         $this->is_pre43_dispatcher = 2 === \count($p) && 'event' !== $p[0]->name;
+
+        // Attach persistence event subscriber to provided dispatcher
+        $dispatcher->addSubscriber(new AuditEventSubscriber($this));
     }
 
     public function isPre43Dispatcher(): bool

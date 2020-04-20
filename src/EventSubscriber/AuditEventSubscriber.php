@@ -4,6 +4,7 @@ namespace DH\Auditor\EventSubscriber;
 
 use DH\Auditor\Auditor;
 use DH\Auditor\Event\LifecycleEvent;
+use Exception;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class AuditEventSubscriber implements EventSubscriberInterface
@@ -27,7 +28,13 @@ class AuditEventSubscriber implements EventSubscriberInterface
 
     public function onAuditEvent(LifecycleEvent $event): LifecycleEvent
     {
-        $this->auditor->getProvider()->persist($event);
+        foreach ($this->auditor->getProviders() as $provider) {
+            try {
+                $provider->persist($event);
+            } catch (Exception $e) {
+                // do nothing to ensure other providers are called
+            }
+        }
 
         return $event;
     }
