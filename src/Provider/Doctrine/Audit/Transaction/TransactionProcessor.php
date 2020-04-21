@@ -4,9 +4,9 @@ namespace DH\Auditor\Provider\Doctrine\Audit\Transaction;
 
 use DateTime;
 use DateTimeZone;
-use DH\Auditor\Provider\Doctrine\Configuration;
-use DH\Auditor\Provider\Doctrine\Event\LifecycleEvent;
-use DH\Auditor\Provider\Doctrine\Model\Transaction;
+use DH\Auditor\Event\LifecycleEvent;
+use DH\Auditor\Model\Transaction;
+use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -17,19 +17,19 @@ class TransactionProcessor
     use AuditTrait;
 
     /**
-     * @var Configuration
+     * @var DoctrineProvider
      */
-    private $configuration;
+    private $provider;
 
     /**
      * @var EntityManagerInterface
      */
     private $em;
 
-    public function __construct(Configuration $configuration)
+    public function __construct(DoctrineProvider $provider)
     {
-        $this->configuration = $configuration;
-        $this->em = $this->configuration->getEntityManager();
+        $this->provider = $provider;
+//        $this->em = $this->provider->getEntityManager();
     }
 
     /**
@@ -47,9 +47,9 @@ class TransactionProcessor
 
     private function notify(array $payload): void
     {
-        $dispatcher = $this->configuration->getEventDispatcher();
+        $dispatcher = $this->provider->getAuditor()->getEventDispatcher();
 
-        if ($this->configuration->isPre43Dispatcher()) {
+        if ($this->provider->getAuditor()->isPre43Dispatcher()) {
             // Symfony 3.x
             $dispatcher->dispatch(LifecycleEvent::class, new LifecycleEvent($payload));
         } else {
@@ -270,8 +270,8 @@ class TransactionProcessor
     private function audit(array $data): void
     {
         $schema = $data['schema'] ? $data['schema'].'.' : '';
-        $auditTable = $schema.$this->configuration->getTablePrefix().$data['table'].$this->configuration->getTableSuffix();
-        $dt = new DateTime('now', new DateTimeZone($this->configuration->getTimezone()));
+        $auditTable = $schema.$this->provider->getTablePrefix().$data['table'].$this->provider->getTableSuffix();
+        $dt = new DateTime('now', new DateTimeZone($this->provider->getTimezone()));
 
         $payload = [
             'entity' => $data['entity'],

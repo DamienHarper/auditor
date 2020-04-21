@@ -2,10 +2,17 @@
 
 namespace DH\Auditor\Provider\Doctrine;
 
+use DH\Auditor\Auditor;
 use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\Provider\AbstractProvider;
 use DH\Auditor\Provider\Doctrine\Audit\Annotation\AnnotationLoader;
+use DH\Auditor\Provider\Doctrine\Audit\Event\DoctrineSubscriber;
+use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
+use DH\Auditor\Transaction\TransactionManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Gedmo\SoftDeleteable\SoftDeleteableListener;
 
 class DoctrineProvider extends AbstractProvider
 {
@@ -15,29 +22,54 @@ class DoctrineProvider extends AbstractProvider
     private $configuration;
 
     /**
-     * @var AnnotationLoader
+     * @var EntityManagerInterface[]
      */
-    private $annotationLoader;
+    private $storageEntityManagers;
 
-    public function __construct(Configuration $configuration, AnnotationLoader $annotationLoader)
+    /**
+     * @var EntityManagerInterface[]
+     */
+    private $auditingEntityManagers;
+
+    /**
+     * @var TransactionManager
+     */
+    private $transactionManager;
+
+    /**
+     * @var Reader
+     */
+    private $reader;
+
+    public function __construct(Configuration $configuration, array $storageEntityManagers, array $auditingEntityManagers)
     {
         $this->configuration = $configuration;
-        $this->annotationLoader = $annotationLoader;
+        $this->storageEntityManagers = $storageEntityManagers;
+        $this->auditingEntityManagers = $auditingEntityManagers;
 
-        $this->configuration->setEntities(array_merge(
-            $this->configuration->getEntities(),
-            $this->annotationLoader->load()
-        ));
+        $this->transactionManager = new TransactionManager($this);
+
+        foreach ($this->storageEntityManagers as $em) {
+            $evm = $em->getEventManager();
+            $evm->addEventSubscriber(new CreateSchemaListener($this));
+        }
+        foreach ($this->auditingEntityManagers as $em) {
+            $evm = $em->getEventManager();
+            $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager));
+            $evm->addEventSubscriber(new SoftDeleteableListener());
+
+            $annotationLoader = new AnnotationLoader($em);
+
+            $this->configuration->setEntities(array_merge(
+                $this->configuration->getEntities(),
+                $annotationLoader->load()
+            ));
+        }
     }
 
     public function persist(LifecycleEvent $event): void
     {
         // TODO: Implement persist() method.
-    }
-
-    public function getAnnotationLoader(): AnnotationLoader
-    {
-        return $this->annotationLoader;
     }
 
     /**
@@ -126,6 +158,11 @@ class DoctrineProvider extends AbstractProvider
         }
 
         return true;
+    }
+
+    public function getAuditor(): Auditor
+    {
+        return $this->auditor;
     }
 
     public function supportsStorage(): bool

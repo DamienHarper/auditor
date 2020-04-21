@@ -2,10 +2,10 @@
 
 namespace DH\Auditor\Provider\Doctrine\Audit\Event;
 
-use DH\Auditor\Provider\Doctrine\DBAL\Logger;
-use DH\Auditor\Provider\Doctrine\DBAL\LoggerChain;
-use DH\Auditor\Provider\Doctrine\Model\Transaction;
-use DH\Auditor\Provider\Doctrine\Transaction\TransactionManager;
+use DH\Auditor\Model\Transaction;
+use DH\Auditor\Provider\Doctrine\Audit\Logger\Logger;
+use DH\Auditor\Provider\Doctrine\Audit\Logger\LoggerChain;
+use DH\Auditor\Transaction\TransactionManager;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Logging\SQLLogger;
 use Doctrine\ORM\Event\OnFlushEventArgs;

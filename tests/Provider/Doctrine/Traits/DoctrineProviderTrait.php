@@ -2,7 +2,6 @@
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
-use DH\Auditor\Provider\Doctrine\Audit\Annotation\AnnotationLoader;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Tests\Traits\AuditorTrait;
@@ -15,18 +14,23 @@ trait DoctrineProviderTrait
 
     private function createUnregisteredDoctrineProvider(?Configuration $configuration = null): DoctrineProvider
     {
+        $em = $this->createEntityManager();
+
         return new DoctrineProvider(
             $configuration ?? $this->createProviderConfiguration(),
-            new AnnotationLoader($this->createEntityManager())
+            [$em],
+            [$em]
         );
     }
 
     private function createDoctrineProvider(?Configuration $configuration = null): DoctrineProvider
     {
+        $em = $this->createEntityManager();
         $auditor = $this->createAuditor();
         $provider = new DoctrineProvider(
             $configuration ?? $this->createProviderConfiguration(),
-            new AnnotationLoader($this->createEntityManager())
+            [$em],
+            [$em]
         );
         $auditor->registerProvider($provider);
 

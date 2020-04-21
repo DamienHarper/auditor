@@ -2,9 +2,10 @@
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Event;
 
+use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 use DH\Auditor\Provider\Doctrine\Persistence\Updater\UpdateManager;
-use DH\Auditor\Provider\Doctrine\Transaction\TransactionManager;
+use DH\Auditor\Transaction\TransactionManager;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
@@ -14,19 +15,13 @@ use Exception;
 class CreateSchemaListener implements EventSubscriber
 {
     /**
-     * @var TransactionManager
+     * @var DoctrineProvider
      */
-    protected $transactionManager;
+    private $provider;
 
-    /**
-     * @var \DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader
-     */
-    protected $reader;
-
-    public function __construct(TransactionManager $transactionManager, Reader $reader)
+    public function __construct(DoctrineProvider $provider)
     {
-        $this->transactionManager = $transactionManager;
-        $this->reader = $reader;
+        $this->provider = $provider;
     }
 
     public function postGenerateSchemaTable(GenerateSchemaTableEventArgs $eventArgs): void
@@ -42,20 +37,20 @@ class CreateSchemaListener implements EventSubscriber
             throw new Exception(sprintf('Inheritance type "%s" is not yet supported', $metadata->inheritanceType));
         }
 
-        // check reader and manager entity managers and returns if different
-        if ($this->reader->getEntityManager() !== $this->transactionManager->getConfiguration()->getEntityManager()) {
-            return;
-        }
+//        // check reader and manager entity managers and returns if different
+//        if ($this->reader->getEntityManager() !== $this->transactionManager->getConfiguration()->getEntityManager()) {
+//            return;
+//        }
 
         // check if entity or its children are audited
-        if (!$this->transactionManager->getConfiguration()->isAuditable($metadata->name)) {
+        if (!$this->provider->isAuditable($metadata->name)) {
             $audited = false;
             if (
                 $metadata->rootEntityName === $metadata->name &&
                 ClassMetadataInfo::INHERITANCE_TYPE_SINGLE_TABLE === $metadata->inheritanceType
             ) {
                 foreach ($metadata->subClasses as $subClass) {
-                    if ($this->transactionManager->getConfiguration()->isAuditable($subClass)) {
+                    if ($this->provider->isAuditable($subClass)) {
                         $audited = true;
                     }
                 }
@@ -65,7 +60,7 @@ class CreateSchemaListener implements EventSubscriber
             }
         }
 
-        $updater = new UpdateManager($this->transactionManager, $this->reader);
+        $updater = new UpdateManager($this->provider);
         $updater->createAuditTable($eventArgs->getClassTable(), $eventArgs->getSchema());
     }
 

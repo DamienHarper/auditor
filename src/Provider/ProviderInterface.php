@@ -9,6 +9,8 @@ interface ProviderInterface
 {
     public function setAuditor(Auditor $auditor): self;
 
+    public function isRegistered(): bool;
+
     public function persist(LifecycleEvent $event): void;
 
     /**

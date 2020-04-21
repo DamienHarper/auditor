@@ -2,7 +2,6 @@
 
 namespace DH\Auditor\Tests\Provider\Doctrine;
 
-use DH\Auditor\Provider\Doctrine\Audit\Annotation\AnnotationLoader;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Tag;
@@ -302,22 +301,6 @@ final class DoctrineProviderTest extends TestCase
         $entities2 = $configuration->getEntities();
 
         self::assertNotSame($entities2, $entities1, 'Configuration::setEntities() replaces previously configured entities.');
-    }
-
-    public function testGetAnnotationReader(): void
-    {
-        $entities = [
-            Post::class => [
-                'enabled' => true,
-            ],
-        ];
-
-        $configuration = $this->createProviderConfiguration([
-            'entities' => $entities,
-        ]);
-        $provider = $this->createDoctrineProvider($configuration);
-
-        self::assertInstanceOf(AnnotationLoader::class, $provider->getAnnotationLoader(), 'AnnotationLoader is set.');
     }
 
     public function testPersist(): void

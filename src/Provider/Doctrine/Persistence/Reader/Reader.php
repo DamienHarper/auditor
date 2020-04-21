@@ -5,7 +5,7 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
 use DateTime;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Provider\Doctrine\Audit\Annotation\Security;
-use DH\Auditor\Provider\Doctrine\Configuration;
+use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Exception\AccessDeniedException;
 use DH\Auditor\Provider\Doctrine\Model\Entry;
 use DH\Auditor\Provider\Doctrine\User\UserInterface;
@@ -28,9 +28,9 @@ class Reader
     public const PAGE_SIZE = 50;
 
     /**
-     * @var Configuration
+     * @var DoctrineProvider
      */
-    private $configuration;
+    private $provider;
 
     /**
      * @var EntityManagerInterface
@@ -45,17 +45,10 @@ class Reader
     /**
      * AuditReader constructor.
      */
-    public function __construct(
-        Configuration $configuration,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->configuration = $configuration;
-        $this->entityManager = $entityManager;
-    }
-
-    public function getConfiguration(): Configuration
+    public function __construct(DoctrineProvider $provider, EntityManagerInterface $entityManager)
     {
-        return $this->configuration;
+        $this->provider = $provider;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -98,7 +91,7 @@ class Reader
         }
         $audited = [];
         foreach ($entities as $entity) {
-            if ($this->configuration->isAuditable($entity)) {
+            if ($this->provider->isAuditable($entity)) {
                 $audited[$entity] = $this->getEntityTableName($entity);
             }
         }
@@ -286,7 +279,7 @@ class Reader
             $schema = $this->entityManager->getClassMetadata($entity)->getSchemaName().'.';
         }
 
-        return sprintf('%s%s%s%s', $schema, $this->configuration->getTablePrefix(), $this->getEntityTableName($entity), $this->configuration->getTableSuffix());
+        return sprintf('%s%s%s%s', $schema, $this->provider->getTablePrefix(), $this->getEntityTableName($entity), $this->provider->getTableSuffix());
     }
 
     public function getEntityManager(): EntityManagerInterface
@@ -377,7 +370,7 @@ class Reader
             throw new \InvalidArgumentException('$pageSize must be greater or equal than 1.');
         }
 
-        $storage = $this->configuration->getEntityManager() ?? $this->entityManager;
+        $storage = $this->provider->getEntityManager() ?? $this->entityManager;
         $connection = $storage->getConnection();
 
         $queryBuilder = $connection->createQueryBuilder();
@@ -418,7 +411,7 @@ class Reader
      */
     private function checkAuditable(string $entity): void
     {
-        if (!$this->configuration->isAuditable($entity)) {
+        if (!$this->provider->isAuditable($entity)) {
             throw new InvalidArgumentException('Entity '.$entity.' is not auditable.');
         }
     }
@@ -430,7 +423,7 @@ class Reader
      */
     private function checkRoles(string $entity, string $scope): void
     {
-        $userProvider = $this->configuration->getUserProvider();
+        $userProvider = $this->provider->getUserProvider();
         $user = null === $userProvider ? null : $userProvider->getUser();
         $security = null === $userProvider ? null : $userProvider->getSecurity();
 
@@ -439,7 +432,7 @@ class Reader
             return;
         }
 
-        $entities = $this->configuration->getEntities();
+        $entities = $this->provider->getEntities();
 
         $roles = $entities[$entity]['roles'] ?? null;
 
