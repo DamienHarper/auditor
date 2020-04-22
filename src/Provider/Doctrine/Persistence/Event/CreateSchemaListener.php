@@ -3,9 +3,7 @@
 namespace DH\Auditor\Provider\Doctrine\Persistence\Event;
 
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
-use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 use DH\Auditor\Provider\Doctrine\Persistence\Updater\UpdateManager;
-use DH\Auditor\Transaction\TransactionManager;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
@@ -26,6 +24,7 @@ class CreateSchemaListener implements EventSubscriber
 
     public function postGenerateSchemaTable(GenerateSchemaTableEventArgs $eventArgs): void
     {
+//dump(__METHOD__.'('.$eventArgs->getClassMetadata()->name.')');
         $metadata = $eventArgs->getClassMetadata();
 
         // check inheritance type and returns if unsupported
@@ -61,7 +60,7 @@ class CreateSchemaListener implements EventSubscriber
         }
 
         $updater = new UpdateManager($this->provider);
-        $updater->createAuditTable($eventArgs->getClassTable(), $eventArgs->getSchema());
+        $updater->createAuditTable($metadata->name, $eventArgs->getClassTable(), $eventArgs->getSchema());
     }
 
     /**

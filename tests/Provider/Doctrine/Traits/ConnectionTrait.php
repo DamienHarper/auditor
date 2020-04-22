@@ -84,6 +84,7 @@ trait ConnectionTrait
             $params = [
                 'driver' => 'pdo_sqlite',
                 'memory' => true,
+//                'path' => __DIR__.'/../../dams.sqlite',
             ];
         }
 

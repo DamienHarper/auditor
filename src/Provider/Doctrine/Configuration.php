@@ -82,10 +82,12 @@ class Configuration
      *
      * @param array<string, array> $entities
      */
-    public function setEntities(array $entities): void
+    public function setEntities(array $entities): self
     {
         $this->annotationLoaded = true;
         $this->entities = $entities;
+
+        return $this;
     }
 
     /**

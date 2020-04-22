@@ -2,10 +2,14 @@
 
 namespace DH\Auditor\Tests\Provider\Doctrine;
 
+use DH\Auditor\Exception\ProviderException;
+use DH\Auditor\Provider\Doctrine\Configuration;
+use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\DoctrineProviderTrait;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -14,6 +18,143 @@ use PHPUnit\Framework\TestCase;
 final class DoctrineProviderTest extends TestCase
 {
     use DoctrineProviderTrait;
+
+    public function testRegisterStorageEntityManager(): void
+    {
+        $provider = $this->createUnregisteredDoctrineProvider();
+
+        self::assertCount(0, $provider->getStorageEntityManagers(), 'There is no storage entity manager registered.');
+
+        $entityManager = $this->createEntityManager();
+        $provider->registerStorageEntityManager($entityManager, 'storageEM_1');
+
+        self::assertCount(1, $provider->getStorageEntityManagers(), 'There is 1 storage entity manager registered.');
+
+        $entityManager = $this->createEntityManager();
+        $provider->registerStorageEntityManager($entityManager, 'storageEM_2');
+
+        self::assertCount(2, $provider->getStorageEntityManagers(), 'There are 2 storage entity managers registered.');
+
+        $this->expectException(ProviderException::class);
+        $entityManager = $this->createEntityManager();
+        $provider->registerStorageEntityManager($entityManager, 'storageEM_1');
+    }
+
+    public function testRegisterAuditingEntityManager(): void
+    {
+        $provider = $this->createUnregisteredDoctrineProvider();
+
+        self::assertCount(0, $provider->getAuditingEntityManagers(), 'There is no auditing entity manager registered.');
+
+        $entityManager = $this->createEntityManager();
+        $provider->registerAuditingEntityManager($entityManager, 'auditingEM_1');
+
+        self::assertCount(1, $provider->getAuditingEntityManagers(), 'There is 1 auditing entity manager registered.');
+
+        $entityManager = $this->createEntityManager();
+        $provider->registerAuditingEntityManager($entityManager, 'auditingEM_2');
+
+        self::assertCount(2, $provider->getAuditingEntityManagers(), 'There are 2 auditing entity managers registered.');
+
+        $this->expectException(ProviderException::class);
+        $entityManager = $this->createEntityManager();
+        $provider->registerAuditingEntityManager($entityManager, 'auditingEM_1');
+    }
+
+    /**
+     * @depends testRegisterAuditingEntityManager
+     * @depends testRegisterStorageEntityManager
+     */
+    public function testRegisterEntityManager(): void
+    {
+        $provider = $this->createUnregisteredDoctrineProvider();
+
+        self::assertCount(0, $provider->getAuditingEntityManagers(), 'There is no auditing entity manager registered.');
+        self::assertCount(0, $provider->getStorageEntityManagers(), 'There is no storage entity manager registered.');
+
+        $entityManager = $this->createEntityManager();
+        $provider->registerEntityManager($entityManager, DoctrineProvider::AUDITING_ONLY, 'auditingEM');
+
+        self::assertCount(1, $provider->getAuditingEntityManagers(), 'There is 1 auditing entity manager registered.');
+        self::assertCount(0, $provider->getStorageEntityManagers(), 'There is no storage entity manager registered.');
+
+        $entityManager = $this->createEntityManager();
+        $provider->registerEntityManager($entityManager, DoctrineProvider::STORAGE_ONLY, 'storageEM');
+
+        self::assertCount(1, $provider->getAuditingEntityManagers(), 'There is 1 auditing entity manager registered.');
+        self::assertCount(1, $provider->getStorageEntityManagers(), 'There is 1 storage entity manager registered.');
+
+        $entityManager = $this->createEntityManager();
+        $provider->registerEntityManager($entityManager, DoctrineProvider::BOTH, 'EM');
+
+        self::assertCount(2, $provider->getAuditingEntityManagers(), 'There are 2 auditing entity managers registered.');
+        self::assertCount(2, $provider->getStorageEntityManagers(), 'There are 2 storage entity managers registered.');
+
+        $this->expectException(ProviderException::class);
+        $entityManager = $this->createEntityManager();
+        $provider->registerEntityManager($entityManager, DoctrineProvider::AUDITING_ONLY, 'auditingEM');
+
+        $this->expectException(ProviderException::class);
+        $entityManager = $this->createEntityManager();
+        $provider->registerEntityManager($entityManager, DoctrineProvider::STORAGE_ONLY, 'storageEM');
+
+        $this->expectException(ProviderException::class);
+        $entityManager = $this->createEntityManager();
+        $provider->registerEntityManager($entityManager, DoctrineProvider::BOTH, 'EM');
+    }
+
+    public function testRegisterEntityManagerDefaultName(): void
+    {
+        $provider = $this->createUnregisteredDoctrineProvider();
+        $entityManager = $this->createEntityManager();
+        $provider->registerEntityManager($entityManager);
+
+        $expected = ['default' => $entityManager];
+        self::assertSame($expected, $provider->getStorageEntityManagers(), 'Default name is "default".');
+        self::assertSame($expected, $provider->getAuditingEntityManagers(), 'Default name is "default".');
+    }
+
+    public function testIsMapperRequired(): void
+    {
+        $provider = $this->createUnregisteredDoctrineProvider();
+
+        self::assertFalse($provider->isMapperRequired(), 'Mapper is not required since there is strictly less than 2 storage entity manager.');
+
+        $entityManager = $this->createEntityManager();
+        $provider->registerEntityManager($entityManager, DoctrineProvider::BOTH, 'EM1');
+
+        self::assertFalse($provider->isMapperRequired(), 'Mapper is not required since there is strictly less than 2 storage entity manager.');
+
+        $entityManager = $this->createEntityManager();
+        $provider->registerEntityManager($entityManager, DoctrineProvider::BOTH, 'EM2');
+
+        self::assertTrue($provider->isMapperRequired(), 'Mapper is required since there is more than 2 storage entity managers.');
+    }
+
+    public function testSetMappingClosure(): void
+    {
+        $provider = $this->createUnregisteredDoctrineProvider();
+
+        // register 2 entity managers for storage (at least)
+        $entityManager1 = $this->createEntityManager();
+        $entityManager2 = $this->createEntityManager();
+        $provider->registerEntityManager($entityManager1, DoctrineProvider::BOTH, 'EM1');
+        $provider->registerEntityManager($entityManager2, DoctrineProvider::BOTH, 'EM2');
+
+        self::assertNull($provider->getMappingClosure(), 'Mapping closure is not set.');
+
+        $provider->setMappingClosure(function (string $entity, array $storageEntityManagers): EntityManagerInterface {
+            // Audit records regarding entities starting with "foo" are mapped to "EM1", others are mapped to "EM2"
+            return 0 === strpos($entity, 'Foo') ? $storageEntityManagers['EM1'] : $storageEntityManagers['EM2'];
+        });
+
+        self::assertNotNull($provider->getMappingClosure(), 'Mapping closure is set.');
+
+        self::assertSame($entityManager1, $provider->getEntityManagerForEntity('Foo1'), 'EM1 is used.');
+        self::assertSame($entityManager1, $provider->getEntityManagerForEntity('Foo2'), 'EM1 is used.');
+        self::assertSame($entityManager2, $provider->getEntityManagerForEntity('Bar1'), 'EM2 is used.');
+        self::assertSame($entityManager2, $provider->getEntityManagerForEntity('Bar2'), 'EM2 is used.');
+    }
 
     public function testIsRegistered(): void
     {
@@ -301,6 +442,13 @@ final class DoctrineProviderTest extends TestCase
         $entities2 = $configuration->getEntities();
 
         self::assertNotSame($entities2, $entities1, 'Configuration::setEntities() replaces previously configured entities.');
+    }
+
+    public function testGetConfiguration(): void
+    {
+        $provider = $this->createDoctrineProvider();
+
+        self:self::assertInstanceOf(Configuration::class, $provider->getConfiguration(), 'Configuration is reachable.');
     }
 
     public function testPersist(): void

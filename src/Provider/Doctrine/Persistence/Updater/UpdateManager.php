@@ -2,54 +2,41 @@
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Updater;
 
-use DH\Auditor\Provider\Doctrine\Configuration;
-use DH\Auditor\Provider\Doctrine\Persistence\Exception\UpdateException;
+use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
-use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
-use DH\Auditor\Provider\Doctrine\Transaction\TransactionManager;
-use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 
 class UpdateManager
 {
     /**
-     * @var TransactionManager
+     * @var DoctrineProvider
      */
-    private $transactionManager;
+    private $provider;
 
-    /**
-     * @var Reader
-     */
-    private $reader;
-
-    public function __construct(TransactionManager $transactionManager, Reader $reader)
+    public function __construct(DoctrineProvider $provider)
     {
-        $this->transactionManager = $transactionManager;
-        $this->reader = $reader;
+        $this->provider = $provider;
     }
 
-    public function getConfiguration(): Configuration
-    {
-        return $this->transactionManager->getConfiguration();
-    }
-
-    /**
-     * @param null|array    $sqls     SQL queries to execute
-     * @param null|callable $callback Callback executed after each query is run
-     */
     public function updateAuditSchema(?array $sqls = null, ?callable $callback = null): void
     {
-        $auditEntityManager = $this->transactionManager->getConfiguration()->getEntityManager();
+//dump(__METHOD__);
+        $storageEntityManagers = $this->provider->getStorageEntityManagers();
 
+        // TODO: FIXME will create the same schema on all connections
         if (null === $sqls) {
             $sqls = $this->getUpdateAuditSchemaSql();
         }
 
-        foreach ($sqls as $index => $sql) {
-            try {
-                $statement = $auditEntityManager->getConnection()->prepare($sql);
+//dump('Run SQL queries');
+        foreach ($sqls as $entityManagerName => $queries) {
+            foreach ($queries as $index => $sql) {
+//dump(__METHOD__.' => '.$sql);
+                $statement = $storageEntityManagers[$entityManagerName]->getConnection()->prepare($sql);
                 $statement->execute();
 
                 if (null !== $callback) {
@@ -58,59 +45,124 @@ class UpdateManager
                         'current' => $index,
                     ]);
                 }
-            } catch (Exception $e) {
-                // something bad happened here :/
             }
         }
+    }
+
+    /**
+     * Returns an array of audit table names indexed by entity FQN.
+     * Only auditable entities are considered.
+     *
+     * @throws \Doctrine\ORM\ORMException
+     *
+     * @return array
+     */
+    public function getAuditableTableNames(EntityManagerInterface $entityManager): array
+    {
+//dump(__METHOD__);
+        $metadataDriver = $entityManager->getConfiguration()->getMetadataDriverImpl();
+        $entities = [];
+        if (null !== $metadataDriver) {
+            $entities = $metadataDriver->getAllClassNames();
+        }
+        $audited = [];
+        foreach ($entities as $entity) {
+            if ($this->provider->isAuditable($entity)) {
+                $audited[$entity] = $entityManager->getClassMetadata($entity)->getTableName();
+            }
+        }
+        ksort($audited);
+
+        return $audited;
     }
 
     public function getUpdateAuditSchemaSql(): array
     {
-        $readerEntityManager = $this->reader->getEntityManager();
-        $readerSchemaManager = $readerEntityManager->getConnection()->getSchemaManager();
+//dump(__METHOD__);
+        $storageEntityManagers = $this->provider->getStorageEntityManagers();
 
-        $auditEntityManager = $this->transactionManager->getConfiguration()->getEntityManager();
-        $auditSchemaManager = $auditEntityManager->getConnection()->getSchemaManager();
+        // schema A1 et schema A2 source d'audit
+        // schema S stockage
 
-        $auditSchema = $auditSchemaManager->createSchema();
-        $fromSchema = clone $auditSchema;
-        $readerSchema = $readerSchemaManager->createSchema();
-        $tables = $readerSchema->getTables();
+        $repository = [];   // auditable entities by storage entity manager
 
-        $entities = $this->reader->getEntities();
-        foreach ($tables as $table) {
-            if (\in_array($table->getName(), array_values($entities), true)) {
-                $auditTablename = preg_replace(
-                    sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($table->getName(), '#')),
-                    sprintf(
-                        '$1%s$2%s',
-                        preg_quote($this->transactionManager->getConfiguration()->getTablePrefix(), '#'),
-                        preg_quote($this->transactionManager->getConfiguration()->getTableSuffix(), '#')
-                    ),
-                    $table->getName()
-                );
+        // Collect auditable entities from auditing storage managers
+        $auditingEntityManagers = $this->provider->getAuditingEntityManagers();
+        foreach ($auditingEntityManagers as $name => $auditingEntityManager) {
+//dump('Collecting auditable entities from auditing storage manager "'.$name.'"');
+            $classes = $this->getAuditableTableNames($auditingEntityManager);
+//dump('classes:', $classes);
 
-                if ($auditSchema->hasTable($auditTablename)) {
-                    $this->updateAuditTable($auditSchema->getTable($auditTablename), $auditSchema);
-                } else {
-                    $this->createAuditTable($table, $auditSchema);
+            // Populate the auditable entities repository
+            foreach ($classes as $entity => $tableName) {
+                $em = $this->provider->getEntityManagerForEntity($entity);
+                $key = array_search($em, $this->provider->getStorageEntityManagers(), true);
+                if (!isset($repository[$key])) {
+                    $repository[$key] = [];
                 }
+                $repository[$key][$entity] = $tableName;
             }
         }
+//dump('repository:', $repository);
+        $repositoryFindByTablename = static function(string $tableName) use ($repository): ?string {
+            foreach ($repository as $emName => $map) {
+                return array_search($tableName, $map, true);
+            }
+        };
 
-        return $fromSchema->getMigrateToSql($auditSchema, $auditSchemaManager->getDatabasePlatform());
+        // Compute and collect SQL queries
+        $sqls = [];
+        foreach ($repository as $name => $classes) {
+//dump('Processing auditable entities from storage entity manager "'.$name.'"');
+            $storageSchemaManager = $storageEntityManagers[$name]->getConnection()->getSchemaManager();
+
+            $storageSchema = $storageSchemaManager->createSchema();
+            $fromSchema = clone $storageSchema;
+            $tables = $storageSchema->getTables();
+//dump('Current tables from storage entity manager "'.$name.'"', array_map(static function($t) {return $t->getName();}, $tables));
+            foreach ($tables as $table) {
+                if (\in_array($table->getName(), array_values($repository[$name]), true)) {
+                    // table is the one of an auditable entity
+
+                    $auditTablename = preg_replace(
+                        sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($table->getName(), '#')),
+                        sprintf(
+                            '$1%s$2%s',
+                            preg_quote($this->provider->getConfiguration()->getTablePrefix(), '#'),
+                            preg_quote($this->provider->getConfiguration()->getTableSuffix(), '#')
+                        ),
+                        $table->getName()
+                    );
+//dump('table "'.$table->getName().'" => audit table "'.$auditTablename.'"');
+
+                    if ($storageSchema->hasTable($auditTablename)) {
+                        // Audit table does not exists, let's create it
+//dump('table "'.$auditTablename.'" already exists => update it');
+                        $this->updateAuditTable($repositoryFindByTablename($table->getName()), $storageSchema->getTable($auditTablename), $storageSchema);
+                    } else {
+                        // Audit table exists, let's update it if needed
+//dump('table "'.$auditTablename.'" does not exist => create it');
+                        $this->createAuditTable($repositoryFindByTablename($table->getName()), $table, $storageSchema);
+                    }
+                }
+            }
+
+            $sqls[$name] = $fromSchema->getMigrateToSql($storageSchema, $storageSchemaManager->getDatabasePlatform());
+        }
+//dump($sqls);
+
+        return $sqls;
     }
 
     /**
      * Creates an audit table.
-     *
-     * @throws \Doctrine\DBAL\DBALException
      */
-    public function createAuditTable(Table $table, ?Schema $schema = null): Schema
+    public function createAuditTable(string $entity, Table $table, ?Schema $schema = null): Schema
     {
-        $entityManager = $this->getConfiguration()->getEntityManager();
-        $schemaManager = $entityManager->getConnection()->getSchemaManager();
+//dump(__METHOD__.'('.$table->getName().')');
         if (null === $schema) {
+            $entityManager = $this->provider->getEntityManagerForEntity($entity);
+            $schemaManager = $entityManager->getConnection()->getSchemaManager();
             $schema = $schemaManager->createSchema();
         }
 
@@ -118,8 +170,8 @@ class UpdateManager
             sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($table->getName(), '#')),
             sprintf(
                 '$1%s$2%s',
-                preg_quote($this->getConfiguration()->getTablePrefix(), '#'),
-                preg_quote($this->getConfiguration()->getTableSuffix(), '#')
+                preg_quote($this->provider->getConfiguration()->getTablePrefix(), '#'),
+                preg_quote($this->provider->getConfiguration()->getTableSuffix(), '#')
             ),
             $table->getName()
         );
@@ -148,26 +200,25 @@ class UpdateManager
     /**
      * Ensures an audit table's structure is valid.
      *
-     * @throws UpdateException
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
      */
-    public function updateAuditTable(Table $table, ?Schema $schema = null, ?array $expectedColumns = null, ?array $expectedIndices = null): Schema
+    public function updateAuditTable(string $entity, Table $table, ?Schema $schema = null): Schema
     {
-        $entityManager = $this->getConfiguration()->getEntityManager();
+//dump(__METHOD__.'('.$table->getName().')');
+        $entityManager = $this->provider->getEntityManagerForEntity($entity);
         $schemaManager = $entityManager->getConnection()->getSchemaManager();
         if (null === $schema) {
             $schema = $schemaManager->createSchema();
         }
 
         $table = $schema->getTable($table->getName());
-
         $columns = $schemaManager->listTableColumns($table->getName());
 
         // process columns
-        $this->processColumns($table, $columns, $expectedColumns ?? SchemaHelper::getAuditTableColumns());
+        $this->processColumns($table, $columns, SchemaHelper::getAuditTableColumns());
 
         // process indices
-        $this->processIndices($table, $expectedIndices ?? SchemaHelper::getAuditTableIndices($table->getName()));
+        $this->processIndices($table, SchemaHelper::getAuditTableIndices($table->getName()));
 
         return $schema;
     }
@@ -198,7 +249,7 @@ class UpdateManager
     }
 
     /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
      */
     private function processIndices(Table $table, array $expectedIndices): void
     {
