@@ -2,9 +2,9 @@
 
 namespace DH\Auditor\Provider\Doctrine\Audit\Event;
 
-use DH\Auditor\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Audit\Logger\Logger;
 use DH\Auditor\Provider\Doctrine\Audit\Logger\LoggerChain;
+use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Transaction\TransactionManager;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Logging\SQLLogger;
@@ -33,20 +33,17 @@ class DoctrineSubscriber implements EventSubscriber
      * and their associations have been computed.
      *
      * @see https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/events.html#onflush
-     *
-     * @throws \Doctrine\DBAL\DBALException
-     * @throws \Doctrine\ORM\Mapping\MappingException
      */
     public function onFlush(OnFlushEventArgs $args): void
     {
-        $em = $args->getEntityManager();
-        $transaction = new Transaction();
+        $entityManager = $args->getEntityManager();
+        $transaction = new Transaction($entityManager);
 
         // extend the SQL logger
-        $this->loggerBackup = $em->getConnection()->getConfiguration()->getSQLLogger();
-        $auditLogger = new Logger(function () use ($em, $transaction): void {
+        $this->loggerBackup = $entityManager->getConnection()->getConfiguration()->getSQLLogger();
+        $auditLogger = new Logger(function () use ($entityManager, $transaction): void {
             // flushes pending data
-            $em->getConnection()->getConfiguration()->setSQLLogger($this->loggerBackup);
+            $entityManager->getConnection()->getConfiguration()->setSQLLogger($this->loggerBackup);
             $this->transactionManager->process($transaction);
         });
 
@@ -54,14 +51,13 @@ class DoctrineSubscriber implements EventSubscriber
         $loggerChain = new LoggerChain();
         $loggerChain->addLogger($auditLogger);
         if ($this->loggerBackup instanceof LoggerChain) {
-            /** @var SQLLogger $logger */
             foreach ($this->loggerBackup->getLoggers() as $logger) {
                 $loggerChain->addLogger($logger);
             }
         } elseif ($this->loggerBackup instanceof SQLLogger) {
             $loggerChain->addLogger($this->loggerBackup);
         }
-        $em->getConnection()->getConfiguration()->setSQLLogger($loggerChain);
+        $entityManager->getConnection()->getConfiguration()->setSQLLogger($loggerChain);
 
         // Populate transaction
         $this->transactionManager->populate($transaction);

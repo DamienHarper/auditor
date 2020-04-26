@@ -5,3 +5,4 @@
 /vendor/
 composer.lock
 /tests/coverage/
+*.sqlite

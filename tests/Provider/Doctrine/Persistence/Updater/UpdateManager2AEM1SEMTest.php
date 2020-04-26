@@ -31,7 +31,7 @@ final class UpdateManager2AEM1SEMTest extends TestCase
         $tagEM = $this->provider->getEntityManagerForEntity(Tag::class);
 
         self::assertSame($authorEM, $postEM, 'Author and Post use the same storage entity manager.');
-        self::assertSame($authorEM, $commentEM, 'Author and Comment do not use the same storage entity manager.');
-        self::assertSame($authorEM, $tagEM, 'Author and Tag do not use the same storage entity manager.');
+        self::assertSame($authorEM, $commentEM, 'Author and Comment use the same storage entity manager.');
+        self::assertSame($authorEM, $tagEM, 'Author and Tag use the same storage entity manager.');
     }
 }

@@ -12,24 +12,16 @@ trait AuditTrait
 {
     /**
      * Returns the primary key value of an entity.
-     *
-     * @param object $entity
-     *
-     * @throws \Doctrine\DBAL\DBALException
-     * @throws \Doctrine\ORM\Mapping\MappingException
-     *
-     * @return mixed
      */
-    private function id(EntityManagerInterface $em, $entity)
+    private function id(EntityManagerInterface $entityManager, $entity)
     {
-        /** @var ClassMetadata $meta */
-        $meta = $em->getClassMetadata(DoctrineHelper::getRealClassName($entity));
+        $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
         $pk = $meta->getSingleIdentifierFieldName();
 
         if (isset($meta->fieldMappings[$pk])) {
             $type = Type::getType($meta->fieldMappings[$pk]['type']);
 
-            return $this->value($em, $type, $meta->getReflectionProperty($pk)->getValue($entity));
+            return $this->value($entityManager, $type, $meta->getReflectionProperty($pk)->getValue($entity));
         }
 
         /**
@@ -43,30 +35,23 @@ trait AuditTrait
 
         $mapping = $meta->getAssociationMapping($pk);
 
-        /** @var ClassMetadata $meta */
-        $meta = $em->getClassMetadata($mapping['targetEntity']);
+        $meta = $entityManager->getClassMetadata($mapping['targetEntity']);
         $pk = $meta->getSingleIdentifierFieldName();
         $type = Type::getType($meta->fieldMappings[$pk]['type']);
 
-        return $this->value($em, $type, $meta->getReflectionProperty($pk)->getValue($targetEntity));
+        return $this->value($entityManager, $type, $meta->getReflectionProperty($pk)->getValue($targetEntity));
     }
 
     /**
      * Type converts the input value and returns it.
-     *
-     * @param mixed $value
-     *
-     * @throws \Doctrine\DBAL\DBALException
-     *
-     * @return mixed
      */
-    private function value(EntityManagerInterface $em, Type $type, $value)
+    private function value(EntityManagerInterface $entityManager, Type $type, $value)
     {
         if (null === $value) {
             return;
         }
 
-        $platform = $em->getConnection()->getDatabasePlatform();
+        $platform = $entityManager->getConnection()->getDatabasePlatform();
 
         switch ($type->getName()) {
             case DoctrineHelper::getDoctrineType('BIGINT'):
@@ -93,38 +78,32 @@ trait AuditTrait
 
     /**
      * Computes a usable diff.
-     *
-     * @param object $entity
-     *
-     * @throws \Doctrine\DBAL\DBALException
-     * @throws \Doctrine\ORM\Mapping\MappingException
      */
-    private function diff(EntityManagerInterface $em, $entity, array $ch): array
+    private function diff(EntityManagerInterface $entityManager, $entity, array $changeset): array
     {
-        /** @var ClassMetadata $meta */
-        $meta = $em->getClassMetadata(DoctrineHelper::getRealClassName($entity));
+        $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
         $diff = [];
 
-        foreach ($ch as $fieldName => [$old, $new]) {
+        foreach ($changeset as $fieldName => [$old, $new]) {
             $o = null;
             $n = null;
 
             if (
-                $meta->hasField($fieldName) &&
                 !isset($meta->embeddedClasses[$fieldName]) &&
-                $this->configuration->isAuditedField($entity, $fieldName)
+                $meta->hasField($fieldName) &&
+                $this->provider->isAuditedField($entity, $fieldName)
             ) {
                 $mapping = $meta->fieldMappings[$fieldName];
                 $type = Type::getType($mapping['type']);
-                $o = $this->value($em, $type, $old);
-                $n = $this->value($em, $type, $new);
+                $o = $this->value($entityManager, $type, $old);
+                $n = $this->value($entityManager, $type, $new);
             } elseif (
                 $meta->hasAssociation($fieldName) &&
                 $meta->isSingleValuedAssociation($fieldName) &&
-                $this->configuration->isAuditedField($entity, $fieldName)
+                $this->provider->isAuditedField($entity, $fieldName)
             ) {
-                $o = $this->summarize($em, $old);
-                $n = $this->summarize($em, $new);
+                $o = $this->summarize($entityManager, $old);
+                $n = $this->summarize($entityManager, $new);
             }
 
             if ($o !== $n) {
@@ -141,26 +120,17 @@ trait AuditTrait
 
     /**
      * Returns an array describing an entity.
-     *
-     * @param object $entity
-     * @param mixed  $id
-     *
-     * @throws \Doctrine\DBAL\DBALException
-     * @throws \Doctrine\ORM\Mapping\MappingException
-     *
-     * @return array
      */
-    private function summarize(EntityManagerInterface $em, $entity = null, $id = null): ?array
+    private function summarize(EntityManagerInterface $entityManager, $entity = null, $id = null): ?array
     {
         if (null === $entity) {
             return null;
         }
 
-        $em->getUnitOfWork()->initializeObject($entity); // ensure that proxies are initialized
-        /** @var ClassMetadata $meta */
-        $meta = $em->getClassMetadata(DoctrineHelper::getRealClassName($entity));
+        $entityManager->getUnitOfWork()->initializeObject($entity); // ensure that proxies are initialized
+        $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
         $pkName = $meta->getSingleIdentifierFieldName();
-        $pkValue = $id ?? $this->id($em, $entity);
+        $pkValue = $id ?? $this->id($entityManager, $entity);
         // An added guard for proxies that fail to initialize.
         if (null === $pkValue) {
             return null;
@@ -191,18 +161,18 @@ trait AuditTrait
         $user_fqdn = null;
         $user_firewall = null;
 
-        $request = $this->configuration->getRequestStack()->getCurrentRequest();
-        if (null !== $request) {
-            $client_ip = $request->getClientIp();
-            $user_firewall = null === $this->configuration->getFirewallMap()->getFirewallConfig($request) ? null : $this->configuration->getFirewallMap()->getFirewallConfig($request)->getName();
-        }
-
-        $user = null === $this->configuration->getUserProvider() ? null : $this->configuration->getUserProvider()->getUser();
-        if ($user instanceof UserInterface) {
-            $user_id = $user->getId();
-            $username = $user->getUsername();
-            $user_fqdn = DoctrineHelper::getRealClassName($user);
-        }
+//        $request = $this->configuration->getRequestStack()->getCurrentRequest();
+//        if (null !== $request) {
+//            $client_ip = $request->getClientIp();
+//            $user_firewall = null === $this->configuration->getFirewallMap()->getFirewallConfig($request) ? null : $this->configuration->getFirewallMap()->getFirewallConfig($request)->getName();
+//        }
+//
+//        $user = null === $this->configuration->getUserProvider() ? null : $this->configuration->getUserProvider()->getUser();
+//        if ($user instanceof UserInterface) {
+//            $user_id = $user->getId();
+//            $username = $user->getUsername();
+//            $user_fqdn = DoctrineHelper::getRealClassName($user);
+//        }
 
         return [
             'user_id' => $user_id,

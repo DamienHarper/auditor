@@ -8,61 +8,69 @@ use Doctrine\DBAL\DriverManager;
 trait ConnectionTrait
 {
     /**
-     * @var Connection
+     * @var Connection[]
      */
-    private static $connection;
+    private static $connections = [];
 
-    private function getConnection(): Connection
+    private function getConnection(string $name = 'default', ?array $params = null): Connection
     {
-        if (null === self::$connection) {
-            self::$connection = $this->createConnection();
+//dump(__METHOD__, $name);
+        if (!isset(self::$connections[$name]) || null === self::$connections[$name]) {
+            self::$connections[$name] = $this->createConnection($params);
         }
 
-        if (false === self::$connection->ping()) {
-            self::$connection->close();
-            self::$connection->connect();
+        if (false === self::$connections[$name]->ping()) {
+            self::$connections[$name]->close();
+            self::$connections[$name]->connect();
         }
 
-        return self::$connection;
+        return self::$connections[$name];
     }
 
-    private function createConnection(): Connection
+    private function createConnection(?array $params = null): Connection
     {
-        $params = self::getConnectionParameters();
+//dump(__METHOD__);
+        $params = self::getConnectionParameters($params);
 
-        if (isset(
-            $GLOBALS['db_type'],
-            $GLOBALS['db_username'],
-            $GLOBALS['db_password'],
-            $GLOBALS['db_host'],
-            $GLOBALS['db_name'],
-            $GLOBALS['db_port']
-        )) {
+        if ('pdo_sqlite' === $params['driver']) {
+            // SQLite
+//dump('SQLite');
+//dump(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2));
+//dump($params);
+            $connection = DriverManager::getConnection($params);
+            $sm = $connection->getSchemaManager();
+            $schema = $sm->createSchema();
+            $stmts = $schema->toDropSql($connection->getDatabasePlatform());
+            foreach ($stmts as $stmt) {
+                $connection->exec($stmt);
+            }
+        } else {
+            // Other
+//dump('Other DB');
             $tmpParams = $params;
             $dbname = $params['dbname'];
             unset($tmpParams['dbname']);
 
-            $conn = DriverManager::getConnection($tmpParams);
-            $platform = $conn->getDatabasePlatform();
+            $connection = DriverManager::getConnection($tmpParams);
 
-            if ($platform->supportsCreateDropDatabase()) {
-                $conn->getSchemaManager()->dropAndCreateDatabase($dbname);
+            if ($connection->getDatabasePlatform()->supportsCreateDropDatabase()) {
+                $connection->getSchemaManager()->dropAndCreateDatabase($dbname);
             } else {
-                $sm = $conn->getSchemaManager();
+                $sm = $connection->getSchemaManager();
                 $schema = $sm->createSchema();
-                $stmts = $schema->toDropSql($conn->getDatabasePlatform());
+                $stmts = $schema->toDropSql($connection->getDatabasePlatform());
                 foreach ($stmts as $stmt) {
-                    $conn->exec($stmt);
+                    $connection->exec($stmt);
                 }
             }
-
-            $conn->close();
         }
+
+        $connection->close();
 
         return DriverManager::getConnection($params);
     }
 
-    private static function getConnectionParameters(): array
+    private static function getConnectionParameters(?array $params = null): array
     {
         if (isset(
             $GLOBALS['db_type'],
@@ -80,11 +88,13 @@ trait ConnectionTrait
                 'dbname' => $GLOBALS['db_name'],
                 'port' => $GLOBALS['db_port'],
             ];
+        } elseif (null !== $params) {
+            // do nothing
         } else {
+            // in memory SQLite DB
             $params = [
                 'driver' => 'pdo_sqlite',
                 'memory' => true,
-//                'path' => __DIR__.'/../../dams.sqlite',
             ];
         }
 

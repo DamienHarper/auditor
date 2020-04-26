@@ -2,44 +2,36 @@
 
 namespace DH\Auditor\Provider\Doctrine\Audit\Transaction;
 
-use DH\Auditor\Model\Transaction;
-use DH\Auditor\Provider\Doctrine\DoctrineProvider;
+use DH\Auditor\Provider\Doctrine\Model\Transaction;
+use DH\Auditor\Provider\ProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\UnitOfWork;
 
 class TransactionHydrator
 {
     use AuditTrait;
 
     /**
-     * @var DoctrineProvider
+     * @var ProviderInterface
      */
     private $provider;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
-    public function __construct(DoctrineProvider $provider)
+    public function __construct(ProviderInterface $provider)
     {
         $this->provider = $provider;
-//        $this->em = $this->provider->getEntityManager();
     }
 
     public function hydrate(Transaction $transaction): void
     {
-        $uow = $this->em->getUnitOfWork();
-
-        $this->hydrateWithScheduledInsertions($transaction, $uow);
-        $this->hydrateWithScheduledUpdates($transaction, $uow);
-        $this->hydrateWithScheduledDeletions($transaction, $uow, $this->em);
-        $this->hydrateWithScheduledCollectionUpdates($transaction, $uow, $this->em);
-        $this->hydrateWithScheduledCollectionDeletions($transaction, $uow, $this->em);
+        $this->hydrateWithScheduledInsertions($transaction, $transaction->getEntityManager());
+        $this->hydrateWithScheduledUpdates($transaction, $transaction->getEntityManager());
+        $this->hydrateWithScheduledDeletions($transaction, $transaction->getEntityManager());
+        $this->hydrateWithScheduledCollectionUpdates($transaction, $transaction->getEntityManager());
+        $this->hydrateWithScheduledCollectionDeletions($transaction, $transaction->getEntityManager());
     }
 
-    private function hydrateWithScheduledInsertions(Transaction $transaction, UnitOfWork $uow): void
+    private function hydrateWithScheduledInsertions(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
+        $uow = $entityManager->getUnitOfWork();
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
             if ($this->provider->isAudited($entity)) {
                 $transaction->trackAuditEvent(Transaction::INSERT, [
@@ -50,8 +42,9 @@ class TransactionHydrator
         }
     }
 
-    private function hydrateWithScheduledUpdates(Transaction $transaction, UnitOfWork $uow): void
+    private function hydrateWithScheduledUpdates(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
+        $uow = $entityManager->getUnitOfWork();
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
             if ($this->provider->isAudited($entity)) {
                 $transaction->trackAuditEvent(Transaction::UPDATE, [
@@ -62,29 +55,23 @@ class TransactionHydrator
         }
     }
 
-    /**
-     * @throws \Doctrine\DBAL\DBALException
-     * @throws \Doctrine\ORM\Mapping\MappingException
-     */
-    private function hydrateWithScheduledDeletions(Transaction $transaction, UnitOfWork $uow, EntityManagerInterface $em): void
+    private function hydrateWithScheduledDeletions(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
+        $uow = $entityManager->getUnitOfWork();
         foreach ($uow->getScheduledEntityDeletions() as $entity) {
             if ($this->provider->isAudited($entity)) {
                 $uow->initializeObject($entity);
                 $transaction->trackAuditEvent(Transaction::REMOVE, [
                     $entity,
-                    $this->id($em, $entity),
+                    $this->id($entityManager, $entity),
                 ]);
             }
         }
     }
 
-    /**
-     * @throws \Doctrine\DBAL\DBALException
-     * @throws \Doctrine\ORM\Mapping\MappingException
-     */
-    private function hydrateWithScheduledCollectionUpdates(Transaction $transaction, UnitOfWork $uow, EntityManagerInterface $em): void
+    private function hydrateWithScheduledCollectionUpdates(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
+        $uow = $entityManager->getUnitOfWork();
         foreach ($uow->getScheduledCollectionUpdates() as $collection) {
             if ($this->provider->isAudited($collection->getOwner())) {
                 $mapping = $collection->getMapping();
@@ -102,7 +89,7 @@ class TransactionHydrator
                         $transaction->trackAuditEvent(Transaction::DISSOCIATE, [
                             $collection->getOwner(),
                             $entity,
-                            $this->id($em, $entity),
+                            $this->id($entityManager, $entity),
                             $mapping,
                         ]);
                     }
@@ -111,12 +98,9 @@ class TransactionHydrator
         }
     }
 
-    /**
-     * @throws \Doctrine\DBAL\DBALException
-     * @throws \Doctrine\ORM\Mapping\MappingException
-     */
-    private function hydrateWithScheduledCollectionDeletions(Transaction $transaction, UnitOfWork $uow, EntityManagerInterface $em): void
+    private function hydrateWithScheduledCollectionDeletions(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
+        $uow = $entityManager->getUnitOfWork();
         foreach ($uow->getScheduledCollectionDeletions() as $collection) {
             if ($this->provider->isAudited($collection->getOwner())) {
                 $mapping = $collection->getMapping();
@@ -125,7 +109,7 @@ class TransactionHydrator
                         $transaction->trackAuditEvent(Transaction::DISSOCIATE, [
                             $collection->getOwner(),
                             $entity,
-                            $this->id($em, $entity),
+                            $this->id($entityManager, $entity),
                             $mapping,
                         ]);
                     }

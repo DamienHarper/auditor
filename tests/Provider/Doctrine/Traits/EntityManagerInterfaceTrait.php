@@ -21,9 +21,9 @@ trait EntityManagerInterfaceTrait
         __DIR__.'/../Fixtures',
     ];
 
-    private function createEntityManager(?array $paths = null, ?EventDispatcherInterface $eventDispatcher = null): EntityManagerInterface
+    private function createEntityManager(?array $paths = null, string $connection = 'default', array $params = null): EntityManagerInterface
     {
-        $config = Setup::createAnnotationMetadataConfiguration(
+        $configuration = Setup::createAnnotationMetadataConfiguration(
             $paths ?? $this->fixturesPath,
             true,
             null,
@@ -33,17 +33,6 @@ trait EntityManagerInterfaceTrait
 
         DoctrineExtensions::registerAnnotations();
 
-        return EntityManager::create($this->getConnection(), $config);
-//        $entityManager = EntityManager::create($connection, $config);
-//
-//        // get rid of more global state
-//        $evm = $connection->getEventManager();
-//        foreach ($evm->getListeners() as $event => $listeners) {
-//            foreach ($listeners as $listener) {
-//                $evm->removeEventListener([$event], $listener);
-//            }
-//        }
-//
-//        return $entityManager;
+        return EntityManager::create($this->getConnection($connection, $params), $configuration);
     }
 }

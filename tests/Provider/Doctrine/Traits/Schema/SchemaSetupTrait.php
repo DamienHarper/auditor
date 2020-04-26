@@ -33,6 +33,9 @@ trait SchemaSetupTrait
             $this->configureEntities();
             $this->setUpEntitySchema($schemaTool, $entityManager);
             $this->setUpAuditSchema($schemaTool, $entityManager);
+        }
+
+        foreach ($this->provider->getStorageEntityManagers() as $name => $entityManager) {
             $this->setupEntities();
         }
     }

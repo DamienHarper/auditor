@@ -114,7 +114,41 @@ class DoctrineProvider extends AbstractProvider
 
     public function persist(LifecycleEvent $event): void
     {
-        // TODO: Implement persist() method.
+//dump(__METHOD__);
+        $payload = $event->getPayload();
+        $auditTable = $payload['table'];
+        $entity = $payload['entity'];
+        unset($payload['table'], $payload['entity']);
+
+        $fields = [
+            'type' => ':type',
+            'object_id' => ':object_id',
+            'discriminator' => ':discriminator',
+            'transaction_hash' => ':transaction_hash',
+            'diffs' => ':diffs',
+            'blame_id' => ':blame_id',
+            'blame_user' => ':blame_user',
+            'blame_user_fqdn' => ':blame_user_fqdn',
+            'blame_user_firewall' => ':blame_user_firewall',
+            'ip' => ':ip',
+            'created_at' => ':created_at',
+        ];
+
+        $query = sprintf(
+            'INSERT INTO %s (%s) VALUES (%s)',
+            $auditTable,
+            implode(', ', array_keys($fields)),
+            implode(', ', array_values($fields))
+        );
+
+        $entityManager = $this->getEntityManagerForEntity($entity);
+        $statement = $entityManager->getConnection()->prepare($query);
+
+        foreach ($payload as $key => $value) {
+            $statement->bindValue($key, $value);
+        }
+
+        $statement->execute();
     }
 
     /**
