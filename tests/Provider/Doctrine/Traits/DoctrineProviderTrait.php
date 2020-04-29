@@ -4,8 +4,10 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Author;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Post;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Traits\AuditorTrait;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -14,49 +16,6 @@ trait DoctrineProviderTrait
     use AuditorTrait;
     use EntityManagerInterfaceTrait;
     use ProviderConfigurationTrait;
-
-    /**
-     * Creates a registered DoctrineProvider with 2 auditing entity managers and 1 storage entity manager.
-     */
-    protected function createDoctrineProviderWith2AEM1SEM(?Configuration $configuration = null): DoctrineProvider
-    {
-        $auditor = $this->createAuditor();
-        $provider = new DoctrineProvider($configuration ?? $this->createProviderConfiguration());
-
-        // Entity manager "aem1" is used for auditing only
-        $provider->registerEntityManager(
-            $this->createEntityManager([
-                __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
-                __DIR__.'/../Fixtures/Entity/Standard',
-            ]),
-            DoctrineProvider::AUDITING_ONLY,
-            'aem1'
-        );
-
-        // Entity manager "aem2" is used for auditing only
-        $provider->registerEntityManager(
-            $this->createEntityManager([
-                __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
-                __DIR__.'/../Fixtures/Entity/Standard',
-            ]),
-            DoctrineProvider::AUDITING_ONLY,
-            'aem2'
-        );
-
-        // Entity manager "sem1" is used for storage only
-        $provider->registerEntityManager(
-            $this->createEntityManager([
-                __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
-                __DIR__.'/../Fixtures/Entity/Standard',
-            ]),
-            DoctrineProvider::STORAGE_ONLY,
-            'sem1'
-        );
-
-        $auditor->registerProvider($provider);
-
-        return $provider;
-    }
 
     /**
      * Creates an unregistered DoctrineProvider with 1 entity manager used both for auditing and storage.
@@ -109,7 +68,7 @@ trait DoctrineProviderTrait
             $this->createEntityManager(
                 [
                     __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
-                    __DIR__.'/../Fixtures/Entity/Standard',
+                    __DIR__.'/../Fixtures/Entity/Standard/Blog',
                 ],
                 'db1',
                 [
@@ -127,7 +86,7 @@ trait DoctrineProviderTrait
             $this->createEntityManager(
                 [
                     __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
-                    __DIR__.'/../Fixtures/Entity/Standard',
+                    __DIR__.'/../Fixtures/Entity/Inheritance',
                 ],
                 'db2',
                 [
@@ -143,8 +102,51 @@ trait DoctrineProviderTrait
 
         $provider->setMappingClosure(function (string $entity, array $storageEntityManagers): EntityManagerInterface {
 //dump(__METHOD__.'('.$entity.'): '.(\in_array($entity, [Author::class, Post::class], true) ?'sem1':'sem2'), $storageEntityManagers);
-            return \in_array($entity, [Author::class, Post::class], true) ? $storageEntityManagers['sem1'] : $storageEntityManagers['sem2'];
+            return \in_array($entity, [Author::class, Post::class, Comment::class, Tag::class], true) ? $storageEntityManagers['sem1'] : $storageEntityManagers['sem2'];
         });
+
+        return $provider;
+    }
+
+    /**
+     * Creates a registered DoctrineProvider with 2 auditing entity managers and 1 storage entity manager.
+     */
+    private function createDoctrineProviderWith2AEM1SEM(?Configuration $configuration = null): DoctrineProvider
+    {
+        $auditor = $this->createAuditor();
+        $provider = new DoctrineProvider($configuration ?? $this->createProviderConfiguration());
+
+        // Entity manager "aem1" is used for auditing only
+        $provider->registerEntityManager(
+            $this->createEntityManager([
+                __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
+                __DIR__.'/../Fixtures/Entity/Standard',
+            ]),
+            DoctrineProvider::AUDITING_ONLY,
+            'aem1'
+        );
+
+        // Entity manager "aem2" is used for auditing only
+        $provider->registerEntityManager(
+            $this->createEntityManager([
+                __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
+                __DIR__.'/../Fixtures/Entity/Inheritance',
+            ]),
+            DoctrineProvider::AUDITING_ONLY,
+            'aem2'
+        );
+
+        // Entity manager "sem1" is used for storage only
+        $provider->registerEntityManager(
+            $this->createEntityManager([
+                __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
+                __DIR__.'/../Fixtures/Entity/Standard',
+            ]),
+            DoctrineProvider::STORAGE_ONLY,
+            'sem1'
+        );
+
+        $auditor->registerProvider($provider);
 
         return $provider;
     }

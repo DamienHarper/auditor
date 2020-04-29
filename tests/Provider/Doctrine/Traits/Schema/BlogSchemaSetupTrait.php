@@ -3,10 +3,10 @@
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits\Schema;
 
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Author;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Comment;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Post;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Tag;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 
 trait BlogSchemaSetupTrait
 {

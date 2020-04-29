@@ -1,7 +1,8 @@
 <?php
 
-namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard;
+namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -86,7 +87,7 @@ class Tag
     /**
      * Add Post entity to collection.
      *
-     * @param \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Basic\Blog\DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Post $post
+     * @param Post $post
      *
      * @return Tag
      */
@@ -100,7 +101,7 @@ class Tag
     /**
      * Remove Post entity from collection.
      *
-     * @param \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Basic\Blog\DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Post $post
+     * @param Post $post
      *
      * @return Tag
      */

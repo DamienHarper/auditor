@@ -1,6 +1,6 @@
 <?php
 
-namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance;
+namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable;
 
 use Doctrine\ORM\Mapping as ORM;
 

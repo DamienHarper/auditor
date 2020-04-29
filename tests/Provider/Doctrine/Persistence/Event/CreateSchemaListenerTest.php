@@ -2,13 +2,13 @@
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Event;
 
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Animal;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Bike;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Car;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Cat;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Dog;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Vehicle;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Author;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Bike;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Car;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Dog;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Vehicle;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\DummyEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use Doctrine\ORM\EntityManagerInterface;

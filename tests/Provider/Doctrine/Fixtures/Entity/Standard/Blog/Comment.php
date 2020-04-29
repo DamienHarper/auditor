@@ -1,8 +1,9 @@
 <?php
 
-namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard;
+namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 
 use DateTime;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
