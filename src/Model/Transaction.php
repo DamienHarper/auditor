@@ -4,11 +4,11 @@ namespace DH\Auditor\Model;
 
 class Transaction
 {
-    public const INSERT = 'inserted';
-    public const UPDATE = 'updated';
-    public const REMOVE = 'removed';
-    public const ASSOCIATE = 'associated';
-    public const DISSOCIATE = 'dissociated';
+    public const INSERT = 'insert';
+    public const UPDATE = 'update';
+    public const REMOVE = 'remove';
+    public const ASSOCIATE = 'associate';
+    public const DISSOCIATE = 'dissociate';
 
     /**
      * @var null|string
@@ -79,6 +79,22 @@ class Transaction
 
     public function trackAuditEvent(string $type, array $data): void
     {
-        $this->{$type}[] = $data;
+        switch ($type) {
+            case self::INSERT:
+                $this->inserted[] = $data;
+                break;
+            case self::UPDATE:
+                $this->updated[] = $data;
+                break;
+            case self::REMOVE:
+                $this->removed[] = $data;
+                break;
+            case self::ASSOCIATE:
+                $this->associated[] = $data;
+                break;
+            case self::DISSOCIATE:
+                $this->dissociated[] = $data;
+                break;
+        }
     }
 }

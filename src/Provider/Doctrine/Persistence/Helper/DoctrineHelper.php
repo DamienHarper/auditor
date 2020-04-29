@@ -29,8 +29,7 @@ final class DoctrineHelper
         // __PM__: Ocramius Proxy Manager (ODM >= 2.0)
         $positionCg = mb_strrpos($class, '\\__CG__\\');
         $positionPm = mb_strrpos($class, '\\__PM__\\');
-        if ((false === $positionCg) &&
-            (false === $positionPm)) {
+        if (false === $positionCg && false === $positionPm) {
             return $class;
         }
         if (false !== $positionCg) {

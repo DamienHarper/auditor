@@ -24,10 +24,12 @@ trait SchemaSetupTrait
 
     protected function setUp(): void
     {
+//dump(__METHOD__);
         // provider with 1 em for both storage and auditing
         $this->createAndInitDoctrineProvider();
 
         foreach ($this->provider->getStorageEntityManagers() as $name => $entityManager) {
+//dump($name);
             $schemaTool = new SchemaTool($entityManager);
 
             $this->configureEntities();
@@ -42,7 +44,9 @@ trait SchemaSetupTrait
 
     protected function tearDown(): void
     {
+//dump(__METHOD__);
         foreach ($this->provider->getStorageEntityManagers() as $name => $entityManager) {
+//dump($name);
             $schemaTool = new SchemaTool($entityManager);
 
             $this->tearDownAuditSchema($schemaTool, $entityManager);
@@ -70,14 +74,11 @@ trait SchemaSetupTrait
             $toSchema = $toSchema->dropTable($table->getName());
         }
 
-        $sql = $fromSchema->getMigrateToSql($toSchema, $schemaManager->getDatabasePlatform());
-        foreach ($sql as $query) {
-//            try {
-//dump($query);
-            $statement = $entityManager->getConnection()->prepare($query);
+        $sqls = $fromSchema->getMigrateToSql($toSchema, $schemaManager->getDatabasePlatform());
+        foreach ($sqls as $sql) {
+//dump($sql);
+            $statement = $entityManager->getConnection()->prepare($sql);
             $statement->execute();
-//            } catch (\Exception $e) {
-//            }
         }
     }
 
@@ -106,13 +107,9 @@ trait SchemaSetupTrait
         $sqls = $fromSchema->getMigrateToSql($schema, $schemaManager->getDatabasePlatform());
 
         foreach ($sqls as $sql) {
-//            try {
 //dump($sql);
             $statement = $entityManager->getConnection()->prepare($sql);
             $statement->execute();
-//            } catch (\Exception $e) {
-//                // something bad happened here :/
-//            }
         }
     }
 
@@ -123,5 +120,20 @@ trait SchemaSetupTrait
 
     private function setupEntities(): void
     {
+    }
+
+    private function flushAll(array $entityManagers): void
+    {
+        $done = [];
+        foreach ($entityManagers as $entity => $entityManager) {
+//dump($entity);
+            $hash = spl_object_hash($entityManager);
+            if (!in_array($hash, $done, true)) {
+//dump($hash);
+                $entityManager->flush();
+//                $entityManager->clear();
+                $done[] = $hash;
+            }
+        }
     }
 }

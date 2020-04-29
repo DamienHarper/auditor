@@ -12,11 +12,6 @@ trait BlogSchemaSetupTrait
 {
     use SchemaSetupTrait;
 
-    /**
-     * @var DoctrineProvider
-     */
-    private $provider;
-
     private function configureEntities(): void
     {
         $this->provider->getConfiguration()->setEntities([
@@ -36,8 +31,8 @@ trait BlogSchemaSetupTrait
      *   +Post 3
      *      +Comment 2
      *      +Comment 3
-     * +-Author 3
-     *   +-Post 4
+     * +Author 3
+     *   +Post 4
      * +Tag 1
      * +Tag 2
      * +Tag 3
@@ -49,10 +44,15 @@ trait BlogSchemaSetupTrait
      * +PostTag 3.3
      * +PostTag 3.5
      * +-PostTag 4.4
-     * +-PostTag 4.5.
+     * +-PostTag 4.5
+     * Author 3
+     *   -Post 4
+     * -Author 3
      */
     private function setupEntities(): void
     {
+//dump(__METHOD__);
+//dump(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2));
         $entityManagers = [
             Author::class => $this->provider->getEntityManagerForEntity(Author::class),
             Post::class => $this->provider->getEntityManagerForEntity(Post::class),
@@ -136,7 +136,7 @@ trait BlogSchemaSetupTrait
         $author3 = new Author();
         $author3
             ->setFullname('Luke Slywalker')
-            ->setEmail('luck.skywalker@gmail.com')
+            ->setEmail('luke.skywalker@gmail.com')
         ;
         $entityManagers[Author::class]->persist($author3);
 
@@ -199,12 +199,5 @@ trait BlogSchemaSetupTrait
 
         $entityManagers[Author::class]->remove($author3);
         $this->flushAll($entityManagers);
-    }
-
-    private function flushAll(array $entityManagers): void
-    {
-        foreach ($entityManagers as $entity => $entityManager) {
-            $entityManager->flush();
-        }
     }
 }

@@ -21,7 +21,7 @@ trait EntityManagerInterfaceTrait
         __DIR__.'/../Fixtures',
     ];
 
-    private function createEntityManager(?array $paths = null, string $connection = 'default', array $params = null): EntityManagerInterface
+    private function createEntityManager(?array $paths = null, string $connectionName = 'default', array $params = null): EntityManagerInterface
     {
         $configuration = Setup::createAnnotationMetadataConfiguration(
             $paths ?? $this->fixturesPath,
@@ -33,6 +33,17 @@ trait EntityManagerInterfaceTrait
 
         DoctrineExtensions::registerAnnotations();
 
-        return EntityManager::create($this->getConnection($connection, $params), $configuration);
+        $connection = $this->getConnection($connectionName, $params);
+
+        // get rid of previously attached listeners (connections are re-used)
+        // this can be safely removed if connections are not shared (freshly created for each test)
+        $evm = $connection->getEventManager();
+        foreach ($evm->getListeners() as $event => $listeners) {
+            foreach ($listeners as $listener) {
+                $evm->removeEventListener([$event], $listener);
+            }
+        }
+
+        return EntityManager::create($connection, $configuration);
     }
 }

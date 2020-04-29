@@ -114,24 +114,24 @@ final class DoctrineProviderTest extends TestCase
         self::assertSame($expected, $provider->getAuditingEntityManagers(), 'Default name is "default".');
     }
 
-    public function testIsMapperRequired(): void
+    public function testIsStorageMapperRequired(): void
     {
         $provider = $this->createUnregisteredDoctrineProvider();
 
-        self::assertFalse($provider->isMapperRequired(), 'Mapper is not required since there is strictly less than 2 storage entity manager.');
+        self::assertFalse($provider->isStorageMapperRequired(), 'Mapper is not required since there is strictly less than 2 storage entity manager.');
 
         $entityManager = $this->createEntityManager();
         $provider->registerEntityManager($entityManager, DoctrineProvider::BOTH, 'EM1');
 
-        self::assertFalse($provider->isMapperRequired(), 'Mapper is not required since there is strictly less than 2 storage entity manager.');
+        self::assertFalse($provider->isStorageMapperRequired(), 'Mapper is not required since there is strictly less than 2 storage entity manager.');
 
         $entityManager = $this->createEntityManager();
         $provider->registerEntityManager($entityManager, DoctrineProvider::BOTH, 'EM2');
 
-        self::assertTrue($provider->isMapperRequired(), 'Mapper is required since there is more than 2 storage entity managers.');
+        self::assertTrue($provider->isStorageMapperRequired(), 'Mapper is required since there is more than 2 storage entity managers.');
     }
 
-    public function testSetMappingClosure(): void
+    public function testSetStorageMapper(): void
     {
         $provider = $this->createUnregisteredDoctrineProvider();
 
@@ -141,14 +141,14 @@ final class DoctrineProviderTest extends TestCase
         $provider->registerEntityManager($entityManager1, DoctrineProvider::BOTH, 'EM1');
         $provider->registerEntityManager($entityManager2, DoctrineProvider::BOTH, 'EM2');
 
-        self::assertNull($provider->getMappingClosure(), 'Mapping closure is not set.');
+        self::assertNull($provider->getStorageMapper(), 'Mapping closure is not set.');
 
-        $provider->setMappingClosure(function (string $entity, array $storageEntityManagers): EntityManagerInterface {
+        $provider->setStorageMapper(function (string $entity, array $storageEntityManagers): EntityManagerInterface {
             // Audit records regarding entities starting with "foo" are mapped to "EM1", others are mapped to "EM2"
             return 0 === strpos($entity, 'Foo') ? $storageEntityManagers['EM1'] : $storageEntityManagers['EM2'];
         });
 
-        self::assertNotNull($provider->getMappingClosure(), 'Mapping closure is set.');
+        self::assertNotNull($provider->getStorageMapper(), 'Mapping closure is set.');
 
         self::assertSame($entityManager1, $provider->getEntityManagerForEntity('Foo1'), 'EM1 is used.');
         self::assertSame($entityManager1, $provider->getEntityManagerForEntity('Foo2'), 'EM1 is used.');
@@ -449,10 +449,5 @@ final class DoctrineProviderTest extends TestCase
         $provider = $this->createDoctrineProvider();
 
         self:self::assertInstanceOf(Configuration::class, $provider->getConfiguration(), 'Configuration is reachable.');
-    }
-
-    public function testPersist(): void
-    {
-        self::markTestIncomplete('Not yet implemented.');
     }
 }

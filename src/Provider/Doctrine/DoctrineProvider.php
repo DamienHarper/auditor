@@ -43,7 +43,17 @@ class DoctrineProvider extends AbstractProvider
     /**
      * @var Closure
      */
-    private $mapper;
+    private $storageMapper;
+
+    /**
+     * @var Closure
+     */
+    private $userProvider;
+
+    /**
+     * @var Closure
+     */
+    private $rolesChecker;
 
     public function __construct(Configuration $configuration)
     {
@@ -88,33 +98,63 @@ class DoctrineProvider extends AbstractProvider
         return $this;
     }
 
-    public function setMappingClosure(Closure $mapper): self
+    public function setStorageMapper(Closure $mapper): self
     {
-        $this->mapper = $mapper;
+        $this->storageMapper = $mapper;
 
         return $this;
     }
 
-    public function getMappingClosure(): ?Closure
+    public function getStorageMapper(): ?Closure
     {
-        return $this->mapper;
+        return $this->storageMapper;
+    }
+
+    public function isStorageMapperRequired(): bool
+    {
+        return \count($this->storageEntityManagers) > 1;
+    }
+
+    public function setUserProvider(Closure $userProvider): self
+    {
+        $this->userProvider = $userProvider;
+
+        return $this;
+    }
+
+    public function getUserProvider(): ?Closure
+    {
+        return $this->userProvider;
+    }
+
+    public function setRolesChecker(Closure $rolesChecker): self
+    {
+        $this->rolesChecker = $rolesChecker;
+
+        return $this;
+    }
+
+    public function getRolesChecker(): ?Closure
+    {
+        return $this->rolesChecker;
     }
 
     public function getEntityManagerForEntity(string $entity): EntityManagerInterface
     {
-        $this->checkMapper();
+        $this->checkStorageMapper();
 
-        if (null === $this->mapper && 1 === count($this->getStorageEntityManagers())) {
+        if (null === $this->storageMapper && 1 === count($this->getStorageEntityManagers())) {
             // No mapper and only 1 storage entity manager
             return array_values($this->storageEntityManagers)[0];
         }
 
-        return $this->mapper->call($this, $entity, $this->getStorageEntityManagers());
+        return $this->storageMapper->call($this, $entity, $this->getStorageEntityManagers());
     }
 
     public function persist(LifecycleEvent $event): void
     {
 //dump(__METHOD__);
+//dump($event);
         $payload = $event->getPayload();
         $auditTable = $payload['table'];
         $entity = $payload['entity'];
@@ -278,6 +318,11 @@ class DoctrineProvider extends AbstractProvider
         $this->storageEntityManagers[$name] = $entityManager;
 
         $evm = $entityManager->getEventManager();
+//dump(__METHOD__);
+//foreach ($evm->getListeners() as $listener) {
+//    dump(get_class(array_values($listener)[0]));
+////    dump(get_class($listener));
+//}
         $evm->addEventSubscriber(new CreateSchemaListener($this));
 
         return $this;
@@ -291,17 +336,17 @@ class DoctrineProvider extends AbstractProvider
         $this->auditingEntityManagers[$name] = $entityManager;
 
         $evm = $entityManager->getEventManager();
+//dump(__METHOD__);
+//foreach ($evm->getListeners() as $listener) {
+//    dump(get_class(array_values($listener)[0]));
+////    dump(get_class($listener));
+//}
         $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager));
         $evm->addEventSubscriber(new SoftDeleteableListener());
 
         $this->loadAnnotations($entityManager);
 
         return $this;
-    }
-
-    public function isMapperRequired(): bool
-    {
-        return \count($this->storageEntityManagers) > 1;
     }
 
     private function loadAnnotations(EntityManagerInterface $entityManager): self
@@ -315,11 +360,16 @@ class DoctrineProvider extends AbstractProvider
         return $this;
     }
 
-    private function checkMapper(): self
+    private function checkStorageMapper(): self
     {
-        if (null === $this->mapper && $this->isMapperRequired()) {
+        if (null === $this->storageMapper && $this->isStorageMapperRequired()) {
             throw new ProviderException('You must provide a mapper function to map audits to storage.');
         }
+
+//        if (null === $this->storageMapper && 1 === count($this->getStorageEntityManagers())) {
+//            // No mapper and only 1 storage entity manager
+//            return array_values($this->storageEntityManagers)[0];
+//        }
 
         return $this;
     }

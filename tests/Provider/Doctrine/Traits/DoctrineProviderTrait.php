@@ -34,7 +34,12 @@ trait DoctrineProviderTrait
         $provider = new DoctrineProvider($configuration ?? $this->createProviderConfiguration());
 
         // Entity manager "default" is used both for auditing and storage
-        $provider->registerEntityManager($this->createEntityManager());
+        $provider->registerEntityManager($this->createEntityManager(
+            [
+                __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
+                __DIR__.'/../Fixtures/Entity/Standard/Blog',
+            ]
+        ));
         $auditor->registerProvider($provider);
 
         return $provider;
@@ -100,7 +105,7 @@ trait DoctrineProviderTrait
 
         $auditor->registerProvider($provider);
 
-        $provider->setMappingClosure(function (string $entity, array $storageEntityManagers): EntityManagerInterface {
+        $provider->setStorageMapper(function (string $entity, array $storageEntityManagers): EntityManagerInterface {
 //dump(__METHOD__.'('.$entity.'): '.(\in_array($entity, [Author::class, Post::class], true) ?'sem1':'sem2'), $storageEntityManagers);
             return \in_array($entity, [Author::class, Post::class, Comment::class, Tag::class], true) ? $storageEntityManagers['sem1'] : $storageEntityManagers['sem2'];
         });
