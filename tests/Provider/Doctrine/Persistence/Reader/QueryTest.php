@@ -5,8 +5,8 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Query;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ConnectionTrait;
+use DH\Auditor\Tests\Traits\ReflectionTrait;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 /**
  * @internal
@@ -14,6 +14,7 @@ use ReflectionClass;
 final class QueryTest extends TestCase
 {
     use ConnectionTrait;
+    use ReflectionTrait;
 
     public function testNoFiltersByDefault(): void
     {
@@ -205,15 +206,6 @@ final class QueryTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
         $query->limit(0, -50);
-    }
-
-    private function reflectMethod(Query $query, string $method): \ReflectionMethod
-    {
-        $reflectedClass = new ReflectionClass($query);
-        $reflectedMethod = $reflectedClass->getMethod($method);
-        $reflectedMethod->setAccessible(true);
-
-        return $reflectedMethod;
     }
 
     /**

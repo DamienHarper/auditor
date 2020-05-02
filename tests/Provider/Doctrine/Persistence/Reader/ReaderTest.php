@@ -13,6 +13,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\BlogSchemaSetupTrait;
+use DH\Auditor\Tests\Traits\ReflectionTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException as OptionsResolverInvalidArgumentException;
 
@@ -23,6 +24,7 @@ final class ReaderTest extends TestCase
 {
     use BlogSchemaSetupTrait;
     use ReaderTrait;
+    use ReflectionTrait;
 
     public function testCheckAuditable(): void
     {
@@ -35,11 +37,8 @@ final class ReaderTest extends TestCase
         $this->provider->getConfiguration()->setEntities($entities);
         $reader = $this->createReader();
 
-        $reflectedClass = new \ReflectionClass($reader);
-        $reflectedMethod = $reflectedClass->getMethod('checkAuditable');
-        $reflectedMethod->setAccessible(true);
-
         // below should not throw exception as Post is auditable
+        $reflectedMethod = $this->reflectMethod($reader, 'checkAuditable');
         $reflectedMethod->invokeArgs($reader, [Post::class]);
 
         // ensure an exception is thrown with an undefined entity

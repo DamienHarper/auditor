@@ -9,6 +9,7 @@ use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Updater\UpdateManager;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
+use DH\Auditor\Tests\Traits\ReflectionTrait;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
@@ -22,6 +23,7 @@ use PHPUnit\Framework\TestCase;
 final class UpdateManagerTest extends TestCase
 {
     use DefaultSchemaSetupTrait;
+    use ReflectionTrait;
 
     public function testCreateAuditTable(): void
     {
@@ -178,13 +180,10 @@ final class UpdateManagerTest extends TestCase
         $table = $toSchema->getTable('author_audit');
         $columns = $schemaManager->listTableColumns($authorAuditTable->getName());
 
-        $reflectedClass = new \ReflectionClass($updater);
-        $reflectedMethod = $reflectedClass->getMethod('processColumns');
-        $reflectedMethod->setAccessible(true);
+        $reflectedMethod = $this->reflectMethod($updater, 'processColumns');
         $reflectedMethod->invokeArgs($updater, [$table, $columns, $alternateColumns]);
 
-        $reflectedMethod = $reflectedClass->getMethod('processIndices');
-        $reflectedMethod->setAccessible(true);
+        $reflectedMethod = $this->reflectMethod($updater, 'processIndices');
         $reflectedMethod->invokeArgs($updater, [$table, $alternateIndices]);
 
         $this->migrate($fromSchema, $toSchema, $entityManager, $schemaManager->getDatabasePlatform(), true);
