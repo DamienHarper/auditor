@@ -67,8 +67,19 @@ trait DoctrineProviderTrait
             'aem1'
         );
 
+        $db = self::getConnectionParameters();
+
         // Entity manager "sem1" is used for storage only
 //dump('Entity manager "sem1" is used for storage only');
+        if (!empty($db)) {
+            $db['dbname'] = 'db1';
+        } else {
+            $db = [
+                'driver' => 'pdo_sqlite',
+                'path' => __DIR__.'/../../db1.sqlite',
+            ];
+        }
+//dump('sem1', $db);
         $provider->registerEntityManager(
             $this->createEntityManager(
                 [
@@ -76,10 +87,7 @@ trait DoctrineProviderTrait
                     __DIR__.'/../Fixtures/Entity/Standard/Blog',
                 ],
                 'db1',
-                [
-                    'driver' => 'pdo_sqlite',
-                    'path' => __DIR__.'/../../db1.sqlite',
-                ]
+                $db
             ),
             DoctrineProvider::STORAGE_ONLY,
             'sem1'
@@ -87,6 +95,15 @@ trait DoctrineProviderTrait
 
         // Entity manager "sem2" is used for storage only
 //dump('Entity manager "sem2" is used for storage only');
+        if (!empty($db)) {
+            $db['dbname'] = 'db2';
+        } else {
+            $db = [
+                'driver' => 'pdo_sqlite',
+                'path' => __DIR__.'/../../db2.sqlite',
+            ];
+        }
+//dump('sem2', $db);
         $provider->registerEntityManager(
             $this->createEntityManager(
                 [
@@ -94,10 +111,7 @@ trait DoctrineProviderTrait
                     __DIR__.'/../Fixtures/Entity/Inheritance',
                 ],
                 'db2',
-                [
-                    'driver' => 'pdo_sqlite',
-                    'path' => __DIR__.'/../../db2.sqlite',
-                ]
+                $db
             ),
             DoctrineProvider::STORAGE_ONLY,
             'sem2'

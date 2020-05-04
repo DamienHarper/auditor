@@ -16,6 +16,7 @@ trait ConnectionTrait
     {
 //dump(__METHOD__, $name);
         if (!isset(self::$connections[$name]) || null === self::$connections[$name]) {
+//dump('create', $params);
             self::$connections[$name] = $this->createConnection($params);
         }
 
@@ -34,7 +35,7 @@ trait ConnectionTrait
 
         if ('pdo_sqlite' === $params['driver']) {
             // SQLite
-//dump('SQLite');
+//dump('SQLite', $params);
 //dump(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2));
 //dump($params);
             $connection = DriverManager::getConnection($params);
@@ -46,7 +47,7 @@ trait ConnectionTrait
             }
         } else {
             // Other
-//dump('Other DB');
+//dump('Other DB', $params);
             $tmpParams = $params;
             $dbname = $params['dbname'];
             unset($tmpParams['dbname']);
@@ -54,6 +55,7 @@ trait ConnectionTrait
             $connection = DriverManager::getConnection($tmpParams);
 
             if ($connection->getDatabasePlatform()->supportsCreateDropDatabase()) {
+//dump('dropAndCreateDatabase: '.$dbname);
                 $connection->getSchemaManager()->dropAndCreateDatabase($dbname);
             } else {
                 $sm = $connection->getSchemaManager();
@@ -72,7 +74,7 @@ trait ConnectionTrait
 
     private static function getConnectionParameters(?array $params = null): array
     {
-        if (isset(
+        if (null === $params && !isset(
             $GLOBALS['db_type'],
             $GLOBALS['db_username'],
             $GLOBALS['db_password'],
@@ -80,24 +82,27 @@ trait ConnectionTrait
             $GLOBALS['db_name'],
             $GLOBALS['db_port']
         )) {
-            $params = [
-                'driver' => $GLOBALS['db_type'],
-                'user' => $GLOBALS['db_username'],
-                'password' => $GLOBALS['db_password'],
-                'host' => $GLOBALS['db_host'],
-                'dbname' => $GLOBALS['db_name'],
-                'port' => $GLOBALS['db_port'],
-            ];
-        } elseif (null !== $params) {
-            // do nothing
-        } else {
             // in memory SQLite DB
-            $params = [
+            return [
                 'driver' => 'pdo_sqlite',
                 'memory' => true,
             ];
         }
 
-        return $params;
+        if (null !== $params) {
+            // provided params take precedence
+//dump($params);
+            return $params;
+        }
+
+        // fallback to what's defined in $GLOBALS (from phpunit config file)
+        return [
+            'driver' => $GLOBALS['db_type'],
+            'user' => $GLOBALS['db_username'],
+            'password' => $GLOBALS['db_password'],
+            'host' => $GLOBALS['db_host'],
+            'dbname' => $GLOBALS['db_name'],
+            'port' => $GLOBALS['db_port'],
+        ];
     }
 }

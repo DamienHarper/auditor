@@ -84,7 +84,7 @@ This configuration expects to connect to a PostgreSQL database.
 Assuming you have docker installed, you can easily start a PostgreSQL server with following command (PostgreSQL 11)
 
 ```bash
-docker run --name postgres_db -e POSTGRES_DB=auditor -d -p 5432:5432 postgres
+docker run --name postgres_db -e POSTGRES_DB=auditor  -e POSTGRES_HOST_AUTH_METHOD=trust -d -p 5432:5432 postgres
 ```
 
 

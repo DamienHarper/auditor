@@ -2,7 +2,6 @@
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Updater;
 
-use DH\Auditor\Provider\Doctrine\Persistence\Updater\UpdateManager;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Dog;
@@ -14,7 +13,6 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\BlogSchemaSetupTrait;
-use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -23,28 +21,6 @@ use PHPUnit\Framework\TestCase;
 final class UpdateManager1AEM2SEMTest extends TestCase
 {
     use BlogSchemaSetupTrait;
-
-    private function configureEntities(): void
-    {
-        $this->provider->getConfiguration()->setEntities([
-            Author::class => ['enabled' => true],
-            Post::class => ['enabled' => true],
-            Comment::class => ['enabled' => true],
-            Tag::class => ['enabled' => true],
-
-            Animal::class => ['enabled' => true],
-            Cat::class => ['enabled' => true],
-            Dog::class => ['enabled' => true],
-            Vehicle::class => ['enabled' => true],
-            Bike::class => ['enabled' => true],
-            Car::class => ['enabled' => true],
-        ]);
-    }
-
-    private function createAndInitDoctrineProvider(): void
-    {
-        $this->provider = $this->createDoctrineProviderWith1AEM2SEM();
-    }
 
     public function testEntityManagerSetup(): void
     {
@@ -74,9 +50,31 @@ final class UpdateManager1AEM2SEMTest extends TestCase
 
         foreach ($entityManagers as $name => $entityManager) {
             $schemaManager = $entityManager->getConnection()->getSchemaManager();
-            $tables = array_map(static function($t) {return $t->getName();}, $schemaManager->listTables());
+            $tables = array_map(static function ($t) {return $t->getName(); }, $schemaManager->listTables());
             sort($tables);
             self::assertSame($expected[$name], $tables, 'Schema of "'.$name.'" is correct.');
         }
+    }
+
+    private function configureEntities(): void
+    {
+        $this->provider->getConfiguration()->setEntities([
+            Author::class => ['enabled' => true],
+            Post::class => ['enabled' => true],
+            Comment::class => ['enabled' => true],
+            Tag::class => ['enabled' => true],
+
+            Animal::class => ['enabled' => true],
+            Cat::class => ['enabled' => true],
+            Dog::class => ['enabled' => true],
+            Vehicle::class => ['enabled' => true],
+            Bike::class => ['enabled' => true],
+            Car::class => ['enabled' => true],
+        ]);
+    }
+
+    private function createAndInitDoctrineProvider(): void
+    {
+        $this->provider = $this->createDoctrineProviderWith1AEM2SEM();
     }
 }
