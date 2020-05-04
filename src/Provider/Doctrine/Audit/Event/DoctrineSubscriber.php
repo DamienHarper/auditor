@@ -36,15 +36,7 @@ class DoctrineSubscriber implements EventSubscriber
      */
     public function onFlush(OnFlushEventArgs $args): void
     {
-//dump(__METHOD__);
-//dump(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10));
         $entityManager = $args->getEntityManager();
-//foreach ($entityManager->getEventManager()->getListeners() as $listener) {
-//    dump('>>> '.get_class(array_values($listener)[0]));
-////    dump(get_class($listener));
-//}
-
-//dump('create new transaction');
         $transaction = new Transaction($entityManager);
 
         // extend the SQL logger
@@ -52,7 +44,6 @@ class DoctrineSubscriber implements EventSubscriber
         $auditLogger = new Logger(function () use ($entityManager, $transaction): void {
             // flushes pending data
             $entityManager->getConnection()->getConfiguration()->setSQLLogger($this->loggerBackup);
-//dump('process transaction');
             $this->transactionManager->process($transaction);
         });
 
@@ -69,7 +60,6 @@ class DoctrineSubscriber implements EventSubscriber
         $entityManager->getConnection()->getConfiguration()->setSQLLogger($loggerChain);
 
         // Populate transaction
-//dump('hydrate transaction');
         $this->transactionManager->populate($transaction);
     }
 

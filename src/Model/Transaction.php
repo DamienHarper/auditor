@@ -82,18 +82,23 @@ class Transaction
         switch ($type) {
             case self::INSERT:
                 $this->inserted[] = $data;
+
                 break;
             case self::UPDATE:
                 $this->updated[] = $data;
+
                 break;
             case self::REMOVE:
                 $this->removed[] = $data;
+
                 break;
             case self::ASSOCIATE:
                 $this->associated[] = $data;
+
                 break;
             case self::DISSOCIATE:
                 $this->dissociated[] = $data;
+
                 break;
         }
     }

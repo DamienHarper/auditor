@@ -17,19 +17,12 @@ trait SchemaSetupTrait
      */
     private $provider;
 
-    private function createAndInitDoctrineProvider(): void
-    {
-        $this->provider = $this->createDoctrineProvider();
-    }
-
     protected function setUp(): void
     {
-//dump(__METHOD__);
         // provider with 1 em for both storage and auditing
         $this->createAndInitDoctrineProvider();
 
         foreach ($this->provider->getStorageEntityManagers() as $name => $entityManager) {
-//dump($name);
             $schemaTool = new SchemaTool($entityManager);
 
             $this->configureEntities();
@@ -44,9 +37,7 @@ trait SchemaSetupTrait
 
     protected function tearDown(): void
     {
-//dump(__METHOD__);
         foreach ($this->provider->getStorageEntityManagers() as $name => $entityManager) {
-//dump($name);
             $schemaTool = new SchemaTool($entityManager);
 
             $this->tearDownAuditSchema($schemaTool, $entityManager);
@@ -56,42 +47,41 @@ trait SchemaSetupTrait
 
     protected function setUpEntitySchema(SchemaTool $schemaTool, EntityManagerInterface $entityManager): void
     {
-//dump(__METHOD__);
         $classes = $entityManager->getMetadataFactory()->getAllMetadata();
         $schemaTool->createSchema($classes);
     }
 
     protected function tearDownEntitySchema(SchemaTool $schemaTool, EntityManagerInterface $entityManager): void
     {
-//dump(__METHOD__);
         $schemaManager = $entityManager->getConnection()->getSchemaManager();
         $fromSchema = $schemaManager->createSchema();
         $toSchema = clone $fromSchema;
 
         $tables = $fromSchema->getTables();
-//dump('tables:', array_map(static function($t) {return $t->getName();}, $tables));
         foreach ($tables as $table) {
             $toSchema = $toSchema->dropTable($table->getName());
         }
 
         $sqls = $fromSchema->getMigrateToSql($toSchema, $schemaManager->getDatabasePlatform());
         foreach ($sqls as $sql) {
-//dump($sql);
             $statement = $entityManager->getConnection()->prepare($sql);
             $statement->execute();
         }
     }
 
+    private function createAndInitDoctrineProvider(): void
+    {
+        $this->provider = $this->createDoctrineProvider();
+    }
+
     private function setUpAuditSchema(SchemaTool $schemaTool, EntityManagerInterface $entityManager): void
     {
-//dump(__METHOD__);
         $updater = new UpdateManager($this->provider);
         $updater->updateAuditSchema();
     }
 
     private function tearDownAuditSchema(SchemaTool $schemaTool, EntityManagerInterface $entityManager): void
     {
-//dump(__METHOD__);
         $schemaManager = $entityManager->getConnection()->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $fromSchema = clone $schema;
@@ -107,7 +97,6 @@ trait SchemaSetupTrait
         $sqls = $fromSchema->getMigrateToSql($schema, $schemaManager->getDatabasePlatform());
 
         foreach ($sqls as $sql) {
-//dump($sql);
             $statement = $entityManager->getConnection()->prepare($sql);
             $statement->execute();
         }
@@ -126,12 +115,9 @@ trait SchemaSetupTrait
     {
         $done = [];
         foreach ($entityManagers as $entity => $entityManager) {
-//dump($entity);
             $hash = spl_object_hash($entityManager);
-            if (!in_array($hash, $done, true)) {
-//dump($hash);
+            if (!\in_array($hash, $done, true)) {
                 $entityManager->flush();
-//                $entityManager->clear();
                 $done[] = $hash;
             }
         }

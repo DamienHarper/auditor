@@ -3,10 +3,10 @@
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Event;
 
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Bike;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Car;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Dog;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Bike;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Car;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Vehicle;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\DummyEntity;
@@ -62,20 +62,6 @@ final class CreateSchemaListenerTest extends TestCase
         self::assertNotContains('animal_audit', $tableNames);
     }
 
-    private function getTables(): array
-    {
-        $entityManager = array_values($this->provider->getStorageEntityManagers())[0];
-        $schemaManager = $entityManager->getConnection()->getSchemaManager();
-
-        $tableNames = [];
-
-        foreach ($schemaManager->listTables() as $table) {
-            $tableNames[] = $table->getName();
-        }
-
-        return $tableNames;
-    }
-
     protected function setUpEntitySchema(SchemaTool $schemaTool, EntityManagerInterface $entityManager): void
     {
         $this->provider
@@ -110,5 +96,19 @@ final class CreateSchemaListenerTest extends TestCase
         }
 
         $schemaTool->createSchema($metaClasses);    // !!! triggers CreateSchemaListener !!!
+    }
+
+    private function getTables(): array
+    {
+        $entityManager = array_values($this->provider->getStorageEntityManagers())[0];
+        $schemaManager = $entityManager->getConnection()->getSchemaManager();
+
+        $tableNames = [];
+
+        foreach ($schemaManager->listTables() as $table) {
+            $tableNames[] = $table->getName();
+        }
+
+        return $tableNames;
     }
 }

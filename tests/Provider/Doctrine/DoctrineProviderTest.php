@@ -145,7 +145,7 @@ final class DoctrineProviderTest extends TestCase
 
         $provider->setStorageMapper(function (string $entity, array $storageEntityManagers): EntityManagerInterface {
             // Audit records regarding entities starting with "foo" are mapped to "EM1", others are mapped to "EM2"
-            return 0 === strpos($entity, 'Foo') ? $storageEntityManagers['EM1'] : $storageEntityManagers['EM2'];
+            return 0 === mb_strpos($entity, 'Foo') ? $storageEntityManagers['EM1'] : $storageEntityManagers['EM2'];
         });
 
         self::assertNotNull($provider->getStorageMapper(), 'Mapping closure is set.');

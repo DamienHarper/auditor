@@ -24,7 +24,6 @@ class CreateSchemaListener implements EventSubscriber
 
     public function postGenerateSchemaTable(GenerateSchemaTableEventArgs $eventArgs): void
     {
-//dump(__METHOD__.'('.$eventArgs->getClassMetadata()->name.')');
         $metadata = $eventArgs->getClassMetadata();
 
         // check inheritance type and returns if unsupported

@@ -28,7 +28,6 @@ final class ReaderTest extends TestCase
 
     public function testCheckAuditable(): void
     {
-//dump(__METHOD__);
         $entities = [
             Post::class => null,
             Comment::class => null,
@@ -48,7 +47,6 @@ final class ReaderTest extends TestCase
 
     public function testGetEntityTableName(): void
     {
-//dump(__METHOD__);
         $entities = [
             Post::class => null,
             Comment::class => null,
@@ -66,7 +64,6 @@ final class ReaderTest extends TestCase
      */
     public function testGetEntityTableAuditName(): void
     {
-//dump(__METHOD__);
         $entities = [
             Post::class => null,
             Comment::class => null,
@@ -81,13 +78,10 @@ final class ReaderTest extends TestCase
 
     public function testGetAudits(): void
     {
-//dump(__METHOD__);
         $reader = $this->createReader();
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class)->execute();
-//dump($audits);
-
         $audits[0]->id = $audits[0]->getId();   // used to trigger Entry::__set()
         self::assertIsInt($audits[0]->getId());
         self::assertIsInt($audits[0]->id);

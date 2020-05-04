@@ -143,7 +143,7 @@ class DoctrineProvider extends AbstractProvider
     {
         $this->checkStorageMapper();
 
-        if (null === $this->storageMapper && 1 === count($this->getStorageEntityManagers())) {
+        if (null === $this->storageMapper && 1 === \count($this->getStorageEntityManagers())) {
             // No mapper and only 1 storage entity manager
             return array_values($this->storageEntityManagers)[0];
         }
@@ -153,8 +153,6 @@ class DoctrineProvider extends AbstractProvider
 
     public function persist(LifecycleEvent $event): void
     {
-//dump(__METHOD__);
-//dump($event);
         $payload = $event->getPayload();
         $auditTable = $payload['table'];
         $entity = $payload['entity'];
@@ -199,8 +197,6 @@ class DoctrineProvider extends AbstractProvider
     public function isAuditable($entity): bool
     {
         $class = DoctrineHelper::getRealClassName($entity);
-//dump(__METHOD__.'('.$class.'): '.(\array_key_exists($class, $this->configuration->getEntities())?'true':'false'));
-
         // is $entity part of audited entities?
         if (!\array_key_exists($class, $this->configuration->getEntities())) {
             // no => $entity is not audited
@@ -318,11 +314,6 @@ class DoctrineProvider extends AbstractProvider
         $this->storageEntityManagers[$name] = $entityManager;
 
         $evm = $entityManager->getEventManager();
-//dump(__METHOD__);
-//foreach ($evm->getListeners() as $listener) {
-//    dump(get_class(array_values($listener)[0]));
-////    dump(get_class($listener));
-//}
         $evm->addEventSubscriber(new CreateSchemaListener($this));
 
         return $this;
@@ -336,11 +327,6 @@ class DoctrineProvider extends AbstractProvider
         $this->auditingEntityManagers[$name] = $entityManager;
 
         $evm = $entityManager->getEventManager();
-//dump(__METHOD__);
-//foreach ($evm->getListeners() as $listener) {
-//    dump(get_class(array_values($listener)[0]));
-////    dump(get_class($listener));
-//}
         $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager));
         $evm->addEventSubscriber(new SoftDeleteableListener());
 

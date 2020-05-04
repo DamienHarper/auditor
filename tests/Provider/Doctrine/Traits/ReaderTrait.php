@@ -10,7 +10,7 @@ trait ReaderTrait
 //    use DoctrineProviderTrait;
 
     /**
-     * Creates a Reader
+     * Creates a Reader.
      */
     private function createReader(?DoctrineProvider $provider = null): Reader
     {

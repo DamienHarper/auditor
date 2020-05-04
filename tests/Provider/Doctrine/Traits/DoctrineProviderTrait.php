@@ -50,12 +50,10 @@ trait DoctrineProviderTrait
      */
     private function createDoctrineProviderWith1AEM2SEM(?Configuration $configuration = null): DoctrineProvider
     {
-//dump(__METHOD__);
         $auditor = $this->createAuditor();
         $provider = new DoctrineProvider($configuration ?? $this->createProviderConfiguration());
 
         // Entity manager "aem1" is used for auditing only
-//dump('Entity manager "aem1" is used for auditing only');
         $provider->registerEntityManager(
             $this->createEntityManager(
                 [
@@ -70,7 +68,6 @@ trait DoctrineProviderTrait
         $db = self::getConnectionParameters();
 
         // Entity manager "sem1" is used for storage only
-//dump('Entity manager "sem1" is used for storage only');
         if (!empty($db)) {
             $db['dbname'] = 'db1';
         } else {
@@ -79,7 +76,6 @@ trait DoctrineProviderTrait
                 'path' => __DIR__.'/../../db1.sqlite',
             ];
         }
-//dump('sem1', $db);
         $provider->registerEntityManager(
             $this->createEntityManager(
                 [
@@ -94,7 +90,6 @@ trait DoctrineProviderTrait
         );
 
         // Entity manager "sem2" is used for storage only
-//dump('Entity manager "sem2" is used for storage only');
         if (!empty($db)) {
             $db['dbname'] = 'db2';
         } else {
@@ -103,7 +98,6 @@ trait DoctrineProviderTrait
                 'path' => __DIR__.'/../../db2.sqlite',
             ];
         }
-//dump('sem2', $db);
         $provider->registerEntityManager(
             $this->createEntityManager(
                 [
@@ -120,7 +114,6 @@ trait DoctrineProviderTrait
         $auditor->registerProvider($provider);
 
         $provider->setStorageMapper(function (string $entity, array $storageEntityManagers): EntityManagerInterface {
-//dump(__METHOD__.'('.$entity.'): '.(\in_array($entity, [Author::class, Post::class], true) ?'sem1':'sem2'), $storageEntityManagers);
             return \in_array($entity, [Author::class, Post::class, Comment::class, Tag::class], true) ? $storageEntityManagers['sem1'] : $storageEntityManagers['sem2'];
         });
 

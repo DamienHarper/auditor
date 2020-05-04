@@ -2,7 +2,7 @@
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits\Schema;
 
-use DH\Auditor\Provider\Doctrine\DoctrineProvider;
+use DateTime;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
@@ -47,12 +47,10 @@ trait BlogSchemaSetupTrait
      * +-PostTag 4.5
      * Author 3
      *   -Post 4
-     * -Author 3
+     * -Author 3.
      */
     private function setupEntities(): void
     {
-//dump(__METHOD__);
-//dump(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2));
         $entityManagers = [
             Author::class => $this->provider->getEntityManagerForEntity(Author::class),
             Post::class => $this->provider->getEntityManagerForEntity(Post::class),
@@ -72,7 +70,7 @@ trait BlogSchemaSetupTrait
             ->setAuthor($author1)
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new \DateTime())
+            ->setCreatedAt(new DateTime())
         ;
         $entityManagers[Post::class]->persist($post1);
 
@@ -81,7 +79,7 @@ trait BlogSchemaSetupTrait
             ->setPost($post1)
             ->setBody('First comment about post #1')
             ->setAuthor('Dark Vador')
-            ->setCreatedAt(new \DateTime())
+            ->setCreatedAt(new DateTime())
         ;
         $entityManagers[Comment::class]->persist($comment1);
 
@@ -90,7 +88,7 @@ trait BlogSchemaSetupTrait
             ->setAuthor($author1)
             ->setTitle('Second post')
             ->setBody('Here is another body')
-            ->setCreatedAt(new \DateTime())
+            ->setCreatedAt(new DateTime())
         ;
         $entityManagers[Post::class]->persist($post2);
 
@@ -106,7 +104,7 @@ trait BlogSchemaSetupTrait
             ->setAuthor($author2)
             ->setTitle('Second post')
             ->setBody('Here is another body')
-            ->setCreatedAt(new \DateTime())
+            ->setCreatedAt(new DateTime())
         ;
         $entityManagers[Post::class]->persist($post3);
 
@@ -115,7 +113,7 @@ trait BlogSchemaSetupTrait
             ->setPost($post3)
             ->setBody('First comment about post #3')
             ->setAuthor('Yoshi')
-            ->setCreatedAt(new \DateTime())
+            ->setCreatedAt(new DateTime())
         ;
         $entityManagers[Comment::class]->persist($comment2);
 
@@ -124,7 +122,7 @@ trait BlogSchemaSetupTrait
             ->setPost($post3)
             ->setBody('Second comment about post #3')
             ->setAuthor('Mario')
-            ->setCreatedAt(new \DateTime())
+            ->setCreatedAt(new DateTime())
         ;
         $entityManagers[Comment::class]->persist($comment3);
 
@@ -145,7 +143,7 @@ trait BlogSchemaSetupTrait
             ->setAuthor($author3)
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new \DateTime())
+            ->setCreatedAt(new DateTime())
         ;
         $entityManagers[Post::class]->persist($post4);
 

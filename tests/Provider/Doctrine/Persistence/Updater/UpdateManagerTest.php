@@ -77,7 +77,6 @@ final class UpdateManagerTest extends TestCase
         $authorTable = $this->getTable($schemaManager->listTables(), 'author');
 
         // create audit table for Author entity
-//dump('create audit table for Author entity');
         $toSchema = $updater->createAuditTable(Author::class, $authorTable);
         $this->migrate($fromSchema, $toSchema, $entityManager, $schemaManager->getDatabasePlatform(), true);
 
@@ -174,7 +173,6 @@ final class UpdateManagerTest extends TestCase
         ];
 
         // apply new structure to author_audit table
-//dump('apply new structure to author_audit table');
         $fromSchema = $schemaManager->createSchema();
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
         $table = $toSchema->getTable('author_audit');
@@ -205,7 +203,6 @@ final class UpdateManagerTest extends TestCase
         }
 
         // run UpdateManager::updateAuditTable() to bring author_audit to expected structure
-//dump('run UpdateManager::updateAuditTable() to bring author_audit to expected structure');
         $fromSchema = $schemaManager->createSchema();
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
 
@@ -232,9 +229,6 @@ final class UpdateManagerTest extends TestCase
     private function migrate(Schema $fromSchema, Schema $toSchema, EntityManagerInterface $entityManager, AbstractPlatform $platform, bool $debug = false): void
     {
         $sqls = $fromSchema->getMigrateToSql($toSchema, $platform);
-//if ($debug) {
-//    dump($sqls);
-//}
         foreach ($sqls as $sql) {
             $statement = $entityManager->getConnection()->prepare($sql);
             $statement->execute();

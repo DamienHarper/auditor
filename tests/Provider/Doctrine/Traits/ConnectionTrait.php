@@ -14,9 +14,7 @@ trait ConnectionTrait
 
     private function getConnection(string $name = 'default', ?array $params = null): Connection
     {
-//dump(__METHOD__, $name);
         if (!isset(self::$connections[$name]) || null === self::$connections[$name]) {
-//dump('create', $params);
             self::$connections[$name] = $this->createConnection($params);
         }
 
@@ -30,14 +28,10 @@ trait ConnectionTrait
 
     private function createConnection(?array $params = null): Connection
     {
-//dump(__METHOD__);
         $params = self::getConnectionParameters($params);
 
         if ('pdo_sqlite' === $params['driver']) {
             // SQLite
-//dump('SQLite', $params);
-//dump(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2));
-//dump($params);
             $connection = DriverManager::getConnection($params);
             $sm = $connection->getSchemaManager();
             $schema = $sm->createSchema();
@@ -47,7 +41,6 @@ trait ConnectionTrait
             }
         } else {
             // Other
-//dump('Other DB', $params);
             $tmpParams = $params;
             $dbname = $params['dbname'];
             unset($tmpParams['dbname']);
@@ -55,7 +48,6 @@ trait ConnectionTrait
             $connection = DriverManager::getConnection($tmpParams);
 
             if ($connection->getDatabasePlatform()->supportsCreateDropDatabase()) {
-//dump('dropAndCreateDatabase: '.$dbname);
                 $connection->getSchemaManager()->dropAndCreateDatabase($dbname);
             } else {
                 $sm = $connection->getSchemaManager();
@@ -91,7 +83,6 @@ trait ConnectionTrait
 
         if (null !== $params) {
             // provided params take precedence
-//dump($params);
             return $params;
         }
 

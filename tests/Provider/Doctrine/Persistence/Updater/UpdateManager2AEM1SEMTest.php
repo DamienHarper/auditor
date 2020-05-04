@@ -2,13 +2,11 @@
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Updater;
 
-use DH\Auditor\Provider\Doctrine\Persistence\Updater\UpdateManager;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\BlogSchemaSetupTrait;
-use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,11 +15,6 @@ use PHPUnit\Framework\TestCase;
 final class UpdateManager2AEM1SEMTest extends TestCase
 {
     use BlogSchemaSetupTrait;
-
-    private function createAndInitDoctrineProvider(): void
-    {
-        $this->provider = $this->createDoctrineProviderWith2AEM1SEM();
-    }
 
     public function testEntityManagerSetup(): void
     {
@@ -49,9 +42,14 @@ final class UpdateManager2AEM1SEMTest extends TestCase
 
         foreach ($entityManagers as $name => $entityManager) {
             $schemaManager = $entityManager->getConnection()->getSchemaManager();
-            $tables = array_map(static function($t) {return $t->getName();}, $schemaManager->listTables());
+            $tables = array_map(static function ($t) {return $t->getName(); }, $schemaManager->listTables());
             sort($tables);
             self::assertSame($expected[$name], $tables, 'Schema of "'.$name.'" is correct.');
         }
+    }
+
+    private function createAndInitDoctrineProvider(): void
+    {
+        $this->provider = $this->createDoctrineProviderWith2AEM1SEM();
     }
 }

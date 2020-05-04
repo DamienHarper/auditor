@@ -87,8 +87,6 @@ class Tag
     /**
      * Add Post entity to collection.
      *
-     * @param Post $post
-     *
      * @return Tag
      */
     public function addPost(Post $post): self
@@ -100,8 +98,6 @@ class Tag
 
     /**
      * Remove Post entity from collection.
-     *
-     * @param Post $post
      *
      * @return Tag
      */

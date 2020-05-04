@@ -6,12 +6,13 @@ use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\User\UserInterface;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
 
 trait AuditTrait
 {
     /**
      * Returns the primary key value of an entity.
+     *
+     * @param mixed $entity
      */
     private function id(EntityManagerInterface $entityManager, $entity)
     {
@@ -44,6 +45,8 @@ trait AuditTrait
 
     /**
      * Type converts the input value and returns it.
+     *
+     * @param mixed $value
      */
     private function value(EntityManagerInterface $entityManager, Type $type, $value)
     {
@@ -78,6 +81,8 @@ trait AuditTrait
 
     /**
      * Computes a usable diff.
+     *
+     * @param mixed $entity
      */
     private function diff(EntityManagerInterface $entityManager, $entity, array $changeset): array
     {
@@ -120,6 +125,9 @@ trait AuditTrait
 
     /**
      * Returns an array describing an entity.
+     *
+     * @param null|mixed $entity
+     * @param null|mixed $id
      */
     private function summarize(EntityManagerInterface $entityManager, $entity = null, $id = null): ?array
     {

@@ -2,6 +2,7 @@
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
 
+use DateTime;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Model\Entry;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
@@ -62,7 +63,6 @@ class Query
     public function execute(): array
     {
         $queryBuilder = $this->buildQueryBuilder();
-//dump($queryBuilder->getSQL(), $queryBuilder->getParameters());
         $statement = $queryBuilder->execute();
         $statement->setFetchMode(PDO::FETCH_CLASS, Entry::class);
 
@@ -108,7 +108,7 @@ class Query
         return $this;
     }
 
-    public function addDateRangeFilter(string $name, ?\DateTime $minValue = null, ?\DateTime $maxValue = null): self
+    public function addDateRangeFilter(string $name, ?DateTime $minValue = null, ?DateTime $maxValue = null): self
     {
         $this->checkFilter($name);
 
@@ -191,9 +191,7 @@ class Query
         $queryBuilder = $this->buildOrderBy($queryBuilder);
 
         // build LIMIT part
-        $queryBuilder = $this->buildLimit($queryBuilder);
-
-        return $queryBuilder;
+        return $this->buildLimit($queryBuilder);
     }
 
     private function buildWhere(QueryBuilder $queryBuilder): QueryBuilder
@@ -203,7 +201,7 @@ class Query
                 continue;
             }
 
-            if (1 === \count($values) && is_array($values[0])) {
+            if (1 === \count($values) && \is_array($values[0])) {
                 // Range filter
                 if (null !== $values[0][0]) {
                     $queryBuilder
@@ -217,7 +215,7 @@ class Query
                         ->setParameter('max_'.$filter, $values[0][1])
                     ;
                 }
-            } elseif (1 === \count($values) && !is_array($values[0])) {
+            } elseif (1 === \count($values) && !\is_array($values[0])) {
                 $queryBuilder
                     ->andWhere(sprintf('%s = :%s', $filter, $filter))
                     ->setParameter($filter, $values[0])
