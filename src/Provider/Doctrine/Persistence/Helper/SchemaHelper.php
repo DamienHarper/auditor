@@ -4,10 +4,6 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
 final class SchemaHelper
 {
-    private function __construct()
-    {
-    }
-
     /**
      * Return columns of audit tables.
      */

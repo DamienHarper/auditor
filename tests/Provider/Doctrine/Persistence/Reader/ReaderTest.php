@@ -90,11 +90,11 @@ final class ReaderTest extends TestCase
         self::assertNull($audits[0]->getDiscriminator());
         self::assertIsString($audits[0]->getTransactionHash());
         self::assertIsArray($audits[0]->getDiffs());
-        self::assertNull($audits[0]->getUserId());
-        self::assertNull($audits[0]->getUsername());
-        self::assertNull($audits[0]->getUserFqdn());
+        self::assertIsString($audits[0]->getUserId());
+        self::assertIsString($audits[0]->getUsername());
+        self::assertIsString($audits[0]->getUserFqdn());
         self::assertNull($audits[0]->getUserFirewall());
-        self::assertNull($audits[0]->getIp());
+        self::assertIsString($audits[0]->getIp());
         self::assertRegExp('#\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}#', $audits[0]->getCreatedAt());
 
         $i = 0;

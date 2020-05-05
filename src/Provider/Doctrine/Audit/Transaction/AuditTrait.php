@@ -3,7 +3,7 @@
 namespace DH\Auditor\Provider\Doctrine\Audit\Transaction;
 
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
-use DH\Auditor\Provider\Doctrine\User\UserInterface;
+use DH\Auditor\User\UserInterface;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -13,6 +13,8 @@ trait AuditTrait
      * Returns the primary key value of an entity.
      *
      * @param mixed $entity
+     *
+     * @return mixed
      */
     private function id(EntityManagerInterface $entityManager, $entity)
     {
@@ -47,6 +49,8 @@ trait AuditTrait
      * Type converts the input value and returns it.
      *
      * @param mixed $value
+     *
+     * @return mixed
      */
     private function value(EntityManagerInterface $entityManager, Type $type, $value)
     {
@@ -169,18 +173,18 @@ trait AuditTrait
         $user_fqdn = null;
         $user_firewall = null;
 
-//        $request = $this->configuration->getRequestStack()->getCurrentRequest();
-//        if (null !== $request) {
-//            $client_ip = $request->getClientIp();
-//            $user_firewall = null === $this->configuration->getFirewallMap()->getFirewallConfig($request) ? null : $this->configuration->getFirewallMap()->getFirewallConfig($request)->getName();
-//        }
-//
-//        $user = null === $this->configuration->getUserProvider() ? null : $this->configuration->getUserProvider()->getUser();
-//        if ($user instanceof UserInterface) {
-//            $user_id = $user->getId();
-//            $username = $user->getUsername();
-//            $user_fqdn = DoctrineHelper::getRealClassName($user);
-//        }
+        $ipProvider = $this->provider->getIpProvider();
+        if (null !== $ipProvider) {
+            $client_ip = $ipProvider->call($this);
+        }
+
+        $userProvider = $this->provider->getUserProvider();
+        $user = null === $userProvider ? null : $userProvider->call($this);
+        if ($user instanceof UserInterface) {
+            $user_id = $user->getId();
+            $username = $user->getUsername();
+            $user_fqdn = DoctrineHelper::getRealClassName($user);
+        }
 
         return [
             'user_id' => $user_id,

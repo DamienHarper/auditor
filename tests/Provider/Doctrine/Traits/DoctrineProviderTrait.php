@@ -4,6 +4,7 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
+use DH\Auditor\Tests\Fixtures\User\User;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
@@ -40,6 +41,15 @@ trait DoctrineProviderTrait
                 __DIR__.'/../Fixtures/Entity/Standard/Blog',
             ]
         ));
+
+        $provider->setUserProvider(function () {
+            return new User(1, 'dark.vador');
+        });
+
+        $provider->setIpProvider(function () {
+            return '1.2.3.4';
+        });
+
         $auditor->registerProvider($provider);
 
         return $provider;

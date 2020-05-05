@@ -7,10 +7,6 @@ use Doctrine\DBAL\Types\Types;
 
 final class DoctrineHelper
 {
-    private function __construct()
-    {
-    }
-
     /**
      * Gets the real class name of a class name that could be a proxy.
      *

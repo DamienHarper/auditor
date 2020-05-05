@@ -7,10 +7,9 @@ use DH\Auditor\Exception\AccessDeniedException;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Provider\Doctrine\Audit\Annotation\Security;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
-use DH\Auditor\Provider\Doctrine\User\UserInterface;
+use DH\Auditor\User\UserInterface;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMMetadata;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\Security as CoreSecurity;
 
 class Reader
 {
@@ -190,10 +189,10 @@ class Reader
     private function checkRoles(string $entity, string $scope): void
     {
         $userProvider = $this->provider->getUserProvider();
-        $user = null === $userProvider ? null : $userProvider->getUser();
-        $security = null === $userProvider ? null : $userProvider->getSecurity();
+        $user = null === $userProvider ? null : $userProvider->call($this);
 
-        if (!($user instanceof UserInterface) || !($security instanceof CoreSecurity)) {
+        $roleChecker = $this->provider->getRoleChecker();
+        if (!($user instanceof UserInterface) || null === $roleChecker) {
             // If no security defined or no user identified, consider access granted
             return;
         }
@@ -201,14 +200,12 @@ class Reader
         $entities = $this->provider->getEntities();
 
         $roles = $entities[$entity]['roles'] ?? null;
-
         if (null === $roles) {
             // If no roles are configured, consider access granted
             return;
         }
 
         $scope = $roles[$scope] ?? null;
-
         if (null === $scope) {
             // If no roles for the given scope are configured, consider access granted
             return;
@@ -216,7 +213,7 @@ class Reader
 
         // roles are defined for the given scope
         foreach ($scope as $role) {
-            if ($security->isGranted($role)) {
+            if ($roleChecker->call($this, $role)) {
                 // role granted => access granted
                 return;
             }

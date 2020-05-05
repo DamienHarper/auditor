@@ -53,7 +53,12 @@ class DoctrineProvider extends AbstractProvider
     /**
      * @var Closure
      */
-    private $rolesChecker;
+    private $roleChecker;
+
+    /**
+     * @var Closure
+     */
+    private $ipProvider;
 
     public function __construct(Configuration $configuration)
     {
@@ -127,16 +132,28 @@ class DoctrineProvider extends AbstractProvider
         return $this->userProvider;
     }
 
-    public function setRolesChecker(Closure $rolesChecker): self
+    public function setRoleChecker(Closure $roleChecker): self
     {
-        $this->rolesChecker = $rolesChecker;
+        $this->roleChecker = $roleChecker;
 
         return $this;
     }
 
-    public function getRolesChecker(): ?Closure
+    public function getRoleChecker(): ?Closure
     {
-        return $this->rolesChecker;
+        return $this->roleChecker;
+    }
+
+    public function setIpProvider(Closure $ipProvider): self
+    {
+        $this->ipProvider = $ipProvider;
+
+        return $this;
+    }
+
+    public function getIpProvider(): ?Closure
+    {
+        return $this->ipProvider;
     }
 
     public function getEntityManagerForEntity(string $entity): EntityManagerInterface
