@@ -4,41 +4,46 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Command;
 
 use DateInterval;
 use DateTime;
-use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
-use Doctrine\DBAL\Connection;
+use DH\Auditor\Auditor;
+use DH\Auditor\Provider\Doctrine\DoctrineProvider;
+use DH\Auditor\Provider\Doctrine\Persistence\Updater\UpdateManager;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class CleanAuditLogsCommand extends Command implements ContainerAwareInterface
+class CleanAuditLogsCommand extends Command
 {
     use LockableTrait;
 
     protected static $defaultName = 'audit:clean';
 
     /**
-     * @var null|ContainerInterface
+     * @var Auditor
      */
-    private $container;
+    private $auditor;
 
-    public function setContainer(?ContainerInterface $container = null): void
-    {
-        $this->container = $container;
-    }
+    /**
+     * @var DoctrineProvider
+     */
+    private $provider;
 
     public function unlock(): void
     {
         $this->release();
+    }
+
+    public function setAuditor(Auditor $auditor): self
+    {
+        $this->auditor = $auditor;
+
+        return $this;
     }
 
     protected function configure(): void
@@ -53,10 +58,6 @@ class CleanAuditLogsCommand extends Command implements ContainerAwareInterface
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (null === $this->container) {
-            throw new RuntimeException('No container.');
-        }
-
         if (!$this->lock()) {
             $output->writeln('The command is already running in another process.');
 
@@ -97,54 +98,75 @@ class CleanAuditLogsCommand extends Command implements ContainerAwareInterface
             $until->sub($dateInterval);
         }
 
-        /**
-         * @var Reader
-         */
-        $reader = $this->container->get('dh_doctrine_audit.reader');
+        $this->provider = $this->auditor->getProvider(DoctrineProvider::class);
+        $entities = $this->provider->getConfiguration()->getEntities();
 
-        /**
-         * @var Connection
-         */
-        $connection = $reader->getConfiguration()->getEntityManager()->getConnection();
+        $updateManager = new UpdateManager($this->provider);
 
-        $entities = $reader->getEntities();
+        $storageEntityManagers = $this->provider->getStorageEntityManagers();
+
+        // auditable entities by storage entity manager
+        $repository = [];
+        $count = 0;
+
+        // Collect auditable entities from auditing storage managers
+        $auditingEntityManagers = $this->provider->getAuditingEntityManagers();
+        foreach ($auditingEntityManagers as $name => $auditingEntityManager) {
+            $classes = $updateManager->getAuditableTableNames($auditingEntityManager);
+            // Populate the auditable entities repository
+            foreach ($classes as $entity => $tableName) {
+                $em = $this->provider->getEntityManagerForEntity($entity);
+                $key = array_search($em, $this->provider->getStorageEntityManagers(), true);
+                if (!isset($repository[$key])) {
+                    $repository[$key] = [];
+                }
+                $repository[$key][$entity] = $tableName;
+                $count++;
+            }
+        }
 
         $message = sprintf(
             "You are about to clean audits created before <comment>%s</comment>: %d entities involved.\n Do you want to proceed?",
             $until->format('Y-m-d'),
-            \count($entities)
+            $count
         );
 
         $confirm = $input->getOption('no-confirm') ? true : $io->confirm($message, false);
 
         if ($confirm) {
-            $progressBar = new ProgressBar($output, \count($entities));
+            $progressBar = new ProgressBar($output, $count);
             $progressBar->setBarWidth(70);
             $progressBar->setFormat("%message%\n".$progressBar->getFormatDefinition('debug'));
 
             $progressBar->setMessage('Starting...');
             $progressBar->start();
 
-            foreach ($entities as $entity => $tablename) {
-                $auditTable = implode('', [
-                    $reader->getConfiguration()->getTablePrefix(),
-                    $tablename,
-                    $reader->getConfiguration()->getTableSuffix(),
-                ]);
+            foreach ($repository as $name => $entities) {
+                foreach ($entities as $entity => $tablename) {
+                    $auditTable = preg_replace(
+                        sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($tablename, '#')),
+                        sprintf(
+                            '$1%s$2%s',
+                            preg_quote($this->provider->getConfiguration()->getTablePrefix(), '#'),
+                            preg_quote($this->provider->getConfiguration()->getTableSuffix(), '#')
+                        ),
+                        $tablename
+                    );
 
-                /**
-                 * @var QueryBuilder
-                 */
-                $queryBuilder = $connection->createQueryBuilder();
-                $queryBuilder
-                    ->delete($auditTable)
-                    ->where('created_at < :until')
-                    ->setParameter(':until', $until->format('Y-m-d'))
-                    ->execute()
-                ;
+                    /**
+                     * @var QueryBuilder
+                     */
+                    $queryBuilder = $storageEntityManagers[$name]->getConnection()->createQueryBuilder();
+                    $queryBuilder
+                        ->delete($auditTable)
+                        ->where('created_at < :until')
+                        ->setParameter(':until', $until->format('Y-m-d'))
+                        ->execute()
+                    ;
 
-                $progressBar->setMessage("Cleaning audit tables... (<info>{$auditTable}</info>)");
-                $progressBar->advance();
+                    $progressBar->setMessage("Cleaning audit tables... (<info>{$auditTable}</info>)");
+                    $progressBar->advance();
+                }
             }
 
             $progressBar->setMessage('Cleaning audit tables... (<info>done</info>)');
