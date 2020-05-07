@@ -2,7 +2,7 @@
 
 namespace DH\Auditor\Transaction;
 
-use DH\Auditor\Model\Transaction;
+use DH\Auditor\Model\TransactionInterface;
 use DH\Auditor\Provider\Doctrine\Audit\Transaction\TransactionHydrator;
 use DH\Auditor\Provider\Doctrine\Audit\Transaction\TransactionProcessor;
 use DH\Auditor\Provider\ProviderInterface;
@@ -25,12 +25,12 @@ class TransactionManager
         $this->hydrator = new TransactionHydrator($provider);
     }
 
-    public function populate(Transaction $transaction): void
+    public function populate(TransactionInterface $transaction): void
     {
         $this->hydrator->hydrate($transaction);
     }
 
-    public function process(Transaction $transaction): void
+    public function process(TransactionInterface $transaction): void
     {
         $this->processor->process($transaction);
     }

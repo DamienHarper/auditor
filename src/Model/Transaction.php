@@ -2,7 +2,7 @@
 
 namespace DH\Auditor\Model;
 
-class Transaction
+class Transaction implements TransactionInterface
 {
     public const INSERT = 'insert';
     public const UPDATE = 'update';

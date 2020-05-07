@@ -2,16 +2,19 @@
 
 namespace DH\Auditor\Provider\Doctrine\Audit\Transaction;
 
+use DH\Auditor\Model\TransactionInterface;
+use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Provider\ProviderInterface;
+use DH\Auditor\Transaction\TransactionHydratorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-class TransactionHydrator
+class TransactionHydrator implements TransactionHydratorInterface
 {
     use AuditTrait;
 
     /**
-     * @var ProviderInterface
+     * @var DoctrineProvider
      */
     private $provider;
 
@@ -20,7 +23,7 @@ class TransactionHydrator
         $this->provider = $provider;
     }
 
-    public function hydrate(Transaction $transaction): void
+    public function hydrate(TransactionInterface $transaction): void
     {
         $this->hydrateWithScheduledInsertions($transaction, $transaction->getEntityManager());
         $this->hydrateWithScheduledUpdates($transaction, $transaction->getEntityManager());

@@ -5,18 +5,21 @@ namespace DH\Auditor\Provider\Doctrine\Audit\Transaction;
 use DateTime;
 use DateTimeZone;
 use DH\Auditor\Event\LifecycleEvent;
+use DH\Auditor\Model\TransactionInterface;
+use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\ProviderInterface;
+use DH\Auditor\Transaction\TransactionProcessorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-class TransactionProcessor
+class TransactionProcessor implements TransactionProcessorInterface
 {
     use AuditTrait;
 
     /**
-     * @var ProviderInterface
+     * @var DoctrineProvider
      */
     private $provider;
 
@@ -25,7 +28,7 @@ class TransactionProcessor
         $this->provider = $provider;
     }
 
-    public function process(Transaction $transaction): void
+    public function process(TransactionInterface $transaction): void
     {
         $this->processInsertions($transaction, $transaction->getEntityManager());
         $this->processUpdates($transaction, $transaction->getEntityManager());

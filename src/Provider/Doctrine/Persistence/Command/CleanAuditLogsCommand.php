@@ -121,7 +121,7 @@ class CleanAuditLogsCommand extends Command
                     $repository[$key] = [];
                 }
                 $repository[$key][$entity] = $tableName;
-                $count++;
+                ++$count;
             }
         }
 

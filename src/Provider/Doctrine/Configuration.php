@@ -80,7 +80,7 @@ class Configuration
      * This method completely overrides entities configuration
      * including annotation configuration
      *
-     * @param array<string, array> $entities
+     * @param array<int|string, mixed> $entities
      */
     public function setEntities(array $entities): self
     {

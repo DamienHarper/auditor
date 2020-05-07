@@ -3,13 +3,11 @@
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Command;
 
 use DH\Auditor\Provider\Doctrine\Persistence\Command\CleanAuditLogsCommand;
-use DH\Auditor\Provider\Doctrine\Persistence\Command\UpdateSchemaCommand;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
-use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -49,7 +47,7 @@ final class CleanAuditLogsCommandTest extends TestCase
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString("'keep' argument must be a positive number.", $output);
+        self::assertStringContainsString("[ERROR] 'keep' argument must be a positive number.", $output);
     }
 
     /**
@@ -67,7 +65,7 @@ final class CleanAuditLogsCommandTest extends TestCase
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString("'keep' argument must be a positive number.", $output);
+        self::assertStringContainsString("[ERROR] 'keep' argument must be a positive number.", $output);
     }
 
     public function testExecuteFailsWithKeepWrongFormat(): void
@@ -84,7 +82,7 @@ final class CleanAuditLogsCommandTest extends TestCase
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString(sprintf("'keep' argument must be a valid ISO 8601 date interval. '%s' given.", $keep), $output);
+        self::assertStringContainsString(sprintf("[ERROR] 'keep' argument must be a valid ISO 8601 date interval. '%s' given.", $keep), $output);
     }
 
     public function testExecute(): void
