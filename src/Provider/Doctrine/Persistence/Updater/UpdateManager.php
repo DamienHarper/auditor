@@ -23,12 +23,12 @@ class UpdateManager
 
     public function updateAuditSchema(?array $sqls = null, ?callable $callback = null): void
     {
-        $storageEntityManagers = $this->provider->getStorageEntityManagers();
-
         // TODO: FIXME will create the same schema on all connections
         if (null === $sqls) {
             $sqls = $this->getUpdateAuditSchemaSql();
         }
+
+        $storageEntityManagers = $this->provider->getStorageEntityManagers();
 
         foreach ($sqls as $entityManagerName => $queries) {
             foreach ($queries as $index => $sql) {
@@ -73,10 +73,8 @@ class UpdateManager
     {
         $storageEntityManagers = $this->provider->getStorageEntityManagers();
 
-        // schema A1 et schema A2 source d'audit
-        // schema S stockage
-
-        $repository = [];   // auditable entities by storage entity manager
+        // auditable entities by storage entity manager
+        $repository = [];
 
         // Collect auditable entities from auditing storage managers
         $auditingEntityManagers = $this->provider->getAuditingEntityManagers();
@@ -120,10 +118,10 @@ class UpdateManager
                         $table->getName()
                     );
                     if ($storageSchema->hasTable($auditTablename)) {
-                        // Audit table does not exists, let's create it
+                        // Audit table exists, let's update it if needed
                         $this->updateAuditTable($repositoryFindByTablename($table->getName()), $storageSchema->getTable($auditTablename), $storageSchema);
                     } else {
-                        // Audit table exists, let's update it if needed
+                        // Audit table does not exists, let's create it
                         $this->createAuditTable($repositoryFindByTablename($table->getName()), $table, $storageSchema);
                     }
                 }

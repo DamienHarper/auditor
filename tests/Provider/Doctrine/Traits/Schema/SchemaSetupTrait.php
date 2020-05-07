@@ -25,9 +25,9 @@ trait SchemaSetupTrait
         foreach ($this->provider->getStorageEntityManagers() as $name => $entityManager) {
             $schemaTool = new SchemaTool($entityManager);
 
-            $this->configureEntities();
-            $this->setUpEntitySchema($schemaTool, $entityManager);
-            $this->setUpAuditSchema($schemaTool, $entityManager);
+            $this->setUpEntitySchema($schemaTool, $entityManager);  // setup entity schema only since audited entites are not declared
+            $this->configureEntities();                             // declare audited entites
+            $this->setUpAuditSchema($schemaTool, $entityManager);   // setup audit schema based on configured audited entities
         }
 
         foreach ($this->provider->getStorageEntityManagers() as $name => $entityManager) {

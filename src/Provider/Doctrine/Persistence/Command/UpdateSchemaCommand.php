@@ -2,39 +2,38 @@
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Command;
 
-use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
+use DH\Auditor\Auditor;
+use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Updater\UpdateManager;
-use DH\Auditor\Provider\Doctrine\Transaction\TransactionManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class UpdateSchemaCommand extends Command implements ContainerAwareInterface
+class UpdateSchemaCommand extends Command
 {
     use LockableTrait;
 
     protected static $defaultName = 'audit:schema:update';
 
     /**
-     * @var null|ContainerInterface
+     * @var Auditor
      */
-    private $container;
-
-    public function setContainer(?ContainerInterface $container = null): void
-    {
-        $this->container = $container;
-    }
+    private $auditor;
 
     public function unlock(): void
     {
         $this->release();
+    }
+
+    public function setAuditor(Auditor $auditor): self
+    {
+        $this->auditor = $auditor;
+
+        return $this;
     }
 
     protected function configure(): void
@@ -49,10 +48,6 @@ class UpdateSchemaCommand extends Command implements ContainerAwareInterface
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (null === $this->container) {
-            throw new RuntimeException('No container.');
-        }
-
         if (!$this->lock()) {
             $output->writeln('The command is already running in another process.');
 
@@ -64,26 +59,16 @@ class UpdateSchemaCommand extends Command implements ContainerAwareInterface
         $dumpSql = true === $input->getOption('dump-sql');
         $force = true === $input->getOption('force');
 
-        /**
-         * @var TransactionManager
-         */
-        $manager = $this->container->get('dh_doctrine_audit.manager');
-
-        /**
-         * @var Reader
-         */
-        $reader = $this->container->get('dh_doctrine_audit.reader');
-
-        /**
-         * @var \DH\Auditor\Provider\Doctrine\Persistence\Updater\UpdateManager
-         */
-        $updater = new UpdateManager($manager, $reader);
-
+        $updater = new UpdateManager($this->auditor->getProvider(DoctrineProvider::class));
         $sqls = $updater->getUpdateAuditSchemaSql();
 
-        if (empty($sqls)) {
-            $io->success('Nothing to update.');
+        $count = 0;
+        foreach ($sqls as $entityManagerName => $queries) {
+            $count += \count($queries);
+        }
 
+        if (0 === $count) {
+            $io->success('Nothing to update.');
             $this->release();
 
             return 0;
@@ -93,8 +78,10 @@ class UpdateSchemaCommand extends Command implements ContainerAwareInterface
             $io->text('The following SQL statements will be executed:');
             $io->newLine();
 
-            foreach ($sqls as $sql) {
-                $io->text(sprintf('    %s;', $sql));
+            foreach ($sqls as $entityManagerName => $queries) {
+                foreach ($queries as $index => $sql) {
+                    $io->text(sprintf('    %s;', $sql));
+                }
             }
         }
 
@@ -113,12 +100,11 @@ class UpdateSchemaCommand extends Command implements ContainerAwareInterface
             });
 
             $progressBar->finish();
-
             $io->newLine(2);
 
-            $pluralization = (1 === \count($sqls)) ? 'query was' : 'queries were';
+            $pluralization = (1 === $count) ? 'query was' : 'queries were';
 
-            $io->text(sprintf('    <info>%s</info> %s executed', \count($sqls), $pluralization));
+            $io->text(sprintf('    <info>%s</info> %s executed', $count, $pluralization));
             $io->success('Database schema updated successfully!');
         }
 
@@ -129,10 +115,9 @@ class UpdateSchemaCommand extends Command implements ContainerAwareInterface
         }
 
         $io->caution('This operation should not be executed in a production environment!');
-
         $io->text(
             [
-                sprintf('The Schema-Tool would execute <info>"%s"</info> queries to update the database.', \count($sqls)),
+                sprintf('The Schema-Tool would execute <info>"%s"</info> queries to update the database.', $count),
                 '',
                 'Please run the operation by passing one - or both - of the following options:',
                 '',
