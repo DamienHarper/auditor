@@ -29,10 +29,12 @@ class AuditEventSubscriber implements EventSubscriberInterface
     public function onAuditEvent(LifecycleEvent $event): LifecycleEvent
     {
         foreach ($this->auditor->getProviders() as $provider) {
-            try {
-                $provider->persist($event);
-            } catch (Exception $e) {
-                // do nothing to ensure other providers are called
+            if ($provider->supportsStorage()) {
+                try {
+                    $provider->persist($event);
+                } catch (Exception $e) {
+                    // do nothing to ensure other providers are called
+                }
             }
         }
 
