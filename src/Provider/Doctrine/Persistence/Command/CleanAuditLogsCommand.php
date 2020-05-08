@@ -8,7 +8,6 @@ use DH\Auditor\Auditor;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
-use DH\Auditor\Provider\ProviderInterface;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Exception;
 use Symfony\Component\Console\Command\Command;
@@ -30,11 +29,6 @@ class CleanAuditLogsCommand extends Command
      * @var Auditor
      */
     private $auditor;
-
-    /**
-     * @var ProviderInterface
-     */
-    private $provider;
 
     public function unlock(): void
     {
@@ -98,27 +92,25 @@ class CleanAuditLogsCommand extends Command
             $until->sub($dateInterval);
         }
 
-        $this->provider = $this->auditor->getProvider(DoctrineProvider::class);
-
         /** @var DoctrineProvider $provider */
-        $provider = $this->provider;
+        $provider = $this->auditor->getProvider(DoctrineProvider::class);
         $updateManager = new SchemaManager($provider);
 
 //        $entities = $this->provider->getConfiguration()->getEntities();
-        $storageEntityManagers = $this->provider->getStorageServices();
+        $storageEntityManagers = $provider->getStorageServices();
 
         // auditable entities by storage entity manager
         $repository = [];
         $count = 0;
 
         // Collect auditable entities from auditing storage managers
-        $auditingEntityManagers = $this->provider->getAuditingServices();
+        $auditingEntityManagers = $provider->getAuditingServices();
         foreach ($auditingEntityManagers as $name => $auditingEntityManager) {
             $classes = $updateManager->getAuditableTableNames($auditingEntityManager);
             // Populate the auditable entities repository
             foreach ($classes as $entity => $tableName) {
-                $em = $this->provider->getEntityManagerForEntity($entity);
-                $key = array_search($em, $this->provider->getStorageServices(), true);
+                $em = $provider->getEntityManagerForEntity($entity);
+                $key = array_search($em, $provider->getStorageServices(), true);
                 if (!isset($repository[$key])) {
                     $repository[$key] = [];
                 }
@@ -137,7 +129,7 @@ class CleanAuditLogsCommand extends Command
 
         if ($confirm) {
             /** @var Configuration $configuration */
-            $configuration = $this->provider->getConfiguration();
+            $configuration = $provider->getConfiguration();
 
             $progressBar = new ProgressBar($output, $count);
             $progressBar->setBarWidth(70);

@@ -1,13 +1,14 @@
 <?php
 
-namespace DH\Auditor\Transaction;
+namespace DH\Auditor\Provider\Doctrine\Auditing\Transaction;
 
 use DH\Auditor\Model\TransactionInterface;
-use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionHydrator;
-use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionProcessor;
-use DH\Auditor\Provider\ProviderInterface;
+use DH\Auditor\Provider\Doctrine\DoctrineProvider;
+use DH\Auditor\Transaction\TransactionHydratorInterface;
+use DH\Auditor\Transaction\TransactionManagerInterface;
+use DH\Auditor\Transaction\TransactionProcessorInterface;
 
-class TransactionManager
+class TransactionManager implements TransactionManagerInterface
 {
     /**
      * @var TransactionProcessorInterface
@@ -19,7 +20,7 @@ class TransactionManager
      */
     private $hydrator;
 
-    public function __construct(ProviderInterface $provider)
+    public function __construct(DoctrineProvider $provider)
     {
         $this->processor = new TransactionProcessor($provider);
         $this->hydrator = new TransactionHydrator($provider);

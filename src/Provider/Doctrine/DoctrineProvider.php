@@ -9,9 +9,9 @@ use DH\Auditor\Provider\AbstractProvider;
 use DH\Auditor\Provider\ConfigurationInterface;
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
 use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
-use DH\Auditor\Transaction\TransactionManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Gedmo\SoftDeleteable\SoftDeleteableListener;
 
@@ -37,7 +37,7 @@ class DoctrineProvider extends AbstractProvider
     private $auditingEntityManagers = [];
 
     /**
-     * @var TransactionManager
+     * @var \DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager
      */
     private $transactionManager;
 
