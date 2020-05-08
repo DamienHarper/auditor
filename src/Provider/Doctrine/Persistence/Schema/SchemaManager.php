@@ -1,6 +1,6 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Persistence\Updater;
+namespace DH\Auditor\Provider\Doctrine\Persistence\Schema;
 
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
@@ -10,7 +10,7 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\EntityManagerInterface;
 
-class UpdateManager
+class SchemaManager
 {
     /**
      * @var DoctrineProvider

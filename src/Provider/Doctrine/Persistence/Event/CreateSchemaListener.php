@@ -3,7 +3,7 @@
 namespace DH\Auditor\Provider\Doctrine\Persistence\Event;
 
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
-use DH\Auditor\Provider\Doctrine\Persistence\Updater\UpdateManager;
+use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
@@ -58,7 +58,7 @@ class CreateSchemaListener implements EventSubscriber
             }
         }
 
-        $updater = new UpdateManager($this->provider);
+        $updater = new SchemaManager($this->provider);
         $updater->createAuditTable($metadata->name, $eventArgs->getClassTable(), $eventArgs->getSchema());
     }
 

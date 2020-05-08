@@ -6,7 +6,7 @@ use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
-use DH\Auditor\Provider\Doctrine\Persistence\Updater\UpdateManager;
+use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use DH\Auditor\Tests\Traits\ReflectionTrait;
@@ -27,7 +27,7 @@ final class UpdateManagerTest extends TestCase
 
     public function testCreateAuditTable(): void
     {
-        $updater = new UpdateManager($this->provider);
+        $updater = new SchemaManager($this->provider);
 
         $entityManager = $this->provider->getEntityManagerForEntity(Author::class);
         $schemaManager = $entityManager->getConnection()->getSchemaManager();
@@ -67,7 +67,7 @@ final class UpdateManagerTest extends TestCase
      */
     public function testUpdateAuditTable(): void
     {
-        $updater = new UpdateManager($this->provider);
+        $updater = new SchemaManager($this->provider);
 
         $entityManager = $this->provider->getEntityManagerForEntity(Author::class);
         $schemaManager = $entityManager->getConnection()->getSchemaManager();

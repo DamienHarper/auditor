@@ -4,7 +4,7 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Command;
 
 use DH\Auditor\Auditor;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
-use DH\Auditor\Provider\Doctrine\Persistence\Updater\UpdateManager;
+use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -61,7 +61,7 @@ class UpdateSchemaCommand extends Command
 
         /** @var DoctrineProvider $provider */
         $provider = $this->auditor->getProvider(DoctrineProvider::class);
-        $updateManager = new UpdateManager($provider);
+        $updateManager = new SchemaManager($provider);
 
         $sqls = $updateManager->getUpdateAuditSchemaSql();
 

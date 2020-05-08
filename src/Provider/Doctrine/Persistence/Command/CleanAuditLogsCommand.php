@@ -7,7 +7,7 @@ use DateTime;
 use DH\Auditor\Auditor;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
-use DH\Auditor\Provider\Doctrine\Persistence\Updater\UpdateManager;
+use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\ProviderInterface;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Exception;
@@ -102,7 +102,7 @@ class CleanAuditLogsCommand extends Command
 
         /** @var DoctrineProvider $provider */
         $provider = $this->provider;
-        $updateManager = new UpdateManager($provider);
+        $updateManager = new SchemaManager($provider);
 
 //        $entities = $this->provider->getConfiguration()->getEntities();
         $storageEntityManagers = $this->provider->getStorageServices();

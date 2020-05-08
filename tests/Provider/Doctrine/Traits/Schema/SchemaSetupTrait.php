@@ -3,7 +3,7 @@
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits\Schema;
 
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
-use DH\Auditor\Provider\Doctrine\Persistence\Updater\UpdateManager;
+use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\DoctrineProviderTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -76,7 +76,7 @@ trait SchemaSetupTrait
 
     private function setUpAuditSchema(SchemaTool $schemaTool, EntityManagerInterface $entityManager): void
     {
-        $updater = new UpdateManager($this->provider);
+        $updater = new SchemaManager($this->provider);
         $updater->updateAuditSchema();
     }
 
