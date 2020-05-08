@@ -2,6 +2,7 @@
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Updater;
 
+use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use Doctrine\DBAL\Schema\Schema;
@@ -71,6 +72,8 @@ class UpdateManager
 
     public function getUpdateAuditSchemaSql(): array
     {
+        /** @var Configuration $configuration */
+        $configuration = $this->provider->getConfiguration();
         $storageEntityManagers = $this->provider->getStorageEntityManagers();
 
         // auditable entities by storage entity manager
@@ -90,10 +93,15 @@ class UpdateManager
                 $repository[$key][$entity] = $tableName;
             }
         }
-        $repositoryFindByTablename = static function (string $tableName) use ($repository): ?string {
+        $findEntityByTablename = static function (string $tableName) use ($repository): ?string {
             foreach ($repository as $emName => $map) {
-                return array_search($tableName, $map, true);
+                $result = array_search($tableName, $map, true);
+                if (false !== $result) {
+                    return (string) $result;
+                }
             }
+
+            return null;
         };
 
         // Compute and collect SQL queries
@@ -108,21 +116,22 @@ class UpdateManager
                 if (\in_array($table->getName(), array_values($repository[$name]), true)) {
                     // table is the one of an auditable entity
 
+                    /** @var string $auditTablename */
                     $auditTablename = preg_replace(
                         sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($table->getName(), '#')),
                         sprintf(
                             '$1%s$2%s',
-                            preg_quote($this->provider->getConfiguration()->getTablePrefix(), '#'),
-                            preg_quote($this->provider->getConfiguration()->getTableSuffix(), '#')
+                            preg_quote($configuration->getTablePrefix(), '#'),
+                            preg_quote($configuration->getTableSuffix(), '#')
                         ),
                         $table->getName()
                     );
                     if ($storageSchema->hasTable($auditTablename)) {
                         // Audit table exists, let's update it if needed
-                        $this->updateAuditTable($repositoryFindByTablename($table->getName()), $storageSchema->getTable($auditTablename), $storageSchema);
+                        $this->updateAuditTable($findEntityByTablename($table->getName()), $storageSchema->getTable($auditTablename), $storageSchema);
                     } else {
                         // Audit table does not exists, let's create it
-                        $this->createAuditTable($repositoryFindByTablename($table->getName()), $table, $storageSchema);
+                        $this->createAuditTable($findEntityByTablename($table->getName()), $table, $storageSchema);
                     }
                 }
             }
@@ -144,12 +153,15 @@ class UpdateManager
             $schema = $schemaManager->createSchema();
         }
 
+        /** @var Configuration $configuration */
+        $configuration = $this->provider->getConfiguration();
+
         $auditTablename = preg_replace(
             sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($table->getName(), '#')),
             sprintf(
                 '$1%s$2%s',
-                preg_quote($this->provider->getConfiguration()->getTablePrefix(), '#'),
-                preg_quote($this->provider->getConfiguration()->getTableSuffix(), '#')
+                preg_quote($configuration->getTablePrefix(), '#'),
+                preg_quote($configuration->getTableSuffix(), '#')
             ),
             $table->getName()
         );

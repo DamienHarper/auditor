@@ -86,6 +86,9 @@ class Query
         return false === $result ? 0 : $result;
     }
 
+    /**
+     * @param mixed $value
+     */
     public function addFilter(string $name, $value): self
     {
         $this->checkFilter($name);
@@ -95,6 +98,10 @@ class Query
         return $this;
     }
 
+    /**
+     * @param mixed $minValue
+     * @param mixed $maxValue
+     */
     public function addRangeFilter(string $name, $minValue = null, $maxValue = null): self
     {
         $this->checkFilter($name);
@@ -141,7 +148,7 @@ class Query
         return $this;
     }
 
-    public function limit(int $limit, ?int $offset = 0): self
+    public function limit(int $limit, int $offset = 0): self
     {
         if (0 > $limit) {
             throw new InvalidArgumentException('Limit cannot be negative.');

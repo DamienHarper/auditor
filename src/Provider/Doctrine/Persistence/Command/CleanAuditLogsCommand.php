@@ -5,8 +5,10 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Command;
 use DateInterval;
 use DateTime;
 use DH\Auditor\Auditor;
+use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Updater\UpdateManager;
+use DH\Auditor\Provider\ProviderInterface;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Exception;
 use Symfony\Component\Console\Command\Command;
@@ -30,7 +32,7 @@ class CleanAuditLogsCommand extends Command
     private $auditor;
 
     /**
-     * @var DoctrineProvider
+     * @var ProviderInterface
      */
     private $provider;
 
@@ -66,14 +68,14 @@ class CleanAuditLogsCommand extends Command
 
         $io = new SymfonyStyle($input, $output);
 
-        if (is_numeric($input->getArgument('keep'))) {
+        $keep = $input->getArgument('keep');
+        $keep = (\is_array($keep) ? $keep[0] : $keep);
+        if (is_numeric($keep)) {
             $deprecationMessage = "Providing an integer value for the 'keep' argument is deprecated. Please use the ISO 8601 duration format (e.g. P12M).";
             @trigger_error($deprecationMessage, E_USER_DEPRECATED);
             $io->writeln($deprecationMessage);
 
-            $keep = (int) $input->getArgument('keep');
-
-            if ($keep <= 0) {
+            if ((int) $keep <= 0) {
                 $io->error("'keep' argument must be a positive number.");
                 $this->release();
 
@@ -83,12 +85,10 @@ class CleanAuditLogsCommand extends Command
             $until = new DateTime();
             $until->modify('-'.$keep.' month');
         } else {
-            $keep = (string) ($input->getArgument('keep'));
-
             try {
-                $dateInterval = new DateInterval($keep);
+                $dateInterval = new DateInterval((string) $keep);
             } catch (Exception $e) {
-                $io->error(sprintf("'keep' argument must be a valid ISO 8601 date interval. '%s' given.", $keep));
+                $io->error(sprintf("'keep' argument must be a valid ISO 8601 date interval. '%s' given.", (string) $keep));
                 $this->release();
 
                 return 0;
@@ -99,24 +99,26 @@ class CleanAuditLogsCommand extends Command
         }
 
         $this->provider = $this->auditor->getProvider(DoctrineProvider::class);
-        $entities = $this->provider->getConfiguration()->getEntities();
 
-        $updateManager = new UpdateManager($this->provider);
+        /** @var DoctrineProvider $provider */
+        $provider = $this->provider;
+        $updateManager = new UpdateManager($provider);
 
-        $storageEntityManagers = $this->provider->getStorageEntityManagers();
+//        $entities = $this->provider->getConfiguration()->getEntities();
+        $storageEntityManagers = $this->provider->getStorageServices();
 
         // auditable entities by storage entity manager
         $repository = [];
         $count = 0;
 
         // Collect auditable entities from auditing storage managers
-        $auditingEntityManagers = $this->provider->getAuditingEntityManagers();
+        $auditingEntityManagers = $this->provider->getAuditingServices();
         foreach ($auditingEntityManagers as $name => $auditingEntityManager) {
             $classes = $updateManager->getAuditableTableNames($auditingEntityManager);
             // Populate the auditable entities repository
             foreach ($classes as $entity => $tableName) {
                 $em = $this->provider->getEntityManagerForEntity($entity);
-                $key = array_search($em, $this->provider->getStorageEntityManagers(), true);
+                $key = array_search($em, $this->provider->getStorageServices(), true);
                 if (!isset($repository[$key])) {
                     $repository[$key] = [];
                 }
@@ -134,6 +136,9 @@ class CleanAuditLogsCommand extends Command
         $confirm = $input->getOption('no-confirm') ? true : $io->confirm($message, false);
 
         if ($confirm) {
+            /** @var Configuration $configuration */
+            $configuration = $this->provider->getConfiguration();
+
             $progressBar = new ProgressBar($output, $count);
             $progressBar->setBarWidth(70);
             $progressBar->setFormat("%message%\n".$progressBar->getFormatDefinition('debug'));
@@ -147,8 +152,8 @@ class CleanAuditLogsCommand extends Command
                         sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($tablename, '#')),
                         sprintf(
                             '$1%s$2%s',
-                            preg_quote($this->provider->getConfiguration()->getTablePrefix(), '#'),
-                            preg_quote($this->provider->getConfiguration()->getTableSuffix(), '#')
+                            preg_quote($configuration->getTablePrefix(), '#'),
+                            preg_quote($configuration->getTableSuffix(), '#')
                         ),
                         $tablename
                     );

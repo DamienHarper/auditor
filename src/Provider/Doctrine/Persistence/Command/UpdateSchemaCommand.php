@@ -59,8 +59,11 @@ class UpdateSchemaCommand extends Command
         $dumpSql = true === $input->getOption('dump-sql');
         $force = true === $input->getOption('force');
 
-        $updater = new UpdateManager($this->auditor->getProvider(DoctrineProvider::class));
-        $sqls = $updater->getUpdateAuditSchemaSql();
+        /** @var DoctrineProvider $provider */
+        $provider = $this->auditor->getProvider(DoctrineProvider::class);
+        $updateManager = new UpdateManager($provider);
+
+        $sqls = $updateManager->getUpdateAuditSchemaSql();
 
         $count = 0;
         foreach ($sqls as $entityManagerName => $queries) {
@@ -95,7 +98,7 @@ class UpdateSchemaCommand extends Command
             $progressBar = new ProgressBar($output, \count($sqls));
             $progressBar->start();
 
-            $updater->updateAuditSchema($sqls, static function (array $progress) use ($progressBar): void {
+            $updateManager->updateAuditSchema($sqls, static function (array $progress) use ($progressBar): void {
                 $progressBar->advance();
             });
 

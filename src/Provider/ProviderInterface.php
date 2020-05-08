@@ -11,9 +11,15 @@ interface ProviderInterface
 
     public function getAuditor(): Auditor;
 
+    public function getConfiguration(): ConfigurationInterface;
+
     public function isRegistered(): bool;
 
     public function persist(LifecycleEvent $event): void;
+
+    public function getStorageServices(): array;
+
+    public function getAuditingServices(): array;
 
     /**
      * Provider supports audit storage.

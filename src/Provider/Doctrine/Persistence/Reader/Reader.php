@@ -6,6 +6,7 @@ use ArrayIterator;
 use DH\Auditor\Exception\AccessDeniedException;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
+use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\User\UserInterface;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMMetadata;
@@ -28,7 +29,7 @@ class Reader
         $this->provider = $provider;
     }
 
-    public function createQuery(string $entity, ?array $options = []): Query
+    public function createQuery(string $entity, array $options = []): Query
     {
         $this->checkAuditable($entity);
         $this->checkRoles($entity, Security::VIEW_SCOPE);
@@ -105,9 +106,11 @@ class Reader
      */
     public function getAuditsByTransactionHash(string $transactionHash): array
     {
+        /** @var Configuration $configuration */
+        $configuration = $this->provider->getConfiguration();
         $results = [];
 
-        $entities = $this->provider->getConfiguration()->getEntities();
+        $entities = $configuration->getEntities();
         foreach ($entities as $entity => $tablename) {
             try {
                 $audits = $this->createQuery($entity, ['transaction_hash' => $transactionHash])->execute();
@@ -122,7 +125,7 @@ class Reader
         return $results;
     }
 
-    public function paginate(Query $query, ?int $page = 1, ?int $pageSize = self::PAGE_SIZE): array
+    public function paginate(Query $query, int $page = 1, int $pageSize = self::PAGE_SIZE): array
     {
         $numResults = $query->count();
         $currentPage = $page < 1 ? 1 : $page;
@@ -154,6 +157,8 @@ class Reader
      */
     public function getEntityAuditTableName(string $entity): string
     {
+        /** @var Configuration $configuration */
+        $configuration = $this->provider->getConfiguration();
         $entityManager = $this->provider->getEntityManagerForEntity($entity);
         $schema = '';
         if ($entityManager->getClassMetadata($entity)->getSchemaName()) {
@@ -163,9 +168,9 @@ class Reader
         return sprintf(
             '%s%s%s%s',
             $schema,
-            $this->provider->getConfiguration()->getTablePrefix(),
+            $configuration->getTablePrefix(),
             $this->getEntityTableName($entity),
-            $this->provider->getConfiguration()->getTableSuffix()
+            $configuration->getTableSuffix()
         );
     }
 
@@ -188,6 +193,9 @@ class Reader
      */
     private function checkRoles(string $entity, string $scope): void
     {
+        /** @var Configuration $configuration */
+        $configuration = $this->provider->getConfiguration();
+
         $userProvider = $this->provider->getUserProvider();
         $user = null === $userProvider ? null : $userProvider->call($this);
 
@@ -197,7 +205,7 @@ class Reader
             return;
         }
 
-        $entities = $this->provider->getEntities();
+        $entities = $configuration->getEntities();
 
         $roles = $entities[$entity]['roles'] ?? null;
         if (null === $roles) {

@@ -6,6 +6,7 @@ use Closure;
 use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\Exception\ProviderException;
 use DH\Auditor\Provider\AbstractProvider;
+use DH\Auditor\Provider\ConfigurationInterface;
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
 use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
@@ -21,7 +22,7 @@ class DoctrineProvider extends AbstractProvider
     public const BOTH = 3;
 
     /**
-     * @var Configuration
+     * @var ConfigurationInterface
      */
     private $configuration;
 
@@ -60,13 +61,13 @@ class DoctrineProvider extends AbstractProvider
      */
     private $ipProvider;
 
-    public function __construct(Configuration $configuration)
+    public function __construct(ConfigurationInterface $configuration)
     {
         $this->configuration = $configuration;
         $this->transactionManager = new TransactionManager($this);
     }
 
-    public function getConfiguration(): Configuration
+    public function getConfiguration(): ConfigurationInterface
     {
         return $this->configuration;
     }
@@ -215,7 +216,9 @@ class DoctrineProvider extends AbstractProvider
     {
         $class = DoctrineHelper::getRealClassName($entity);
         // is $entity part of audited entities?
-        if (!\array_key_exists($class, $this->configuration->getEntities())) {
+        /** @var Configuration $configuration */
+        $configuration = $this->configuration;
+        if (!\array_key_exists($class, $configuration->getEntities())) {
             // no => $entity is not audited
             return false;
         }
@@ -234,15 +237,17 @@ class DoctrineProvider extends AbstractProvider
             return false;
         }
 
+        /** @var Configuration $configuration */
+        $configuration = $this->configuration;
         $class = DoctrineHelper::getRealClassName($entity);
 
         // is $entity part of audited entities?
-        if (!\array_key_exists($class, $this->configuration->getEntities())) {
+        if (!\array_key_exists($class, $configuration->getEntities())) {
             // no => $entity is not audited
             return false;
         }
 
-        $entityOptions = $this->configuration->getEntities()[$class];
+        $entityOptions = $configuration->getEntities()[$class];
 
         if (null === $entityOptions) {
             // no option defined => $entity is audited
@@ -264,7 +269,9 @@ class DoctrineProvider extends AbstractProvider
     public function isAuditedField($entity, string $field): bool
     {
         // is $field is part of globally ignored columns?
-        if (\in_array($field, $this->configuration->getIgnoredColumns(), true)) {
+        /** @var Configuration $configuration */
+        $configuration = $this->configuration;
+        if (\in_array($field, $configuration->getIgnoredColumns(), true)) {
             // yes => $field is not audited
             return false;
         }
@@ -276,7 +283,7 @@ class DoctrineProvider extends AbstractProvider
         }
 
         $class = DoctrineHelper::getRealClassName($entity);
-        $entityOptions = $this->configuration->getEntities()[$class];
+        $entityOptions = $configuration->getEntities()[$class];
 
         if (null === $entityOptions) {
             // no option defined => $field is audited
@@ -291,6 +298,16 @@ class DoctrineProvider extends AbstractProvider
         }
 
         return true;
+    }
+
+    public function getStorageServices(): array
+    {
+        return $this->getStorageEntityManagers();
+    }
+
+    public function getAuditingServices(): array
+    {
+        return $this->getAuditingEntityManagers();
     }
 
     /**
@@ -354,9 +371,11 @@ class DoctrineProvider extends AbstractProvider
 
     private function loadAnnotations(EntityManagerInterface $entityManager): self
     {
+        /** @var Configuration $configuration */
+        $configuration = $this->configuration;
         $annotationLoader = new AnnotationLoader($entityManager);
-        $this->configuration->setEntities(array_merge(
-            $this->configuration->getEntities(),
+        $configuration->setEntities(array_merge(
+            $configuration->getEntities(),
             $annotationLoader->load()
         ));
 

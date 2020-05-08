@@ -6,10 +6,10 @@ use DateTime;
 use DateTimeZone;
 use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\Model\TransactionInterface;
+use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
-use DH\Auditor\Provider\ProviderInterface;
 use DH\Auditor\Transaction\TransactionProcessorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -23,13 +23,14 @@ class TransactionProcessor implements TransactionProcessorInterface
      */
     private $provider;
 
-    public function __construct(ProviderInterface $provider)
+    public function __construct(DoctrineProvider $provider)
     {
         $this->provider = $provider;
     }
 
     public function process(TransactionInterface $transaction): void
     {
+        /** @var Transaction $transaction */
         $this->processInsertions($transaction, $transaction->getEntityManager());
         $this->processUpdates($transaction, $transaction->getEntityManager());
         $this->processAssociations($transaction, $transaction->getEntityManager());
@@ -52,10 +53,8 @@ class TransactionProcessor implements TransactionProcessorInterface
 
     /**
      * Adds an insert entry to the audit table.
-     *
-     * @param mixed $entity
      */
-    private function insert(EntityManagerInterface $entityManager, $entity, array $ch, string $transactionHash): void
+    private function insert(EntityManagerInterface $entityManager, object $entity, array $ch, string $transactionHash): void
     {
         $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
         $this->audit([
@@ -73,10 +72,8 @@ class TransactionProcessor implements TransactionProcessorInterface
 
     /**
      * Adds an update entry to the audit table.
-     *
-     * @param mixed $entity
      */
-    private function update(EntityManagerInterface $entityManager, $entity, array $ch, string $transactionHash): void
+    private function update(EntityManagerInterface $entityManager, object $entity, array $ch, string $transactionHash): void
     {
         $diff = $this->diff($entityManager, $entity, $ch);
         if (0 === \count($diff)) {
@@ -100,10 +97,9 @@ class TransactionProcessor implements TransactionProcessorInterface
     /**
      * Adds a remove entry to the audit table.
      *
-     * @param mixed $entity
      * @param mixed $id
      */
-    private function remove(EntityManagerInterface $entityManager, $entity, $id, string $transactionHash): void
+    private function remove(EntityManagerInterface $entityManager, object $entity, $id, string $transactionHash): void
     {
         $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
         $this->audit([
@@ -121,22 +117,16 @@ class TransactionProcessor implements TransactionProcessorInterface
 
     /**
      * Adds an association entry to the audit table.
-     *
-     * @param mixed $source
-     * @param mixed $target
      */
-    private function associate(EntityManagerInterface $entityManager, $source, $target, array $mapping, string $transactionHash): void
+    private function associate(EntityManagerInterface $entityManager, object $source, object $target, array $mapping, string $transactionHash): void
     {
         $this->associateOrDissociate('associate', $entityManager, $source, $target, $mapping, $transactionHash);
     }
 
     /**
      * Adds a dissociation entry to the audit table.
-     *
-     * @param mixed $source
-     * @param mixed $target
      */
-    private function dissociate(EntityManagerInterface $entityManager, $source, $target, array $mapping, string $transactionHash): void
+    private function dissociate(EntityManagerInterface $entityManager, object $source, object $target, array $mapping, string $transactionHash): void
     {
         $this->associateOrDissociate('dissociate', $entityManager, $source, $target, $mapping, $transactionHash);
     }
@@ -184,11 +174,8 @@ class TransactionProcessor implements TransactionProcessorInterface
 
     /**
      * Adds an association entry to the audit table.
-     *
-     * @param mixed $source
-     * @param mixed $target
      */
-    private function associateOrDissociate(string $type, EntityManagerInterface $entityManager, $source, $target, array $mapping, string $transactionHash): void
+    private function associateOrDissociate(string $type, EntityManagerInterface $entityManager, object $source, object $target, array $mapping, string $transactionHash): void
     {
         $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($source));
         $data = [
@@ -218,8 +205,10 @@ class TransactionProcessor implements TransactionProcessorInterface
      */
     private function audit(array $data): void
     {
+        /** @var Configuration $configuration */
+        $configuration = $this->provider->getConfiguration();
         $schema = $data['schema'] ? $data['schema'].'.' : '';
-        $auditTable = $schema.$this->provider->getConfiguration()->getTablePrefix().$data['table'].$this->provider->getConfiguration()->getTableSuffix();
+        $auditTable = $schema.$configuration->getTablePrefix().$data['table'].$configuration->getTableSuffix();
         $dt = new DateTime('now', new DateTimeZone($this->provider->getAuditor()->getConfiguration()->getTimezone()));
 
         $payload = [
@@ -242,7 +231,7 @@ class TransactionProcessor implements TransactionProcessorInterface
         $this->notify($payload);
     }
 
-    private function getDiscriminator($entity, int $inheritanceType): ?string
+    private function getDiscriminator(object $entity, int $inheritanceType): ?string
     {
         return ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE === $inheritanceType ? DoctrineHelper::getRealClassName($entity) : null;
     }

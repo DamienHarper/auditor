@@ -2,9 +2,10 @@
 
 namespace DH\Auditor\Provider\Doctrine;
 
+use DH\Auditor\Provider\ConfigurationInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class Configuration
+class Configuration implements ConfigurationInterface
 {
     /**
      * @var string

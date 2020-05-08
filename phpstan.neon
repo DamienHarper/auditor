@@ -10,16 +10,18 @@ parameters:
 
 #    excludes_analyse:
 #        - '%currentWorkingDirectory%/src/DoctrineAuditBundle/DependencyInjection/Configuration.php'
-#
-#    ignoreErrors:
-#        # false positives
-#        - '~Parameter \#1 \$name of method Symfony\\Component\\Console\\Command\\Command\:\:setName\(\) expects string, string\|null given~'
+
+    ignoreErrors:
+        # false positives
+        - '~Parameter \#1 \$name of method Symfony\\Component\\Console\\Command\\Command\:\:setName\(\) expects string, string\|null given~'
 #        - '~Parameter \#1 \$tableName of method Doctrine\\DBAL\\Schema\\Schema\:\:(has|get)Table\(\) expects string, string\|null given~'
-#        - '~Parameter \#1 \$(first|max)Results? of method Doctrine\\DBAL\\Query\\QueryBuilder\:\:set(First|Max)Results?\(\) expects int, null given~'
-#        - '~Parameter \#1 \$event of method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface\:\:dispatch\(\) expects object, string given~'
-#        - '~Parameter \#2 \$eventName of method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface\:\:dispatch\(\) expects string\|null, DH\\DoctrineAuditBundle\\Event\\LifecycleEvent given\.~'
-#        - '~Cannot call method fetchColumn\(\) on Doctrine\\DBAL\\Driver\\Statement\|int~'
-#        - '~Cannot call method fetchAll\(\) on Doctrine\\DBAL\\Driver\\Statement\|int~'
+        - '~Parameter \#1 \$(first|max)Results? of method Doctrine\\DBAL\\Query\\QueryBuilder\:\:set(First|Max)Results?\(\) expects int, null given~'
+        - '~Parameter \#1 \$event of method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface\:\:dispatch\(\) expects object, string given~'
+        - '~Parameter \#2 \$eventName of method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface\:\:dispatch\(\) expects string\|null, DH\\Auditor\\Event\\LifecycleEvent given\.~'
+        - '~Parameter \#1 \$entity of method DH\\Auditor\\Provider\\Doctrine\\Persistence\\Updater\\UpdateManager\:\:(create|update)AuditTable\(\) expects string, string\|null given.~'
+        - '~Cannot call method setFetchMode\(\) on Doctrine\\DBAL\\Driver\\ResultStatement\|int~'
+        - '~Cannot call method fetchColumn\(\) on Doctrine\\DBAL\\Driver\\ResultStatement\|int~'
+        - '~Cannot call method fetchAll\(\) on Doctrine\\DBAL\\Driver\\ResultStatement\|int~'
 #        - '~Cannot cast array\<string\>\|string\|null to string\.~'
 #        - '~Cannot cast array\<string\>\|string\|null to int\.~'
 #        - '~Call to an undefined method Symfony\\Component\\Security\\Core\\Authentication\\Token\\TokenInterface\:\:getRoles\(\)\.~'
