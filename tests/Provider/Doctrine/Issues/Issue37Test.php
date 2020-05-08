@@ -74,7 +74,7 @@ final class Issue37Test extends TestCase
 
         $this->provider->registerEntityManager(
             $this->createEntityManager([
-                __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
+                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
                 __DIR__.'/../Fixtures/Issue37',
             ]),
             DoctrineProvider::BOTH,

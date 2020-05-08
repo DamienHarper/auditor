@@ -3,8 +3,8 @@
 namespace DH\Auditor\Transaction;
 
 use DH\Auditor\Model\TransactionInterface;
-use DH\Auditor\Provider\Doctrine\Audit\Transaction\TransactionHydrator;
-use DH\Auditor\Provider\Doctrine\Audit\Transaction\TransactionProcessor;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionHydrator;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionProcessor;
 use DH\Auditor\Provider\ProviderInterface;
 
 class TransactionManager

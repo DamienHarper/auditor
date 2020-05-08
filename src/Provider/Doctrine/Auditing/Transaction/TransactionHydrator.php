@@ -1,6 +1,6 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Audit\Transaction;
+namespace DH\Auditor\Provider\Doctrine\Auditing\Transaction;
 
 use DH\Auditor\Model\TransactionInterface;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;

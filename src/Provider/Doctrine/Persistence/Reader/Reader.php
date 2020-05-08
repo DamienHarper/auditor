@@ -5,7 +5,7 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
 use ArrayIterator;
 use DH\Auditor\Exception\AccessDeniedException;
 use DH\Auditor\Exception\InvalidArgumentException;
-use DH\Auditor\Provider\Doctrine\Audit\Annotation\Security;
+use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\User\UserInterface;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMMetadata;

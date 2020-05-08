@@ -1,9 +1,9 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Audit\Event;
+namespace DH\Auditor\Provider\Doctrine\Auditing\Event;
 
-use DH\Auditor\Provider\Doctrine\Audit\Logger\Logger;
-use DH\Auditor\Provider\Doctrine\Audit\Logger\LoggerChain;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Logger;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\LoggerChain;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Transaction\TransactionManager;
 use Doctrine\Common\EventSubscriber;

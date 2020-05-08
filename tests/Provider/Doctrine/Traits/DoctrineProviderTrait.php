@@ -37,7 +37,7 @@ trait DoctrineProviderTrait
         // Entity manager "default" is used both for auditing and storage
         $provider->registerEntityManager($this->createEntityManager(
             [
-                __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
+                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
                 __DIR__.'/../Fixtures/Entity/Standard/Blog',
             ]
         ));
@@ -67,7 +67,7 @@ trait DoctrineProviderTrait
         $provider->registerEntityManager(
             $this->createEntityManager(
                 [
-                    __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
+                    __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
                     __DIR__.'/../Fixtures/Entity/Standard',
                 ]
             ),
@@ -89,7 +89,7 @@ trait DoctrineProviderTrait
         $provider->registerEntityManager(
             $this->createEntityManager(
                 [
-                    __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
+                    __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
                     __DIR__.'/../Fixtures/Entity/Standard/Blog',
                 ],
                 'db1',
@@ -111,7 +111,7 @@ trait DoctrineProviderTrait
         $provider->registerEntityManager(
             $this->createEntityManager(
                 [
-                    __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
+                    __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
                     __DIR__.'/../Fixtures/Entity/Inheritance',
                 ],
                 'db2',
@@ -141,7 +141,7 @@ trait DoctrineProviderTrait
         // Entity manager "aem1" is used for auditing only
         $provider->registerEntityManager(
             $this->createEntityManager([
-                __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
+                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
                 __DIR__.'/../Fixtures/Entity/Standard',
             ]),
             DoctrineProvider::AUDITING_ONLY,
@@ -151,7 +151,7 @@ trait DoctrineProviderTrait
         // Entity manager "aem2" is used for auditing only
         $provider->registerEntityManager(
             $this->createEntityManager([
-                __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
+                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
                 __DIR__.'/../Fixtures/Entity/Inheritance',
             ]),
             DoctrineProvider::AUDITING_ONLY,
@@ -161,7 +161,7 @@ trait DoctrineProviderTrait
         // Entity manager "sem1" is used for storage only
         $provider->registerEntityManager(
             $this->createEntityManager([
-                __DIR__.'/../../../../src/Provider/Doctrine/Audit/Annotation',
+                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
                 __DIR__.'/../Fixtures/Entity/Standard',
             ]),
             DoctrineProvider::STORAGE_ONLY,

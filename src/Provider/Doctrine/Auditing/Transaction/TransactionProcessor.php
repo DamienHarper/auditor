@@ -1,6 +1,6 @@
 <?php
 
-namespace DH\Auditor\Provider\Doctrine\Audit\Transaction;
+namespace DH\Auditor\Provider\Doctrine\Auditing\Transaction;
 
 use DateTime;
 use DateTimeZone;

@@ -1,10 +1,10 @@
 <?php
 
-namespace DH\Auditor\Tests\Provider\Doctrine\Audit\Transaction;
+namespace DH\Auditor\Tests\Provider\Doctrine\Auditing\Transaction;
 
 use DateTime;
 use DH\Auditor\Model\Transaction;
-use DH\Auditor\Provider\Doctrine\Audit\Transaction\TransactionProcessor;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionProcessor;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;

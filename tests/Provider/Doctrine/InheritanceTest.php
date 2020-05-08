@@ -106,7 +106,7 @@ final class InheritanceTest extends TestCase
 
         $this->provider->registerEntityManager(
             $this->createEntityManager([
-                __DIR__.'/../../../src/Provider/Doctrine/Audit/Annotation',
+                __DIR__.'/../../../src/Provider/Doctrine/Auditing/Annotation',
                 __DIR__.'/Fixtures/Entity/Inheritance',
             ]),
             DoctrineProvider::BOTH,
