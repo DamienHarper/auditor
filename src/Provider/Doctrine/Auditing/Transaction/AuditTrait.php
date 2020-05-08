@@ -117,8 +117,8 @@ trait AuditTrait
 
             if ($o !== $n) {
                 $diff[$fieldName] = [
-                    'old' => $o,
                     'new' => $n,
+                    'old' => $o,
                 ];
             }
         }
@@ -154,12 +154,15 @@ trait AuditTrait
             $label = DoctrineHelper::getRealClassName($entity).'#'.$pkValue;
         }
 
-        return [
-            'label' => $label,
-            'class' => $meta->name,
-            'table' => $meta->getTableName(),
+        $data = [
             $pkName => $pkValue,
+            'class' => $meta->name,
+            'label' => $label,
+            'table' => $meta->getTableName(),
         ];
+        ksort($data);
+
+        return $data;
     }
 
     /**
@@ -187,11 +190,11 @@ trait AuditTrait
         }
 
         return [
+            'client_ip' => $client_ip,
+            'user_firewall' => $user_firewall,
+            'user_fqdn' => $user_fqdn,
             'user_id' => $user_id,
             'username' => $username,
-            'client_ip' => $client_ip,
-            'user_fqdn' => $user_fqdn,
-            'user_firewall' => $user_firewall,
         ];
     }
 }

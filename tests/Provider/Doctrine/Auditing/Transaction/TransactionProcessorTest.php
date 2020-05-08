@@ -56,12 +56,12 @@ final class TransactionProcessorTest extends TestCase
         self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         self::assertSame([
             'email' => [
-                'old' => null,
                 'new' => 'john.doe@gmail.com',
+                'old' => null,
             ],
             'fullname' => [
-                'old' => null,
                 'new' => 'John Doe',
+                'old' => null,
             ],
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
     }
@@ -100,12 +100,12 @@ final class TransactionProcessorTest extends TestCase
         self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         self::assertSame([
             'email' => [
-                'old' => 'john.doe@gmail.com',
                 'new' => 'dark.vador@gmail.com',
+                'old' => 'john.doe@gmail.com',
             ],
             'fullname' => [
-                'old' => 'John Doe',
                 'new' => 'Dark Vador',
+                'old' => 'John Doe',
             ],
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
     }
@@ -136,10 +136,10 @@ final class TransactionProcessorTest extends TestCase
         self::assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
         self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         self::assertSame([
-            'label' => Author::class.'#1',
             'class' => Author::class,
-            'table' => $entityManager->getClassMetadata(Author::class)->getTableName(),
             'id' => 1,
+            'label' => Author::class.'#1',
+            'table' => $entityManager->getClassMetadata(Author::class)->getTableName(),
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
     }
 
@@ -200,16 +200,16 @@ final class TransactionProcessorTest extends TestCase
         self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         self::assertSame([
             'source' => [
-                'label' => Author::class.'#1',
                 'class' => Author::class,
-                'table' => $entityManager->getClassMetadata(Author::class)->getTableName(),
                 'id' => 1,
+                'label' => Author::class.'#1',
+                'table' => $entityManager->getClassMetadata(Author::class)->getTableName(),
             ],
             'target' => [
-                'label' => (string) $post,
                 'class' => Post::class,
-                'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
                 'id' => 1,
+                'label' => (string) $post,
+                'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
             ],
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
     }
@@ -268,16 +268,16 @@ final class TransactionProcessorTest extends TestCase
         self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         self::assertSame([
             'source' => [
-                'label' => Author::class.'#1',
                 'class' => Author::class,
-                'table' => $entityManager->getClassMetadata(Author::class)->getTableName(),
                 'id' => 1,
+                'label' => Author::class.'#1',
+                'table' => $entityManager->getClassMetadata(Author::class)->getTableName(),
             ],
             'target' => [
-                'label' => (string) $post,
                 'class' => Post::class,
-                'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
                 'id' => 1,
+                'label' => (string) $post,
+                'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
             ],
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
     }
@@ -383,16 +383,16 @@ final class TransactionProcessorTest extends TestCase
         self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         self::assertSame([
             'source' => [
-                'label' => (string) $post,
                 'class' => Post::class,
-                'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
                 'id' => 1,
+                'label' => (string) $post,
+                'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
             ],
             'target' => [
-                'label' => Tag::class.'#2',
                 'class' => Tag::class,
-                'table' => $entityManager->getClassMetadata(Tag::class)->getTableName(),
                 'id' => 2,
+                'label' => Tag::class.'#2',
+                'table' => $entityManager->getClassMetadata(Tag::class)->getTableName(),
             ],
             'table' => 'post__tag',
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
@@ -405,16 +405,16 @@ final class TransactionProcessorTest extends TestCase
         self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         self::assertSame([
             'source' => [
-                'label' => (string) $post,
                 'class' => Post::class,
-                'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
                 'id' => 1,
+                'label' => (string) $post,
+                'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
             ],
             'target' => [
-                'label' => Tag::class.'#1',
                 'class' => Tag::class,
-                'table' => $entityManager->getClassMetadata(Tag::class)->getTableName(),
                 'id' => 1,
+                'label' => Tag::class.'#1',
+                'table' => $entityManager->getClassMetadata(Tag::class)->getTableName(),
             ],
             'table' => 'post__tag',
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
@@ -524,16 +524,16 @@ final class TransactionProcessorTest extends TestCase
         self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         self::assertSame([
             'source' => [
-                'label' => 'First post',
                 'class' => Post::class,
-                'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
                 'id' => 1,
+                'label' => 'First post',
+                'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
             ],
             'target' => [
-                'label' => Tag::class.'#2',
                 'class' => Tag::class,
-                'table' => $entityManager->getClassMetadata(Tag::class)->getTableName(),
                 'id' => 2,
+                'label' => Tag::class.'#2',
+                'table' => $entityManager->getClassMetadata(Tag::class)->getTableName(),
             ],
             'table' => 'post__tag',
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
@@ -548,8 +548,4 @@ final class TransactionProcessorTest extends TestCase
             Tag::class => ['enabled' => true],
         ]);
     }
-
-//    protected function setupEntities(): void
-//    {
-//    }
 }

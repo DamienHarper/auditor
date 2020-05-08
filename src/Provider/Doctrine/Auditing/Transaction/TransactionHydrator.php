@@ -22,9 +22,11 @@ class TransactionHydrator implements TransactionHydratorInterface
         $this->provider = $provider;
     }
 
+    /**
+     * @param Transaction $transaction
+     */
     public function hydrate(TransactionInterface $transaction): void
     {
-        /** @var Transaction $transaction */
         $this->hydrateWithScheduledInsertions($transaction, $transaction->getEntityManager());
         $this->hydrateWithScheduledUpdates($transaction, $transaction->getEntityManager());
         $this->hydrateWithScheduledDeletions($transaction, $transaction->getEntityManager());

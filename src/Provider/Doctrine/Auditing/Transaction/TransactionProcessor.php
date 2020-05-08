@@ -28,9 +28,11 @@ class TransactionProcessor implements TransactionProcessorInterface
         $this->provider = $provider;
     }
 
+    /**
+     * @param Transaction $transaction
+     */
     public function process(TransactionInterface $transaction): void
     {
-        /** @var Transaction $transaction */
         $this->processInsertions($transaction, $transaction->getEntityManager());
         $this->processUpdates($transaction, $transaction->getEntityManager());
         $this->processAssociations($transaction, $transaction->getEntityManager());
