@@ -178,6 +178,18 @@ class Entry
      */
     public function getDiffs(): ?array
     {
-        return json_decode($this->diffs, true);
+        return $this->sort(json_decode($this->diffs, true));
+    }
+
+    private function sort(array $array): array
+    {
+        ksort($array);
+        foreach ($array as $key => $value) {
+            if (\is_array($value)) {
+                $array[$key] = $this->sort($value);
+            }
+        }
+
+        return $array;
     }
 }

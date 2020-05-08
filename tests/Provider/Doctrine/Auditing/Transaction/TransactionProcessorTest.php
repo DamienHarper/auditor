@@ -388,13 +388,13 @@ final class TransactionProcessorTest extends TestCase
                 'label' => (string) $post,
                 'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
             ],
+            'table' => 'post__tag',
             'target' => [
                 'class' => Tag::class,
                 'id' => 2,
                 'label' => Tag::class.'#2',
                 'table' => $entityManager->getClassMetadata(Tag::class)->getTableName(),
             ],
-            'table' => 'post__tag',
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
 
         $entry = array_shift($audits);
@@ -410,13 +410,13 @@ final class TransactionProcessorTest extends TestCase
                 'label' => (string) $post,
                 'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
             ],
+            'table' => 'post__tag',
             'target' => [
                 'class' => Tag::class,
                 'id' => 1,
                 'label' => Tag::class.'#1',
                 'table' => $entityManager->getClassMetadata(Tag::class)->getTableName(),
             ],
-            'table' => 'post__tag',
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
     }
 
@@ -529,13 +529,13 @@ final class TransactionProcessorTest extends TestCase
                 'label' => 'First post',
                 'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
             ],
+            'table' => 'post__tag',
             'target' => [
                 'class' => Tag::class,
                 'id' => 2,
                 'label' => Tag::class.'#2',
                 'table' => $entityManager->getClassMetadata(Tag::class)->getTableName(),
             ],
-            'table' => 'post__tag',
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
     }
 

@@ -122,7 +122,6 @@ trait AuditTrait
                 ];
             }
         }
-        ksort($diff);
 
         return $diff;
     }
@@ -154,15 +153,12 @@ trait AuditTrait
             $label = DoctrineHelper::getRealClassName($entity).'#'.$pkValue;
         }
 
-        $data = [
+        return [
             $pkName => $pkValue,
             'class' => $meta->name,
             'label' => $label,
             'table' => $meta->getTableName(),
         ];
-        ksort($data);
-
-        return $data;
     }
 
     /**
