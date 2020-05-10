@@ -4,13 +4,15 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
+use DH\Auditor\Provider\Doctrine\Service\AuditingService;
+use DH\Auditor\Provider\Doctrine\Service\StorageService;
+use DH\Auditor\Provider\Service\StorageServiceInterface;
 use DH\Auditor\Tests\Fixtures\User\User;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Traits\AuditorTrait;
-use Doctrine\ORM\EntityManagerInterface;
 
 trait DoctrineProviderTrait
 {
@@ -35,12 +37,12 @@ trait DoctrineProviderTrait
         $provider = new DoctrineProvider($configuration ?? $this->createProviderConfiguration());
 
         // Entity manager "default" is used both for auditing and storage
-        $provider->registerEntityManager($this->createEntityManager(
-            [
-                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
-                __DIR__.'/../Fixtures/Entity/Standard/Blog',
-            ]
-        ));
+        $entityManager = $this->createEntityManager([
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../Fixtures/Entity/Standard/Blog',
+        ]);
+        $provider->registerStorageService(new StorageService('default', $entityManager));
+        $provider->registerAuditingService(new AuditingService('default', $entityManager));
 
         $provider->setUserProvider(function () {
             return new User(1, 'dark.vador');
@@ -64,67 +66,47 @@ trait DoctrineProviderTrait
         $provider = new DoctrineProvider($configuration ?? $this->createProviderConfiguration());
 
         // Entity manager "aem1" is used for auditing only
-        $provider->registerEntityManager(
-            $this->createEntityManager(
-                [
-                    __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
-                    __DIR__.'/../Fixtures/Entity/Standard',
-                ]
-            ),
-            DoctrineProvider::AUDITING_ONLY,
-            'aem1'
-        );
+        $provider->registerAuditingService(new AuditingService('aem1', $this->createEntityManager([
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../Fixtures/Entity/Standard',
+        ])));
 
         $db = self::getConnectionParameters();
 
-        // Entity manager "sem1" is used for storage only
+        // Entity manager "db1" is used for storage only
         if (!empty($db)) {
             $db['dbname'] = 'db1';
         } else {
             $db = [
                 'driver' => 'pdo_sqlite',
-                'path' => __DIR__.'/../../db1.sqlite',
+                'path' => __DIR__.'/../db1.sqlite',
             ];
         }
-        $provider->registerEntityManager(
-            $this->createEntityManager(
-                [
-                    __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
-                    __DIR__.'/../Fixtures/Entity/Standard/Blog',
-                ],
-                'db1',
-                $db
-            ),
-            DoctrineProvider::STORAGE_ONLY,
-            'sem1'
-        );
 
-        // Entity manager "sem2" is used for storage only
+        $provider->registerStorageService(new StorageService('db1', $this->createEntityManager([
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../Fixtures/Entity/Standard/Blog',
+        ], 'db1', $db)));
+
+        // Entity manager "db2" is used for storage only
         if (!empty($db)) {
             $db['dbname'] = 'db2';
         } else {
             $db = [
                 'driver' => 'pdo_sqlite',
-                'path' => __DIR__.'/../../db2.sqlite',
+                'path' => __DIR__.'/../db2.sqlite',
             ];
         }
-        $provider->registerEntityManager(
-            $this->createEntityManager(
-                [
-                    __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
-                    __DIR__.'/../Fixtures/Entity/Inheritance',
-                ],
-                'db2',
-                $db
-            ),
-            DoctrineProvider::STORAGE_ONLY,
-            'sem2'
-        );
+
+        $provider->registerStorageService(new StorageService('db2', $this->createEntityManager([
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../Fixtures/Entity/Inheritance',
+        ], 'db2', $db)));
 
         $auditor->registerProvider($provider);
 
-        $provider->setStorageMapper(function (string $entity, array $storageEntityManagers): EntityManagerInterface {
-            return \in_array($entity, [Author::class, Post::class, Comment::class, Tag::class], true) ? $storageEntityManagers['sem1'] : $storageEntityManagers['sem2'];
+        $provider->setStorageMapper(function (string $entity, array $storageServices): StorageServiceInterface {
+            return \in_array($entity, [Author::class, Post::class, Comment::class, Tag::class], true) ? $storageServices['db1'] : $storageServices['db2'];
         });
 
         return $provider;
@@ -139,34 +121,22 @@ trait DoctrineProviderTrait
         $provider = new DoctrineProvider($configuration ?? $this->createProviderConfiguration());
 
         // Entity manager "aem1" is used for auditing only
-        $provider->registerEntityManager(
-            $this->createEntityManager([
-                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
-                __DIR__.'/../Fixtures/Entity/Standard',
-            ]),
-            DoctrineProvider::AUDITING_ONLY,
-            'aem1'
-        );
+        $provider->registerAuditingService(new AuditingService('aem1', $this->createEntityManager([
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../Fixtures/Entity/Standard',
+        ])));
 
         // Entity manager "aem2" is used for auditing only
-        $provider->registerEntityManager(
-            $this->createEntityManager([
-                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
-                __DIR__.'/../Fixtures/Entity/Inheritance',
-            ]),
-            DoctrineProvider::AUDITING_ONLY,
-            'aem2'
-        );
+        $provider->registerAuditingService(new AuditingService('aem2', $this->createEntityManager([
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../Fixtures/Entity/Inheritance',
+        ])));
 
-        // Entity manager "sem1" is used for storage only
-        $provider->registerEntityManager(
-            $this->createEntityManager([
-                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
-                __DIR__.'/../Fixtures/Entity/Standard',
-            ]),
-            DoctrineProvider::STORAGE_ONLY,
-            'sem1'
-        );
+        // Entity manager "db1" is used for storage only
+        $provider->registerStorageService(new StorageService('db1', $this->createEntityManager([
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../Fixtures/Entity/Standard',
+        ])));
 
         $auditor->registerProvider($provider);
 

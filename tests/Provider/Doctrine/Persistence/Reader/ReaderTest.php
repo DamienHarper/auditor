@@ -7,6 +7,7 @@ use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Model\Entry;
 use DH\Auditor\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Query;
+use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
@@ -324,14 +325,15 @@ final class ReaderTest extends TestCase
     public function testGetAuditByTransactionHash(): void
     {
         $reader = $this->createReader();
-        $em = $this->provider->getEntityManagerForEntity(Author::class);
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
 
         $author = new Author();
         $author
             ->setFullname('John Doe')
             ->setEmail('john.doe@gmail.com')
         ;
-        $em->persist($author);
+        $storageService->getEntityManager()->persist($author);
 
         $post1 = new Post();
         $post1
@@ -349,9 +351,9 @@ final class ReaderTest extends TestCase
             ->setCreatedAt(new DateTime())
         ;
 
-        $em->persist($post1);
-        $em->persist($post2);
-        $em->flush();
+        $storageService->getEntityManager()->persist($post1);
+        $storageService->getEntityManager()->persist($post2);
+        $storageService->getEntityManager()->flush();
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Post::class)->execute();
@@ -368,14 +370,15 @@ final class ReaderTest extends TestCase
     public function testGetAllAuditsByTransactionHash(): void
     {
         $reader = $this->createReader();
-        $entityManager = $this->provider->getEntityManagerForEntity(Author::class);
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
 
         $author = new Author();
         $author
             ->setFullname('John Doe')
             ->setEmail('john.doe@gmail.com')
         ;
-        $entityManager->persist($author);
+        $storageService->getEntityManager()->persist($author);
 
         $post1 = new Post();
         $post1
@@ -393,16 +396,16 @@ final class ReaderTest extends TestCase
             ->setCreatedAt(new DateTime())
         ;
 
-        $entityManager->persist($post1);
-        $entityManager->persist($post2);
-        $entityManager->flush();
+        $storageService->getEntityManager()->persist($post1);
+        $storageService->getEntityManager()->persist($post2);
+        $storageService->getEntityManager()->flush();
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Post::class)->execute();
         $hash = $audits[0]->getTransactionHash();
 
-        $entityManager->remove($post2);
-        $entityManager->flush();
+        $storageService->getEntityManager()->remove($post2);
+        $storageService->getEntityManager()->flush();
 
         $reader = $this->createReader();
         $audits = $reader->getAuditsByTransactionHash($hash);

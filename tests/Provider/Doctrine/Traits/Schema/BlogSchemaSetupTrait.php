@@ -51,11 +51,11 @@ trait BlogSchemaSetupTrait
      */
     private function setupEntities(): void
     {
-        $entityManagers = [
-            Author::class => $this->provider->getEntityManagerForEntity(Author::class),
-            Post::class => $this->provider->getEntityManagerForEntity(Post::class),
-            Comment::class => $this->provider->getEntityManagerForEntity(Comment::class),
-            Tag::class => $this->provider->getEntityManagerForEntity(Tag::class),
+        $storageServices = [
+            Author::class => $this->provider->getStorageServiceForEntity(Author::class),
+            Post::class => $this->provider->getStorageServiceForEntity(Post::class),
+            Comment::class => $this->provider->getStorageServiceForEntity(Comment::class),
+            Tag::class => $this->provider->getStorageServiceForEntity(Tag::class),
         ];
 
         $author1 = new Author();
@@ -63,7 +63,7 @@ trait BlogSchemaSetupTrait
             ->setFullname('John')
             ->setEmail('john.doe@gmail.com')
         ;
-        $entityManagers[Author::class]->persist($author1);
+        $storageServices[Author::class]->getEntityManager()->persist($author1);
 
         $post1 = new Post();
         $post1
@@ -72,7 +72,7 @@ trait BlogSchemaSetupTrait
             ->setBody('Here is the body')
             ->setCreatedAt(new DateTime())
         ;
-        $entityManagers[Post::class]->persist($post1);
+        $storageServices[Post::class]->getEntityManager()->persist($post1);
 
         $comment1 = new Comment();
         $comment1
@@ -81,7 +81,7 @@ trait BlogSchemaSetupTrait
             ->setAuthor('Dark Vador')
             ->setCreatedAt(new DateTime())
         ;
-        $entityManagers[Comment::class]->persist($comment1);
+        $storageServices[Comment::class]->getEntityManager()->persist($comment1);
 
         $post2 = new Post();
         $post2
@@ -90,14 +90,14 @@ trait BlogSchemaSetupTrait
             ->setBody('Here is another body')
             ->setCreatedAt(new DateTime())
         ;
-        $entityManagers[Post::class]->persist($post2);
+        $storageServices[Post::class]->getEntityManager()->persist($post2);
 
         $author2 = new Author();
         $author2
             ->setFullname('Chuck Norris')
             ->setEmail('chuck.norris@gmail.com')
         ;
-        $entityManagers[Author::class]->persist($author2);
+        $storageServices[Author::class]->getEntityManager()->persist($author2);
 
         $post3 = new Post();
         $post3
@@ -106,7 +106,7 @@ trait BlogSchemaSetupTrait
             ->setBody('Here is another body')
             ->setCreatedAt(new DateTime())
         ;
-        $entityManagers[Post::class]->persist($post3);
+        $storageServices[Post::class]->getEntityManager()->persist($post3);
 
         $comment2 = new Comment();
         $comment2
@@ -115,7 +115,7 @@ trait BlogSchemaSetupTrait
             ->setAuthor('Yoshi')
             ->setCreatedAt(new DateTime())
         ;
-        $entityManagers[Comment::class]->persist($comment2);
+        $storageServices[Comment::class]->getEntityManager()->persist($comment2);
 
         $comment3 = new Comment();
         $comment3
@@ -124,19 +124,19 @@ trait BlogSchemaSetupTrait
             ->setAuthor('Mario')
             ->setCreatedAt(new DateTime())
         ;
-        $entityManagers[Comment::class]->persist($comment3);
+        $storageServices[Comment::class]->getEntityManager()->persist($comment3);
 
-        $this->flushAll($entityManagers);
+        $this->flushAll($storageServices);
 
         $author1->setFullname('John Doe');
-        $entityManagers[Author::class]->persist($author1);
+        $storageServices[Author::class]->getEntityManager()->persist($author1);
 
         $author3 = new Author();
         $author3
             ->setFullname('Luke Slywalker')
             ->setEmail('luke.skywalker@gmail.com')
         ;
-        $entityManagers[Author::class]->persist($author3);
+        $storageServices[Author::class]->getEntityManager()->persist($author3);
 
         $post4 = new Post();
         $post4
@@ -145,29 +145,29 @@ trait BlogSchemaSetupTrait
             ->setBody('Here is the body')
             ->setCreatedAt(new DateTime())
         ;
-        $entityManagers[Post::class]->persist($post4);
+        $storageServices[Post::class]->getEntityManager()->persist($post4);
 
         $tag1 = new Tag();
         $tag1->setTitle('techno');
-        $entityManagers[Tag::class]->persist($tag1);
+        $storageServices[Tag::class]->getEntityManager()->persist($tag1);
 
         $tag2 = new Tag();
         $tag2->setTitle('house');
-        $entityManagers[Tag::class]->persist($tag2);
+        $storageServices[Tag::class]->getEntityManager()->persist($tag2);
 
         $tag3 = new Tag();
         $tag3->setTitle('hardcore');
-        $entityManagers[Tag::class]->persist($tag3);
+        $storageServices[Tag::class]->getEntityManager()->persist($tag3);
 
         $tag4 = new Tag();
         $tag4->setTitle('jungle');
-        $entityManagers[Tag::class]->persist($tag4);
+        $storageServices[Tag::class]->getEntityManager()->persist($tag4);
 
         $tag5 = new Tag();
         $tag5->setTitle('gabber');
-        $entityManagers[Tag::class]->persist($tag5);
+        $storageServices[Tag::class]->getEntityManager()->persist($tag5);
 
-        $this->flushAll($entityManagers);
+        $this->flushAll($storageServices);
 
         $post1
             ->addTag($tag1)
@@ -184,18 +184,18 @@ trait BlogSchemaSetupTrait
             ->addTag($tag5)
         ;
 
-        $this->flushAll($entityManagers);
+        $this->flushAll($storageServices);
 
         $post4
             ->removeTag($tag4)
             ->removeTag($tag5)
         ;
-        $this->flushAll($entityManagers);
+        $this->flushAll($storageServices);
 
         $author3->removePost($post4);
-        $this->flushAll($entityManagers);
+        $this->flushAll($storageServices);
 
-        $entityManagers[Author::class]->remove($author3);
-        $this->flushAll($entityManagers);
+        $storageServices[Author::class]->getEntityManager()->remove($author3);
+        $this->flushAll($storageServices);
     }
 }

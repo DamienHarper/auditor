@@ -8,6 +8,7 @@ use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
+use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\User\UserInterface;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMMetadata;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -37,7 +38,10 @@ class Reader
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
         $config = $resolver->resolve($options);
-        $entityManager = $this->provider->getEntityManagerForEntity($entity);
+
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity($entity);
+        $entityManager = $storageService->getEntityManager();
 
         $query = new Query($this->getEntityAuditTableName($entity), $entityManager->getConnection());
         $query
@@ -149,7 +153,10 @@ class Reader
      */
     public function getEntityTableName(string $entity): string
     {
-        return $this->provider->getEntityManagerForEntity($entity)->getClassMetadata($entity)->getTableName();
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity($entity);
+
+        return $storageService->getEntityManager()->getClassMetadata($entity)->getTableName();
     }
 
     /**
@@ -159,7 +166,10 @@ class Reader
     {
         /** @var Configuration $configuration */
         $configuration = $this->provider->getConfiguration();
-        $entityManager = $this->provider->getEntityManagerForEntity($entity);
+
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity($entity);
+        $entityManager = $storageService->getEntityManager();
         $schema = '';
         if ($entityManager->getClassMetadata($entity)->getSchemaName()) {
             $schema = $entityManager->getClassMetadata($entity)->getSchemaName().'.';

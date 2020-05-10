@@ -1,12 +1,14 @@
 <?php
 
-namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Updater;
+namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema;
 
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
+use DH\Auditor\Provider\Doctrine\Service\AuditingService;
+use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use DH\Auditor\Tests\Traits\ReflectionTrait;
@@ -20,7 +22,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  */
-final class UpdateManagerTest extends TestCase
+final class SchemaManagerTest extends TestCase
 {
     use DefaultSchemaSetupTrait;
     use ReflectionTrait;
@@ -29,7 +31,9 @@ final class UpdateManagerTest extends TestCase
     {
         $updater = new SchemaManager($this->provider);
 
-        $entityManager = $this->provider->getEntityManagerForEntity(Author::class);
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $entityManager = $storageService->getEntityManager();
         $schemaManager = $entityManager->getConnection()->getSchemaManager();
         $fromSchema = $schemaManager->createSchema();
 
@@ -69,7 +73,9 @@ final class UpdateManagerTest extends TestCase
     {
         $updater = new SchemaManager($this->provider);
 
-        $entityManager = $this->provider->getEntityManagerForEntity(Author::class);
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $entityManager = $storageService->getEntityManager();
         $schemaManager = $entityManager->getConnection()->getSchemaManager();
         $fromSchema = $schemaManager->createSchema();
 
@@ -254,7 +260,9 @@ final class UpdateManagerTest extends TestCase
         $entityManager = $this->createEntityManager();
         $auditor = $this->createAuditor();
         $provider = new DoctrineProvider($configuration ?? $this->createProviderConfiguration());
-        $provider->registerEntityManager($entityManager);
+        $provider->registerStorageService(new StorageService('default', $entityManager));
+        $provider->registerAuditingService(new AuditingService('default', $entityManager));
+
         $auditor->registerProvider($provider);
 
         // unregister CreateSchemaListener

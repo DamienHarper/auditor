@@ -3,6 +3,8 @@
 namespace DH\Auditor\Tests\Provider\Doctrine;
 
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
+use DH\Auditor\Provider\Doctrine\Service\AuditingService;
+use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Dog;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Bike;
@@ -22,12 +24,12 @@ final class InheritanceTest extends TestCase
 
     public function testAuditingSubclass(): void
     {
-        $entityManagers = [
-            Vehicle::class => $this->provider->getEntityManagerForEntity(Vehicle::class),
-            Car::class => $this->provider->getEntityManagerForEntity(Car::class),
-            Bike::class => $this->provider->getEntityManagerForEntity(Bike::class),
-            Cat::class => $this->provider->getEntityManagerForEntity(Cat::class),
-            Dog::class => $this->provider->getEntityManagerForEntity(Dog::class),
+        $storageServices = [
+            Vehicle::class => $this->provider->getStorageServiceForEntity(Vehicle::class),
+            Car::class => $this->provider->getStorageServiceForEntity(Car::class),
+            Bike::class => $this->provider->getStorageServiceForEntity(Bike::class),
+            Cat::class => $this->provider->getStorageServiceForEntity(Cat::class),
+            Dog::class => $this->provider->getStorageServiceForEntity(Dog::class),
         ];
 
         $reader = $this->createReader();
@@ -35,30 +37,30 @@ final class InheritanceTest extends TestCase
         $car = new Car();
         $car->setLabel('La Ferrari');
         $car->setWheels(4);
-        $entityManagers[Car::class]->persist($car);
-        $this->flushAll($entityManagers);
+        $storageServices[Car::class]->getEntityManager()->persist($car);
+        $this->flushAll($storageServices);
 
         $bike = new Bike();
         $bike->setLabel('ZX10R');
         $bike->setWheels(2);
-        $entityManagers[Bike::class]->persist($bike);
-        $this->flushAll($entityManagers);
+        $storageServices[Bike::class]->getEntityManager()->persist($bike);
+        $this->flushAll($storageServices);
 
         $tryke = new Vehicle();
         $tryke->setLabel('Can-am Spyder');
         $tryke->setWheels(3);
-        $entityManagers[Vehicle::class]->persist($tryke);
-        $this->flushAll($entityManagers);
+        $storageServices[Vehicle::class]->getEntityManager()->persist($tryke);
+        $this->flushAll($storageServices);
 
         $cat = new Cat();
         $cat->setLabel('cat');
-        $entityManagers[Cat::class]->persist($cat);
-        $this->flushAll($entityManagers);
+        $storageServices[Cat::class]->getEntityManager()->persist($cat);
+        $this->flushAll($storageServices);
 
         $dog = new Dog();
         $dog->setLabel('dog');
-        $entityManagers[Dog::class]->persist($dog);
-        $this->flushAll($entityManagers);
+        $storageServices[Dog::class]->getEntityManager()->persist($dog);
+        $this->flushAll($storageServices);
 
         $audits = $reader->createQuery(Vehicle::class)->execute();
         self::assertCount(1, $audits, 'results count ok.');
@@ -79,12 +81,12 @@ final class InheritanceTest extends TestCase
         self::assertCount(1, $audits, 'results count ok.');
 
         $car->setLabel('Taycan');
-        $entityManagers[Car::class]->persist($car);
-        $this->flushAll($entityManagers);
+        $storageServices[Car::class]->getEntityManager()->persist($car);
+        $this->flushAll($storageServices);
 
         $cat->setLabel('cat2');
-        $entityManagers[Cat::class]->persist($cat);
-        $this->flushAll($entityManagers);
+        $storageServices[Cat::class]->getEntityManager()->persist($cat);
+        $this->flushAll($storageServices);
 
         $audits = $reader->createQuery(Vehicle::class)->execute();
         self::assertCount(1, $audits, 'results count ok.');
@@ -104,14 +106,20 @@ final class InheritanceTest extends TestCase
         $auditor = $this->createAuditor();
         $this->provider = new DoctrineProvider($this->createProviderConfiguration());
 
-        $this->provider->registerEntityManager(
-            $this->createEntityManager([
-                __DIR__.'/../../../src/Provider/Doctrine/Auditing/Annotation',
-                __DIR__.'/Fixtures/Entity/Inheritance',
-            ]),
-            DoctrineProvider::BOTH,
-            'default'
-        );
+        $entityManager = $this->createEntityManager([
+            __DIR__.'/../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/Fixtures/Entity/Inheritance',
+        ]);
+        $this->provider->registerStorageService(new StorageService('default', $entityManager));
+        $this->provider->registerAuditingService(new AuditingService('default', $entityManager));
+//        $this->provider->registerEntityManager(
+//            $this->createEntityManager([
+//                __DIR__.'/../../../src/Provider/Doctrine/Auditing/Annotation',
+//                __DIR__.'/Fixtures/Entity/Inheritance',
+//            ]),
+//            DoctrineProvider::BOTH,
+//            'default'
+//        );
 
         $auditor->registerProvider($this->provider);
     }

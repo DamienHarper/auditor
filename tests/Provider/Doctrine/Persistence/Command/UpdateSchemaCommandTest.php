@@ -3,6 +3,7 @@
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Command;
 
 use DH\Auditor\Provider\Doctrine\Persistence\Command\UpdateSchemaCommand;
+use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
@@ -26,14 +27,22 @@ final class UpdateSchemaCommandTest extends TestCase
         // provider with 1 em for both storage and auditing
         $this->createAndInitDoctrineProvider();
 
-        foreach ($this->provider->getStorageEntityManagers() as $name => $entityManager) {
-            $schemaTool = new SchemaTool($entityManager);
+        /**
+         * @var string         $name
+         * @var StorageService $storageService
+         */
+        foreach ($this->provider->getStorageServices() as $name => $storageService) {
+            $schemaTool = new SchemaTool($storageService->getEntityManager());
 
-            $this->setUpEntitySchema($schemaTool, $entityManager);  // setup entity schema only since audited entites are not declared
-            $this->configureEntities();                             // declare audited entites
+            $this->setUpEntitySchema($schemaTool, $storageService->getEntityManager()); // setup entity schema only since audited entites are not declared
+            $this->configureEntities();                                                 // declare audited entites
         }
 
-        foreach ($this->provider->getStorageEntityManagers() as $name => $entityManager) {
+        /**
+         * @var string         $name
+         * @var StorageService $storageService
+         */
+        foreach ($this->provider->getStorageServices() as $name => $storageService) {
             $this->setupEntities();
         }
     }

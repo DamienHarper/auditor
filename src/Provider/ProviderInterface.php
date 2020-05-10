@@ -4,6 +4,8 @@ namespace DH\Auditor\Provider;
 
 use DH\Auditor\Auditor;
 use DH\Auditor\Event\LifecycleEvent;
+use DH\Auditor\Provider\Service\AuditingServiceInterface;
+use DH\Auditor\Provider\Service\StorageServiceInterface;
 
 interface ProviderInterface
 {
@@ -15,10 +17,20 @@ interface ProviderInterface
 
     public function isRegistered(): bool;
 
+    public function registerStorageService(StorageServiceInterface $service): self;
+
+    public function registerAuditingService(AuditingServiceInterface $service): self;
+
     public function persist(LifecycleEvent $event): void;
 
+    /**
+     * @return StorageServiceInterface[]
+     */
     public function getStorageServices(): array;
 
+    /**
+     * @return AuditingServiceInterface[]
+     */
     public function getAuditingServices(): array;
 
     /**

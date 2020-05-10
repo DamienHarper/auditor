@@ -2,6 +2,7 @@
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Event;
 
+use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Dog;
@@ -100,8 +101,9 @@ final class CreateSchemaListenerTest extends TestCase
 
     private function getTables(): array
     {
-        $entityManager = array_values($this->provider->getStorageEntityManagers())[0];
-        $schemaManager = $entityManager->getConnection()->getSchemaManager();
+        /** @var StorageService $storageService */
+        $storageService = array_values($this->provider->getStorageServices())[0];
+        $schemaManager = $storageService->getEntityManager()->getConnection()->getSchemaManager();
 
         $tableNames = [];
 

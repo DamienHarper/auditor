@@ -4,6 +4,7 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Traits\Schema;
 
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
+use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\DoctrineProviderTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -22,26 +23,38 @@ trait SchemaSetupTrait
         // provider with 1 em for both storage and auditing
         $this->createAndInitDoctrineProvider();
 
-        foreach ($this->provider->getStorageEntityManagers() as $name => $entityManager) {
-            $schemaTool = new SchemaTool($entityManager);
+        /**
+         * @var string         $name
+         * @var StorageService $storageService
+         */
+        foreach ($this->provider->getStorageServices() as $name => $storageService) {
+            $schemaTool = new SchemaTool($storageService->getEntityManager());
 
-            $this->setUpEntitySchema($schemaTool, $entityManager);  // setup entity schema only since audited entites are not declared
+            $this->setUpEntitySchema($schemaTool, $storageService->getEntityManager());  // setup entity schema only since audited entites are not declared
             $this->configureEntities();                             // declare audited entites
-            $this->setUpAuditSchema($schemaTool, $entityManager);   // setup audit schema based on configured audited entities
+            $this->setUpAuditSchema($schemaTool, $storageService->getEntityManager());   // setup audit schema based on configured audited entities
         }
 
-        foreach ($this->provider->getStorageEntityManagers() as $name => $entityManager) {
+        /**
+         * @var string         $name
+         * @var StorageService $storageService
+         */
+        foreach ($this->provider->getStorageServices() as $name => $storageService) {
             $this->setupEntities();
         }
     }
 
     protected function tearDown(): void
     {
-        foreach ($this->provider->getStorageEntityManagers() as $name => $entityManager) {
-            $schemaTool = new SchemaTool($entityManager);
+        /**
+         * @var string         $name
+         * @var StorageService $storageService
+         */
+        foreach ($this->provider->getStorageServices() as $name => $storageService) {
+            $schemaTool = new SchemaTool($storageService->getEntityManager());
 
-            $this->tearDownAuditSchema($schemaTool, $entityManager);
-            $this->tearDownEntitySchema($schemaTool, $entityManager);
+            $this->tearDownAuditSchema($schemaTool, $storageService->getEntityManager());
+            $this->tearDownEntitySchema($schemaTool, $storageService->getEntityManager());
         }
     }
 
@@ -111,13 +124,17 @@ trait SchemaSetupTrait
     {
     }
 
-    private function flushAll(array $entityManagers): void
+    private function flushAll(array $storageServices): void
     {
         $done = [];
-        foreach ($entityManagers as $entity => $entityManager) {
-            $hash = spl_object_hash($entityManager);
+        /**
+         * @var string         $entity
+         * @var StorageService $storageService
+         */
+        foreach ($storageServices as $entity => $storageService) {
+            $hash = spl_object_hash($storageService);
             if (!\in_array($hash, $done, true)) {
-                $entityManager->flush();
+                $storageService->getEntityManager()->flush();
                 $done[] = $hash;
             }
         }

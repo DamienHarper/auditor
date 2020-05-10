@@ -3,6 +3,8 @@
 namespace DH\Auditor\Tests\Provider\Doctrine\Issues;
 
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
+use DH\Auditor\Provider\Doctrine\Service\AuditingService;
+use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue37\Locale;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue37\User;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
@@ -19,9 +21,9 @@ final class Issue37Test extends TestCase
 
     public function testIssue37(): void
     {
-        $entityManagers = [
-            User::class => $this->provider->getEntityManagerForEntity(User::class),
-            Locale::class => $this->provider->getEntityManagerForEntity(Locale::class),
+        $storageServices = [
+            User::class => $this->provider->getStorageServiceForEntity(User::class),
+            Locale::class => $this->provider->getStorageServiceForEntity(Locale::class),
         ];
 
         $reader = $this->createReader();
@@ -31,16 +33,16 @@ final class Issue37Test extends TestCase
             ->setId('fr_FR')
             ->setName('Français')
         ;
-        $entityManagers[Locale::class]->persist($localeFR);
-        $this->flushAll($entityManagers);
+        $storageServices[Locale::class]->getEntityManager()->persist($localeFR);
+        $this->flushAll($storageServices);
 
         $localeEN = new Locale();
         $localeEN
             ->setId('en_US')
             ->setName('Français')
         ;
-        $entityManagers[Locale::class]->persist($localeEN);
-        $this->flushAll($entityManagers);
+        $storageServices[Locale::class]->getEntityManager()->persist($localeEN);
+        $this->flushAll($storageServices);
 
         $audits = $reader->createQuery(Locale::class)->execute();
         self::assertCount(2, $audits, 'results count ok.');
@@ -52,16 +54,16 @@ final class Issue37Test extends TestCase
             ->setUsername('john.doe')
             ->setLocale($localeFR)
         ;
-        $entityManagers[User::class]->persist($user1);
-        $this->flushAll($entityManagers);
+        $storageServices[User::class]->getEntityManager()->persist($user1);
+        $this->flushAll($storageServices);
 
         $user2 = new User();
         $user2
             ->setUsername('dark.vador')
             ->setLocale($localeEN)
         ;
-        $entityManagers[User::class]->persist($user2);
-        $this->flushAll($entityManagers);
+        $storageServices[User::class]->getEntityManager()->persist($user2);
+        $this->flushAll($storageServices);
 
         $audits = $reader->createQuery(User::class)->execute();
         self::assertCount(2, $audits, 'results count ok.');
@@ -72,14 +74,20 @@ final class Issue37Test extends TestCase
         $auditor = $this->createAuditor();
         $this->provider = new DoctrineProvider($this->createProviderConfiguration());
 
-        $this->provider->registerEntityManager(
-            $this->createEntityManager([
-                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
-                __DIR__.'/../Fixtures/Issue37',
-            ]),
-            DoctrineProvider::BOTH,
-            'default'
-        );
+        $entityManager = $this->createEntityManager([
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../Fixtures/Issue37',
+        ]);
+        $this->provider->registerStorageService(new StorageService('default', $entityManager));
+        $this->provider->registerAuditingService(new AuditingService('default', $entityManager));
+//        $this->provider->registerEntityManager(
+//            $this->createEntityManager([
+//                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+//                __DIR__.'/../Fixtures/Issue37',
+//            ]),
+//            DoctrineProvider::BOTH,
+//            'default'
+//        );
 
         $auditor->registerProvider($this->provider);
     }

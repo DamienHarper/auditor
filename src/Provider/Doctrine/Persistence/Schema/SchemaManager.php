@@ -5,6 +5,8 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Schema;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
+use DH\Auditor\Provider\Doctrine\Service\AuditingService;
+use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
@@ -29,11 +31,11 @@ class SchemaManager
             $sqls = $this->getUpdateAuditSchemaSql();
         }
 
-        $storageEntityManagers = $this->provider->getStorageEntityManagers();
-
-        foreach ($sqls as $entityManagerName => $queries) {
+        /** @var StorageService[] $storageServices */
+        $storageServices = $this->provider->getStorageServices();
+        foreach ($sqls as $name => $queries) {
             foreach ($queries as $index => $sql) {
-                $statement = $storageEntityManagers[$entityManagerName]->getConnection()->prepare($sql);
+                $statement = $storageServices[$name]->getEntityManager()->getConnection()->prepare($sql);
                 $statement->execute();
 
                 if (null !== $callback) {
@@ -74,19 +76,22 @@ class SchemaManager
     {
         /** @var Configuration $configuration */
         $configuration = $this->provider->getConfiguration();
-        $storageEntityManagers = $this->provider->getStorageEntityManagers();
+
+        /** @var StorageService[] $storageServices */
+        $storageServices = $this->provider->getStorageServices();
 
         // auditable entities by storage entity manager
         $repository = [];
 
         // Collect auditable entities from auditing storage managers
-        $auditingEntityManagers = $this->provider->getAuditingEntityManagers();
-        foreach ($auditingEntityManagers as $name => $auditingEntityManager) {
-            $classes = $this->getAuditableTableNames($auditingEntityManager);
+        /** @var AuditingService[] $auditingServices */
+        $auditingServices = $this->provider->getAuditingServices();
+        foreach ($auditingServices as $name => $auditingService) {
+            $classes = $this->getAuditableTableNames($auditingService->getEntityManager());
             // Populate the auditable entities repository
             foreach ($classes as $entity => $tableName) {
-                $em = $this->provider->getEntityManagerForEntity($entity);
-                $key = array_search($em, $this->provider->getStorageEntityManagers(), true);
+                $storageService = $this->provider->getStorageServiceForEntity($entity);
+                $key = array_search($storageService, $this->provider->getStorageServices(), true);
                 if (!isset($repository[$key])) {
                     $repository[$key] = [];
                 }
@@ -107,7 +112,7 @@ class SchemaManager
         // Compute and collect SQL queries
         $sqls = [];
         foreach ($repository as $name => $classes) {
-            $storageSchemaManager = $storageEntityManagers[$name]->getConnection()->getSchemaManager();
+            $storageSchemaManager = $storageServices[$name]->getEntityManager()->getConnection()->getSchemaManager();
 
             $storageSchema = $storageSchemaManager->createSchema();
             $fromSchema = clone $storageSchema;
@@ -148,8 +153,9 @@ class SchemaManager
     public function createAuditTable(string $entity, Table $table, ?Schema $schema = null): Schema
     {
         if (null === $schema) {
-            $entityManager = $this->provider->getEntityManagerForEntity($entity);
-            $schemaManager = $entityManager->getConnection()->getSchemaManager();
+            /** @var StorageService $storageService */
+            $storageService = $this->provider->getStorageServiceForEntity($entity);
+            $schemaManager = $storageService->getEntityManager()->getConnection()->getSchemaManager();
             $schema = $schemaManager->createSchema();
         }
 
@@ -194,8 +200,9 @@ class SchemaManager
      */
     public function updateAuditTable(string $entity, Table $table, ?Schema $schema = null): Schema
     {
-        $entityManager = $this->provider->getEntityManagerForEntity($entity);
-        $schemaManager = $entityManager->getConnection()->getSchemaManager();
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity($entity);
+        $schemaManager = $storageService->getEntityManager()->getConnection()->getSchemaManager();
         if (null === $schema) {
             $schema = $schemaManager->createSchema();
         }

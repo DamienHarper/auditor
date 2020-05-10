@@ -1,7 +1,8 @@
 <?php
 
-namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Updater;
+namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema;
 
+use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Dog;
@@ -18,38 +19,41 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  */
-final class UpdateManager1AEM2SEMTest extends TestCase
+final class SchemaManager1AEM2SEMTest extends TestCase
 {
     use BlogSchemaSetupTrait;
 
-    public function testEntityManagerSetup(): void
+    public function testStorageServicesSetup(): void
     {
-        $authorEM = $this->provider->getEntityManagerForEntity(Author::class);
-        $postEM = $this->provider->getEntityManagerForEntity(Post::class);
-        $commentEM = $this->provider->getEntityManagerForEntity(Comment::class);
-        $tagEM = $this->provider->getEntityManagerForEntity(Tag::class);
+        $authorStorageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $postStorageService = $this->provider->getStorageServiceForEntity(Post::class);
+        $commentStorageService = $this->provider->getStorageServiceForEntity(Comment::class);
+        $tagStorageService = $this->provider->getStorageServiceForEntity(Tag::class);
 
-        self::assertSame($authorEM, $postEM, 'Author and Post use the same storage entity manager.');
-        self::assertSame($authorEM, $commentEM, 'Author and Comment use the same storage entity manager.');
-        self::assertSame($authorEM, $tagEM, 'Author and Tag use the same storage entity manager.');
+        self::assertSame($authorStorageService, $postStorageService, 'Author and Post use the same storage entity manager.');
+        self::assertSame($authorStorageService, $commentStorageService, 'Author and Comment use the same storage entity manager.');
+        self::assertSame($authorStorageService, $tagStorageService, 'Author and Tag use the same storage entity manager.');
     }
 
     /**
-     * @depends testEntityManagerSetup
+     * @depends testStorageServicesSetup
      */
     public function testSchemaSetup(): void
     {
-        $entityManagers = $this->provider->getStorageEntityManagers();
-
+        $storageServices = $this->provider->getStorageServices();
         $expected = [
-            'sem1' => ['author', 'author_audit', 'comment', 'comment_audit', 'post', 'post_audit', 'tag', 'tag_audit', 'post__tag'],
-            'sem2' => ['animal', 'animal_audit', 'cat', 'cat_audit', 'dog', 'dog_audit', 'vehicle', 'vehicle_audit'],
+            'db1' => ['author', 'author_audit', 'comment', 'comment_audit', 'post', 'post_audit', 'tag', 'tag_audit', 'post__tag'],
+            'db2' => ['animal', 'animal_audit', 'cat', 'cat_audit', 'dog', 'dog_audit', 'vehicle', 'vehicle_audit'],
         ];
-        sort($expected['sem1']);
-        sort($expected['sem2']);
+        sort($expected['db1']);
+        sort($expected['db2']);
 
-        foreach ($entityManagers as $name => $entityManager) {
-            $schemaManager = $entityManager->getConnection()->getSchemaManager();
+        /**
+         * @var string         $name
+         * @var StorageService $storageService
+         */
+        foreach ($storageServices as $name => $storageService) {
+            $schemaManager = $storageService->getEntityManager()->getConnection()->getSchemaManager();
             $tables = array_map(static function ($t) {return $t->getName(); }, $schemaManager->listTables());
             sort($tables);
             self::assertSame($expected[$name], $tables, 'Schema of "'.$name.'" is correct.');

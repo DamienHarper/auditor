@@ -12,32 +12,20 @@ use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
+use DH\Auditor\Provider\Doctrine\Service\AuditingService;
+use DH\Auditor\Provider\Doctrine\Service\StorageService;
+use DH\Auditor\Provider\ProviderInterface;
+use DH\Auditor\Provider\Service\AuditingServiceInterface;
+use DH\Auditor\Provider\Service\StorageServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Gedmo\SoftDeleteable\SoftDeleteableListener;
 
 class DoctrineProvider extends AbstractProvider
 {
-    public const STORAGE_ONLY = 1;
-    public const AUDITING_ONLY = 2;
     public const BOTH = 3;
 
     /**
-     * @var ConfigurationInterface
-     */
-    private $configuration;
-
-    /**
-     * @var EntityManagerInterface[]
-     */
-    private $storageEntityManagers = [];
-
-    /**
-     * @var EntityManagerInterface[]
-     */
-    private $auditingEntityManagers = [];
-
-    /**
-     * @var \DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager
+     * @var TransactionManager
      */
     private $transactionManager;
 
@@ -67,39 +55,33 @@ class DoctrineProvider extends AbstractProvider
         $this->transactionManager = new TransactionManager($this);
     }
 
-    public function getConfiguration(): ConfigurationInterface
+    public function registerAuditingService(AuditingServiceInterface $service): ProviderInterface
     {
-        return $this->configuration;
+        parent::registerAuditingService($service);
+
+        /** @var AuditingService $service */
+        $entityManager = $service->getEntityManager();
+        $evm = $entityManager->getEventManager();
+
+        // Register subscribers
+        $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager));
+        $evm->addEventSubscriber(new SoftDeleteableListener());
+
+        $this->loadAnnotations($entityManager);
+
+        return $this;
     }
 
-    /**
-     * Registers an entity manager.
-     *
-     * @param EntityManagerInterface $entityManager The entity manager to register
-     * @param int                    $scope         Scope of the provided entity manager: storage only, auditing only, both (default)
-     * @param string                 $name          Name of the entity manager (metadata namespace by default)
-     *
-     * @throws ProviderException
-     *
-     * @return DoctrineProvider
-     */
-    public function registerEntityManager(EntityManagerInterface $entityManager, int $scope = self::BOTH, string $name = 'default'): self
+    public function registerStorageService(StorageServiceInterface $service): ProviderInterface
     {
-        switch ($scope) {
-            case self::STORAGE_ONLY:
-                $this->registerStorageEntityManager($entityManager, $name);
+        parent::registerStorageService($service);
 
-                break;
-            case self::AUDITING_ONLY:
-                $this->registerAuditingEntityManager($entityManager, $name);
+        /** @var StorageService $service */
+        $entityManager = $service->getEntityManager();
+        $evm = $entityManager->getEventManager();
 
-                break;
-            case self::BOTH:
-                $this->registerStorageEntityManager($entityManager, $name);
-                $this->registerAuditingEntityManager($entityManager, $name);
-
-                break;
-        }
+        // Register subscribers
+        $evm->addEventSubscriber(new CreateSchemaListener($this));
 
         return $this;
     }
@@ -118,7 +100,7 @@ class DoctrineProvider extends AbstractProvider
 
     public function isStorageMapperRequired(): bool
     {
-        return \count($this->storageEntityManagers) > 1;
+        return \count($this->getStorageServices()) > 1;
     }
 
     public function setUserProvider(Closure $userProvider): self
@@ -157,16 +139,16 @@ class DoctrineProvider extends AbstractProvider
         return $this->ipProvider;
     }
 
-    public function getEntityManagerForEntity(string $entity): EntityManagerInterface
+    public function getStorageServiceForEntity(string $entity): StorageServiceInterface
     {
         $this->checkStorageMapper();
 
-        if (null === $this->storageMapper && 1 === \count($this->getStorageEntityManagers())) {
+        if (null === $this->storageMapper && 1 === \count($this->getStorageServices())) {
             // No mapper and only 1 storage entity manager
-            return array_values($this->storageEntityManagers)[0];
+            return array_values($this->getStorageServices())[0];
         }
 
-        return $this->storageMapper->call($this, $entity, $this->getStorageEntityManagers());
+        return $this->storageMapper->call($this, $entity, $this->getStorageServices());
     }
 
     public function persist(LifecycleEvent $event): void
@@ -197,8 +179,9 @@ class DoctrineProvider extends AbstractProvider
             implode(', ', array_values($fields))
         );
 
-        $entityManager = $this->getEntityManagerForEntity($entity);
-        $statement = $entityManager->getConnection()->prepare($query);
+        /** @var StorageService $storageService */
+        $storageService = $this->getStorageServiceForEntity($entity);
+        $statement = $storageService->getEntityManager()->getConnection()->prepare($query);
 
         foreach ($payload as $key => $value) {
             $statement->bindValue($key, $value);
@@ -300,36 +283,6 @@ class DoctrineProvider extends AbstractProvider
         return true;
     }
 
-    public function getStorageServices(): array
-    {
-        return $this->getStorageEntityManagers();
-    }
-
-    public function getAuditingServices(): array
-    {
-        return $this->getAuditingEntityManagers();
-    }
-
-    /**
-     * Get the value of storageEntityManagers.
-     *
-     * @return EntityManagerInterface[]
-     */
-    public function getStorageEntityManagers(): array
-    {
-        return $this->storageEntityManagers;
-    }
-
-    /**
-     * Get the value of auditingEntityManagers.
-     *
-     * @return EntityManagerInterface[]
-     */
-    public function getAuditingEntityManagers(): array
-    {
-        return $this->auditingEntityManagers;
-    }
-
     public function supportsStorage(): bool
     {
         return true;
@@ -338,35 +291,6 @@ class DoctrineProvider extends AbstractProvider
     public function supportsAuditing(): bool
     {
         return true;
-    }
-
-    public function registerStorageEntityManager(EntityManagerInterface $entityManager, string $name): self
-    {
-        if (\array_key_exists($name, $this->storageEntityManagers)) {
-            throw new ProviderException(sprintf('A provider named "%s" is already registered.', $name));
-        }
-        $this->storageEntityManagers[$name] = $entityManager;
-
-        $evm = $entityManager->getEventManager();
-        $evm->addEventSubscriber(new CreateSchemaListener($this));
-
-        return $this;
-    }
-
-    public function registerAuditingEntityManager(EntityManagerInterface $entityManager, string $name): self
-    {
-        if (\array_key_exists($name, $this->auditingEntityManagers)) {
-            throw new ProviderException(sprintf('A provider named "%s" is already registered.', $name));
-        }
-        $this->auditingEntityManagers[$name] = $entityManager;
-
-        $evm = $entityManager->getEventManager();
-        $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager));
-        $evm->addEventSubscriber(new SoftDeleteableListener());
-
-        $this->loadAnnotations($entityManager);
-
-        return $this;
     }
 
     private function loadAnnotations(EntityManagerInterface $entityManager): self
@@ -388,9 +312,9 @@ class DoctrineProvider extends AbstractProvider
             throw new ProviderException('You must provide a mapper function to map audits to storage.');
         }
 
-//        if (null === $this->storageMapper && 1 === count($this->getStorageEntityManagers())) {
+//        if (null === $this->storageMapper && 1 === count($this->getStorageServices())) {
 //            // No mapper and only 1 storage entity manager
-//            return array_values($this->storageEntityManagers)[0];
+//            return array_values($this->storageServices)[0];
 //        }
 
         return $this;

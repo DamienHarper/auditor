@@ -4,6 +4,8 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Issues;
 
 use DH\Auditor\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
+use DH\Auditor\Provider\Doctrine\Service\AuditingService;
+use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue40\CoreCase;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue40\DieselCase;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
@@ -20,9 +22,9 @@ final class Issue40Test extends TestCase
 
     public function testIssue40(): void
     {
-        $entityManagers = [
-            CoreCase::class => $this->provider->getEntityManagerForEntity(CoreCase::class),
-            DieselCase::class => $this->provider->getEntityManagerForEntity(DieselCase::class),
+        $storageServices = [
+            CoreCase::class => $this->provider->getStorageServiceForEntity(CoreCase::class),
+            DieselCase::class => $this->provider->getStorageServiceForEntity(DieselCase::class),
         ];
 
         $reader = $this->createReader();
@@ -30,14 +32,14 @@ final class Issue40Test extends TestCase
         $coreCase = new CoreCase();
         $coreCase->type = 'type1';
         $coreCase->status = 'status1';
-        $entityManagers[CoreCase::class]->persist($coreCase);
-        $this->flushAll($entityManagers);
+        $storageServices[CoreCase::class]->getEntityManager()->persist($coreCase);
+        $this->flushAll($storageServices);
 
         $dieselCase = new DieselCase();
         $dieselCase->coreCase = $coreCase;
         $dieselCase->setName('yo');
-        $entityManagers[DieselCase::class]->persist($dieselCase);
-        $this->flushAll($entityManagers);
+        $storageServices[DieselCase::class]->getEntityManager()->persist($dieselCase);
+        $this->flushAll($storageServices);
 
         $audits = $reader->createQuery(CoreCase::class)->execute();
         self::assertCount(1, $audits, 'results count ok.');
@@ -53,14 +55,20 @@ final class Issue40Test extends TestCase
         $auditor = $this->createAuditor();
         $this->provider = new DoctrineProvider($this->createProviderConfiguration());
 
-        $this->provider->registerEntityManager(
-            $this->createEntityManager([
-                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
-                __DIR__.'/../Fixtures/Issue40',
-            ]),
-            DoctrineProvider::BOTH,
-            'default'
-        );
+        $entityManager = $this->createEntityManager([
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../Fixtures/Issue40',
+        ]);
+        $this->provider->registerStorageService(new StorageService('default', $entityManager));
+        $this->provider->registerAuditingService(new AuditingService('default', $entityManager));
+//        $this->provider->registerEntityManager(
+//            $this->createEntityManager([
+//                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+//                __DIR__.'/../Fixtures/Issue40',
+//            ]),
+//            DoctrineProvider::BOTH,
+//            'default'
+//        );
 
         $auditor->registerProvider($this->provider);
     }

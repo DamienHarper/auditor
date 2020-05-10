@@ -8,6 +8,8 @@ use DH\Auditor\Auditor;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
+use DH\Auditor\Provider\Doctrine\Service\AuditingService;
+use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Exception;
 use Symfony\Component\Console\Command\Command;
@@ -97,20 +99,22 @@ class CleanAuditLogsCommand extends Command
         $updateManager = new SchemaManager($provider);
 
 //        $entities = $this->provider->getConfiguration()->getEntities();
-        $storageEntityManagers = $provider->getStorageServices();
+        /** @var StorageService[] $storageServices */
+        $storageServices = $provider->getStorageServices();
 
         // auditable entities by storage entity manager
         $repository = [];
         $count = 0;
 
         // Collect auditable entities from auditing storage managers
-        $auditingEntityManagers = $provider->getAuditingServices();
-        foreach ($auditingEntityManagers as $name => $auditingEntityManager) {
-            $classes = $updateManager->getAuditableTableNames($auditingEntityManager);
+        /** @var AuditingService[] $auditingServices */
+        $auditingServices = $provider->getAuditingServices();
+        foreach ($auditingServices as $name => $auditingService) {
+            $classes = $updateManager->getAuditableTableNames($auditingService->getEntityManager());
             // Populate the auditable entities repository
             foreach ($classes as $entity => $tableName) {
-                $em = $provider->getEntityManagerForEntity($entity);
-                $key = array_search($em, $provider->getStorageServices(), true);
+                $storageService = $provider->getStorageServiceForEntity($entity);
+                $key = array_search($storageService, $provider->getStorageServices(), true);
                 if (!isset($repository[$key])) {
                     $repository[$key] = [];
                 }
@@ -153,7 +157,7 @@ class CleanAuditLogsCommand extends Command
                     /**
                      * @var QueryBuilder
                      */
-                    $queryBuilder = $storageEntityManagers[$name]->getConnection()->createQueryBuilder();
+                    $queryBuilder = $storageServices[$name]->getEntityManager()->getConnection()->createQueryBuilder();
                     $queryBuilder
                         ->delete($auditTable)
                         ->where('created_at < :until')

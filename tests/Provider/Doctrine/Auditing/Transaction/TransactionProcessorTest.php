@@ -6,6 +6,7 @@ use DateTime;
 use DH\Auditor\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionProcessor;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
+use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
@@ -35,8 +36,11 @@ final class TransactionProcessorTest extends TestCase
             ->setEmail('john.doe@gmail.com')
         ;
 
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $entityManager = $storageService->getEntityManager();
         $method->invokeArgs($processor, [
-            $this->provider->getEntityManagerForEntity(Author::class),
+            $entityManager,
             $author,
             [
                 'fullname' => [null, 'John Doe'],
@@ -79,8 +83,11 @@ final class TransactionProcessorTest extends TestCase
             ->setEmail('john.doe@gmail.com')
         ;
 
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $entityManager = $storageService->getEntityManager();
         $method->invokeArgs($processor, [
-            $this->provider->getEntityManagerForEntity(Author::class),
+            $entityManager,
             $author,
             [
                 'fullname' => ['John Doe', 'Dark Vador'],
@@ -115,7 +122,10 @@ final class TransactionProcessorTest extends TestCase
         $processor = new TransactionProcessor($this->provider);
         $reader = new Reader($this->provider);
         $method = $this->reflectMethod(TransactionProcessor::class, 'remove');
-        $entityManager = $this->provider->getEntityManagerForEntity(Author::class);
+
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $entityManager = $storageService->getEntityManager();
 
         $author = new Author();
         $author
@@ -148,7 +158,10 @@ final class TransactionProcessorTest extends TestCase
         $processor = new TransactionProcessor($this->provider);
         $reader = new Reader($this->provider);
         $method = $this->reflectMethod(TransactionProcessor::class, 'associate');
-        $entityManager = $this->provider->getEntityManagerForEntity(Post::class);
+
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Post::class);
+        $entityManager = $storageService->getEntityManager();
 
         $author = new Author();
         $author
@@ -219,7 +232,10 @@ final class TransactionProcessorTest extends TestCase
         $processor = new TransactionProcessor($this->provider);
         $reader = new Reader($this->provider);
         $method = $this->reflectMethod(TransactionProcessor::class, 'dissociate');
-        $entityManager = $this->provider->getEntityManagerForEntity(Author::class);
+
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $entityManager = $storageService->getEntityManager();
 
         $author = new Author();
         $author
@@ -287,7 +303,10 @@ final class TransactionProcessorTest extends TestCase
         $processor = new TransactionProcessor($this->provider);
         $reader = new Reader($this->provider);
         $method = $this->reflectMethod(TransactionProcessor::class, 'associate');
-        $entityManager = $this->provider->getEntityManagerForEntity(Author::class);
+
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $entityManager = $storageService->getEntityManager();
 
         $author = new Author();
         $author
@@ -426,7 +445,10 @@ final class TransactionProcessorTest extends TestCase
         $reader = new Reader($this->provider);
         $associateMethod = $this->reflectMethod(TransactionProcessor::class, 'associate');
         $dissociateMethod = $this->reflectMethod(TransactionProcessor::class, 'dissociate');
-        $entityManager = $this->provider->getEntityManagerForEntity(Author::class);
+
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $entityManager = $storageService->getEntityManager();
 
         $author = new Author();
         $author
