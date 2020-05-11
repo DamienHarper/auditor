@@ -2,7 +2,7 @@
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
-final class SchemaHelper
+abstract class SchemaHelper
 {
     /**
      * Return columns of audit tables.

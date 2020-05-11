@@ -5,7 +5,7 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 
-final class DoctrineHelper
+abstract class DoctrineHelper
 {
     /**
      * Gets the real class name of a class name that could be a proxy.
