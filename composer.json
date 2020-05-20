@@ -1,7 +1,7 @@
 {
   "name": "damienharper/auditor",
   "type": "library",
-  "description": "Audits logs made easy.",
+  "description": "The missing audit log library.",
   "keywords": ["doctrine", "audit", "audit-log", "audit-trail"],
   "license": "MIT",
   "authors": [
