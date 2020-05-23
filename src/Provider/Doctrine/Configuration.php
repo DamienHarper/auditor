@@ -43,7 +43,7 @@ class Configuration implements ConfigurationInterface
         $this->configureOptions($resolver);
         $config = $resolver->resolve($options);
 
-        $this->enabledViewer = $config['enabled_viewer'];
+        $this->enabledViewer = $config['viewer'];
         $this->tablePrefix = $config['table_prefix'];
         $this->tableSuffix = $config['table_suffix'];
         $this->ignoredColumns = $config['ignored_columns'];
@@ -65,13 +65,13 @@ class Configuration implements ConfigurationInterface
                 'table_suffix' => '_audit',
                 'ignored_columns' => [],
                 'entities' => [],
-                'enabled_viewer' => true,
+                'viewer' => true,
             ])
             ->setAllowedTypes('table_prefix', 'string')
             ->setAllowedTypes('table_suffix', 'string')
             ->setAllowedTypes('ignored_columns', 'array')
             ->setAllowedTypes('entities', 'array')
-            ->setAllowedTypes('enabled_viewer', 'bool')
+            ->setAllowedTypes('viewer', 'bool')
         ;
     }
 
@@ -118,7 +118,7 @@ class Configuration implements ConfigurationInterface
     /**
      * Get enabled flag.
      */
-    public function isEnabledViewer(): bool
+    public function isViewerEnabled(): bool
     {
         return $this->enabledViewer;
     }

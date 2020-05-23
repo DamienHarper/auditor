@@ -49,11 +49,11 @@ final class ConfigurationTest extends TestCase
         self::assertSame('_audit_log', $configuration->getTableSuffix(), 'Custom "table_suffix" is "_audit_log".');
     }
 
-    public function testIsEnabledViewerDefault(): void
+    public function testIsViewerEnabledByDefault(): void
     {
         $configuration = $this->createProviderConfiguration();
 
-        self::assertTrue($configuration->isEnabledViewer(), 'Viewer is enabled by default.');
+        self::assertTrue($configuration->isViewerEnabled(), 'Viewer is enabled by default.');
     }
 
     public function testDisableViewer(): void
@@ -61,7 +61,7 @@ final class ConfigurationTest extends TestCase
         $configuration = $this->createProviderConfiguration();
         $configuration->disableViewer();
 
-        self::assertFalse($configuration->isEnabledViewer(), 'Viewer is disabled.');
+        self::assertFalse($configuration->isViewerEnabled(), 'Viewer is disabled.');
     }
 
     public function testEnableViewer(): void
@@ -70,7 +70,7 @@ final class ConfigurationTest extends TestCase
         $configuration->disableViewer();
         $configuration->enableViewer();
 
-        self::assertTrue($configuration->isEnabledViewer(), 'Viewer is enabled.');
+        self::assertTrue($configuration->isViewerEnabled(), 'Viewer is enabled.');
     }
 
     public function testGloballyIgnoredColumns(): void

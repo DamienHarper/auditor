@@ -454,6 +454,6 @@ final class DoctrineProviderTest extends TestCase
     {
         $provider = $this->createDoctrineProvider();
 
-        self:self::assertInstanceOf(Configuration::class, $provider->getConfiguration(), 'Configuration is reachable.');
+        self::assertInstanceOf(Configuration::class, $provider->getConfiguration(), 'Configuration is reachable.');
     }
 }

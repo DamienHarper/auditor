@@ -96,7 +96,7 @@ class CleanAuditLogsCommand extends Command
 
         /** @var DoctrineProvider $provider */
         $provider = $this->auditor->getProvider(DoctrineProvider::class);
-        $updateManager = new SchemaManager($provider);
+        $schemaManager = new SchemaManager($provider);
 
 //        $entities = $this->provider->getConfiguration()->getEntities();
         /** @var StorageService[] $storageServices */
@@ -110,7 +110,7 @@ class CleanAuditLogsCommand extends Command
         /** @var AuditingService[] $auditingServices */
         $auditingServices = $provider->getAuditingServices();
         foreach ($auditingServices as $name => $auditingService) {
-            $classes = $updateManager->getAuditableTableNames($auditingService->getEntityManager());
+            $classes = $schemaManager->getAuditableTableNames($auditingService->getEntityManager());
             // Populate the auditable entities repository
             foreach ($classes as $entity => $tableName) {
                 $storageService = $provider->getStorageServiceForEntity($entity);

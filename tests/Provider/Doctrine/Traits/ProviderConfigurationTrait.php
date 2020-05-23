@@ -14,7 +14,7 @@ trait ProviderConfigurationTrait
                 'table_suffix' => '_audit',
                 'ignored_columns' => [],
                 'entities' => [],
-                'enabled_viewer' => true,
+                'viewer' => true,
             ], $options)
         );
     }
