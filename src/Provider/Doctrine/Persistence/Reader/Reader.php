@@ -206,10 +206,10 @@ class Reader
         /** @var Configuration $configuration */
         $configuration = $this->provider->getConfiguration();
 
-        $userProvider = $this->provider->getUserProvider();
+        $userProvider = $this->provider->getConfiguration()->getUserProvider();
         $user = null === $userProvider ? null : $userProvider->call($this);
 
-        $roleChecker = $this->provider->getRoleChecker();
+        $roleChecker = $this->provider->getConfiguration()->getRoleChecker();
         if (!($user instanceof UserInterface) || null === $roleChecker) {
             // If no security defined or no user identified, consider access granted
             return;

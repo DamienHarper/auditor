@@ -147,14 +147,14 @@ final class DoctrineProviderTest extends TestCase
 //        $provider->registerEntityManager($entityManager1, DoctrineProvider::BOTH, 'EM1');
 //        $provider->registerEntityManager($entityManager2, DoctrineProvider::BOTH, 'EM2');
 
-        self::assertNull($provider->getStorageMapper(), 'Mapping closure is not set.');
+        self::assertNull($provider->getConfiguration()->getStorageMapper(), 'Mapping closure is not set.');
 
-        $provider->setStorageMapper(function (string $entity, array $storageServices): StorageServiceInterface {
+        $provider->getConfiguration()->setStorageMapper(function (string $entity, array $storageServices): StorageServiceInterface {
             // Audit records regarding entities starting with "foo" are mapped to "EM1", others are mapped to "EM2"
             return 0 === mb_strpos($entity, 'Foo') ? $storageServices['EM1'] : $storageServices['EM2'];
         });
 
-        self::assertNotNull($provider->getStorageMapper(), 'Mapping closure is set.');
+        self::assertNotNull($provider->getConfiguration()->getStorageMapper(), 'Mapping closure is set.');
 
         self::assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo1')->getEntityManager(), 'EM1 is used.');
         self::assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo2')->getEntityManager(), 'EM1 is used.');

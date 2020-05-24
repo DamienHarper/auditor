@@ -2,6 +2,7 @@
 
 namespace DH\Auditor\Provider\Doctrine;
 
+use Closure;
 use DH\Auditor\Provider\ConfigurationInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -30,12 +31,32 @@ class Configuration implements ConfigurationInterface
     /**
      * @var bool
      */
-    private $enabledViewer;
+    private $isViewerEnabled;
 
     /**
      * @var bool
      */
     private $annotationLoaded = false;
+
+    /**
+     * @var Closure
+     */
+    private $storageMapper;
+
+    /**
+     * @var Closure
+     */
+    private $userProvider;
+
+    /**
+     * @var Closure
+     */
+    private $roleChecker;
+
+    /**
+     * @var Closure
+     */
+    private $ipProvider;
 
     public function __construct(array $options)
     {
@@ -43,7 +64,7 @@ class Configuration implements ConfigurationInterface
         $this->configureOptions($resolver);
         $config = $resolver->resolve($options);
 
-        $this->enabledViewer = $config['viewer'];
+        $this->isViewerEnabled = $config['viewer'];
         $this->tablePrefix = $config['table_prefix'];
         $this->tableSuffix = $config['table_suffix'];
         $this->ignoredColumns = $config['ignored_columns'];
@@ -98,7 +119,7 @@ class Configuration implements ConfigurationInterface
      */
     public function enableViewer(): self
     {
-        $this->enabledViewer = true;
+        $this->isViewerEnabled = true;
 
         return $this;
     }
@@ -110,7 +131,7 @@ class Configuration implements ConfigurationInterface
      */
     public function disableViewer(): self
     {
-        $this->enabledViewer = false;
+        $this->isViewerEnabled = false;
 
         return $this;
     }
@@ -120,7 +141,7 @@ class Configuration implements ConfigurationInterface
      */
     public function isViewerEnabled(): bool
     {
-        return $this->enabledViewer;
+        return $this->isViewerEnabled;
     }
 
     /**
@@ -187,5 +208,53 @@ class Configuration implements ConfigurationInterface
         }
 
         return $this;
+    }
+
+    public function setStorageMapper(Closure $mapper): self
+    {
+        $this->storageMapper = $mapper;
+
+        return $this;
+    }
+
+    public function getStorageMapper(): ?Closure
+    {
+        return $this->storageMapper;
+    }
+
+    public function setUserProvider(Closure $userProvider): self
+    {
+        $this->userProvider = $userProvider;
+
+        return $this;
+    }
+
+    public function setRoleChecker(Closure $roleChecker): self
+    {
+        $this->roleChecker = $roleChecker;
+
+        return $this;
+    }
+
+    public function getRoleChecker(): ?Closure
+    {
+        return $this->roleChecker;
+    }
+
+    public function getUserProvider(): ?Closure
+    {
+        return $this->userProvider;
+    }
+
+    public function setIpProvider(Closure $ipProvider): self
+    {
+        $this->ipProvider = $ipProvider;
+
+        return $this;
+    }
+
+    public function getIpProvider(): ?Closure
+    {
+        return $this->ipProvider;
     }
 }

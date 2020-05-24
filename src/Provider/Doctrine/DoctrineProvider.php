@@ -2,7 +2,6 @@
 
 namespace DH\Auditor\Provider\Doctrine;
 
-use Closure;
 use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\Exception\ProviderException;
 use DH\Auditor\Provider\AbstractProvider;
@@ -28,26 +27,6 @@ class DoctrineProvider extends AbstractProvider
      * @var TransactionManager
      */
     private $transactionManager;
-
-    /**
-     * @var Closure
-     */
-    private $storageMapper;
-
-    /**
-     * @var Closure
-     */
-    private $userProvider;
-
-    /**
-     * @var Closure
-     */
-    private $roleChecker;
-
-    /**
-     * @var Closure
-     */
-    private $ipProvider;
 
     public function __construct(ConfigurationInterface $configuration)
     {
@@ -86,69 +65,21 @@ class DoctrineProvider extends AbstractProvider
         return $this;
     }
 
-    public function setStorageMapper(Closure $mapper): self
-    {
-        $this->storageMapper = $mapper;
-
-        return $this;
-    }
-
-    public function getStorageMapper(): ?Closure
-    {
-        return $this->storageMapper;
-    }
-
     public function isStorageMapperRequired(): bool
     {
         return \count($this->getStorageServices()) > 1;
-    }
-
-    public function setUserProvider(Closure $userProvider): self
-    {
-        $this->userProvider = $userProvider;
-
-        return $this;
-    }
-
-    public function getUserProvider(): ?Closure
-    {
-        return $this->userProvider;
-    }
-
-    public function setRoleChecker(Closure $roleChecker): self
-    {
-        $this->roleChecker = $roleChecker;
-
-        return $this;
-    }
-
-    public function getRoleChecker(): ?Closure
-    {
-        return $this->roleChecker;
-    }
-
-    public function setIpProvider(Closure $ipProvider): self
-    {
-        $this->ipProvider = $ipProvider;
-
-        return $this;
-    }
-
-    public function getIpProvider(): ?Closure
-    {
-        return $this->ipProvider;
     }
 
     public function getStorageServiceForEntity(string $entity): StorageServiceInterface
     {
         $this->checkStorageMapper();
 
-        if (null === $this->storageMapper && 1 === \count($this->getStorageServices())) {
+        if (null === $this->getConfiguration()->getStorageMapper() && 1 === \count($this->getStorageServices())) {
             // No mapper and only 1 storage entity manager
             return array_values($this->getStorageServices())[0];
         }
 
-        return $this->storageMapper->call($this, $entity, $this->getStorageServices());
+        return $this->getConfiguration()->getStorageMapper()->call($this, $entity, $this->getStorageServices());
     }
 
     public function persist(LifecycleEvent $event): void
@@ -308,11 +239,11 @@ class DoctrineProvider extends AbstractProvider
 
     private function checkStorageMapper(): self
     {
-        if (null === $this->storageMapper && $this->isStorageMapperRequired()) {
+        if (null === $this->getConfiguration()->getStorageMapper() && $this->isStorageMapperRequired()) {
             throw new ProviderException('You must provide a mapper function to map audits to storage.');
         }
 
-//        if (null === $this->storageMapper && 1 === count($this->getStorageServices())) {
+//        if (null === $this->getStorageMapper() && 1 === count($this->getStorageServices())) {
 //            // No mapper and only 1 storage entity manager
 //            return array_values($this->storageServices)[0];
 //        }

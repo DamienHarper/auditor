@@ -44,11 +44,11 @@ trait DoctrineProviderTrait
         $provider->registerStorageService(new StorageService('default', $entityManager));
         $provider->registerAuditingService(new AuditingService('default', $entityManager));
 
-        $provider->setUserProvider(function () {
+        $provider->getConfiguration()->setUserProvider(function () {
             return new User(1, 'dark.vador');
         });
 
-        $provider->setIpProvider(function () {
+        $provider->getConfiguration()->setIpProvider(function () {
             return '1.2.3.4';
         });
 
@@ -105,7 +105,7 @@ trait DoctrineProviderTrait
 
         $auditor->registerProvider($provider);
 
-        $provider->setStorageMapper(function (string $entity, array $storageServices): StorageServiceInterface {
+        $provider->getConfiguration()->setStorageMapper(function (string $entity, array $storageServices): StorageServiceInterface {
             return \in_array($entity, [Author::class, Post::class, Comment::class, Tag::class], true) ? $storageServices['db1'] : $storageServices['db2'];
         });
 
