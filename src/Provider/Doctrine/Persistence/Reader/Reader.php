@@ -30,6 +30,11 @@ class Reader
         $this->provider = $provider;
     }
 
+    public function getProvider(): DoctrineProvider
+    {
+        return $this->provider;
+    }
+
     public function createQuery(string $entity, array $options = []): Query
     {
         $this->checkAuditable($entity);

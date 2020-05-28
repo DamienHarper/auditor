@@ -29,6 +29,16 @@ class Configuration implements ConfigurationInterface
     private $entities = [];
 
     /**
+     * @var array
+     */
+    private $storageServices = [];
+
+    /**
+     * @var array
+     */
+    private $auditingServices = [];
+
+    /**
      * @var bool
      */
     private $isViewerEnabled;
@@ -64,7 +74,6 @@ class Configuration implements ConfigurationInterface
         $this->configureOptions($resolver);
         $config = $resolver->resolve($options);
 
-        $this->isViewerEnabled = $config['viewer'];
         $this->tablePrefix = $config['table_prefix'];
         $this->tableSuffix = $config['table_suffix'];
         $this->ignoredColumns = $config['ignored_columns'];
@@ -75,6 +84,14 @@ class Configuration implements ConfigurationInterface
                 $this->entities[$auditedEntity] = $entityOptions;
             }
         }
+
+        $this->storageServices = $config['storage_services'];
+        $this->auditingServices = $config['auditing_services'];
+        $this->storageMapper = $config['storage_mapper'];
+        $this->roleChecker = $config['roles_checker'];
+        $this->userProvider = $config['user_provider'];
+        $this->ipProvider = $config['security_provider'];
+        $this->isViewerEnabled = $config['viewer'];
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -86,12 +103,24 @@ class Configuration implements ConfigurationInterface
                 'table_suffix' => '_audit',
                 'ignored_columns' => [],
                 'entities' => [],
+                'storage_services' => [],
+                'auditing_services' => [],
+                'storage_mapper' => null,
+                'roles_checker' => null,
+                'user_provider' => null,
+                'security_provider' => null,
                 'viewer' => true,
             ])
             ->setAllowedTypes('table_prefix', 'string')
             ->setAllowedTypes('table_suffix', 'string')
             ->setAllowedTypes('ignored_columns', 'array')
             ->setAllowedTypes('entities', 'array')
+            ->setAllowedTypes('storage_services', 'array')
+            ->setAllowedTypes('auditing_services', 'array')
+            ->setAllowedTypes('storage_mapper', ['null', 'Closure'])
+            ->setAllowedTypes('roles_checker', ['null', 'Closure'])
+            ->setAllowedTypes('user_provider', ['null', 'Closure'])
+            ->setAllowedTypes('security_provider', ['null', 'Closure'])
             ->setAllowedTypes('viewer', 'bool')
         ;
     }
