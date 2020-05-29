@@ -8,6 +8,8 @@ use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Provider\Service\StorageServiceInterface;
+use DH\Auditor\Tests\Fixtures\Provider\AuditNoStorageProvider;
+use DH\Auditor\Tests\Fixtures\Provider\StorageNoAuditProvider;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
@@ -20,6 +22,22 @@ use PHPUnit\Framework\TestCase;
 final class DoctrineProviderTest extends TestCase
 {
     use DoctrineProviderTrait;
+
+    public function testRegisterStorageServiceAgainstNoStorageProvider(): void
+    {
+        $provider = new AuditNoStorageProvider();
+
+        $this->expectException(ProviderException::class);
+        $provider->registerStorageService(new StorageService('storageEM_1', $this->createEntityManager()));
+    }
+
+    public function testRegisterAuditingServiceAgainstNoAuditingProvider(): void
+    {
+        $provider = new StorageNoAuditProvider();
+
+        $this->expectException(ProviderException::class);
+        $provider->registerAuditingService(new AuditingService('auditingEM_1', $this->createEntityManager()));
+    }
 
     public function testRegisterStorageEntityManager(): void
     {

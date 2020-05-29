@@ -70,10 +70,6 @@ abstract class AbstractProvider implements ProviderInterface
      */
     public function getStorageServices(): array
     {
-//        if ($this->supportsStorage()) {
-//            throw new ProviderException('You have to provide a concrete implementation of the "getStorageServices" method.');
-//        }
-
         return $this->storageServices;
     }
 
@@ -96,10 +92,6 @@ abstract class AbstractProvider implements ProviderInterface
      */
     public function getAuditingServices(): array
     {
-//        if ($this->supportsAuditing()) {
-//            throw new ProviderException('You have to provide a concrete implementation of the "getAuditingServices" method.');
-//        }
-
         return $this->auditingServices;
     }
 }
