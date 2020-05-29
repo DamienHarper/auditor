@@ -9,7 +9,6 @@ use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
-use DH\Auditor\User\UserInterface;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMMetadata;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -208,41 +207,13 @@ class Reader
      */
     private function checkRoles(string $entity, string $scope): void
     {
-        /** @var Configuration $configuration */
-        $configuration = $this->provider->getConfiguration();
-
-        $userProvider = $this->provider->getConfiguration()->getUserProvider();
-        $user = null === $userProvider ? null : $userProvider->call($this);
-
         $roleChecker = $this->provider->getConfiguration()->getRoleChecker();
-        if (!($user instanceof UserInterface) || null === $roleChecker) {
-            // If no security defined or no user identified, consider access granted
+
+        if (null === $roleChecker || $roleChecker->call($this, $entity, $scope)) {
             return;
-        }
-
-        $entities = $configuration->getEntities();
-
-        $roles = $entities[$entity]['roles'] ?? null;
-        if (null === $roles) {
-            // If no roles are configured, consider access granted
-            return;
-        }
-
-        $scope = $roles[$scope] ?? null;
-        if (null === $scope) {
-            // If no roles for the given scope are configured, consider access granted
-            return;
-        }
-
-        // roles are defined for the given scope
-        foreach ($scope as $role) {
-            if ($roleChecker->call($this, $role)) {
-                // role granted => access granted
-                return;
-            }
         }
 
         // access denied
-        throw new AccessDeniedException('You are not allowed to access audits of '.$entity.' entity.');
+        throw new AccessDeniedException('You are not allowed to access audits of "'.$entity.'" entity.');
     }
 }

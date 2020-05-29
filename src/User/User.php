@@ -1,8 +1,6 @@
 <?php
 
-namespace DH\Auditor\Tests\Fixtures\User;
-
-use DH\Auditor\User\UserInterface;
+namespace DH\Auditor\User;
 
 class User implements UserInterface
 {
@@ -18,19 +16,14 @@ class User implements UserInterface
 
     /**
      * User constructor.
-     *
-     * @param null|int|string $id
      */
-    public function __construct($id = null, ?string $username = null)
+    public function __construct(?string $id = null, ?string $username = null)
     {
         $this->id = $id;
         $this->username = $username;
     }
 
-    /**
-     * @return null|int|string
-     */
-    public function getId()
+    public function getIdentifier(): ?string
     {
         return $this->id;
     }

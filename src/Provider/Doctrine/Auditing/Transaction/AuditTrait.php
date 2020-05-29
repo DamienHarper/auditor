@@ -174,13 +174,13 @@ trait AuditTrait
 
         $ipProvider = $this->provider->getConfiguration()->getIpProvider();
         if (null !== $ipProvider) {
-            $client_ip = $ipProvider->call($this);
+            [$client_ip, $user_firewall] = $ipProvider->call($this);
         }
 
         $userProvider = $this->provider->getConfiguration()->getUserProvider();
         $user = null === $userProvider ? null : $userProvider->call($this);
         if ($user instanceof UserInterface) {
-            $user_id = $user->getId();
+            $user_id = $user->getIdentifier();
             $username = $user->getUsername();
             $user_fqdn = DoctrineHelper::getRealClassName($user);
         }

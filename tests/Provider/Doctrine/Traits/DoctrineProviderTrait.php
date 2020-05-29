@@ -7,12 +7,12 @@ use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Provider\Service\StorageServiceInterface;
-use DH\Auditor\Tests\Fixtures\User\User;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Traits\AuditorTrait;
+use DH\Auditor\User\User;
 
 trait DoctrineProviderTrait
 {
@@ -49,7 +49,7 @@ trait DoctrineProviderTrait
         });
 
         $provider->getConfiguration()->setIpProvider(function () {
-            return '1.2.3.4';
+            return ['1.2.3.4', 'main'];
         });
 
         $auditor->registerProvider($provider);

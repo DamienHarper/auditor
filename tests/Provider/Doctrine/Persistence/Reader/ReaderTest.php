@@ -94,7 +94,7 @@ final class ReaderTest extends TestCase
         self::assertIsString($audits[0]->getUserId());
         self::assertIsString($audits[0]->getUsername());
         self::assertIsString($audits[0]->getUserFqdn());
-        self::assertNull($audits[0]->getUserFirewall());
+        self::assertSame('main', $audits[0]->getUserFirewall());
         self::assertIsString($audits[0]->getIp());
         self::assertRegExp('#\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}#', $audits[0]->getCreatedAt());
 
