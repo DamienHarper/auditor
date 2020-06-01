@@ -50,6 +50,8 @@ class CleanAuditLogsCommand extends Command
             ->setDescription('Cleans audit tables')
             ->setName(self::$defaultName)
             ->addOption('no-confirm', null, InputOption::VALUE_NONE, 'No interaction mode')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Do not execute SQL queries.')
+            ->addOption('dump-sql', null, InputOption::VALUE_NONE, 'Prints SQL related queries.')
             ->addArgument('keep', InputArgument::OPTIONAL, 'Audits retention period (must be expressed as an ISO 8601 date interval, e.g. P12M to keep the last 12 months or P7D to keep the last 7 days).', 'P12M')
         ;
     }
@@ -130,6 +132,8 @@ class CleanAuditLogsCommand extends Command
         );
 
         $confirm = $input->getOption('no-confirm') ? true : $io->confirm($message, false);
+        $dryRun = (bool) $input->getOption('dry-run');
+        $dumpSQL = (bool) $input->getOption('dump-sql');
 
         if ($confirm) {
             /** @var Configuration $configuration */
@@ -142,6 +146,7 @@ class CleanAuditLogsCommand extends Command
             $progressBar->setMessage('Starting...');
             $progressBar->start();
 
+            $queries = [];
             foreach ($repository as $name => $entities) {
                 foreach ($entities as $entity => $tablename) {
                     $auditTable = preg_replace(
@@ -162,8 +167,13 @@ class CleanAuditLogsCommand extends Command
                         ->delete($auditTable)
                         ->where('created_at < :until')
                         ->setParameter(':until', $until->format('Y-m-d'))
-                        ->execute()
                     ;
+
+                    if ($dumpSQL) {
+                        $queries[] = str_replace(':until', "'".$until->format('Y-m-d')."'", $queryBuilder->getSQL());
+                    } else {
+                        $queryBuilder->execute();
+                    }
 
                     $progressBar->setMessage("Cleaning audit tables... (<info>{$auditTable}</info>)");
                     $progressBar->advance();
@@ -173,8 +183,16 @@ class CleanAuditLogsCommand extends Command
             $progressBar->setMessage('Cleaning audit tables... (<info>done</info>)');
             $progressBar->display();
 
-            $io->newLine(2);
+            $io->newLine();
+            if ($dumpSQL) {
+                $io->newLine();
+                $io->writeln('SQL queries to be run:');
+                foreach ($queries as $query) {
+                    $io->writeln($query);
+                }
+            }
 
+            $io->newLine();
             $io->success('Success.');
         } else {
             $io->success('Cancelled.');
