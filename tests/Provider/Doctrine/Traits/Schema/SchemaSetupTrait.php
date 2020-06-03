@@ -20,6 +20,8 @@ trait SchemaSetupTrait
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         // provider with 1 em for both storage and auditing
         $this->createAndInitDoctrineProvider();
 
@@ -46,6 +48,8 @@ trait SchemaSetupTrait
 
     protected function tearDown(): void
     {
+        parent::tearDown();
+
         /**
          * @var string         $name
          * @var StorageService $storageService

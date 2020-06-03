@@ -2,7 +2,7 @@
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
+use DH\Auditor\Provider\Doctrine\Auditing\Annotation as Audit;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity
  * @ORM\Table(name="author")
+ * @Audit\Security(view={"ROLE1", "ROLE2"})
  */
 class Author
 {
