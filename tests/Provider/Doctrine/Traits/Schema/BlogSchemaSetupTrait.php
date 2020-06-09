@@ -15,7 +15,12 @@ trait BlogSchemaSetupTrait
     private function configureEntities(): void
     {
         $this->provider->getConfiguration()->setEntities([
-            Author::class => ['enabled' => true],
+            Author::class => [
+                'enabled' => true,
+                'roles' => [
+                    'view' => ['ROLE1', 'ROLE2'],
+                ],
+            ],
             Post::class => ['enabled' => true],
             Comment::class => ['enabled' => true],
             Tag::class => ['enabled' => true],

@@ -44,11 +44,6 @@ class Configuration implements ConfigurationInterface
     private $isViewerEnabled;
 
     /**
-     * @var bool
-     */
-    private $annotationLoaded = false;
-
-    /**
      * @var Closure
      */
     private $storageMapper;
@@ -135,7 +130,6 @@ class Configuration implements ConfigurationInterface
      */
     public function setEntities(array $entities): self
     {
-        $this->annotationLoaded = true;
         $this->entities = $entities;
 
         return $this;
@@ -258,6 +252,11 @@ class Configuration implements ConfigurationInterface
         return $this;
     }
 
+    public function getUserProvider(): ?Closure
+    {
+        return $this->userProvider;
+    }
+
     public function setRoleChecker(Closure $roleChecker): self
     {
         $this->roleChecker = $roleChecker;
@@ -268,11 +267,6 @@ class Configuration implements ConfigurationInterface
     public function getRoleChecker(): ?Closure
     {
         return $this->roleChecker;
-    }
-
-    public function getUserProvider(): ?Closure
-    {
-        return $this->userProvider;
     }
 
     public function setIpProvider(Closure $ipProvider): self
