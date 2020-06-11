@@ -8,6 +8,7 @@ use DH\Auditor\Model\Entry;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Exception;
 use PDO;
 
 class Query
@@ -83,7 +84,7 @@ class Query
                 ->execute()
                 ->fetchColumn(0)
             ;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $result = false;
         }
 

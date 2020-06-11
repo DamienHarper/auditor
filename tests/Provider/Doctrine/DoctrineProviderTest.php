@@ -8,12 +8,17 @@ use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Provider\Service\StorageServiceInterface;
+use DH\Auditor\Security\IpProviderInterface;
+use DH\Auditor\Security\RoleCheckerInterface;
 use DH\Auditor\Tests\Fixtures\Provider\AuditNoStorageProvider;
 use DH\Auditor\Tests\Fixtures\Provider\StorageNoAuditProvider;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\DoctrineProviderTrait;
+use DH\Auditor\User\User;
+use DH\Auditor\User\UserInterface;
+use DH\Auditor\User\UserProviderInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -473,5 +478,71 @@ final class DoctrineProviderTest extends TestCase
         $provider = $this->createDoctrineProvider();
 
         self::assertInstanceOf(Configuration::class, $provider->getConfiguration(), 'Configuration is reachable.');
+    }
+
+    public function testSetUserProvider(): void
+    {
+        $provider = $this->createDoctrineProvider();
+
+        $before = $provider->getConfiguration()->getUserProvider();
+        $provider->setUserProvider(new FakeUserProvider());
+        $after = $provider->getConfiguration()->getUserProvider();
+
+        self::assertIsCallable($after, 'UserProvider is a Closure.');
+        self::assertNotSame($before, $after, 'UserProvider has changed.');
+
+        self::assertInstanceOf(User::class, $after->call($this), 'UserProvider returns a User instance.');
+    }
+
+    public function testSetIpProvider(): void
+    {
+        $provider = $this->createDoctrineProvider();
+
+        $before = $provider->getConfiguration()->getIpProvider();
+        $provider->setIpProvider(new FakeIpProvider());
+        $after = $provider->getConfiguration()->getIpProvider();
+
+        self::assertIsCallable($after, 'IpProvider is a Closure.');
+        self::assertNotSame($before, $after, 'IpProvider has changed.');
+
+        self::assertIsArray($after->call($this), 'IpProvider returns an array.');
+    }
+
+    public function testSetRoleChecker(): void
+    {
+        $provider = $this->createDoctrineProvider();
+
+        $before = $provider->getConfiguration()->getRoleChecker();
+        $provider->setRoleChecker(new FakeRoleChecker());
+        $after = $provider->getConfiguration()->getRoleChecker();
+
+        self::assertIsCallable($after, 'RoleChecker is a Closure.');
+        self::assertNotSame($before, $after, 'RoleChecker has changed.');
+
+        self::assertIsBool($after->call($this, '', ''), 'RoleChecker returns a bool.');
+    }
+}
+
+class FakeUserProvider implements UserProviderInterface
+{
+    public function getUser(): ?UserInterface
+    {
+        return new User();
+    }
+}
+
+class FakeIpProvider implements IpProviderInterface
+{
+    public function getClientIpAndFirewall(): array
+    {
+        return [];
+    }
+}
+
+class FakeRoleChecker implements RoleCheckerInterface
+{
+    public function isGranted(string $entity, string $scope): bool
+    {
+        return true;
     }
 }

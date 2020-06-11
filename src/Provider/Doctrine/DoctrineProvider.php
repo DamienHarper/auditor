@@ -16,10 +16,10 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Provider\ProviderInterface;
 use DH\Auditor\Provider\Service\AuditingServiceInterface;
 use DH\Auditor\Provider\Service\StorageServiceInterface;
+use DH\Auditor\Security\IpProviderInterface;
+use DH\Auditor\Security\RoleCheckerInterface;
 use DH\Auditor\User\UserInterface;
-use DH\AuditorBundle\Security\IpProvider;
-use DH\AuditorBundle\Security\RolesChecker;
-use DH\AuditorBundle\User\UserProvider;
+use DH\Auditor\User\UserProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Gedmo\SoftDeleteable\SoftDeleteableListener;
 
@@ -228,21 +228,21 @@ class DoctrineProvider extends AbstractProvider
         return true;
     }
 
-    public function setUserProvider(UserProvider $userProvider): void
+    public function setUserProvider(UserProviderInterface $userProvider): void
     {
         $this->configuration->setUserProvider(function () use ($userProvider): ?UserInterface {
             return $userProvider->getUser();
         });
     }
 
-    public function setIpProvider(IpProvider $ipProvider): void
+    public function setIpProvider(IpProviderInterface $ipProvider): void
     {
         $this->configuration->setIpProvider(function () use ($ipProvider): array {
             return $ipProvider->getClientIpAndFirewall();
         });
     }
 
-    public function setRolesChecker(RolesChecker $rolesChecker): void
+    public function setRoleChecker(RoleCheckerInterface $rolesChecker): void
     {
         $this->configuration->setRoleChecker(function (string $entity, string $scope) use ($rolesChecker): bool {
             return $rolesChecker->isGranted($entity, $scope);
