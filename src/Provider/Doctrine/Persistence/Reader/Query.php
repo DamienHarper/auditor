@@ -73,15 +73,19 @@ class Query
     {
         $queryBuilder = $this->buildQueryBuilder();
 
-        $result = $queryBuilder
-            ->resetQueryPart('select')
-            ->resetQueryPart('orderBy')
-            ->setMaxResults(null)
-            ->setFirstResult(null)
-            ->select('COUNT(id)')
-            ->execute()
-            ->fetchColumn(0)
-        ;
+        try {
+            $result = $queryBuilder
+                ->resetQueryPart('select')
+                ->resetQueryPart('orderBy')
+                ->setMaxResults(null)
+                ->setFirstResult(null)
+                ->select('COUNT(id)')
+                ->execute()
+                ->fetchColumn(0)
+            ;
+        } catch (\Exception $e) {
+            $result = false;
+        }
 
         return false === $result ? 0 : $result;
     }
