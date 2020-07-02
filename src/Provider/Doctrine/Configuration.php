@@ -2,7 +2,6 @@
 
 namespace DH\Auditor\Provider\Doctrine;
 
-use Closure;
 use DH\Auditor\Provider\ConfigurationInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -44,24 +43,24 @@ class Configuration implements ConfigurationInterface
     private $isViewerEnabled;
 
     /**
-     * @var Closure
+     * @var callable
      */
     private $storageMapper;
 
     /**
-     * @var Closure
+     * @var callable
      */
     private $userProvider;
 
     /**
-     * @var Closure
+     * @var callable
      */
     private $roleChecker;
 
     /**
-     * @var Closure
+     * @var callable
      */
-    private $ipProvider;
+    private $securityProvider;
 
     public function __construct(array $options)
     {
@@ -83,9 +82,9 @@ class Configuration implements ConfigurationInterface
         $this->storageServices = $config['storage_services'];
         $this->auditingServices = $config['auditing_services'];
         $this->storageMapper = $config['storage_mapper'];
-        $this->roleChecker = $config['roles_checker'];
+        $this->roleChecker = $config['role_checker'];
         $this->userProvider = $config['user_provider'];
-        $this->ipProvider = $config['security_provider'];
+        $this->securityProvider = $config['security_provider'];
         $this->isViewerEnabled = $config['viewer'];
     }
 
@@ -101,7 +100,7 @@ class Configuration implements ConfigurationInterface
                 'storage_services' => [],
                 'auditing_services' => [],
                 'storage_mapper' => null,
-                'roles_checker' => null,
+                'role_checker' => null,
                 'user_provider' => null,
                 'security_provider' => null,
                 'viewer' => true,
@@ -112,10 +111,10 @@ class Configuration implements ConfigurationInterface
             ->setAllowedTypes('entities', 'array')
             ->setAllowedTypes('storage_services', 'array')
             ->setAllowedTypes('auditing_services', 'array')
-            ->setAllowedTypes('storage_mapper', ['null', 'Closure'])
-            ->setAllowedTypes('roles_checker', ['null', 'Closure'])
-            ->setAllowedTypes('user_provider', ['null', 'Closure'])
-            ->setAllowedTypes('security_provider', ['null', 'Closure'])
+            ->setAllowedTypes('storage_mapper', ['null', 'string', 'callable'])
+            ->setAllowedTypes('role_checker', ['null', 'string', 'callable'])
+            ->setAllowedTypes('user_provider', ['null', 'string', 'callable'])
+            ->setAllowedTypes('security_provider', ['null', 'string', 'callable'])
             ->setAllowedTypes('viewer', 'bool')
         ;
     }
@@ -233,51 +232,51 @@ class Configuration implements ConfigurationInterface
         return $this;
     }
 
-    public function setStorageMapper(Closure $mapper): self
+    public function setStorageMapper(callable $mapper): self
     {
         $this->storageMapper = $mapper;
 
         return $this;
     }
 
-    public function getStorageMapper(): ?Closure
+    public function getStorageMapper(): ?callable
     {
         return $this->storageMapper;
     }
 
-    public function setUserProvider(Closure $userProvider): self
+    public function setUserProvider(callable $userProvider): self
     {
         $this->userProvider = $userProvider;
 
         return $this;
     }
 
-    public function getUserProvider(): ?Closure
+    public function getUserProvider(): ?callable
     {
         return $this->userProvider;
     }
 
-    public function setRoleChecker(Closure $roleChecker): self
+    public function setRoleChecker(callable $roleChecker): self
     {
         $this->roleChecker = $roleChecker;
 
         return $this;
     }
 
-    public function getRoleChecker(): ?Closure
+    public function getRoleChecker(): ?callable
     {
         return $this->roleChecker;
     }
 
-    public function setIpProvider(Closure $ipProvider): self
+    public function setSecurityProvider(callable $securityProvider): self
     {
-        $this->ipProvider = $ipProvider;
+        $this->securityProvider = $securityProvider;
 
         return $this;
     }
 
-    public function getIpProvider(): ?Closure
+    public function getSecurityProvider(): ?callable
     {
-        return $this->ipProvider;
+        return $this->securityProvider;
     }
 }

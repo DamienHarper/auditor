@@ -16,17 +16,14 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Provider\ProviderInterface;
 use DH\Auditor\Provider\Service\AuditingServiceInterface;
 use DH\Auditor\Provider\Service\StorageServiceInterface;
-use DH\Auditor\Security\IpProviderInterface;
 use DH\Auditor\Security\RoleCheckerInterface;
-use DH\Auditor\User\UserInterface;
+use DH\Auditor\Security\SecurityProviderInterface;
 use DH\Auditor\User\UserProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Gedmo\SoftDeleteable\SoftDeleteableListener;
 
 class DoctrineProvider extends AbstractProvider
 {
-    public const BOTH = 3;
-
     /**
      * @var TransactionManager
      */
@@ -83,7 +80,9 @@ class DoctrineProvider extends AbstractProvider
             return array_values($this->getStorageServices())[0];
         }
 
-        return $this->getConfiguration()->getStorageMapper()->call($this, $entity, $this->getStorageServices());
+        $storageMapper = $this->getConfiguration()->getStorageMapper();
+
+        return $storageMapper($entity, $this->getStorageServices());
     }
 
     public function persist(LifecycleEvent $event): void
@@ -228,25 +227,24 @@ class DoctrineProvider extends AbstractProvider
         return true;
     }
 
-    public function setUserProvider(UserProviderInterface $userProvider): void
+    public function setStorageMapper(callable $storageMapper): void
     {
-        $this->configuration->setUserProvider(function () use ($userProvider): ?UserInterface {
-            return $userProvider->getUser();
-        });
+        $this->configuration->setStorageMapper($storageMapper);
     }
 
-    public function setIpProvider(IpProviderInterface $ipProvider): void
+    public function setUserProvider(UserProviderInterface $userProvider): void
     {
-        $this->configuration->setIpProvider(function () use ($ipProvider): array {
-            return $ipProvider->getClientIpAndFirewall();
-        });
+        $this->configuration->setUserProvider($userProvider);
+    }
+
+    public function setSecurityProvider(SecurityProviderInterface $securityProvider): void
+    {
+        $this->configuration->setSecurityProvider($securityProvider);
     }
 
     public function setRoleChecker(RoleCheckerInterface $rolesChecker): void
     {
-        $this->configuration->setRoleChecker(function (string $entity, string $scope) use ($rolesChecker): bool {
-            return $rolesChecker->isGranted($entity, $scope);
-        });
+        $this->configuration->setRoleChecker($rolesChecker);
     }
 
     private function loadAnnotations(EntityManagerInterface $entityManager): self

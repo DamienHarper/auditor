@@ -209,7 +209,7 @@ class Reader
     {
         $roleChecker = $this->provider->getConfiguration()->getRoleChecker();
 
-        if (null === $roleChecker || $roleChecker->call($this, $entity, $scope)) {
+        if (null === $roleChecker || $roleChecker($entity, $scope)) {
             return;
         }
 

@@ -4,12 +4,11 @@ namespace DH\Auditor\Tests\Provider\Doctrine;
 
 use DH\Auditor\Exception\ProviderException;
 use DH\Auditor\Provider\Doctrine\Configuration;
-use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Provider\Service\StorageServiceInterface;
-use DH\Auditor\Security\IpProviderInterface;
 use DH\Auditor\Security\RoleCheckerInterface;
+use DH\Auditor\Security\SecurityProviderInterface;
 use DH\Auditor\Tests\Fixtures\Provider\AuditNoStorageProvider;
 use DH\Auditor\Tests\Fixtures\Provider\StorageNoAuditProvider;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
@@ -109,30 +108,7 @@ final class DoctrineProviderTest extends TestCase
 
         self::assertCount(2, $provider->getAuditingServices(), 'There are 2 auditing entity managers registered.');
         self::assertCount(2, $provider->getStorageServices(), 'There are 2 storage entity managers registered.');
-
-//        $this->expectException(ProviderException::class);
-//        $entityManager = $this->createEntityManager();
-//        $provider->registerEntityManager($entityManager, DoctrineProvider::AUDITING_ONLY, 'auditingEM');
-//
-//        $this->expectException(ProviderException::class);
-//        $entityManager = $this->createEntityManager();
-//        $provider->registerEntityManager($entityManager, DoctrineProvider::STORAGE_ONLY, 'storageEM');
-//
-//        $this->expectException(ProviderException::class);
-//        $entityManager = $this->createEntityManager();
-//        $provider->registerEntityManager($entityManager, DoctrineProvider::BOTH, 'EM');
     }
-
-//    public function testRegisterEntityManagerDefaultName(): void
-//    {
-//        $provider = $this->createUnregisteredDoctrineProvider();
-//        $entityManager = $this->createEntityManager();
-//        $provider->registerEntityManager($entityManager);
-//
-//        $expected = ['default' => $entityManager];
-//        self::assertSame($expected, $provider->getStorageEntityManagers(), 'Default name is "default".');
-//        self::assertSame($expected, $provider->getAuditingEntityManagers(), 'Default name is "default".');
-//    }
 
     public function testIsStorageMapperRequired(): void
     {
@@ -143,14 +119,12 @@ final class DoctrineProviderTest extends TestCase
         $entityManager = $this->createEntityManager();
         $provider->registerAuditingService(new AuditingService('EM1', $entityManager));
         $provider->registerStorageService(new StorageService('EM1', $entityManager));
-//        $provider->registerEntityManager($entityManager, DoctrineProvider::BOTH, 'EM1');
 
         self::assertFalse($provider->isStorageMapperRequired(), 'Mapper is not required since there is strictly less than 2 storage entity manager.');
 
         $entityManager = $this->createEntityManager();
         $provider->registerAuditingService(new AuditingService('EM2', $entityManager));
         $provider->registerStorageService(new StorageService('EM2', $entityManager));
-//        $provider->registerEntityManager($entityManager, DoctrineProvider::BOTH, 'EM2');
 
         self::assertTrue($provider->isStorageMapperRequired(), 'Mapper is required since there is more than 2 storage entity managers.');
     }
@@ -167,8 +141,6 @@ final class DoctrineProviderTest extends TestCase
         $entityManager2 = $this->createEntityManager();
         $provider->registerAuditingService(new AuditingService('EM2', $entityManager2));
         $provider->registerStorageService(new StorageService('EM2', $entityManager2));
-//        $provider->registerEntityManager($entityManager1, DoctrineProvider::BOTH, 'EM1');
-//        $provider->registerEntityManager($entityManager2, DoctrineProvider::BOTH, 'EM2');
 
         self::assertNull($provider->getConfiguration()->getStorageMapper(), 'Mapping closure is not set.');
 
@@ -488,24 +460,24 @@ final class DoctrineProviderTest extends TestCase
         $provider->setUserProvider(new FakeUserProvider());
         $after = $provider->getConfiguration()->getUserProvider();
 
-        self::assertIsCallable($after, 'UserProvider is a Closure.');
+        self::assertIsCallable($after, 'UserProvider is a callable.');
         self::assertNotSame($before, $after, 'UserProvider has changed.');
 
-        self::assertInstanceOf(User::class, $after->call($this), 'UserProvider returns a User instance.');
+        self::assertInstanceOf(User::class, $after(), 'UserProvider returns a User instance.');
     }
 
-    public function testSetIpProvider(): void
+    public function testSetSecurityProvider(): void
     {
         $provider = $this->createDoctrineProvider();
 
-        $before = $provider->getConfiguration()->getIpProvider();
-        $provider->setIpProvider(new FakeIpProvider());
-        $after = $provider->getConfiguration()->getIpProvider();
+        $before = $provider->getConfiguration()->getSecurityProvider();
+        $provider->setSecurityProvider(new FakeSecurityProvider());
+        $after = $provider->getConfiguration()->getSecurityProvider();
 
-        self::assertIsCallable($after, 'IpProvider is a Closure.');
-        self::assertNotSame($before, $after, 'IpProvider has changed.');
+        self::assertIsCallable($after, 'SecurityProvider is a callable.');
+        self::assertNotSame($before, $after, 'SecurityProvider has changed.');
 
-        self::assertIsArray($after->call($this), 'IpProvider returns an array.');
+        self::assertIsArray($after(), 'SecurityProvider returns an array.');
     }
 
     public function testSetRoleChecker(): void
@@ -516,24 +488,24 @@ final class DoctrineProviderTest extends TestCase
         $provider->setRoleChecker(new FakeRoleChecker());
         $after = $provider->getConfiguration()->getRoleChecker();
 
-        self::assertIsCallable($after, 'RoleChecker is a Closure.');
+        self::assertIsCallable($after, 'RoleChecker is a callable.');
         self::assertNotSame($before, $after, 'RoleChecker has changed.');
 
-        self::assertIsBool($after->call($this, '', ''), 'RoleChecker returns a bool.');
+        self::assertIsBool($after('', ''), 'RoleChecker returns a bool.');
     }
 }
 
 class FakeUserProvider implements UserProviderInterface
 {
-    public function getUser(): ?UserInterface
+    public function __invoke(): ?UserInterface
     {
         return new User();
     }
 }
 
-class FakeIpProvider implements IpProviderInterface
+class FakeSecurityProvider implements SecurityProviderInterface
 {
-    public function getClientIpAndFirewall(): array
+    public function __invoke(): array
     {
         return [];
     }
@@ -541,7 +513,7 @@ class FakeIpProvider implements IpProviderInterface
 
 class FakeRoleChecker implements RoleCheckerInterface
 {
-    public function isGranted(string $entity, string $scope): bool
+    public function __invoke(string $entity, string $scope): bool
     {
         return true;
     }

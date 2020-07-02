@@ -48,7 +48,7 @@ trait DoctrineProviderTrait
             return new User(1, 'dark.vador');
         });
 
-        $provider->getConfiguration()->setIpProvider(function () {
+        $provider->getConfiguration()->setSecurityProvider(function () {
             return ['1.2.3.4', 'main'];
         });
 
