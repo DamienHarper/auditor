@@ -16,9 +16,6 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Provider\ProviderInterface;
 use DH\Auditor\Provider\Service\AuditingServiceInterface;
 use DH\Auditor\Provider\Service\StorageServiceInterface;
-use DH\Auditor\Security\RoleCheckerInterface;
-use DH\Auditor\Security\SecurityProviderInterface;
-use DH\Auditor\User\UserProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Gedmo\SoftDeleteable\SoftDeleteableListener;
 
@@ -230,21 +227,6 @@ class DoctrineProvider extends AbstractProvider
     public function setStorageMapper(callable $storageMapper): void
     {
         $this->configuration->setStorageMapper($storageMapper);
-    }
-
-    public function setUserProvider(UserProviderInterface $userProvider): void
-    {
-        $this->configuration->setUserProvider($userProvider);
-    }
-
-    public function setSecurityProvider(SecurityProviderInterface $securityProvider): void
-    {
-        $this->configuration->setSecurityProvider($securityProvider);
-    }
-
-    public function setRoleChecker(RoleCheckerInterface $rolesChecker): void
-    {
-        $this->configuration->setRoleChecker($rolesChecker);
     }
 
     private function loadAnnotations(EntityManagerInterface $entityManager): self

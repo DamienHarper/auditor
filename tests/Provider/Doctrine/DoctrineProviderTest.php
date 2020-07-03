@@ -456,9 +456,9 @@ final class DoctrineProviderTest extends TestCase
     {
         $provider = $this->createDoctrineProvider();
 
-        $before = $provider->getConfiguration()->getUserProvider();
-        $provider->setUserProvider(new FakeUserProvider());
-        $after = $provider->getConfiguration()->getUserProvider();
+        $before = $provider->getAuditor()->getConfiguration()->getUserProvider();
+        $provider->getAuditor()->getConfiguration()->setUserProvider(new FakeUserProvider());
+        $after = $provider->getAuditor()->getConfiguration()->getUserProvider();
 
         self::assertIsCallable($after, 'UserProvider is a callable.');
         self::assertNotSame($before, $after, 'UserProvider has changed.');
@@ -470,9 +470,9 @@ final class DoctrineProviderTest extends TestCase
     {
         $provider = $this->createDoctrineProvider();
 
-        $before = $provider->getConfiguration()->getSecurityProvider();
-        $provider->setSecurityProvider(new FakeSecurityProvider());
-        $after = $provider->getConfiguration()->getSecurityProvider();
+        $before = $provider->getAuditor()->getConfiguration()->getSecurityProvider();
+        $provider->getAuditor()->getConfiguration()->setSecurityProvider(new FakeSecurityProvider());
+        $after = $provider->getAuditor()->getConfiguration()->getSecurityProvider();
 
         self::assertIsCallable($after, 'SecurityProvider is a callable.');
         self::assertNotSame($before, $after, 'SecurityProvider has changed.');
@@ -484,9 +484,9 @@ final class DoctrineProviderTest extends TestCase
     {
         $provider = $this->createDoctrineProvider();
 
-        $before = $provider->getConfiguration()->getRoleChecker();
-        $provider->setRoleChecker(new FakeRoleChecker());
-        $after = $provider->getConfiguration()->getRoleChecker();
+        $before = $provider->getAuditor()->getConfiguration()->getRoleChecker();
+        $provider->getAuditor()->getConfiguration()->setRoleChecker(new FakeRoleChecker());
+        $after = $provider->getAuditor()->getConfiguration()->getRoleChecker();
 
         self::assertIsCallable($after, 'RoleChecker is a callable.');
         self::assertNotSame($before, $after, 'RoleChecker has changed.');

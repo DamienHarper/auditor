@@ -35,6 +35,7 @@ trait DoctrineProviderTrait
     {
         $auditor = $this->createAuditor();
         $provider = new DoctrineProvider($configuration ?? $this->createProviderConfiguration());
+        $auditor->registerProvider($provider);
 
         // Entity manager "default" is used both for auditing and storage
         $entityManager = $this->createEntityManager([
@@ -44,15 +45,13 @@ trait DoctrineProviderTrait
         $provider->registerStorageService(new StorageService('default', $entityManager));
         $provider->registerAuditingService(new AuditingService('default', $entityManager));
 
-        $provider->getConfiguration()->setUserProvider(function () {
+        $provider->getAuditor()->getConfiguration()->setUserProvider(function () {
             return new User(1, 'dark.vador');
         });
 
-        $provider->getConfiguration()->setSecurityProvider(function () {
+        $provider->getAuditor()->getConfiguration()->setSecurityProvider(function () {
             return ['1.2.3.4', 'main'];
         });
-
-        $auditor->registerProvider($provider);
 
         return $provider;
     }

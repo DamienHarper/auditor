@@ -172,12 +172,12 @@ trait AuditTrait
         $user_fqdn = null;
         $user_firewall = null;
 
-        $securityProvider = $this->provider->getConfiguration()->getSecurityProvider();
+        $securityProvider = $this->provider->getAuditor()->getConfiguration()->getSecurityProvider();
         if (null !== $securityProvider) {
             [$client_ip, $user_firewall] = $securityProvider();
         }
 
-        $userProvider = $this->provider->getConfiguration()->getUserProvider();
+        $userProvider = $this->provider->getAuditor()->getConfiguration()->getUserProvider();
         $user = null === $userProvider ? null : $userProvider();
         if ($user instanceof UserInterface) {
             $user_id = $user->getIdentifier();

@@ -47,21 +47,6 @@ class Configuration implements ConfigurationInterface
      */
     private $storageMapper;
 
-    /**
-     * @var callable
-     */
-    private $userProvider;
-
-    /**
-     * @var callable
-     */
-    private $roleChecker;
-
-    /**
-     * @var callable
-     */
-    private $securityProvider;
-
     public function __construct(array $options)
     {
         $resolver = new OptionsResolver();
@@ -81,11 +66,8 @@ class Configuration implements ConfigurationInterface
 
         $this->storageServices = $config['storage_services'];
         $this->auditingServices = $config['auditing_services'];
-        $this->storageMapper = $config['storage_mapper'];
-        $this->roleChecker = $config['role_checker'];
-        $this->userProvider = $config['user_provider'];
-        $this->securityProvider = $config['security_provider'];
         $this->isViewerEnabled = $config['viewer'];
+        $this->storageMapper = $config['storage_mapper'];
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -99,11 +81,8 @@ class Configuration implements ConfigurationInterface
                 'entities' => [],
                 'storage_services' => [],
                 'auditing_services' => [],
-                'storage_mapper' => null,
-                'role_checker' => null,
-                'user_provider' => null,
-                'security_provider' => null,
                 'viewer' => true,
+                'storage_mapper' => null,
             ])
             ->setAllowedTypes('table_prefix', 'string')
             ->setAllowedTypes('table_suffix', 'string')
@@ -111,11 +90,8 @@ class Configuration implements ConfigurationInterface
             ->setAllowedTypes('entities', 'array')
             ->setAllowedTypes('storage_services', 'array')
             ->setAllowedTypes('auditing_services', 'array')
-            ->setAllowedTypes('storage_mapper', ['null', 'string', 'callable'])
-            ->setAllowedTypes('role_checker', ['null', 'string', 'callable'])
-            ->setAllowedTypes('user_provider', ['null', 'string', 'callable'])
-            ->setAllowedTypes('security_provider', ['null', 'string', 'callable'])
             ->setAllowedTypes('viewer', 'bool')
+            ->setAllowedTypes('storage_mapper', ['null', 'string', 'callable'])
         ;
     }
 
@@ -242,41 +218,5 @@ class Configuration implements ConfigurationInterface
     public function getStorageMapper(): ?callable
     {
         return $this->storageMapper;
-    }
-
-    public function setUserProvider(callable $userProvider): self
-    {
-        $this->userProvider = $userProvider;
-
-        return $this;
-    }
-
-    public function getUserProvider(): ?callable
-    {
-        return $this->userProvider;
-    }
-
-    public function setRoleChecker(callable $roleChecker): self
-    {
-        $this->roleChecker = $roleChecker;
-
-        return $this;
-    }
-
-    public function getRoleChecker(): ?callable
-    {
-        return $this->roleChecker;
-    }
-
-    public function setSecurityProvider(callable $securityProvider): self
-    {
-        $this->securityProvider = $securityProvider;
-
-        return $this;
-    }
-
-    public function getSecurityProvider(): ?callable
-    {
-        return $this->securityProvider;
     }
 }

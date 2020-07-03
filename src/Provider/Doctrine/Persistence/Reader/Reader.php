@@ -207,7 +207,7 @@ class Reader
      */
     private function checkRoles(string $entity, string $scope): void
     {
-        $roleChecker = $this->provider->getConfiguration()->getRoleChecker();
+        $roleChecker = $this->provider->getAuditor()->getConfiguration()->getRoleChecker();
 
         if (null === $roleChecker || $roleChecker($entity, $scope)) {
             return;

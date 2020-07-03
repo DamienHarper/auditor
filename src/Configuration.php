@@ -16,6 +16,21 @@ class Configuration
      */
     private $timezone;
 
+    /**
+     * @var callable
+     */
+    private $userProvider;
+
+    /**
+     * @var callable
+     */
+    private $roleChecker;
+
+    /**
+     * @var callable
+     */
+    private $securityProvider;
+
     public function __construct(array $options)
     {
         $resolver = new OptionsResolver();
@@ -24,6 +39,9 @@ class Configuration
 
         $this->enabled = $config['enabled'];
         $this->timezone = $config['timezone'];
+        $this->userProvider = $config['user_provider'];
+        $this->securityProvider = $config['security_provider'];
+        $this->roleChecker = $config['role_checker'];
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -33,9 +51,15 @@ class Configuration
             ->setDefaults([
                 'enabled' => true,
                 'timezone' => 'UTC',
+                'role_checker' => null,
+                'user_provider' => null,
+                'security_provider' => null,
             ])
             ->setAllowedTypes('enabled', 'bool')
             ->setAllowedTypes('timezone', 'string')
+            ->setAllowedTypes('role_checker', ['null', 'string', 'callable'])
+            ->setAllowedTypes('user_provider', ['null', 'string', 'callable'])
+            ->setAllowedTypes('security_provider', ['null', 'string', 'callable'])
         ;
     }
 
@@ -73,5 +97,41 @@ class Configuration
     public function getTimezone(): string
     {
         return $this->timezone;
+    }
+
+    public function setUserProvider(callable $userProvider): self
+    {
+        $this->userProvider = $userProvider;
+
+        return $this;
+    }
+
+    public function getUserProvider(): ?callable
+    {
+        return $this->userProvider;
+    }
+
+    public function setSecurityProvider(callable $securityProvider): self
+    {
+        $this->securityProvider = $securityProvider;
+
+        return $this;
+    }
+
+    public function getSecurityProvider(): ?callable
+    {
+        return $this->securityProvider;
+    }
+
+    public function setRoleChecker(callable $roleChecker): self
+    {
+        $this->roleChecker = $roleChecker;
+
+        return $this;
+    }
+
+    public function getRoleChecker(): ?callable
+    {
+        return $this->roleChecker;
     }
 }
