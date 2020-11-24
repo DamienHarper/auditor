@@ -46,9 +46,7 @@ Follow instructions at [auditor-demo](https://github.com/DamienHarper/auditor-de
 
 
 ## Official Documentation
-`auditor` official documentation can be found [here](doc/00-index.md).
-
-`DoctrineProvider` official documentation can be found [here](doc/00-index.md).
+`auditor` official documentation can be found [here](https://damienharper.github.io/auditor-docs/).
 
 
 ## Version Information
@@ -56,14 +54,7 @@ Follow instructions at [auditor-demo](https://github.com/DamienHarper/auditor-de
 :----------|:----------------------------|:-----------------|:---------------------|:-----------
  1.x       | Active development :rocket: | >= 7.2           | >= 3.4               | [![Build Status](https://travis-ci.com/DamienHarper/auditor.svg?branch=master)](https://travis-ci.com/DamienHarper/auditor) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=master)
  
-Changelog is available [here](CHANGELOG.md)
-
-
-## Usage
-Once [installed](doc/11-installation.md) and [configured](doc/20-general-configuration.md), any database change 
-affecting audited entities will be logged to audit logs automatically.
-Also, running schema update or similar will automatically setup audit logs for every 
-new auditable entity.
+Changelog is available [here](https://damienharper.github.io/auditor-docs/docs/auditor/release-notes.html)
 
 
 ## Contributing
