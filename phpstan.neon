@@ -8,6 +8,9 @@ parameters:
     checkMissingIterableValueType: false
     checkGenericClassInNonGenericObjectType: false
 
+    excludes_analyse:
+        - 'src/Event/AuditEvent.php'
+
     ignoreErrors:
         # false positives
         - '~Parameter \#1 \$name of method Symfony\\Component\\Console\\Command\\Command\:\:setName\(\) expects string, string\|null given~'
@@ -18,3 +21,4 @@ parameters:
         - '~Cannot call method setFetchMode\(\) on Doctrine\\DBAL\\Driver\\ResultStatement\|int~'
         - '~Cannot call method fetchColumn\(\) on Doctrine\\DBAL\\Driver\\ResultStatement\|int~'
         - '~Cannot call method fetchAll\(\) on Doctrine\\DBAL\\Driver\\ResultStatement\|int~'
+        - '~Parameter \#1 \$keep of method DH\\Auditor\\Provider\\Doctrine\\Persistence\\Command\\CleanAuditLogsCommand\:\:validateKeepArgument\(\) expects string, string\|null given~'

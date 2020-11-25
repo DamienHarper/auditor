@@ -36,7 +36,7 @@ class DoctrineProvider extends AbstractProvider
     {
         parent::registerAuditingService($service);
 
-        /** @var AuditingService $service */
+        \assert($service instanceof AuditingService);    // helps PHPStan
         $entityManager = $service->getEntityManager();
         $evm = $entityManager->getEventManager();
 
@@ -53,7 +53,7 @@ class DoctrineProvider extends AbstractProvider
     {
         parent::registerStorageService($service);
 
-        /** @var StorageService $service */
+        \assert($service instanceof StorageService);     // helps PHPStan
         $entityManager = $service->getEntityManager();
         $evm = $entityManager->getEventManager();
 
@@ -72,12 +72,13 @@ class DoctrineProvider extends AbstractProvider
     {
         $this->checkStorageMapper();
 
-        if (null === $this->getConfiguration()->getStorageMapper() && 1 === \count($this->getStorageServices())) {
+        \assert($this->configuration instanceof Configuration);   // helps PHPStan
+        $storageMapper = $this->configuration->getStorageMapper();
+
+        if (null === $storageMapper || 1 === \count($this->getStorageServices())) {
             // No mapper and only 1 storage entity manager
             return array_values($this->getStorageServices())[0];
         }
-
-        $storageMapper = $this->getConfiguration()->getStorageMapper();
 
         return $storageMapper($entity, $this->getStorageServices());
     }
@@ -130,9 +131,8 @@ class DoctrineProvider extends AbstractProvider
     {
         $class = DoctrineHelper::getRealClassName($entity);
         // is $entity part of audited entities?
-        /** @var Configuration $configuration */
-        $configuration = $this->configuration;
-        if (!\array_key_exists($class, $configuration->getEntities())) {
+        \assert($this->configuration instanceof Configuration);   // helps PHPStan
+        if (!\array_key_exists($class, $this->configuration->getEntities())) {
             // no => $entity is not audited
             return false;
         }
@@ -183,9 +183,8 @@ class DoctrineProvider extends AbstractProvider
     public function isAuditedField($entity, string $field): bool
     {
         // is $field is part of globally ignored columns?
-        /** @var Configuration $configuration */
-        $configuration = $this->configuration;
-        if (\in_array($field, $configuration->getIgnoredColumns(), true)) {
+        \assert($this->configuration instanceof Configuration);   // helps PHPStan
+        if (\in_array($field, $this->configuration->getIgnoredColumns(), true)) {
             // yes => $field is not audited
             return false;
         }
@@ -197,7 +196,7 @@ class DoctrineProvider extends AbstractProvider
         }
 
         $class = DoctrineHelper::getRealClassName($entity);
-        $entityOptions = $configuration->getEntities()[$class];
+        $entityOptions = $this->configuration->getEntities()[$class];
 
         if (null === $entityOptions) {
             // no option defined => $field is audited
@@ -226,16 +225,16 @@ class DoctrineProvider extends AbstractProvider
 
     public function setStorageMapper(callable $storageMapper): void
     {
+        \assert($this->configuration instanceof Configuration);   // helps PHPStan
         $this->configuration->setStorageMapper($storageMapper);
     }
 
     private function loadAnnotations(EntityManagerInterface $entityManager): self
     {
-        /** @var Configuration $configuration */
-        $configuration = $this->configuration;
+        \assert($this->configuration instanceof Configuration);   // helps PHPStan
         $annotationLoader = new AnnotationLoader($entityManager);
-        $configuration->setEntities(array_merge(
-            $configuration->getEntities(),
+        $this->configuration->setEntities(array_merge(
+            $this->configuration->getEntities(),
             $annotationLoader->load()
         ));
 
@@ -244,7 +243,8 @@ class DoctrineProvider extends AbstractProvider
 
     private function checkStorageMapper(): self
     {
-        if (null === $this->getConfiguration()->getStorageMapper() && $this->isStorageMapperRequired()) {
+        \assert($this->configuration instanceof Configuration);   // helps PHPStan
+        if (null === $this->configuration->getStorageMapper() && $this->isStorageMapperRequired()) {
             throw new ProviderException('You must provide a mapper function to map audits to storage.');
         }
 

@@ -25,7 +25,7 @@ class User implements UserInterface
 
     public function getIdentifier(): ?string
     {
-        return $this->id;
+        return \is_int($this->id) ? (string) $this->id : $this->id;
     }
 
     public function getUsername(): ?string

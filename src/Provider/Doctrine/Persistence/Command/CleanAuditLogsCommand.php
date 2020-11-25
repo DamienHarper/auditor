@@ -216,7 +216,7 @@ class CleanAuditLogsCommand extends Command
         return [$repository, $count];
     }
 
-    private function computeAuditTablename($tablename, Configuration $configuration): ?string
+    private function computeAuditTablename(string $tablename, Configuration $configuration): ?string
     {
         return preg_replace(
             sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($tablename, '#')),
