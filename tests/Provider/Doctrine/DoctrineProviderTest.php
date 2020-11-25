@@ -14,6 +14,7 @@ use DH\Auditor\Tests\Fixtures\Provider\StorageNoAuditProvider;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\DummyEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\DoctrineProviderTrait;
 use DH\Auditor\User\User;
 use DH\Auditor\User\UserInterface;
@@ -155,6 +156,21 @@ final class DoctrineProviderTest extends TestCase
         self::assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo2')->getEntityManager(), 'EM1 is used.');
         self::assertSame($entityManager2, $provider->getStorageServiceForEntity('Bar1')->getEntityManager(), 'EM2 is used.');
         self::assertSame($entityManager2, $provider->getStorageServiceForEntity('Bar2')->getEntityManager(), 'EM2 is used.');
+    }
+
+    public function testCheckStorageMapperThrowsExceptionWhenNoMapperDefined(): void
+    {
+        $provider = $this->createUnregisteredDoctrineProvider();
+
+        // register 2 entity managers for storage (at least)
+        $entityManager1 = $this->createEntityManager();
+        $provider->registerStorageService(new StorageService('EM1', $entityManager1));
+
+        $entityManager2 = $this->createEntityManager();
+        $provider->registerStorageService(new StorageService('EM2', $entityManager2));
+
+        $this->expectException(ProviderException::class);
+        $provider->getStorageServiceForEntity(DummyEntity::class);
     }
 
     public function testIsRegistered(): void
