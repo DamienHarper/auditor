@@ -186,6 +186,7 @@ class TransactionProcessor implements TransactionProcessorInterface
             'diff' => [
                 'source' => $this->summarize($entityManager, $source),
                 'target' => $this->summarize($entityManager, $target),
+                'is_owning_side' => $mapping['isOwningSide'],
             ],
             'table' => $meta->getTableName(),
             'schema' => $meta->getSchemaName(),
