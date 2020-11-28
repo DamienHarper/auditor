@@ -23,7 +23,7 @@ class User
     protected $username;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="string", nullable=true, length=5)
      */
     protected $locale_id;
 

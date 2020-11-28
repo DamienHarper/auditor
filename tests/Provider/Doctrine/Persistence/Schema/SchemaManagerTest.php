@@ -109,6 +109,13 @@ final class SchemaManagerTest extends TestCase
                     'length' => 50,
                 ],
             ],
+            'discriminator' => [
+                'type' => Types::STRING,
+                'options' => [
+                    'default' => null,
+                    'notnull' => false,
+                ],
+            ],
             'diffs' => [
                 'type' => Types::JSON_ARRAY,
                 'options' => [
@@ -188,7 +195,7 @@ final class SchemaManagerTest extends TestCase
         $reflectedMethod->invokeArgs($updater, [$table, $columns, $alternateColumns]);
 
         $reflectedMethod = $this->reflectMethod($updater, 'processIndices');
-        $reflectedMethod->invokeArgs($updater, [$table, $alternateIndices]);
+        $reflectedMethod->invokeArgs($updater, [$table, $alternateIndices, $entityManager->getConnection()]);
 
         $this->migrate($fromSchema, $toSchema, $entityManager, $schemaManager->getDatabasePlatform(), true);
 
