@@ -188,7 +188,7 @@ final class SchemaManagerTest extends TestCase
         $reflectedMethod->invokeArgs($updater, [$table, $columns, $alternateColumns]);
 
         $reflectedMethod = $this->reflectMethod($updater, 'processIndices');
-        $reflectedMethod->invokeArgs($updater, [$table, $alternateIndices]);
+        $reflectedMethod->invokeArgs($updater, [$table, $alternateIndices, $entityManager->getConnection()]);
 
         $this->migrate($fromSchema, $toSchema, $entityManager, $schemaManager->getDatabasePlatform(), true);
 

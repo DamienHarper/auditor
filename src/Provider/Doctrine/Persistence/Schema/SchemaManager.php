@@ -4,9 +4,12 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Schema;
 
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
@@ -152,10 +155,12 @@ class SchemaManager
      */
     public function createAuditTable(string $entity, Table $table, ?Schema $schema = null): Schema
     {
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity($entity);
+        $connection = $storageService->getEntityManager()->getConnection();
+
         if (null === $schema) {
-            /** @var StorageService $storageService */
-            $storageService = $this->provider->getStorageServiceForEntity($entity);
-            $schemaManager = $storageService->getEntityManager()->getConnection()->getSchemaManager();
+            $schemaManager = $connection->getSchemaManager();
             $schema = $schemaManager->createSchema();
         }
 
@@ -185,7 +190,12 @@ class SchemaManager
                 if ('primary' === $struct['type']) {
                     $auditTable->setPrimaryKey([$columnName]);
                 } else {
-                    $auditTable->addIndex([$columnName], $struct['name']);
+                    $auditTable->addIndex(
+                        [$columnName],
+                        $struct['name'],
+                        [],
+                        $this->isIndexLengthLimited($columnName, $connection) ? ['lengths' => [191]] : []
+                    );
                 }
             }
         }
@@ -202,7 +212,9 @@ class SchemaManager
     {
         /** @var StorageService $storageService */
         $storageService = $this->provider->getStorageServiceForEntity($entity);
-        $schemaManager = $storageService->getEntityManager()->getConnection()->getSchemaManager();
+        $connection = $storageService->getEntityManager()->getConnection();
+
+        $schemaManager = $connection->getSchemaManager();
         if (null === $schema) {
             $schema = $schemaManager->createSchema();
         }
@@ -214,7 +226,7 @@ class SchemaManager
         $this->processColumns($table, $columns, SchemaHelper::getAuditTableColumns());
 
         // process indices
-        $this->processIndices($table, SchemaHelper::getAuditTableIndices($table->getName()));
+        $this->processIndices($table, SchemaHelper::getAuditTableIndices($table->getName()), $connection);
 
         return $schema;
     }
@@ -247,7 +259,7 @@ class SchemaManager
     /**
      * @throws SchemaException
      */
-    private function processIndices(Table $table, array $expectedIndices): void
+    private function processIndices(Table $table, array $expectedIndices, Connection $connection): void
     {
         foreach ($expectedIndices as $columnName => $options) {
             if ('primary' === $options['type']) {
@@ -257,8 +269,51 @@ class SchemaManager
                 if ($table->hasIndex($options['name'])) {
                     $table->dropIndex($options['name']);
                 }
-                $table->addIndex([$columnName], $options['name']);
+                $table->addIndex(
+                    [$columnName],
+                    $options['name'],
+                    [],
+                    $this->isIndexLengthLimited($columnName, $connection) ? ['lengths' => [191]] : []
+                );
             }
         }
+    }
+
+    /**
+     * MySQL < 5.7.7 and MariaDb < 10.2.2 index length requirements.
+     *
+     * @see https://github.com/doctrine/dbal/issues/3419
+     */
+    private function isIndexLengthLimited(string $name, Connection $connection): bool
+    {
+        $columns = SchemaHelper::getAuditTableColumns();
+        if (
+            !isset($columns[$name])
+            || $columns[$name]['type'] !== DoctrineHelper::getDoctrineType('STRING')
+            || (
+                isset($columns[$name]['options'], $columns[$name]['options']['length'])
+
+                && $columns[$name]['options']['length'] < 191
+            )
+        ) {
+            return false;
+        }
+
+        $wrappedConnection = $connection->getWrappedConnection();
+
+        if ($wrappedConnection instanceof ServerInfoAwareConnection) {
+            $version = $wrappedConnection->getServerVersion();
+
+            $mariadb = false !== mb_stripos($version, 'mariadb');
+            if ($mariadb && version_compare($version, '10.2.2', '<')) {
+                return true;
+            }
+
+            if (!$mariadb && version_compare($version, '5.7.7', '<')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
