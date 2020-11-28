@@ -16,6 +16,7 @@
         <var name="db_password" value="password"/>
         <var name="db_name" value="auditor"/>
         <var name="db_port" value="5432"/>
+        <var name="db_charset" value="utf8"/>
     </php>
 
     <testsuites>

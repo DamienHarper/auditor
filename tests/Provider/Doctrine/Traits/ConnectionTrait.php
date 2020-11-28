@@ -94,7 +94,7 @@ trait ConnectionTrait
             'host' => $GLOBALS['db_host'],
             'dbname' => $GLOBALS['db_name'],
             'port' => $GLOBALS['db_port'],
-            'charset' => 'utf8mb4',
+            'charset' => $GLOBALS['db_charset'],
         ];
     }
 }
