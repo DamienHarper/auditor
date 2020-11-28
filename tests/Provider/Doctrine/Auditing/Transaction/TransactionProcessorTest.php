@@ -212,6 +212,7 @@ final class TransactionProcessorTest extends TestCase
         self::assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
         self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         self::assertSame([
+            'is_owning_side' => false,
             'source' => [
                 'class' => Author::class,
                 'id' => 1,
@@ -283,6 +284,7 @@ final class TransactionProcessorTest extends TestCase
         self::assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
         self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         self::assertSame([
+            'is_owning_side' => false,
             'source' => [
                 'class' => Author::class,
                 'id' => 1,
@@ -401,6 +403,7 @@ final class TransactionProcessorTest extends TestCase
         self::assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
         self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         self::assertSame([
+            'is_owning_side' => true,
             'source' => [
                 'class' => Post::class,
                 'id' => 1,
@@ -423,6 +426,7 @@ final class TransactionProcessorTest extends TestCase
         self::assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
         self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         self::assertSame([
+            'is_owning_side' => true,
             'source' => [
                 'class' => Post::class,
                 'id' => 1,
@@ -545,6 +549,7 @@ final class TransactionProcessorTest extends TestCase
         self::assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
         self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         self::assertSame([
+            'is_owning_side' => true,
             'source' => [
                 'class' => Post::class,
                 'id' => 1,
