@@ -65,27 +65,6 @@ class Entry
     protected $created_at;
 
     /**
-     * @param null|int|string $value
-     */
-    public function __set(string $name, $value): void
-    {
-        $this->{$name} = $value;
-    }
-
-    /**
-     * @return null|int|string
-     */
-    public function __get(string $name)
-    {
-        return $this->{$name};
-    }
-
-    public function __isset(string $name): bool
-    {
-        return property_exists($this, $name);
-    }
-
-    /**
      * Get the value of id.
      */
     public function getId(): int
