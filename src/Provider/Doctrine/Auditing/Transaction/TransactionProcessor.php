@@ -48,7 +48,7 @@ class TransactionProcessor implements TransactionProcessorInterface
             // Symfony 3.x
             $dispatcher->dispatch(LifecycleEvent::class, new LifecycleEvent($payload));
         } else {
-            // Symfony 4.x
+            // Symfony >= 4.x
             $dispatcher->dispatch(new LifecycleEvent($payload));
         }
     }

@@ -134,4 +134,15 @@ abstract class SchemaHelper
             ],
         ];
     }
+
+    public static function isValidPayload(array $payload): bool
+    {
+        foreach (self::getAuditTableColumns() as $columnName => $struct) {
+            if ('id' !== $columnName && !\array_key_exists($columnName, $payload)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

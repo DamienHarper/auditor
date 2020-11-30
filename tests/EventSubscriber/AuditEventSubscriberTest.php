@@ -16,11 +16,27 @@ final class AuditEventSubscriberTest extends TestCase
 
     public function testOnAuditEvent(): void
     {
+        $payload = [
+            'entity' => '',
+            'table' => '',
+            'type' => '',
+            'object_id' => '',
+            'discriminator' => '',
+            'transaction_hash' => '',
+            'diffs' => '',
+            'blame_id' => '',
+            'blame_user' => '',
+            'blame_user_fqdn' => '',
+            'blame_user_firewall' => '',
+            'ip' => '',
+            'created_at' => '',
+        ];
+
         $auditor = $this->createAuditor();
         $dispatcher = $auditor->getEventDispatcher();
         $subscriber = new AuditEventSubscriber($auditor);
         $dispatcher->addSubscriber($subscriber);
-        $dispatcher->dispatch(new LifecycleEvent(['fake payload']));
+        $dispatcher->dispatch(new LifecycleEvent($payload));
 
         self::assertArrayHasKey(LifecycleEvent::class, AuditEventSubscriber::getSubscribedEvents());
     }
