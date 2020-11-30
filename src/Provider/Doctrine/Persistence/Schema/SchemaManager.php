@@ -181,8 +181,15 @@ class SchemaManager
             $auditTable = $schema->createTable($auditTablename);
 
             // Add columns to audit table
+            $isJsonSupported = $this->isJsonSupported($connection);
             foreach (SchemaHelper::getAuditTableColumns() as $columnName => $struct) {
-                $auditTable->addColumn($columnName, $struct['type'], $struct['options']);
+                if (DoctrineHelper::getDoctrineType('JSON') === $struct['type'] && $isJsonSupported) {
+                    $type = DoctrineHelper::getDoctrineType('TEXT');
+                } else {
+                    $type = $struct['type'];
+                }
+
+                $auditTable->addColumn($columnName, $type, $struct['options']);
             }
 
             // Add indices to audit table
@@ -223,7 +230,7 @@ class SchemaManager
         $columns = $schemaManager->listTableColumns($table->getName());
 
         // process columns
-        $this->processColumns($table, $columns, SchemaHelper::getAuditTableColumns());
+        $this->processColumns($table, $columns, SchemaHelper::getAuditTableColumns(), $connection);
 
         // process indices
         $this->processIndices($table, SchemaHelper::getAuditTableIndices($table->getName()), $connection);
@@ -231,15 +238,23 @@ class SchemaManager
         return $schema;
     }
 
-    private function processColumns(Table $table, array $columns, array $expectedColumns): void
+    private function processColumns(Table $table, array $columns, array $expectedColumns, Connection $connection): void
     {
         $processed = [];
 
+        $isJsonSupported = $this->isJsonSupported($connection);
         foreach ($columns as $column) {
             if (\array_key_exists($column->getName(), $expectedColumns)) {
                 // column is part of expected columns
                 $table->dropColumn($column->getName());
-                $table->addColumn($column->getName(), $expectedColumns[$column->getName()]['type'], $expectedColumns[$column->getName()]['options']);
+
+                if (DoctrineHelper::getDoctrineType('JSON') === $expectedColumns[$column->getName()]['type'] && $isJsonSupported) {
+                    $type = DoctrineHelper::getDoctrineType('TEXT');
+                } else {
+                    $type = $expectedColumns[$column->getName()]['type'];
+                }
+
+                $table->addColumn($column->getName(), $type, $expectedColumns[$column->getName()]['options']);
             } else {
                 // column is not part of expected columns so it has to be removed
                 $table->dropColumn($column->getName());
@@ -251,6 +266,12 @@ class SchemaManager
         foreach ($expectedColumns as $columnName => $options) {
             if (!\in_array($columnName, $processed, true)) {
                 // expected column in not part of concrete ones so it's a new column, we need to add it
+                if (DoctrineHelper::getDoctrineType('JSON') === $options['type'] && $isJsonSupported) {
+                    $type = DoctrineHelper::getDoctrineType('TEXT');
+                } else {
+                    $type = $options['type'];
+                }
+
                 $table->addColumn($columnName, $options['type'], $options['options']);
             }
         }
@@ -292,7 +313,6 @@ class SchemaManager
             || $columns[$name]['type'] !== DoctrineHelper::getDoctrineType('STRING')
             || (
                 isset($columns[$name]['options'], $columns[$name]['options']['length'])
-
                 && $columns[$name]['options']['length'] < 191
             )
         ) {
