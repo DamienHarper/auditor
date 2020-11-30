@@ -117,7 +117,7 @@ final class SchemaManagerTest extends TestCase
                 ],
             ],
             'diffs' => [
-                'type' => Types::JSON_ARRAY,
+                'type' => Types::JSON,
                 'options' => [
                     'default' => null,
                     'notnull' => false,
