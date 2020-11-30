@@ -22,7 +22,9 @@ class AuditEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LifecycleEvent::class => 'onAuditEvent',
+            LifecycleEvent::class => [
+                ['onAuditEvent', -1000000],  // should be fired last
+            ],
         ];
     }
 
