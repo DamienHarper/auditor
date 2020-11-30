@@ -1,5 +1,8 @@
 language: php
 os: linux
+arch: arm64-graviton2
+group: edge
+virt: vm
 
 branches:
     only:
