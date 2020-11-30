@@ -83,10 +83,7 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class)->execute();
-        $audits[0]->id = $audits[0]->getId();   // used to trigger Entry::__set()
         self::assertIsInt($audits[0]->getId());
-        self::assertIsInt($audits[0]->id);
-        self::assertTrue(isset($audits[0]->id));
         self::assertIsString($audits[0]->getObjectId());
         self::assertNull($audits[0]->getDiscriminator());
         self::assertIsString($audits[0]->getTransactionHash());
