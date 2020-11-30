@@ -117,7 +117,7 @@ final class SchemaManagerTest extends TestCase
                 ],
             ],
             'diffs' => [
-                'type' => Types::JSON_ARRAY,
+                'type' => Types::JSON,
                 'options' => [
                     'default' => null,
                     'notnull' => false,
@@ -192,7 +192,7 @@ final class SchemaManagerTest extends TestCase
         $columns = $schemaManager->listTableColumns($authorAuditTable->getName());
 
         $reflectedMethod = $this->reflectMethod($updater, 'processColumns');
-        $reflectedMethod->invokeArgs($updater, [$table, $columns, $alternateColumns]);
+        $reflectedMethod->invokeArgs($updater, [$table, $columns, $alternateColumns, $entityManager->getConnection()]);
 
         $reflectedMethod = $this->reflectMethod($updater, 'processIndices');
         $reflectedMethod->invokeArgs($updater, [$table, $alternateIndices, $entityManager->getConnection()]);
