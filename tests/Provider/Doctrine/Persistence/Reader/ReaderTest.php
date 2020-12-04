@@ -405,6 +405,7 @@ final class ReaderTest extends TestCase
         $audits = $reader->createQuery(Post::class)->execute();
         $hash = $audits[0]->getTransactionHash();
 
+        $author->removePost($post2);
         $storageService->getEntityManager()->remove($post2);
         $storageService->getEntityManager()->flush();
 
