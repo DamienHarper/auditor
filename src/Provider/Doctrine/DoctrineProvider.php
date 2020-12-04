@@ -17,7 +17,6 @@ use DH\Auditor\Provider\ProviderInterface;
 use DH\Auditor\Provider\Service\AuditingServiceInterface;
 use DH\Auditor\Provider\Service\StorageServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Gedmo\SoftDeleteable\SoftDeleteableListener;
 
 class DoctrineProvider extends AbstractProvider
 {
@@ -42,7 +41,6 @@ class DoctrineProvider extends AbstractProvider
 
         // Register subscribers
         $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager));
-        $evm->addEventSubscriber(new SoftDeleteableListener());
 
         $this->loadAnnotations($entityManager);
 
