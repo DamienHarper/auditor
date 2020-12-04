@@ -93,7 +93,7 @@ final class ReaderTest extends TestCase
         self::assertIsString($audits[0]->getUserFqdn());
         self::assertSame('main', $audits[0]->getUserFirewall());
         self::assertIsString($audits[0]->getIp());
-        self::assertRegExp('#\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}#', $audits[0]->getCreatedAt());
+        self::assertMatchesRegularExpression('#\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}#', $audits[0]->getCreatedAt());
 
         $i = 0;
         self::assertCount(5, $audits, 'result count is ok.');
