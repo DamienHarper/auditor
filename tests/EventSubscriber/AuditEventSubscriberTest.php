@@ -37,7 +37,14 @@ final class AuditEventSubscriberTest extends TestCase
         $dispatcher = $auditor->getEventDispatcher();
         $subscriber = new AuditEventSubscriber($auditor);
         $dispatcher->addSubscriber($subscriber);
-        $dispatcher->dispatch(new LifecycleEvent($payload));
+
+        if ($auditor->isPre43Dispatcher()) {
+            // Symfony 3.x
+            $dispatcher->dispatch(LifecycleEvent::class, new LifecycleEvent($payload));
+        } else {
+            // Symfony >= 4.x
+            $dispatcher->dispatch(new LifecycleEvent($payload));
+        }
 
         self::assertArrayHasKey(LifecycleEvent::class, AuditEventSubscriber::getSubscribedEvents());
     }
@@ -69,7 +76,13 @@ final class AuditEventSubscriberTest extends TestCase
         $subscriber = new CustomAuditEventSubscriber($auditor);
         $dispatcher->addSubscriber($subscriber);
 
-        $dispatcher->dispatch(new LifecycleEvent($payload));
+        if ($auditor->isPre43Dispatcher()) {
+            // Symfony 3.x
+            $dispatcher->dispatch(LifecycleEvent::class, new LifecycleEvent($payload));
+        } else {
+            // Symfony >= 4.x
+            $dispatcher->dispatch(new LifecycleEvent($payload));
+        }
 
         self::assertArrayHasKey(LifecycleEvent::class, CustomAuditEventSubscriber::getSubscribedEvents());
     }
