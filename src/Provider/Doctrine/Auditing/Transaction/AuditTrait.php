@@ -98,18 +98,18 @@ trait AuditTrait
             $n = null;
 
             if (
-                !isset($meta->embeddedClasses[$fieldName]) &&
-                $meta->hasField($fieldName) &&
-                $this->provider->isAuditedField($entity, $fieldName)
+                !isset($meta->embeddedClasses[$fieldName])
+                && $meta->hasField($fieldName)
+                && $this->provider->isAuditedField($entity, $fieldName)
             ) {
                 $mapping = $meta->fieldMappings[$fieldName];
                 $type = Type::getType($mapping['type']);
                 $o = $this->value($entityManager, $type, $old);
                 $n = $this->value($entityManager, $type, $new);
             } elseif (
-                $meta->hasAssociation($fieldName) &&
-                $meta->isSingleValuedAssociation($fieldName) &&
-                $this->provider->isAuditedField($entity, $fieldName)
+                $meta->hasAssociation($fieldName)
+                && $meta->isSingleValuedAssociation($fieldName)
+                && $this->provider->isAuditedField($entity, $fieldName)
             ) {
                 $o = $this->summarize($entityManager, $old);
                 $n = $this->summarize($entityManager, $new);

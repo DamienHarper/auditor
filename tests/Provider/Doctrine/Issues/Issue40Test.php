@@ -17,8 +17,8 @@ use PHPUnit\Framework\TestCase;
  */
 final class Issue40Test extends TestCase
 {
-    use SchemaSetupTrait;
     use ReaderTrait;
+    use SchemaSetupTrait;
 
     public function testIssue40(): void
     {
@@ -43,11 +43,11 @@ final class Issue40Test extends TestCase
 
         $audits = $reader->createQuery(CoreCase::class)->execute();
         self::assertCount(1, $audits, 'results count ok.');
-        self::assertSame(Transaction::INSERT, $audits[0]->getType(), 'AuditReader::INSERT operation.');
+        self::assertSame(Transaction::INSERT, $audits[0]->getType(), 'Reader::INSERT operation.');
 
         $audits = $reader->createQuery(DieselCase::class)->execute();
         self::assertCount(1, $audits, 'results count ok.');
-        self::assertSame(Transaction::INSERT, $audits[0]->getType(), 'AuditReader::INSERT operation.');
+        self::assertSame(Transaction::INSERT, $audits[0]->getType(), 'Reader::INSERT operation.');
     }
 
     private function createAndInitDoctrineProvider(): void

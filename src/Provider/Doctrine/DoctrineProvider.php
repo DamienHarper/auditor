@@ -202,8 +202,8 @@ class DoctrineProvider extends AbstractProvider
         }
 
         // are columns excluded and is field part of them?
-        if (isset($entityOptions['ignored_columns']) &&
-            \in_array($field, $entityOptions['ignored_columns'], true)) {
+        if (isset($entityOptions['ignored_columns'])
+            && \in_array($field, $entityOptions['ignored_columns'], true)) {
             // yes => $field is not audited
             return false;
         }

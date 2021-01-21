@@ -412,8 +412,8 @@ final class ReaderTest extends TestCase
         $reader = $this->createReader();
         $audits = $reader->getAuditsByTransactionHash($hash);
 
-        self::assertCount(2, $audits, 'AuditReader::getAllAuditsByTransactionHash() is ok.');
-        self::assertCount(1, $audits[Author::class], 'AuditReader::getAllAuditsByTransactionHash() is ok.');
-        self::assertCount(2, $audits[Post::class], 'AuditReader::getAllAuditsByTransactionHash() is ok.');
+        self::assertCount(2, $audits, 'Reader::getAllAuditsByTransactionHash() is ok.');
+        self::assertCount(1, $audits[Author::class], 'Reader::getAllAuditsByTransactionHash() is ok.');
+        self::assertCount(2, $audits[Post::class], 'Reader::getAllAuditsByTransactionHash() is ok.');
     }
 }

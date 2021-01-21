@@ -19,8 +19,8 @@ use PHPUnit\Framework\TestCase;
  */
 final class InheritanceTest extends TestCase
 {
-    use SchemaSetupTrait;
     use ReaderTrait;
+    use SchemaSetupTrait;
 
     public function testAuditingSubclass(): void
     {

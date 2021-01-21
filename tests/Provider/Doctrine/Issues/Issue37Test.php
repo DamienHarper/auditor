@@ -16,8 +16,8 @@ use PHPUnit\Framework\TestCase;
  */
 final class Issue37Test extends TestCase
 {
-    use SchemaSetupTrait;
     use ReaderTrait;
+    use SchemaSetupTrait;
 
     public function testIssue37(): void
     {
@@ -46,8 +46,8 @@ final class Issue37Test extends TestCase
 
         $audits = $reader->createQuery(Locale::class)->execute();
         self::assertCount(2, $audits, 'results count ok.');
-        self::assertSame('en_US', $audits[0]->getObjectId(), 'AuditEntry::object_id is a string.');
-        self::assertSame('fr_FR', $audits[1]->getObjectId(), 'AuditEntry::object_id is a string.');
+        self::assertSame('en_US', $audits[0]->getObjectId(), 'Entry::object_id is a string.');
+        self::assertSame('fr_FR', $audits[1]->getObjectId(), 'Entry::object_id is a string.');
 
         $user1 = new User();
         $user1

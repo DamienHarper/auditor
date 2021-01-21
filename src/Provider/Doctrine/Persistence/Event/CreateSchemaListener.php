@@ -44,8 +44,8 @@ class CreateSchemaListener implements EventSubscriber
         if (!$this->provider->isAuditable($metadata->name)) {
             $audited = false;
             if (
-                $metadata->rootEntityName === $metadata->name &&
-                ClassMetadataInfo::INHERITANCE_TYPE_SINGLE_TABLE === $metadata->inheritanceType
+                $metadata->rootEntityName === $metadata->name
+                && ClassMetadataInfo::INHERITANCE_TYPE_SINGLE_TABLE === $metadata->inheritanceType
             ) {
                 foreach ($metadata->subClasses as $subClass) {
                     if ($this->provider->isAuditable($subClass)) {

@@ -22,7 +22,7 @@ class Reader
     private $provider;
 
     /**
-     * AuditReader constructor.
+     * Reader constructor.
      */
     public function __construct(DoctrineProvider $provider)
     {
@@ -71,9 +71,9 @@ class Reader
 
         $metadata = $entityManager->getClassMetadata($entity);
         if (
-            $config['strict'] &&
-            $metadata instanceof ORMMetadata &&
-            ORMMetadata::INHERITANCE_TYPE_SINGLE_TABLE === $metadata->inheritanceType
+            $config['strict']
+            && $metadata instanceof ORMMetadata
+            && ORMMetadata::INHERITANCE_TYPE_SINGLE_TABLE === $metadata->inheritanceType
         ) {
             $query->addFilter(Query::DISCRIMINATOR, $entity);
         }
