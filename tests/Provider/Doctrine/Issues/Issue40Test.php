@@ -61,14 +61,6 @@ final class Issue40Test extends TestCase
         ]);
         $this->provider->registerStorageService(new StorageService('default', $entityManager));
         $this->provider->registerAuditingService(new AuditingService('default', $entityManager));
-//        $this->provider->registerEntityManager(
-//            $this->createEntityManager([
-//                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
-//                __DIR__.'/../Fixtures/Issue40',
-//            ]),
-//            DoctrineProvider::BOTH,
-//            'default'
-//        );
 
         $auditor->registerProvider($this->provider);
     }

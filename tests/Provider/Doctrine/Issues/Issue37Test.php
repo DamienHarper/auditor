@@ -80,14 +80,6 @@ final class Issue37Test extends TestCase
         ]);
         $this->provider->registerStorageService(new StorageService('default', $entityManager));
         $this->provider->registerAuditingService(new AuditingService('default', $entityManager));
-//        $this->provider->registerEntityManager(
-//            $this->createEntityManager([
-//                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
-//                __DIR__.'/../Fixtures/Issue37',
-//            ]),
-//            DoctrineProvider::BOTH,
-//            'default'
-//        );
 
         $auditor->registerProvider($this->provider);
     }
@@ -99,30 +91,4 @@ final class Issue37Test extends TestCase
             User::class => ['enabled' => true],
         ]);
     }
-
-//    public function testIssue40(): void
-//    {
-//        $em = $this->getEntityManager();
-//        $reader = $this->getReader($this->getAuditConfiguration());
-//
-//        $coreCase = new CoreCase();
-//        $coreCase->type = 'type1';
-//        $coreCase->status = 'status1';
-//        $em->persist($coreCase);
-//        $this->flushAll($entityManagers);
-//
-//        $dieselCase = new DieselCase();
-//        $dieselCase->coreCase = $coreCase;
-//        $dieselCase->setName('yo');
-//        $em->persist($dieselCase);
-//        $this->flushAll($entityManagers);
-//
-//        $audits = $reader->getAudits(CoreCase::class);
-//        self::assertCount(1, $audits, 'results count ok.');
-//        self::assertSame(Reader::INSERT, $audits[0]->getType(), 'AuditReader::INSERT operation.');
-//
-//        $audits = $reader->getAudits(DieselCase::class);
-//        self::assertCount(1, $audits, 'results count ok.');
-//        self::assertSame(Reader::INSERT, $audits[0]->getType(), 'AuditReader::INSERT operation.');
-//    }
 }
