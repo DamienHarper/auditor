@@ -14,7 +14,7 @@ use Doctrine\ORM\Events;
 class DoctrineSubscriber implements EventSubscriber
 {
     /**
-     * @var \DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager
+     * @var TransactionManager
      */
     private $transactionManager;
 

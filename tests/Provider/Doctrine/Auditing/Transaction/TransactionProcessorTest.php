@@ -20,8 +20,8 @@ use PHPUnit\Framework\TestCase;
  */
 final class TransactionProcessorTest extends TestCase
 {
-    use ReflectionTrait;
     use DefaultSchemaSetupTrait;
+    use ReflectionTrait;
 
     public function testInsert(): void
     {
