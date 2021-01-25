@@ -38,7 +38,7 @@ so that even if something fails the global state remains clean.
 * PostgreSQL
 * SQLite
 
-`DoctrineProvider` *should work with **any other** database supported by `Doctrine`. 
+`DoctrineProvider` should work with **any other** database supported by `Doctrine`. 
 Though, we can only really support the ones we can test with [Travis CI](https://travis-ci.com) / Github actions.
 
 Basically you can track any change of any entity from audit logs.
