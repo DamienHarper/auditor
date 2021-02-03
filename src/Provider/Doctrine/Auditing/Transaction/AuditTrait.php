@@ -76,6 +76,23 @@ trait AuditTrait
                 $convertedValue = $type->convertToPHPValue($value, $platform);
 
                 break;
+            case 'uuid_binary':
+            case 'uuid_binary_ordered_time':
+            case 'uuid':
+            case 'ulid':
+                // Ramsey UUID / Symfony UID (UUID/ULID)
+                $convertedValue = (string) $value;
+
+                break;
+            case DoctrineHelper::getDoctrineType('BINARY'):
+                if (\is_resource($value)) {
+                    // let's replace resources with a "simple" representation: resourceType#resourceId
+                    $convertedValue = get_resource_type($value).'#'.get_resource_id($value);
+                } else {
+                    $convertedValue = $type->convertToDatabaseValue($value, $platform);
+                }
+
+                break;
             default:
                 $convertedValue = $type->convertToDatabaseValue($value, $platform);
         }
