@@ -214,22 +214,6 @@ class TransactionProcessor implements TransactionProcessorInterface
         $auditTable = $schema.$configuration->getTablePrefix().$data['table'].$configuration->getTableSuffix();
         $dt = new DateTime('now', new DateTimeZone($this->provider->getAuditor()->getConfiguration()->getTimezone()));
 
-        $diffs = json_encode($data['diff']);
-        if (false === $diffs) {
-            // json_encode failed, probably because of an unsupported type (resource type)
-            // let's replace resources with a "simple" representation
-            foreach ($data['diff'] as $property => $changeset) {
-                if (isset($changeset['old']) && \is_resource($changeset['old'])) {
-                    $data['diff'][$property]['old'] = get_resource_type($changeset['old']).'#'.get_resource_id($changeset['old']);
-                }
-                if (isset($changeset['new']) && \is_resource($changeset['new'])) {
-                    $data['diff'][$property]['new'] = get_resource_type($changeset['new']).'#'.get_resource_id($changeset['new']);
-                }
-            }
-
-            $diffs = json_encode($data['diff']);
-        }
-
         $payload = [
             'entity' => $data['entity'],
             'table' => $auditTable,
@@ -237,7 +221,7 @@ class TransactionProcessor implements TransactionProcessorInterface
             'object_id' => (string) $data['id'],
             'discriminator' => $data['discriminator'],
             'transaction_hash' => (string) $data['transaction_hash'],
-            'diffs' => $diffs,
+            'diffs' => json_encode($data['diff']),
             'blame_id' => $data['blame']['user_id'],
             'blame_user' => $data['blame']['username'],
             'blame_user_fqdn' => $data['blame']['user_fqdn'],
