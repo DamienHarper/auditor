@@ -76,6 +76,14 @@ trait AuditTrait
                 $convertedValue = $type->convertToPHPValue($value, $platform);
 
                 break;
+            case 'uuid_binary':
+            case 'uuid_binary_ordered_time':
+            case 'uuid':
+            case 'ulid':
+                // Ramsey UUID / Symfony UID (UUID/ULID)
+                $convertedValue = (string) $value;
+
+                break;
             default:
                 $convertedValue = $type->convertToDatabaseValue($value, $platform);
         }
