@@ -181,6 +181,21 @@ final class ReaderTest extends TestCase
         self::assertSame(3, $pager['numPages'], 'Pager has 3 pages.');
     }
 
+    public function testMultipleFilters(): void
+    {
+        $reader = $this->createReader();
+
+        $query = $reader->createQuery(Author::class);
+        $audits = $query->execute();
+        self::assertCount(5, $audits);
+
+        $query = $reader->createQuery(Author::class);
+        $query->addFilter('object_id', 1);
+        $query->addFilter('object_id', 2);
+        $audits = $query->execute();
+        self::assertCount(3, $audits);
+    }
+
     /**
      * @depends testGetAudits
      */
