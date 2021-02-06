@@ -235,7 +235,7 @@ class Query
             } else {
                 $queryBuilder
                     ->andWhere(sprintf('%s IN (:%s)', $filter, $filter))
-                    ->setParameter($filter, $values)
+                    ->setParameter($filter, $values, Connection::PARAM_STR_ARRAY)
                 ;
             }
         }
