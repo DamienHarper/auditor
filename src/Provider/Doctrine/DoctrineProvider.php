@@ -48,17 +48,6 @@ class DoctrineProvider extends AbstractProvider
         return $this;
     }
 
-    public function registerStorageService(StorageServiceInterface $service): ProviderInterface
-    {
-        parent::registerStorageService($service);
-
-        \assert($service instanceof StorageService);     // helps PHPStan
-        $entityManager = $service->getEntityManager();
-        $evm = $entityManager->getEventManager();
-
-        return $this;
-    }
-
     public function isStorageMapperRequired(): bool
     {
         return \count($this->getStorageServices()) > 1;
