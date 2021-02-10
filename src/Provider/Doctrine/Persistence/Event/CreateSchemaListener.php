@@ -4,6 +4,7 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Event;
 
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
+use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
@@ -58,8 +59,17 @@ class CreateSchemaListener implements EventSubscriber
             }
         }
 
+        $storageService = $this->provider->getStorageServiceForEntity($metadata->name);
+        \assert($storageService instanceof StorageService);     // helps PHPStan
+        $connection = $storageService->getEntityManager()->getConnection();
+        $storageSchemaManager = $connection->getSchemaManager();
+        $fromSchema = $storageSchemaManager->createSchema();
+        $sqls = [];
+
         $updater = new SchemaManager($this->provider);
-        $updater->createAuditTable($metadata->name, $eventArgs->getClassTable(), $eventArgs->getSchema());
+        $toSchema = $updater->createAuditTable($metadata->name, $eventArgs->getClassTable(), clone $fromSchema);
+        $sqls[$storageService->getName()] = $fromSchema->getMigrateToSql($toSchema, $storageSchemaManager->getDatabasePlatform());
+        $updater->updateAuditSchema($sqls);
     }
 
     /**

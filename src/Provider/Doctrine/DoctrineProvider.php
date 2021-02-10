@@ -40,6 +40,7 @@ class DoctrineProvider extends AbstractProvider
         $evm = $entityManager->getEventManager();
 
         // Register subscribers
+        $evm->addEventSubscriber(new CreateSchemaListener($this));
         $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager));
 
         $this->loadAnnotations($entityManager);
@@ -54,9 +55,6 @@ class DoctrineProvider extends AbstractProvider
         \assert($service instanceof StorageService);     // helps PHPStan
         $entityManager = $service->getEntityManager();
         $evm = $entityManager->getEventManager();
-
-        // Register subscribers
-        $evm->addEventSubscriber(new CreateSchemaListener($this));
 
         return $this;
     }
