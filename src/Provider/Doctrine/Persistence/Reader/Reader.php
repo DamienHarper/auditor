@@ -8,6 +8,7 @@ use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
+use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMMetadata;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -45,9 +46,8 @@ class Reader
 
         /** @var StorageService $storageService */
         $storageService = $this->provider->getStorageServiceForEntity($entity);
-        $entityManager = $storageService->getEntityManager();
 
-        $query = new Query($this->getEntityAuditTableName($entity), $entityManager->getConnection());
+        $query = new Query($this->getEntityAuditTableName($entity), $storageService->getEntityManager()->getConnection());
         $query
             ->addOrderBy(Query::CREATED_AT, 'DESC')
             ->addOrderBy(Query::ID, 'DESC')
@@ -69,7 +69,9 @@ class Reader
             $query->limit($config['page_size'], ($config['page'] - 1) * $config['page_size']);
         }
 
-        $metadata = $entityManager->getClassMetadata($entity);
+        /** @var AuditingService $auditingService */
+        $auditingService = $this->provider->getAuditingServiceForEntity($entity);
+        $metadata = $auditingService->getEntityManager()->getClassMetadata($entity);
         if (
             $config['strict']
             && $metadata instanceof ORMMetadata
@@ -157,10 +159,10 @@ class Reader
      */
     public function getEntityTableName(string $entity): string
     {
-        /** @var StorageService $storageService */
-        $storageService = $this->provider->getStorageServiceForEntity($entity);
+        /** @var AuditingService $auditingService */
+        $auditingService = $this->provider->getAuditingServiceForEntity($entity);
 
-        return $storageService->getEntityManager()->getClassMetadata($entity)->getTableName();
+        return $auditingService->getEntityManager()->getClassMetadata($entity)->getTableName();
     }
 
     /**
@@ -171,9 +173,9 @@ class Reader
         /** @var Configuration $configuration */
         $configuration = $this->provider->getConfiguration();
 
-        /** @var StorageService $storageService */
-        $storageService = $this->provider->getStorageServiceForEntity($entity);
-        $entityManager = $storageService->getEntityManager();
+        /** @var AuditingService $auditingService */
+        $auditingService = $this->provider->getAuditingServiceForEntity($entity);
+        $entityManager = $auditingService->getEntityManager();
         $schema = '';
         if ($entityManager->getClassMetadata($entity)->getSchemaName()) {
             $schema = $entityManager->getClassMetadata($entity)->getSchemaName().'.';

@@ -67,7 +67,7 @@ trait DoctrineProviderTrait
         // Entity manager "aem1" is used for auditing only
         $provider->registerAuditingService(new AuditingService('aem1', $this->createEntityManager([
             __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
-            __DIR__.'/../Fixtures/Entity/Standard',
+            __DIR__.'/../Fixtures/Entity',
         ])));
 
         $db = self::getConnectionParameters();

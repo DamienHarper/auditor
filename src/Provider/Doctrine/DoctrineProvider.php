@@ -3,6 +3,7 @@
 namespace DH\Auditor\Provider\Doctrine;
 
 use DH\Auditor\Event\LifecycleEvent;
+use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Exception\ProviderException;
 use DH\Auditor\Provider\AbstractProvider;
 use DH\Auditor\Provider\ConfigurationInterface;
@@ -17,6 +18,7 @@ use DH\Auditor\Provider\ProviderInterface;
 use DH\Auditor\Provider\Service\AuditingServiceInterface;
 use DH\Auditor\Provider\Service\StorageServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 
 class DoctrineProvider extends AbstractProvider
 {
@@ -40,6 +42,7 @@ class DoctrineProvider extends AbstractProvider
         $evm = $entityManager->getEventManager();
 
         // Register subscribers
+        $evm->addEventSubscriber(new CreateSchemaListener($this));
         $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager));
 
         $this->loadAnnotations($entityManager);
@@ -47,23 +50,26 @@ class DoctrineProvider extends AbstractProvider
         return $this;
     }
 
-    public function registerStorageService(StorageServiceInterface $service): ProviderInterface
-    {
-        parent::registerStorageService($service);
-
-        \assert($service instanceof StorageService);     // helps PHPStan
-        $entityManager = $service->getEntityManager();
-        $evm = $entityManager->getEventManager();
-
-        // Register subscribers
-        $evm->addEventSubscriber(new CreateSchemaListener($this));
-
-        return $this;
-    }
-
     public function isStorageMapperRequired(): bool
     {
         return \count($this->getStorageServices()) > 1;
+    }
+
+    public function getAuditingServiceForEntity(string $entity): AuditingServiceInterface
+    {
+        foreach ($this->auditingServices as $name => $service) {
+            \assert($service instanceof AuditingService);   // helps PHPStan
+
+            try {
+                // entity is managed by the entity manager of this service
+                $service->getEntityManager()->getClassMetadata($entity)->getTableName();
+
+                return $service;
+            } catch (Exception $e) {
+            }
+        }
+
+        throw new InvalidArgumentException(sprintf('Auditing service not found for "%s".', $entity));
     }
 
     public function getStorageServiceForEntity(string $entity): StorageServiceInterface
