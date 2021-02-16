@@ -7,6 +7,7 @@ use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
 use Exception;
@@ -17,6 +18,11 @@ class CreateSchemaListener implements EventSubscriber
      * @var DoctrineProvider
      */
     private $provider;
+
+    /**
+     * @var array
+     */
+    private $tablesForEntityManager = [];
 
     public function __construct(DoctrineProvider $provider)
     {
@@ -61,15 +67,37 @@ class CreateSchemaListener implements EventSubscriber
 
         $storageService = $this->provider->getStorageServiceForEntity($metadata->name);
         \assert($storageService instanceof StorageService);     // helps PHPStan
-        $connection = $storageService->getEntityManager()->getConnection();
-        $storageSchemaManager = $connection->getSchemaManager();
-        $fromSchema = $storageSchemaManager->createSchema();
-        $sqls = [];
+
+        // execute schema updates directly if entity manager has no metadata.
+        // doctrine:schema:update will exit early, as no mapping is configured.
+        $metadatas = $storageService->getEntityManager()->getMetadataFactory()->getAllMetadata();
+        if (empty($metadatas)) {
+            $connection = $storageService->getEntityManager()->getConnection();
+            $storageSchemaManager = $connection->getSchemaManager();
+            $fromSchema = $storageSchemaManager->createSchema();
+            $sqls = [];
+
+            $updater = new SchemaManager($this->provider);
+            $toSchema = $updater->createAuditTable($metadata->name, $eventArgs->getClassTable(), clone $fromSchema);
+            $sqls[$storageService->getName()] = $fromSchema->getMigrateToSql($toSchema, $storageSchemaManager->getDatabasePlatform());
+            $updater->updateAuditSchema($sqls);
+        } else {
+            $id = spl_object_hash($storageService->getEntityManager());
+            $this->tablesForEntityManager[$id][] = [$metadata->name, $eventArgs->getClassTable()];
+        }
+    }
+
+    public function postGenerateSchema(GenerateSchemaEventArgs $eventArgs): void
+    {
+        $id = spl_object_hash($eventArgs->getEntityManager());
+        if (!isset($this->tablesForEntityManager[$id])) {
+            return;
+        }
 
         $updater = new SchemaManager($this->provider);
-        $toSchema = $updater->createAuditTable($metadata->name, $eventArgs->getClassTable(), clone $fromSchema);
-        $sqls[$storageService->getName()] = $fromSchema->getMigrateToSql($toSchema, $storageSchemaManager->getDatabasePlatform());
-        $updater->updateAuditSchema($sqls);
+        foreach ($this->tablesForEntityManager[$id] as $data) {
+            $updater->createAuditTable($data[0], $data[1], $eventArgs->getSchema());
+        }
     }
 
     /**
@@ -79,6 +107,7 @@ class CreateSchemaListener implements EventSubscriber
     {
         return [
             ToolEvents::postGenerateSchemaTable,
+            ToolEvents::postGenerateSchema,
         ];
     }
 }
