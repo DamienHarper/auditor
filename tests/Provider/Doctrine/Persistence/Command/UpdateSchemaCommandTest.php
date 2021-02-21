@@ -2,14 +2,17 @@
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Command;
 
+use DH\Auditor\Provider\Doctrine\Configuration;
+use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Command\UpdateSchemaCommand;
+use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
+use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
-use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -27,24 +30,13 @@ final class UpdateSchemaCommandTest extends TestCase
         // provider with 1 em for both storage and auditing
         $this->createAndInitDoctrineProvider();
 
-        /**
-         * @var string         $name
-         * @var StorageService $storageService
-         */
-        foreach ($this->provider->getStorageServices() as $name => $storageService) {
-            $schemaTool = new SchemaTool($storageService->getEntityManager());
+        // declare audited entites
+        $this->configureEntities();
 
-            $this->setUpEntitySchema($schemaTool, $storageService->getEntityManager()); // setup entity schema only since audited entites are not declared
-            $this->configureEntities();                                                 // declare audited entites
-        }
+        // setup entity schema only
+        $this->setupEntitySchemas();
 
-        /**
-         * @var string         $name
-         * @var StorageService $storageService
-         */
-        foreach ($this->provider->getStorageServices() as $name => $storageService) {
-            $this->setupEntities();
-        }
+        $this->setupEntities();
     }
 
     public function testExecute(): void
@@ -117,10 +109,6 @@ final class UpdateSchemaCommandTest extends TestCase
      */
     public function testExecuteNothingToUpdate(): void
     {
-//        foreach ($this->provider->getStorageEntityManagers() as $name => $entityManager) {
-//            $schemaTool = new SchemaTool($entityManager);
-//            $this->setUpAuditSchema($schemaTool, $entityManager);   // setup audit schema based on configured audited entities
-//        }
         $this->provider->getConfiguration()->setEntities([]);   // workaround because above fails on Travis CI with PHP 7.3.17
 
         $command = $this->createCommand();
@@ -167,5 +155,35 @@ final class UpdateSchemaCommandTest extends TestCase
             Comment::class => ['enabled' => true],
             Tag::class => ['enabled' => true],
         ]);
+    }
+
+    /**
+     * Creates a DoctrineProvider with 1 entity manager used both for auditing and storage.
+     */
+    private function createDoctrineProvider(?Configuration $configuration = null): DoctrineProvider
+    {
+        $entityManager = $this->createEntityManager([
+            __DIR__.'/../../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../Fixtures/Entity/Standard',
+            __DIR__.'/../../Fixtures/Entity/Inheritance',
+        ]);
+        $auditor = $this->createAuditor();
+        $provider = new DoctrineProvider($configuration ?? $this->createProviderConfiguration());
+        $provider->registerStorageService(new StorageService('default', $entityManager));
+        $provider->registerAuditingService(new AuditingService('default', $entityManager));
+
+        $auditor->registerProvider($provider);
+
+        // unregister CreateSchemaListener
+        $evm = $entityManager->getEventManager();
+        foreach ($evm->getListeners() as $event => $listeners) {
+            foreach ($listeners as $listener) {
+                if ($listener instanceof CreateSchemaListener) {
+                    $evm->removeEventListener([$event], $listener);
+                }
+            }
+        }
+
+        return $provider;
     }
 }

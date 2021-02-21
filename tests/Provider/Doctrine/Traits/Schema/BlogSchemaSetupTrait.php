@@ -56,11 +56,11 @@ trait BlogSchemaSetupTrait
      */
     private function setupEntities(): void
     {
-        $storageServices = [
-            Author::class => $this->provider->getStorageServiceForEntity(Author::class),
-            Post::class => $this->provider->getStorageServiceForEntity(Post::class),
-            Comment::class => $this->provider->getStorageServiceForEntity(Comment::class),
-            Tag::class => $this->provider->getStorageServiceForEntity(Tag::class),
+        $auditingServices = [
+            Author::class => $this->provider->getAuditingServiceForEntity(Author::class),
+            Post::class => $this->provider->getAuditingServiceForEntity(Post::class),
+            Comment::class => $this->provider->getAuditingServiceForEntity(Comment::class),
+            Tag::class => $this->provider->getAuditingServiceForEntity(Tag::class),
         ];
 
         $author1 = new Author();
@@ -68,7 +68,7 @@ trait BlogSchemaSetupTrait
             ->setFullname('John')
             ->setEmail('john.doe@gmail.com')
         ;
-        $storageServices[Author::class]->getEntityManager()->persist($author1);
+        $auditingServices[Author::class]->getEntityManager()->persist($author1);
 
         $post1 = new Post();
         $post1
@@ -77,7 +77,7 @@ trait BlogSchemaSetupTrait
             ->setBody('Here is the body')
             ->setCreatedAt(new DateTime())
         ;
-        $storageServices[Post::class]->getEntityManager()->persist($post1);
+        $auditingServices[Post::class]->getEntityManager()->persist($post1);
 
         $comment1 = new Comment();
         $comment1
@@ -86,7 +86,7 @@ trait BlogSchemaSetupTrait
             ->setAuthor('Dark Vador')
             ->setCreatedAt(new DateTime())
         ;
-        $storageServices[Comment::class]->getEntityManager()->persist($comment1);
+        $auditingServices[Comment::class]->getEntityManager()->persist($comment1);
 
         $post2 = new Post();
         $post2
@@ -95,14 +95,14 @@ trait BlogSchemaSetupTrait
             ->setBody('Here is another body')
             ->setCreatedAt(new DateTime())
         ;
-        $storageServices[Post::class]->getEntityManager()->persist($post2);
+        $auditingServices[Post::class]->getEntityManager()->persist($post2);
 
         $author2 = new Author();
         $author2
             ->setFullname('Chuck Norris')
             ->setEmail('chuck.norris@gmail.com')
         ;
-        $storageServices[Author::class]->getEntityManager()->persist($author2);
+        $auditingServices[Author::class]->getEntityManager()->persist($author2);
 
         $post3 = new Post();
         $post3
@@ -111,7 +111,7 @@ trait BlogSchemaSetupTrait
             ->setBody('Here is another body')
             ->setCreatedAt(new DateTime())
         ;
-        $storageServices[Post::class]->getEntityManager()->persist($post3);
+        $auditingServices[Post::class]->getEntityManager()->persist($post3);
 
         $comment2 = new Comment();
         $comment2
@@ -120,7 +120,7 @@ trait BlogSchemaSetupTrait
             ->setAuthor('Yoshi')
             ->setCreatedAt(new DateTime())
         ;
-        $storageServices[Comment::class]->getEntityManager()->persist($comment2);
+        $auditingServices[Comment::class]->getEntityManager()->persist($comment2);
 
         $comment3 = new Comment();
         $comment3
@@ -129,19 +129,19 @@ trait BlogSchemaSetupTrait
             ->setAuthor('Mario')
             ->setCreatedAt(new DateTime())
         ;
-        $storageServices[Comment::class]->getEntityManager()->persist($comment3);
+        $auditingServices[Comment::class]->getEntityManager()->persist($comment3);
 
-        $this->flushAll($storageServices);
+        $this->flushAll($auditingServices);
 
         $author1->setFullname('John Doe');
-        $storageServices[Author::class]->getEntityManager()->persist($author1);
+        $auditingServices[Author::class]->getEntityManager()->persist($author1);
 
         $author3 = new Author();
         $author3
             ->setFullname('Luke Slywalker')
             ->setEmail('luke.skywalker@gmail.com')
         ;
-        $storageServices[Author::class]->getEntityManager()->persist($author3);
+        $auditingServices[Author::class]->getEntityManager()->persist($author3);
 
         $post4 = new Post();
         $post4
@@ -150,29 +150,29 @@ trait BlogSchemaSetupTrait
             ->setBody('Here is the body')
             ->setCreatedAt(new DateTime())
         ;
-        $storageServices[Post::class]->getEntityManager()->persist($post4);
+        $auditingServices[Post::class]->getEntityManager()->persist($post4);
 
         $tag1 = new Tag();
         $tag1->setTitle('techno');
-        $storageServices[Tag::class]->getEntityManager()->persist($tag1);
+        $auditingServices[Tag::class]->getEntityManager()->persist($tag1);
 
         $tag2 = new Tag();
         $tag2->setTitle('house');
-        $storageServices[Tag::class]->getEntityManager()->persist($tag2);
+        $auditingServices[Tag::class]->getEntityManager()->persist($tag2);
 
         $tag3 = new Tag();
         $tag3->setTitle('hardcore');
-        $storageServices[Tag::class]->getEntityManager()->persist($tag3);
+        $auditingServices[Tag::class]->getEntityManager()->persist($tag3);
 
         $tag4 = new Tag();
         $tag4->setTitle('jungle');
-        $storageServices[Tag::class]->getEntityManager()->persist($tag4);
+        $auditingServices[Tag::class]->getEntityManager()->persist($tag4);
 
         $tag5 = new Tag();
         $tag5->setTitle('gabber');
-        $storageServices[Tag::class]->getEntityManager()->persist($tag5);
+        $auditingServices[Tag::class]->getEntityManager()->persist($tag5);
 
-        $this->flushAll($storageServices);
+        $this->flushAll($auditingServices);
 
         $post1
             ->addTag($tag1)
@@ -189,18 +189,18 @@ trait BlogSchemaSetupTrait
             ->addTag($tag5)
         ;
 
-        $this->flushAll($storageServices);
+        $this->flushAll($auditingServices);
 
         $post4
             ->removeTag($tag4)
             ->removeTag($tag5)
         ;
-        $this->flushAll($storageServices);
+        $this->flushAll($auditingServices);
 
         $author3->removePost($post4);
-        $this->flushAll($storageServices);
+        $this->flushAll($auditingServices);
 
-        $storageServices[Author::class]->getEntityManager()->remove($author3);
-        $this->flushAll($storageServices);
+        $auditingServices[Author::class]->getEntityManager()->remove($author3);
+        $this->flushAll($auditingServices);
     }
 }

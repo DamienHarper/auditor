@@ -33,6 +33,16 @@ final class SchemaManager1AEM2SEMTest extends TestCase
         self::assertSame($authorStorageService, $postStorageService, 'Author and Post use the same storage entity manager.');
         self::assertSame($authorStorageService, $commentStorageService, 'Author and Comment use the same storage entity manager.');
         self::assertSame($authorStorageService, $tagStorageService, 'Author and Tag use the same storage entity manager.');
+
+        $animalStorageService = $this->provider->getStorageServiceForEntity(Animal::class);
+        $catStorageService = $this->provider->getStorageServiceForEntity(Cat::class);
+        $dogStorageService = $this->provider->getStorageServiceForEntity(Dog::class);
+        $vehicleStorageService = $this->provider->getStorageServiceForEntity(Vehicle::class);
+
+        self::assertNotSame($authorStorageService, $animalStorageService, 'Author and Animal use different storage entity managers.');
+        self::assertSame($animalStorageService, $catStorageService, 'Animal and Cat use the same storage entity manager.');
+        self::assertSame($animalStorageService, $dogStorageService, 'Animal and Dog use the same storage entity manager.');
+        self::assertSame($animalStorageService, $vehicleStorageService, 'Animal and Vehicle use the same storage entity manager.');
     }
 
     /**
@@ -42,8 +52,8 @@ final class SchemaManager1AEM2SEMTest extends TestCase
     {
         $storageServices = $this->provider->getStorageServices();
         $expected = [
-            'db1' => ['author', 'author_audit', 'comment', 'comment_audit', 'post', 'post_audit', 'tag', 'tag_audit', 'post__tag'],
-            'db2' => ['animal', 'animal_audit', 'cat', 'cat_audit', 'dog', 'dog_audit', 'vehicle', 'vehicle_audit'],
+            'db1' => ['author_audit', 'comment_audit', 'post_audit', 'tag_audit'],
+            'db2' => ['animal_audit', 'cat_audit', 'dog_audit', 'vehicle_audit'],
         ];
         sort($expected['db1']);
         sort($expected['db2']);
@@ -54,7 +64,12 @@ final class SchemaManager1AEM2SEMTest extends TestCase
          */
         foreach ($storageServices as $name => $storageService) {
             $schemaManager = $storageService->getEntityManager()->getConnection()->getSchemaManager();
-            $tables = array_map(static function ($t) {return $t->getName(); }, $schemaManager->listTables());
+            $tables = array_map(
+                static function ($t) {
+                    return $t->getName();
+                },
+                $schemaManager->listTables()
+            );
             sort($tables);
             self::assertSame($expected[$name], $tables, 'Schema of "'.$name.'" is correct.');
         }

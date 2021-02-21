@@ -86,7 +86,7 @@ class SchemaManager
         // auditable entities by storage entity manager
         $repository = [];
 
-        // Collect auditable entities from auditing storage managers
+        // Collect auditable entities from auditing entity managers
         /** @var AuditingService[] $auditingServices */
         $auditingServices = $this->provider->getAuditingServices();
         foreach ($auditingServices as $name => $auditingService) {
@@ -119,28 +119,31 @@ class SchemaManager
 
             $storageSchema = $storageSchemaManager->createSchema();
             $fromSchema = clone $storageSchema;
-            $tables = $storageSchema->getTables();
-            foreach ($tables as $table) {
-                if (\in_array($table->getName(), array_values($repository[$name]), true)) {
-                    // table is the one of an auditable entity
 
+            $processed = [];
+
+            foreach ($classes as $entity => $tableName) {
+                if (!\in_array($tableName, $processed, true)) {
                     /** @var string $auditTablename */
                     $auditTablename = preg_replace(
-                        sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($table->getName(), '#')),
+                        sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($tableName, '#')),
                         sprintf(
                             '$1%s$2%s',
                             preg_quote($configuration->getTablePrefix(), '#'),
                             preg_quote($configuration->getTableSuffix(), '#')
                         ),
-                        $table->getName()
+                        $tableName
                     );
+
                     if ($storageSchema->hasTable($auditTablename)) {
                         // Audit table exists, let's update it if needed
-                        $this->updateAuditTable($findEntityByTablename($table->getName()), $storageSchema->getTable($auditTablename), $storageSchema);
+                        $this->updateAuditTable($findEntityByTablename($tableName), $storageSchema->getTable($auditTablename), $storageSchema);
                     } else {
                         // Audit table does not exists, let's create it
-                        $this->createAuditTable($findEntityByTablename($table->getName()), $table, $storageSchema);
+                        $this->createAuditTable($findEntityByTablename($tableName), $tableName, $storageSchema);
                     }
+
+                    $processed[] = $tableName;
                 }
             }
 
@@ -152,8 +155,10 @@ class SchemaManager
 
     /**
      * Creates an audit table.
+     *
+     * @param mixed $table
      */
-    public function createAuditTable(string $entity, Table $table, ?Schema $schema = null): Schema
+    public function createAuditTable(string $entity, $table, ?Schema $schema = null): Schema
     {
         /** @var StorageService $storageService */
         $storageService = $this->provider->getStorageServiceForEntity($entity);
@@ -167,14 +172,16 @@ class SchemaManager
         /** @var Configuration $configuration */
         $configuration = $this->provider->getConfiguration();
 
+        $tableName = $table instanceof Table ? $table->getName() : (string) $table;
+
         $auditTablename = preg_replace(
-            sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($table->getName(), '#')),
+            sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($tableName, '#')),
             sprintf(
                 '$1%s$2%s',
                 preg_quote($configuration->getTablePrefix(), '#'),
                 preg_quote($configuration->getTableSuffix(), '#')
             ),
-            $table->getName()
+            $tableName
         );
 
         if (null !== $auditTablename && !$schema->hasTable($auditTablename)) {
