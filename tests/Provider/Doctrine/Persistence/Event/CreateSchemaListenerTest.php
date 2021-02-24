@@ -3,17 +3,12 @@
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Event;
 
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Dog;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Bike;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Car;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Vehicle;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\DummyEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -29,9 +24,6 @@ final class CreateSchemaListenerTest extends TestCase
 
         self::assertContains('author', $tableNames);
         self::assertContains('author_audit', $tableNames);
-
-        self::assertContains('dummy_entity', $tableNames);
-        self::assertNotContains('dummy_entity_audit', $tableNames);
     }
 
     /**
@@ -63,52 +55,30 @@ final class CreateSchemaListenerTest extends TestCase
         self::assertNotContains('animal_audit', $tableNames);
     }
 
-    protected function setUpEntitySchema(SchemaTool $schemaTool, EntityManagerInterface $entityManager): void
+    private function configureEntities(): void
     {
-        $this->provider
-            ->getConfiguration()
-            ->setEntities([
-                Car::class => ['enabled' => true],
-                Bike::class => ['enabled' => true],
+        $this->provider->getConfiguration()->setEntities([
+            Car::class => ['enabled' => true],
+            Bike::class => ['enabled' => true],
 
-                Cat::class => ['enabled' => true],
-                Dog::class => ['enabled' => true],
+            Cat::class => ['enabled' => true],
+            Dog::class => ['enabled' => true],
 
-                Author::class => ['enabled' => true],
-            ])
-        ;
-
-        $classes = [
-            Vehicle::class,
-            Car::class,
-            Bike::class,
-
-            Cat::class,
-            Dog::class,
-            Animal::class,
-
-            Author::class,
-            DummyEntity::class,
-        ];
-
-        $metaClasses = [];
-        foreach ($classes as $class) {
-            $metaClasses[] = $entityManager->getMetadataFactory()->getMetadataFor($class);
-        }
-
-        $schemaTool->createSchema($metaClasses);    // !!! triggers CreateSchemaListener !!!
+            Author::class => ['enabled' => true],
+        ]);
     }
 
     private function getTables(): array
     {
-        /** @var StorageService $storageService */
-        $storageService = array_values($this->provider->getStorageServices())[0];
-        $schemaManager = $storageService->getEntityManager()->getConnection()->getSchemaManager();
-
         $tableNames = [];
 
-        foreach ($schemaManager->listTables() as $table) {
-            $tableNames[] = $table->getName();
+        /** @var StorageService $storageService */
+        foreach ($this->provider->getStorageServices() as $name => $storageService) {
+            $schemaManager = $storageService->getEntityManager()->getConnection()->getSchemaManager();
+
+            foreach ($schemaManager->listTables() as $table) {
+                $tableNames[] = $table->getName();
+            }
         }
 
         return $tableNames;

@@ -9,7 +9,14 @@ use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Dog;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Vehicle;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use DH\Auditor\Tests\Traits\ReflectionTrait;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -26,6 +33,28 @@ final class SchemaManagerTest extends TestCase
 {
     use DefaultSchemaSetupTrait;
     use ReflectionTrait;
+
+    public function testStorageServicesSetup(): void
+    {
+        $authorStorageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $postStorageService = $this->provider->getStorageServiceForEntity(Post::class);
+        $commentStorageService = $this->provider->getStorageServiceForEntity(Comment::class);
+        $tagStorageService = $this->provider->getStorageServiceForEntity(Tag::class);
+
+        self::assertSame($authorStorageService, $postStorageService, 'Author and Post use the same storage entity manager.');
+        self::assertSame($authorStorageService, $commentStorageService, 'Author and Comment use the same storage entity manager.');
+        self::assertSame($authorStorageService, $tagStorageService, 'Author and Tag use the same storage entity manager.');
+
+        $animalStorageService = $this->provider->getStorageServiceForEntity(Animal::class);
+        $catStorageService = $this->provider->getStorageServiceForEntity(Cat::class);
+        $dogStorageService = $this->provider->getStorageServiceForEntity(Dog::class);
+        $vehicleStorageService = $this->provider->getStorageServiceForEntity(Vehicle::class);
+
+        self::assertSame($authorStorageService, $animalStorageService, 'Author and Animal use the same storage entity manager.');
+        self::assertSame($animalStorageService, $catStorageService, 'Animal and Cat use the same storage entity manager.');
+        self::assertSame($animalStorageService, $dogStorageService, 'Animal and Dog use the same storage entity manager.');
+        self::assertSame($animalStorageService, $vehicleStorageService, 'Animal and Vehicle use the same storage entity manager.');
+    }
 
     public function testCreateAuditTable(): void
     {
@@ -264,7 +293,11 @@ final class SchemaManagerTest extends TestCase
      */
     private function createDoctrineProvider(?Configuration $configuration = null): DoctrineProvider
     {
-        $entityManager = $this->createEntityManager();
+        $entityManager = $this->createEntityManager([
+            __DIR__.'/../../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../Fixtures/Entity/Standard',
+            __DIR__.'/../../Fixtures/Entity/Inheritance',
+        ]);
         $auditor = $this->createAuditor();
         $provider = new DoctrineProvider($configuration ?? $this->createProviderConfiguration());
         $provider->registerStorageService(new StorageService('default', $entityManager));

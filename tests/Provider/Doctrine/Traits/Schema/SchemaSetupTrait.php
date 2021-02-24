@@ -4,6 +4,7 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Traits\Schema;
 
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
+use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\DoctrineProviderTrait;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,41 +26,24 @@ trait SchemaSetupTrait
         // provider with 1 em for both storage and auditing
         $this->createAndInitDoctrineProvider();
 
-        /**
-         * @var string         $name
-         * @var StorageService $storageService
-         */
-        foreach ($this->provider->getStorageServices() as $name => $storageService) {
-            $schemaTool = new SchemaTool($storageService->getEntityManager());
+        // declare audited entites
+        $this->configureEntities();
 
-            $this->setUpEntitySchema($schemaTool, $storageService->getEntityManager());  // setup entity schema only since audited entites are not declared
-            $this->configureEntities();                             // declare audited entites
-            $this->setUpAuditSchema($schemaTool, $storageService->getEntityManager());   // setup audit schema based on configured audited entities
-        }
+        // setup entity and audit schemas
+        $this->setupEntitySchemas();
+        $this->setupAuditSchemas();
 
-        /**
-         * @var string         $name
-         * @var StorageService $storageService
-         */
-        foreach ($this->provider->getStorageServices() as $name => $storageService) {
-            $this->setupEntities();
-        }
+        // setup (seed) entities
+        $this->setupEntities();
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
 
-        /**
-         * @var string         $name
-         * @var StorageService $storageService
-         */
-        foreach ($this->provider->getStorageServices() as $name => $storageService) {
-            $schemaTool = new SchemaTool($storageService->getEntityManager());
-
-            $this->tearDownAuditSchema($schemaTool, $storageService->getEntityManager());
-            $this->tearDownEntitySchema($schemaTool, $storageService->getEntityManager());
-        }
+        // tear down entity and audit schemas
+        $this->tearDownEntitySchemas();
+        $this->tearDownAuditSchemas();
     }
 
     protected function setUpEntitySchema(SchemaTool $schemaTool, EntityManagerInterface $entityManager): void
@@ -83,6 +67,54 @@ trait SchemaSetupTrait
         foreach ($sqls as $sql) {
             $statement = $entityManager->getConnection()->prepare($sql);
             $statement->execute();
+        }
+    }
+
+    private function setupEntitySchemas(): void
+    {
+        /**
+         * @var string          $name
+         * @var AuditingService $auditingService
+         */
+        foreach ($this->provider->getAuditingServices() as $name => $auditingService) {
+            $schemaTool = new SchemaTool($auditingService->getEntityManager());
+            $this->setUpEntitySchema($schemaTool, $auditingService->getEntityManager());
+        }
+    }
+
+    private function tearDownEntitySchemas(): void
+    {
+        /**
+         * @var string          $name
+         * @var AuditingService $auditingService
+         */
+        foreach ($this->provider->getAuditingServices() as $name => $auditingService) {
+            $schemaTool = new SchemaTool($auditingService->getEntityManager());
+            $this->tearDownEntitySchema($schemaTool, $auditingService->getEntityManager());
+        }
+    }
+
+    private function setupAuditSchemas(): void
+    {
+        /**
+         * @var string         $name
+         * @var StorageService $storageService
+         */
+        foreach ($this->provider->getStorageServices() as $name => $storageService) {
+            $schemaTool = new SchemaTool($storageService->getEntityManager());
+            $this->setUpAuditSchema($schemaTool, $storageService->getEntityManager());
+        }
+    }
+
+    private function tearDownAuditSchemas(): void
+    {
+        /**
+         * @var string         $name
+         * @var StorageService $storageService
+         */
+        foreach ($this->provider->getStorageServices() as $name => $storageService) {
+            $schemaTool = new SchemaTool($storageService->getEntityManager());
+            $this->tearDownAuditSchema($schemaTool, $storageService->getEntityManager());
         }
     }
 

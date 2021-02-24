@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  */
-final class SchemaManager2AEM1SEMTest extends TestCase
+final class SchemaManager2AEM1SEMAltConnectionTest extends TestCase
 {
     use BlogSchemaSetupTrait;
 
@@ -53,10 +53,7 @@ final class SchemaManager2AEM1SEMTest extends TestCase
         $storageServices = $this->provider->getStorageServices();
 
         $expected = [
-            'sem1' => [
-                'author', 'author_audit', 'comment', 'comment_audit', 'post', 'post_audit', 'tag', 'tag_audit', 'post__tag',
-                'animal', 'animal_audit', 'cat', 'cat_audit', 'dog', 'dog_audit', 'vehicle', 'vehicle_audit',
-            ],
+            'sem1' => ['animal_audit', 'cat_audit', 'dog_audit', 'author_audit', 'comment_audit', 'post_audit', 'tag_audit', 'vehicle_audit'],
         ];
         sort($expected['sem1']);
 
@@ -66,7 +63,12 @@ final class SchemaManager2AEM1SEMTest extends TestCase
          */
         foreach ($storageServices as $name => $storageService) {
             $schemaManager = $storageService->getEntityManager()->getConnection()->getSchemaManager();
-            $tables = array_map(static function ($t) {return $t->getName(); }, $schemaManager->listTables());
+            $tables = array_map(
+                static function ($t) {
+                    return $t->getName();
+                },
+                $schemaManager->listTables()
+            );
             sort($tables);
             self::assertSame($expected[$name], $tables, 'Schema of "'.$name.'" is correct.');
         }
@@ -91,6 +93,6 @@ final class SchemaManager2AEM1SEMTest extends TestCase
 
     private function createAndInitDoctrineProvider(): void
     {
-        $this->provider = $this->createDoctrineProviderWith2AEM1SEM();
+        $this->provider = $this->createDoctrineProviderWith2AEM1SEMAltConnection();
     }
 }
