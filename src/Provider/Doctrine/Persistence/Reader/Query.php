@@ -6,6 +6,10 @@ use DateTime;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Model\Entry;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\DateRangeFilter;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\FilterInterface;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\RangeFilter;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Exception;
@@ -92,13 +96,20 @@ class Query
     }
 
     /**
-     * @param mixed $value
+     * @param FilterInterface|string $value
+     * @param mixed                  $value
+     * @param mixed                  $filter
      */
-    public function addFilter(string $name, $value): self
+    public function addFilter($filter, $value = null): self
     {
-        $this->checkFilter($name);
-
-        $this->filters[$name][] = $value;
+        if ($filter instanceof FilterInterface) {
+            $this->checkFilter($filter->getName());
+            $this->filters[$filter->getName()][] = $filter;
+        } else {
+            // TODO: deprecation notice
+            $this->checkFilter($filter);
+            $this->filters[$filter][] = new SimpleFilter($filter, $value);
+        }
 
         return $this;
     }
@@ -109,35 +120,14 @@ class Query
      */
     public function addRangeFilter(string $name, $minValue = null, $maxValue = null): self
     {
-        $this->checkFilter($name);
-
-        if (null === $minValue && null === $maxValue) {
-            throw new InvalidArgumentException('You must provide at least one of the two range bounds.');
-        }
-
-        $this->filters[$name][] = [$minValue, $maxValue];
-
-        return $this;
+        // TODO: deprecation notice
+        return $this->addFilter(new RangeFilter($name, $minValue, $maxValue));
     }
 
     public function addDateRangeFilter(string $name, ?DateTime $minValue = null, ?DateTime $maxValue = null): self
     {
-        $this->checkFilter($name);
-
-        if (null === $minValue && null === $maxValue) {
-            throw new InvalidArgumentException('You must provide at least one of the two range bounds.');
-        }
-
-        if (null !== $minValue && null !== $maxValue && $minValue > $maxValue) {
-            throw new InvalidArgumentException('Max bound has to be later than min bound.');
-        }
-
-        $this->filters[$name][] = [
-            null === $minValue ? null : $minValue->format('Y-m-d H:i:s'),
-            null === $maxValue ? null : $maxValue->format('Y-m-d H:i:s'),
-        ];
-
-        return $this;
+        // TODO: deprecation notice
+        return $this->addFilter(new DateRangeFilter($name, $minValue, $maxValue));
     }
 
     public function addOrderBy(string $field, string $direction = 'DESC'): self
@@ -206,37 +196,75 @@ class Query
         return $this->buildLimit($queryBuilder);
     }
 
+    private function groupFilters(array $filters): array
+    {
+        $grouped = [];
+
+        foreach ($filters as $filter) {
+            $class = \get_class($filter);
+            if (!isset($grouped[$class])) {
+                $grouped[$class] = [];
+            }
+            $grouped[$class][] = $filter;
+        }
+
+        return $grouped;
+    }
+
+    private function mergeSimpleFilters(array $filters): SimpleFilter
+    {
+        $merged = [];
+        $name = null;
+
+        foreach ($filters as $filter) {
+            if (null === $name) {
+                $name = $filter->getName();
+            }
+
+            if (\is_array($filter->getValue())) {
+                $merged = array_merge($merged, $filter->getValue());
+            } else {
+                $merged[] = $filter->getValue();
+            }
+        }
+
+        return new SimpleFilter($name, $merged);
+    }
+
     private function buildWhere(QueryBuilder $queryBuilder): QueryBuilder
     {
-        foreach ($this->filters as $filter => $values) {
-            if (empty($values)) {
+        foreach ($this->filters as $name => $rawFilters) {
+            if (0 === \count($rawFilters)) {
                 continue;
             }
 
-            if (1 === \count($values) && \is_array($values[0])) {
-                // Range filter
-                if (null !== $values[0][0]) {
-                    $queryBuilder
-                        ->andWhere(sprintf('%s >= :min_%s', $filter, $filter))
-                        ->setParameter('min_'.$filter, $values[0][0])
-                    ;
+            // group filters by class
+            $grouped = $this->groupFilters($rawFilters);
+
+            foreach ($grouped as $class => $filters) {
+                switch ($class) {
+                    case SimpleFilter::class:
+                        $filters = [$this->mergeSimpleFilters($filters)];
+
+                        break;
+                    case RangeFilter::class:
+                    case DateRangeFilter::class:
+                        break;
                 }
-                if (null !== $values[0][1]) {
-                    $queryBuilder
-                        ->andWhere(sprintf('%s <= :max_%s', $filter, $filter))
-                        ->setParameter('max_'.$filter, $values[0][1])
-                    ;
+
+                foreach ($filters as $filter) {
+                    $data = $filter->getSQL();
+
+                    $queryBuilder->andWhere($data['sql']);
+
+                    foreach ($data['params'] as $name => $value) {
+                        if (\is_array($value)) {
+                            $queryBuilder->setParameter($name, $value, Connection::PARAM_STR_ARRAY);
+                        } else {
+                            $queryBuilder->setParameter($name, $value);
+                        }
+                    }
                 }
-            } elseif (1 === \count($values) && !\is_array($values[0])) {
-                $queryBuilder
-                    ->andWhere(sprintf('%s = :%s', $filter, $filter))
-                    ->setParameter($filter, $values[0])
-                ;
-            } else {
-                $queryBuilder
-                    ->andWhere(sprintf('%s IN (:%s)', $filter, $filter))
-                    ->setParameter($filter, $values, Connection::PARAM_STR_ARRAY)
-                ;
             }
         }
 
