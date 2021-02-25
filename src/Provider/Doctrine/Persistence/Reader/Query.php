@@ -106,7 +106,8 @@ class Query
             $this->checkFilter($filter->getName());
             $this->filters[$filter->getName()][] = $filter;
         } else {
-            // TODO: deprecation notice
+            @trigger_error('Passing name and value is deprecated, you should pass a FilterInterface object instead.', E_USER_DEPRECATED);
+
             $this->checkFilter($filter);
             $this->filters[$filter][] = new SimpleFilter($filter, $value);
         }
@@ -120,13 +121,15 @@ class Query
      */
     public function addRangeFilter(string $name, $minValue = null, $maxValue = null): self
     {
-        // TODO: deprecation notice
+        @trigger_error('Deprecated method, you should call Query::addFilter(...) instead and pass it a RangeFilter object.', E_USER_DEPRECATED);
+
         return $this->addFilter(new RangeFilter($name, $minValue, $maxValue));
     }
 
     public function addDateRangeFilter(string $name, ?DateTime $minValue = null, ?DateTime $maxValue = null): self
     {
-        // TODO: deprecation notice
+        @trigger_error('Deprecated method, you should call Query::addFilter(...) instead and pass it a DateRangeFilter object.', E_USER_DEPRECATED);
+
         return $this->addFilter(new DateRangeFilter($name, $minValue, $maxValue));
     }
 
