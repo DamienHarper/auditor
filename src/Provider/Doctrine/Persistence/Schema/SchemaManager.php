@@ -29,7 +29,6 @@ class SchemaManager
 
     public function updateAuditSchema(?array $sqls = null, ?callable $callback = null): void
     {
-        // TODO: FIXME will create the same schema on all connections
         if (null === $sqls) {
             $sqls = $this->getUpdateAuditSchemaSql();
         }

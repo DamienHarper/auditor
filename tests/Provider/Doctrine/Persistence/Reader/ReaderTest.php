@@ -6,6 +6,8 @@ use DateTime;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Model\Entry;
 use DH\Auditor\Model\Transaction;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\DateRangeFilter;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Query;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
@@ -190,8 +192,8 @@ final class ReaderTest extends TestCase
         self::assertCount(5, $audits);
 
         $query = $reader->createQuery(Author::class);
-        $query->addFilter('object_id', 1);
-        $query->addFilter('object_id', 2);
+        $query->addFilter(new SimpleFilter('object_id', 1));
+        $query->addFilter(new SimpleFilter('object_id', 2));
         $audits = $query->execute();
         self::assertCount(3, $audits);
     }
@@ -206,7 +208,7 @@ final class ReaderTest extends TestCase
         /** @var Entry[] $audits */
         $audits = $reader
             ->createQuery(Author::class)
-            ->addDateRangeFilter(Query::CREATED_AT, new DateTime('-1 day'))
+            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTime('-1 day')))
             ->execute()
         ;
 
@@ -221,7 +223,7 @@ final class ReaderTest extends TestCase
         /** @var Entry[] $audits */
         $audits = $reader
             ->createQuery(Author::class)
-            ->addDateRangeFilter(Query::CREATED_AT, new DateTime('-5 days'), new DateTime('-4 days'))
+            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTime('-5 days'), new DateTime('-4 days')))
             ->execute()
         ;
         self::assertCount(0, $audits, 'result count is ok.');
@@ -229,7 +231,7 @@ final class ReaderTest extends TestCase
         /** @var Entry[] $audits */
         $audits = $reader
             ->createQuery(Author::class, ['page_size' => 2])
-            ->addDateRangeFilter(Query::CREATED_AT, new DateTime('-1 day'))
+            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTime('-1 day')))
             ->execute()
         ;
         self::assertCount(2, $audits, 'result count is ok.');
@@ -237,7 +239,7 @@ final class ReaderTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $reader
             ->createQuery(Post::class)
-            ->addDateRangeFilter(Query::CREATED_AT, new DateTime('now'), new DateTime('-1 day'))
+            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTime('now'), new DateTime('-1 day')))
             ->execute()
         ;
     }
