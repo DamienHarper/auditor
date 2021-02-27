@@ -31,6 +31,9 @@ class DoctrineProvider extends AbstractProvider
     {
         $this->configuration = $configuration;
         $this->transactionManager = new TransactionManager($this);
+
+        \assert($this->configuration instanceof Configuration);    // helps PHPStan
+        $this->configuration->setProvider($this);
     }
 
     public function registerAuditingService(AuditingServiceInterface $service): ProviderInterface
@@ -44,8 +47,6 @@ class DoctrineProvider extends AbstractProvider
         // Register subscribers
         $evm->addEventSubscriber(new CreateSchemaListener($this));
         $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager));
-
-        $this->loadAnnotations($entityManager);
 
         return $this;
     }
@@ -233,12 +234,12 @@ class DoctrineProvider extends AbstractProvider
         $this->configuration->setStorageMapper($storageMapper);
     }
 
-    private function loadAnnotations(EntityManagerInterface $entityManager): self
+    public function loadAnnotations(EntityManagerInterface $entityManager, ?array $entities = null): self
     {
         \assert($this->configuration instanceof Configuration);   // helps PHPStan
         $annotationLoader = new AnnotationLoader($entityManager);
         $this->configuration->setEntities(array_merge(
-            $this->configuration->getEntities(),
+            null === $entities ? $this->configuration->getEntities() : $entities,
             $annotationLoader->load()
         ));
 

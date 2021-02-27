@@ -3,10 +3,16 @@
 namespace DH\Auditor\Provider\Doctrine;
 
 use DH\Auditor\Provider\ConfigurationInterface;
+use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class Configuration implements ConfigurationInterface
 {
+    /**
+     * @var DoctrineProvider
+     */
+    private $provider;
+
     /**
      * @var string
      */
@@ -23,9 +29,9 @@ class Configuration implements ConfigurationInterface
     private $ignoredColumns;
 
     /**
-     * @var array
+     * @var null|array
      */
-    private $entities = [];
+    private $entities;
 
     /**
      * @var array
@@ -173,7 +179,15 @@ class Configuration implements ConfigurationInterface
      */
     public function getEntities(): array
     {
-        return $this->entities;
+        if (null === $this->entities && null !== $this->provider) {
+            /** @var AuditingService[] $auditingServices */
+            $auditingServices = $this->provider->getAuditingServices();
+            foreach ($auditingServices as $auditingService) {
+                $this->provider->loadAnnotations($auditingService->getEntityManager(), []);
+            }
+        }
+
+        return null === $this->entities ? [] : $this->entities;
     }
 
     /**
@@ -218,5 +232,15 @@ class Configuration implements ConfigurationInterface
     public function getStorageMapper(): ?callable
     {
         return $this->storageMapper;
+    }
+
+    public function getProvider(): DoctrineProvider
+    {
+        return $this->provider;
+    }
+
+    public function setProvider(DoctrineProvider $provider): void
+    {
+        $this->provider = $provider;
     }
 }
