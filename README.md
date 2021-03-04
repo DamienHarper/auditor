@@ -17,6 +17,7 @@ The purpose of `auditor` is to provide an easy and standardized way to collect a
 This library is architected around two concepts:
 - Auditing services responsible for collecting audit events
 - Storage services responsible for persisting audit traces
+
 Those two kind of services are offered by Providers.
 
 
@@ -43,7 +44,7 @@ Though, we can only really support the ones we can test with [Travis CI](https:/
 
 Basically you can track any change of any entity from audit logs.
 
-**NOTE:** `DoctrineProvider` cannot track DQL or direct SQL update or delete statement executions.
+**NOTE:** `DoctrineProvider` cannot track DQL or direct SQL statements executions.
 
 
 ## Official Documentation
