@@ -71,7 +71,7 @@ To do so, follow instructions in this dedicated [README](tests/README.md)
 - Thanks to [all contributors](https://github.com/DamienHarper/auditor/graphs/contributors)
 - This library initially took some inspiration from [data-dog/audit-bundle](https://github.com/DATA-DOG/DataDogAuditBundle.git) and 
 [simplethings/entity-audit-bundle](https://github.com/simplethings/EntityAuditBundle.git)
-
+- Special thanks to [JetBrains](https://www.jetbrains.com/?from=auditor) for their *Licenses for Open Source Development*
 
 ## License
 `auditor` is free to use and is licensed under the [MIT license](http://www.opensource.org/licenses/mit-license.php)
