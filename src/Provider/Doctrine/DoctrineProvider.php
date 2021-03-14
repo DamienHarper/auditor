@@ -125,6 +125,11 @@ class DoctrineProvider extends AbstractProvider
         }
 
         $statement->execute();
+
+        // let's get the last inserted ID from the database so other providers can use that info
+        $payload = $event->getPayload();
+        $payload['id'] = (int)$storageService->getEntityManager()->getConnection()->lastInsertId();
+        $event->setPayload($payload);
     }
 
     /**
