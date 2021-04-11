@@ -7,6 +7,7 @@ use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Transaction\TransactionHydratorInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\PersistentCollection;
 
 class TransactionHydrator implements TransactionHydratorInterface
 {
@@ -77,6 +78,7 @@ class TransactionHydrator implements TransactionHydratorInterface
     private function hydrateWithScheduledCollectionUpdates(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
         $uow = $entityManager->getUnitOfWork();
+        /** @var PersistentCollection $collection */
         foreach (array_reverse($uow->getScheduledCollectionUpdates()) as $collection) {
             if ($this->provider->isAudited($collection->getOwner())) {
                 $mapping = $collection->getMapping();
@@ -106,6 +108,7 @@ class TransactionHydrator implements TransactionHydratorInterface
     private function hydrateWithScheduledCollectionDeletions(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
         $uow = $entityManager->getUnitOfWork();
+        /** @var PersistentCollection $collection */
         foreach (array_reverse($uow->getScheduledCollectionDeletions()) as $collection) {
             if ($this->provider->isAudited($collection->getOwner())) {
                 $mapping = $collection->getMapping();
