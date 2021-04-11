@@ -2,10 +2,12 @@
 
 namespace DH\Auditor\Provider\Doctrine\Auditing\Transaction;
 
+use DH\Auditor\Exception\MappingException;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\User\UserInterface;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 
 trait AuditTrait
 {
@@ -19,7 +21,12 @@ trait AuditTrait
     private function id(EntityManagerInterface $entityManager, $entity)
     {
         $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
-        $pk = $meta->getSingleIdentifierFieldName();
+
+        try {
+            $pk = $meta->getSingleIdentifierFieldName();
+        } catch (ORMMappingException $e) {
+            throw new MappingException(sprintf('Composite primary keys are not supported (%s).', \get_class($entity)));
+        }
 
         if (isset($meta->fieldMappings[$pk])) {
             $type = Type::getType($meta->fieldMappings[$pk]['type']);
