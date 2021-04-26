@@ -85,6 +85,8 @@ class DoctrineProvider extends AbstractProvider
             return array_values($this->getStorageServices())[0];
         }
 
+        \assert(\is_callable($storageMapper));   // helps PHPStan
+
         return $storageMapper($entity, $this->getStorageServices());
     }
 
@@ -128,7 +130,7 @@ class DoctrineProvider extends AbstractProvider
 
         // let's get the last inserted ID from the database so other providers can use that info
         $payload = $event->getPayload();
-        $payload['id'] = (int)$storageService->getEntityManager()->getConnection()->lastInsertId();
+        $payload['id'] = (int) $storageService->getEntityManager()->getConnection()->lastInsertId();
         $event->setPayload($payload);
     }
 
