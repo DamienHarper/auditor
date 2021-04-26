@@ -229,7 +229,10 @@ class Configuration implements ConfigurationInterface
         return $this;
     }
 
-    public function getStorageMapper(): ?callable
+    /**
+     * @return null|callable|string
+     */
+    public function getStorageMapper()
     {
         return $this->storageMapper;
     }
