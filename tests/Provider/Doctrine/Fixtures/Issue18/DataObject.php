@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="data_object")
  */
+#[ORM\Entity, ORM\Table(name: 'data_object')]
 class DataObject
 {
     /**
@@ -15,11 +16,13 @@ class DataObject
      * @ORM\Column(type="integer", options={"unsigned": true})
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
+    #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer', options: ['unsigned' => true])]
     protected $id;
 
     /**
      * @ORM\Column(type="binary")
      */
+    #[ORM\Column(type: 'binary')]
     protected $data;
 
     /**

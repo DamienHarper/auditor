@@ -2,6 +2,7 @@
 
 namespace DH\Auditor\Provider\Doctrine\Auditing\Annotation;
 
+use Attribute;
 use Doctrine\Common\Annotations\Annotation;
 
 /**
@@ -9,6 +10,7 @@ use Doctrine\Common\Annotations\Annotation;
  *
  * @Target("PROPERTY")
  */
-final class Ignore extends Annotation
+#[Attribute(Attribute::TARGET_PROPERTY)]
+final class Ignore
 {
 }
