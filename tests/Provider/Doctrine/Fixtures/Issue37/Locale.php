@@ -8,17 +8,20 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="locale")
  */
+#[ORM\Entity, ORM\Table(name: 'locale')]
 class Locale
 {
     /**
      * @ORM\Id
      * @ORM\Column(type="string", length=5)
      */
+    #[ORM\Id, ORM\Column(type: 'string', length: 5)]
     protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
+    #[ORM\Column(type: 'string', length: 255)]
     protected $name;
 
     public function __sleep()

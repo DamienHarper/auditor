@@ -8,47 +8,57 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="dummy_entity")
  */
+#[ORM\Entity, ORM\Table(name: 'dummy_entity')]
 class DummyEntity
 {
     /**
      * @ORM\Column(type="string", length=50)
      */
+    #[ORM\Column(type: 'string', length: 50)]
     protected $label;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
+    #[ORM\Column(type: 'integer', nullable: true)]
     protected $int_value;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
      */
+    #[ORM\Column(type: 'decimal', precision: 8, scale: 2, nullable: true)]
     protected $decimal_value;
 
     /**
      * @ORM\Column(type="boolean", nullable=true, options={"default": "0"})
      */
+    #[ORM\Column(type: 'boolean', nullable: true, options: ['default' => '0'])]
     protected $bool_value;
 
     /**
      * @ORM\Column(type="array")
      */
+    #[ORM\Column(type: 'array')]
     protected $php_array;
 
     /**
      * @ORM\Column(type="json_array", nullable=true)
      */
+    #[ORM\Column(type: 'json_array', nullable: true)]
     protected $json_array;
 
     /**
      * @ORM\Column(type="simple_array", nullable=true)
      */
+    #[ORM\Column(type: 'simple_array', nullable: true)]
     protected $simple_array;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      * @ORM\Column(type="integer")
      */
+    #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer')]
     private $id;
 
     public function getId()

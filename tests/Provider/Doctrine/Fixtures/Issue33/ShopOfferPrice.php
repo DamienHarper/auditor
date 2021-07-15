@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="shop_offer_price")
  */
+#[ORM\Entity, ORM\Table(name: 'shop_offer_price')]
 class ShopOfferPrice
 {
     /**
@@ -17,6 +18,8 @@ class ShopOfferPrice
      * @ORM\ManyToOne(targetEntity="Shop", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="shop_id", referencedColumnName="id", nullable=true)
      */
+    #[ORM\Id, ORM\ManyToOne(targetEntity: 'Shop', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'shop_id', referencedColumnName: 'id', nullable: true)]
     private $shop;
 
     /**
@@ -24,6 +27,8 @@ class ShopOfferPrice
      * @ORM\ManyToOne(targetEntity="Offer", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="offer_id", referencedColumnName="id", nullable=true)
      */
+    #[ORM\Id, ORM\ManyToOne(targetEntity: 'Offer', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'offer_id', referencedColumnName: 'id', nullable: true)]
     private $offer;
 
     /**

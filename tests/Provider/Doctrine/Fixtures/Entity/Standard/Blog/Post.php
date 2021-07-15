@@ -3,9 +3,6 @@
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 
 use DateTime;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,6 +13,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\Table(name="post", indexes={@ORM\Index(name="fk_author_id", columns={"author_id"})})
  * @Gedmo\SoftDeleteable(fieldName="deleted_at", timeAware=false)
  */
+#[ORM\Entity, ORM\Table(name: 'post'), ORM\Index(name: 'fk_author_id', columns: ['author_id'])]
 class Post
 {
     /**
@@ -23,44 +21,54 @@ class Post
      * @ORM\Column(type="integer", options={"unsigned": true})
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
+    #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer', options: ['unsigned' => true])]
     protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
+    #[ORM\Column(type: 'string', length: 255)]
     protected $title;
 
     /**
      * @ORM\Column(type="text")
      */
+    #[ORM\Column(type: 'text')]
     protected $body;
 
     /**
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
      */
+    #[ORM\Column(type: 'datetime')]
     protected $created_at;
 
     /**
      * @ORM\Column(type="datetime", nullable=true, options={"default": NULL})
      */
+    #[ORM\Column(type: 'datetime', nullable: true, options: ['default' => null])]
     protected $deleted_at;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned": true}, nullable=true)
      */
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true], nullable: true)]
     protected $author_id;
 
     /**
      * @ORM\OneToMany(targetEntity="Comment", mappedBy="post", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="id", referencedColumnName="post_id", nullable=true)
      */
+    #[ORM\OneToMany(targetEntity: 'Comment', mappedBy: 'post', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'id', referencedColumnName: 'post_id', nullable: true)]
     protected $comments;
 
     /**
      * @ORM\ManyToOne(targetEntity="Author", inversedBy="posts", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="author_id", referencedColumnName="id", nullable=true)
      */
+    #[ORM\ManyToOne(targetEntity: 'Author', inversedBy: 'posts', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id', nullable: true)]
     protected $author;
 
     /**
@@ -70,6 +78,10 @@ class Post
      *     inverseJoinColumns={@ORM\JoinColumn(name="tag_id", referencedColumnName="id", nullable=false)}
      * )
      */
+    #[ORM\ManyToMany(targetEntity: 'Tag', inversedBy: 'posts', cascade: ['persist', 'remove'])]
+    #[ORM\JoinTable(name: 'post__tag')]
+    #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id', nullable: false)]
+    #[ORM\InverseJoinColumn(name: 'tag_id', referencedColumnName: 'id', nullable: false)]
     protected $tags;
 
     public function __construct()

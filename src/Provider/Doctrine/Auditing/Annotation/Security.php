@@ -2,17 +2,21 @@
 
 namespace DH\Auditor\Provider\Doctrine\Auditing\Annotation;
 
+use Attribute;
 use Doctrine\Common\Annotations\Annotation;
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\Annotation\Required;
 
 /**
  * @Annotation
+ * @NamedArgumentConstructor()
  * @Target("CLASS")
  * @Attributes({
  *     @Attribute("view", required=true, type="array<string>"),
  * })
  */
-final class Security extends Annotation
+#[Attribute(Attribute::TARGET_CLASS)]
+final class Security
 {
     public const VIEW_SCOPE = 'view';
 
@@ -21,4 +25,9 @@ final class Security extends Annotation
      * @Required
      */
     public $view;
+
+    public function __construct(array $view)
+    {
+        $this->view = $view;
+    }
 }
