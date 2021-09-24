@@ -58,6 +58,24 @@ final class SchemaManagerTest extends TestCase
 
     public function testCreateAuditTable(): void
     {
+        $extraFields = [
+            'extra_field' => [
+                'type' => 'integer',
+                'options' => [
+                    'notnull' => true
+                ]
+            ]
+        ];
+        $extraIndices = [
+            'extra_field' => [
+                'type' => 'index',
+                'name_prefix' => 'other_prefix'
+            ]
+        ];
+        /** @var Configuration $configuration */
+        $configuration = $this->provider->getConfiguration();
+        $configuration->setExtraFields($extraFields);
+        $configuration->setExtraIndices($extraIndices);
         $updater = new SchemaManager($this->provider);
 
         /** @var StorageService $storageService */
@@ -79,13 +97,21 @@ final class SchemaManagerTest extends TestCase
         self::assertNotNull($authorAuditTable, 'author_audit table has been created.');
 
         // check expected columns
-        $expected = SchemaHelper::getAuditTableColumns();
+        $expected = array_merge(SchemaHelper::getAuditTableColumns(), $extraFields);
         foreach ($expected as $name => $options) {
             self::assertTrue($authorAuditTable->hasColumn($name), 'audit table has a column named "'.$name.'".');
         }
 
         // check expected indices
-        $expected = SchemaHelper::getAuditTableIndices($authorAuditTable->getName());
+        $expected = array_merge(
+            SchemaHelper::getAuditTableIndices($authorAuditTable->getName()),
+            [
+                'extra_field' => [
+                    'type' => 'index',
+                    'name' => 'other_prefix_' . md5($authorAuditTable->getName()) . '_idx'
+                ]
+            ]
+        );
         foreach ($expected as $name => $options) {
             if ('primary' === $options['type']) {
                 self::assertTrue($authorAuditTable->hasPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
