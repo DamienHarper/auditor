@@ -1,6 +1,6 @@
 <?php
 
-namespace  DH\Auditor\Security;
+namespace DH\Auditor\Security;
 
 interface RoleCheckerInterface
 {

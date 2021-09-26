@@ -9,7 +9,7 @@ use Doctrine\Common\Annotations\Annotation\Required;
 
 /**
  * @Annotation
- * @NamedArgumentConstructor()
+ * @NamedArgumentConstructor
  * @Target("CLASS")
  * @Attributes({
  *     @Attribute("view", required=true, type="array<string>"),
@@ -21,7 +21,7 @@ final class Security
     public const VIEW_SCOPE = 'view';
 
     /**
-     * @var string
+     * @var array
      * @Required
      */
     public $view;

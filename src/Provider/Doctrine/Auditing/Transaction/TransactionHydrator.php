@@ -80,7 +80,9 @@ class TransactionHydrator implements TransactionHydratorInterface
         $uow = $entityManager->getUnitOfWork();
         /** @var PersistentCollection $collection */
         foreach (array_reverse($uow->getScheduledCollectionUpdates()) as $collection) {
-            if ($this->provider->isAudited($collection->getOwner())) {
+            /** @var object $owner */
+            $owner = $collection->getOwner();
+            if ($this->provider->isAudited($owner)) {
                 $mapping = $collection->getMapping();
                 foreach ($collection->getInsertDiff() as $entity) {
                     if ($this->provider->isAudited($entity)) {
@@ -110,7 +112,9 @@ class TransactionHydrator implements TransactionHydratorInterface
         $uow = $entityManager->getUnitOfWork();
         /** @var PersistentCollection $collection */
         foreach (array_reverse($uow->getScheduledCollectionDeletions()) as $collection) {
-            if ($this->provider->isAudited($collection->getOwner())) {
+            /** @var object $owner */
+            $owner = $collection->getOwner();
+            if ($this->provider->isAudited($owner)) {
                 $mapping = $collection->getMapping();
                 foreach ($collection->toArray() as $entity) {
                     if ($this->provider->isAudited($entity)) {
