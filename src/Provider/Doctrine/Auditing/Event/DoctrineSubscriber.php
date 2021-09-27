@@ -45,6 +45,7 @@ class DoctrineSubscriber implements EventSubscriber
             // flushes pending data
             $entityManager->getConnection()->getConfiguration()->setSQLLogger($this->loggerBackup);
             $this->transactionManager->process($transaction);
+            $transaction->reset();
         });
 
         // Initialize a new LoggerChain with the new AuditLogger + the existing SQLLoggers.

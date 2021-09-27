@@ -77,6 +77,16 @@ class Transaction implements TransactionInterface
         return $this->dissociated;
     }
 
+    public function reset(): void
+    {
+        $this->transaction_hash = null;
+        $this->inserted = [];
+        $this->updated = [];
+        $this->removed = [];
+        $this->associated = [];
+        $this->dissociated = [];
+    }
+
     public function trackAuditEvent(string $type, array $data): void
     {
         switch ($type) {
