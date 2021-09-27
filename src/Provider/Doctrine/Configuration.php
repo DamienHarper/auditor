@@ -53,6 +53,11 @@ class Configuration implements ConfigurationInterface
      */
     private $storageMapper;
 
+    /**
+     * @var array
+     */
+    private $annotationLoaded = [];
+
     public function __construct(array $options)
     {
         $resolver = new OptionsResolver();
@@ -179,11 +184,15 @@ class Configuration implements ConfigurationInterface
      */
     public function getEntities(): array
     {
-        if (null === $this->entities && null !== $this->provider) {
+        if (null !== $this->provider) {
             /** @var AuditingService[] $auditingServices */
             $auditingServices = $this->provider->getAuditingServices();
             foreach ($auditingServices as $auditingService) {
-                $this->provider->loadAnnotations($auditingService->getEntityManager(), []);
+                // do not load annotations if they're already loaded
+                if (!isset($this->annotationLoaded[$auditingService->getName()]) || !$this->annotationLoaded[$auditingService->getName()]) {
+                    $this->provider->loadAnnotations($auditingService->getEntityManager(), null === $this->entities ? [] : $this->entities);
+                    $this->annotationLoaded[$auditingService->getName()] = true;
+                }
             }
         }
 
