@@ -43,14 +43,7 @@ class TransactionProcessor implements TransactionProcessorInterface
     private function notify(array $payload): void
     {
         $dispatcher = $this->provider->getAuditor()->getEventDispatcher();
-
-        if ($this->provider->getAuditor()->isPre43Dispatcher()) {
-            // Symfony 3.x
-            $dispatcher->dispatch(LifecycleEvent::class, new LifecycleEvent($payload));
-        } else {
-            // Symfony >= 4.x
-            $dispatcher->dispatch(new LifecycleEvent($payload));
-        }
+        $dispatcher->dispatch(new LifecycleEvent($payload));
     }
 
     /**

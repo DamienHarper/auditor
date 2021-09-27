@@ -16,8 +16,6 @@ parameters:
         - '~Parameter \#1 \$name of method Symfony\\Component\\Console\\Command\\Command\:\:setName\(\) expects string, string\|null given~'
         - '~Parameter \#1 \$(first|max)Results? of method Doctrine\\DBAL\\Query\\QueryBuilder\:\:set(First|Max)Results?\(\) expects int, null given~'
         - '~Parameter \#1 \$entity of method DH\\Auditor\\Provider\\Doctrine\\Persistence\\Schema\\SchemaManager\:\:(create|update)AuditTable\(\) expects string, string\|null given.~'
-        - '~Parameter \#1 \$event of method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface\:\:dispatch\(\) expects object, string given~'
-        - '~Parameter \#2 \$eventName of method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface\:\:dispatch\(\) expects string\|null, DH\\Auditor\\Event\\LifecycleEvent given\.~'
         - '~Cannot call method setFetchMode\(\) on Doctrine\\DBAL\\ForwardCompatibility\\DriverStatement\|int~'
         - '~Cannot call method fetchAll\(\) on Doctrine\\DBAL\\ForwardCompatibility\\DriverStatement\|int~'
         - '~Method DH\\Auditor\\Provider\\Doctrine\\Persistence\\Reader\\Filter\\RangeFilter\:\:__construct\(\) has parameter \$minValue with no typehint specified~'

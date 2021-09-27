@@ -11,7 +11,6 @@ use DH\Auditor\Tests\Fixtures\Provider\StorageAndAuditProvider;
 use DH\Auditor\Tests\Fixtures\Provider\StorageNoAuditProvider;
 use DH\Auditor\Tests\Traits\AuditorTrait;
 use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
@@ -255,16 +254,5 @@ final class AuditorTest extends TestCase
         $auditor = $this->createAuditor();
 
         self::assertInstanceOf(EventDispatcher::class, $auditor->getEventDispatcher(), 'Auditor::getEventDispatcher() is OK.');
-    }
-
-    public function testIsPre43Dispatcher(): void
-    {
-        $auditor = $this->createAuditor();
-
-        $r = new ReflectionMethod($auditor->getEventDispatcher(), 'dispatch');
-        $p = $r->getParameters();
-        $isPre43Dispatcher = 2 === \count($p) && 'event' !== $p[0]->name;
-
-        self::assertSame($isPre43Dispatcher, $auditor->isPre43Dispatcher(), 'Auditor::isPre43Dispatcher() is OK.');
     }
 }
