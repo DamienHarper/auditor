@@ -4,73 +4,37 @@ namespace DH\Auditor\Event;
 
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
-use Symfony\Component\EventDispatcher\Event as ComponentEvent;
-use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
+use Symfony\Contracts\EventDispatcher\Event;
 
-if (class_exists(ContractsEvent::class)) {
-    abstract class AuditEvent extends ContractsEvent
+abstract class AuditEvent extends Event
+{
+    /**
+     * @var array
+     */
+    private $payload;
+
+    public function __construct(array $payload)
     {
-        /**
-         * @var array
-         */
-        private $payload;
-
-        public function __construct(array $payload)
-        {
-            if (!SchemaHelper::isValidPayload($payload)) {
-                throw new InvalidArgumentException('Invalid payload.');
-            }
-
-            $this->payload = $payload;
+        if (!SchemaHelper::isValidPayload($payload)) {
+            throw new InvalidArgumentException('Invalid payload.');
         }
 
-        final public function setPayload(array $payload): ContractsEvent
-        {
-            if (!SchemaHelper::isValidPayload($payload)) {
-                throw new InvalidArgumentException('Invalid payload.');
-            }
-
-            $this->payload = $payload;
-
-            return $this;
-        }
-
-        final public function getPayload(): array
-        {
-            return $this->payload;
-        }
+        $this->payload = $payload;
     }
-} else {
-    abstract class AuditEvent extends ComponentEvent
+
+    final public function setPayload(array $payload): Event
     {
-        /**
-         * @var array
-         */
-        private $payload;
-
-        public function __construct(array $payload)
-        {
-            if (!SchemaHelper::isValidPayload($payload)) {
-                throw new InvalidArgumentException('Invalid payload.');
-            }
-
-            $this->payload = $payload;
+        if (!SchemaHelper::isValidPayload($payload)) {
+            throw new InvalidArgumentException('Invalid payload.');
         }
 
-        final public function setPayload(array $payload): ComponentEvent
-        {
-            if (!SchemaHelper::isValidPayload($payload)) {
-                throw new InvalidArgumentException('Invalid payload.');
-            }
+        $this->payload = $payload;
 
-            $this->payload = $payload;
+        return $this;
+    }
 
-            return $this;
-        }
-
-        final public function getPayload(): array
-        {
-            return $this->payload;
-        }
+    final public function getPayload(): array
+    {
+        return $this->payload;
     }
 }
