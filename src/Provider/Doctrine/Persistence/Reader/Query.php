@@ -94,10 +94,7 @@ class Query
         return false === $result ? 0 : $result;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function addFilter(FilterInterface $filter, $value = null): self
+    public function addFilter(FilterInterface $filter): self
     {
         $this->checkFilter($filter->getName());
         $this->filters[$filter->getName()][] = $filter;
