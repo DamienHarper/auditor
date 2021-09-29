@@ -2,7 +2,6 @@
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
 
-use DateTime;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Model\Entry;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
@@ -113,24 +112,6 @@ class Query
         }
 
         return $this;
-    }
-
-    /**
-     * @param mixed $minValue
-     * @param mixed $maxValue
-     */
-    public function addRangeFilter(string $name, $minValue = null, $maxValue = null): self
-    {
-        @trigger_error('Deprecated method, you should call Query::addFilter(...) instead and pass it a RangeFilter object.', E_USER_DEPRECATED);
-
-        return $this->addFilter(new RangeFilter($name, $minValue, $maxValue));
-    }
-
-    public function addDateRangeFilter(string $name, ?DateTime $minValue = null, ?DateTime $maxValue = null): self
-    {
-        @trigger_error('Deprecated method, you should call Query::addFilter(...) instead and pass it a DateRangeFilter object.', E_USER_DEPRECATED);
-
-        return $this->addFilter(new DateRangeFilter($name, $minValue, $maxValue));
     }
 
     public function addOrderBy(string $field, string $direction = 'DESC'): self
