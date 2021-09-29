@@ -166,31 +166,17 @@ class CleanAuditLogsCommand extends Command
     private function validateKeepArgument(string $keep, SymfonyStyle $io): ?DateTime
     {
         $until = new DateTime();
-        if (is_numeric($keep)) {
-            $deprecationMessage = "Providing an integer value for the 'keep' argument is deprecated. Please use the ISO 8601 duration format (e.g. P12M).";
-            @trigger_error($deprecationMessage, E_USER_DEPRECATED);
-            $io->writeln($deprecationMessage);
 
-            if ((int) $keep <= 0) {
-                $io->error("'keep' argument must be a positive number.");
-                $this->release();
+        try {
+            $dateInterval = new DateInterval($keep);
+        } catch (Exception $e) {
+            $io->error(sprintf("'keep' argument must be a valid ISO 8601 date interval, '%s' given.", (string) $keep));
+            $this->release();
 
-                return null;
-            }
-
-            $until->modify('-'.$keep.' month');
-        } else {
-            try {
-                $dateInterval = new DateInterval((string) $keep);
-            } catch (Exception $e) {
-                $io->error(sprintf("'keep' argument must be a valid ISO 8601 date interval. '%s' given.", (string) $keep));
-                $this->release();
-
-                return null;
-            }
-
-            $until->sub($dateInterval);
+            return null;
         }
+
+        $until->sub($dateInterval);
 
         return $until;
     }
