@@ -95,21 +95,12 @@ class Query
     }
 
     /**
-     * @param FilterInterface|string $value
-     * @param mixed                  $value
-     * @param mixed                  $filter
+     * @param mixed $value
      */
-    public function addFilter($filter, $value = null): self
+    public function addFilter(FilterInterface $filter, $value = null): self
     {
-        if ($filter instanceof FilterInterface) {
-            $this->checkFilter($filter->getName());
-            $this->filters[$filter->getName()][] = $filter;
-        } else {
-            @trigger_error('Passing name and value is deprecated, you should pass a FilterInterface object instead.', E_USER_DEPRECATED);
-
-            $this->checkFilter($filter);
-            $this->filters[$filter][] = new SimpleFilter($filter, $value);
-        }
+        $this->checkFilter($filter->getName());
+        $this->filters[$filter->getName()][] = $filter;
 
         return $this;
     }

@@ -61,26 +61,6 @@ final class QueryTest extends TestCase
     /**
      * @depends testAddSimpleFilter
      */
-    public function testAddFilterDeprecation(): void
-    {
-        $query = new Query('author_audit', $this->createConnection());
-        $query->addFilter(Query::TRANSACTION_HASH, '123abc');
-
-        $filters = $query->getFilters();
-        self::assertCount(1, $filters[Query::TRANSACTION_HASH], 'Filter is added.');
-        self::assertSame('123abc', $filters[Query::TRANSACTION_HASH][0]->getValue(), 'Filter is added.');
-
-        $query->addFilter(Query::TRANSACTION_HASH, '456def');
-
-        $filters = $query->getFilters();
-        self::assertCount(2, $filters[Query::TRANSACTION_HASH], 'Filter is added.');
-        self::assertSame('123abc', $filters[Query::TRANSACTION_HASH][0]->getValue(), 'First filter is ok.');
-        self::assertSame('456def', $filters[Query::TRANSACTION_HASH][1]->getValue(), 'Second filter is added.');
-    }
-
-    /**
-     * @depends testAddSimpleFilter
-     */
     public function testAddUnexpectedFilter(): void
     {
         $query = new Query('author_audit', $this->createConnection());
