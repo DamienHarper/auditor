@@ -171,4 +171,17 @@ class Entry
 
         return $array;
     }
+
+    public static function fromArray(array $row): self
+    {
+        $entry = new self();
+
+        foreach ($row as $key => $value) {
+            if (property_exists($entry, $key)) {
+                $entry->$key = $value;
+            }
+        }
+
+        return $entry;
+    }
 }
