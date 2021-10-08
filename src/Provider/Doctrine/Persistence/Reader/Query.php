@@ -69,6 +69,15 @@ class Query
     {
         $queryBuilder = $this->buildQueryBuilder();
         $statement = $queryBuilder->execute();
+
+        if ($statement instanceof \Doctrine\DBAL\Result) {
+            $result = [];
+            foreach ($statement->fetchAllAssociative() as $row) {
+                $result[] = Entry::fromArray($row);
+            }
+            return $result;
+        }
+
         $statement->setFetchMode(PDO::FETCH_CLASS, Entry::class);
 
         return $statement->fetchAll();
