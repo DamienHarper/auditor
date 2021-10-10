@@ -122,7 +122,7 @@ class CleanAuditLogsCommand extends Command
                     $queryBuilder
                         ->delete($auditTable)
                         ->where('created_at < :until')
-                        ->setParameter(':until', $until->format('Y-m-d'))
+                        ->setParameter('until', $until->format('Y-m-d'))
                     ;
 
                     if ($dumpSQL) {

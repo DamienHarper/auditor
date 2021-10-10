@@ -160,6 +160,19 @@ class Entry
         return $this->sort(json_decode($this->diffs, true));
     }
 
+    public static function fromArray(array $row): self
+    {
+        $entry = new self();
+
+        foreach ($row as $key => $value) {
+            if (property_exists($entry, $key)) {
+                $entry->{$key} = $value;
+            }
+        }
+
+        return $entry;
+    }
+
     private function sort(array $array): array
     {
         ksort($array);
@@ -170,18 +183,5 @@ class Entry
         }
 
         return $array;
-    }
-
-    public static function fromArray(array $row): self
-    {
-        $entry = new self();
-
-        foreach ($row as $key => $value) {
-            if (property_exists($entry, $key)) {
-                $entry->$key = $value;
-            }
-        }
-
-        return $entry;
     }
 }
