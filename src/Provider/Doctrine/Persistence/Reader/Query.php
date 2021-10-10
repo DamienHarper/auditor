@@ -10,6 +10,7 @@ use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\FilterInterface;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\RangeFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ForwardCompatibility\DriverStatement;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Exception;
 use PDO;
@@ -68,6 +69,15 @@ class Query
     {
         $queryBuilder = $this->buildQueryBuilder();
         $statement = $queryBuilder->execute();
+
+        if ($statement instanceof \Doctrine\DBAL\Result) {
+            $result = [];
+            foreach ($statement->fetchAllAssociative() as $row) {
+                $result[] = Entry::fromArray($row);
+            }
+            return $result;
+        }
+
         $statement->setFetchMode(PDO::FETCH_CLASS, Entry::class);
 
         return $statement->fetchAll();
@@ -84,9 +94,15 @@ class Query
                 ->setMaxResults(null)
                 ->setFirstResult(null)
                 ->select('COUNT(id)')
-                ->execute()
-                ->fetchColumn(0)
-            ;
+                ->execute();
+
+            if ($result instanceof \Doctrine\DBAL\Result) {
+                $result = $result->fetchOne();
+            }
+            else {
+                $result = $result->fetchColumn(0);
+            }
+
         } catch (Exception $e) {
             $result = false;
         }
