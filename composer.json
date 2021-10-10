@@ -14,7 +14,6 @@
     "php": ">=7.3",
     "ext-json": "*",
     "doctrine/annotations": "^1.8",
-    "doctrine/cache": "^2.1",
     "doctrine/orm": "^2.7",
     "symfony/cache": "^4.0|^5.0",
     "symfony/event-dispatcher": "^4.0|^5.0",
