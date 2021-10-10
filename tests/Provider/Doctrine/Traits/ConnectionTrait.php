@@ -48,10 +48,9 @@ trait ConnectionTrait
             $connection = DriverManager::getConnection($tmpParams);
 
             if ($connection->getDatabasePlatform()->supportsCreateDropDatabase()) {
-                $connection->getSchemaManager()->dropAndCreateDatabase($dbname);
+                $connection->createSchemaManager()->dropAndCreateDatabase($dbname);
             } else {
-                $sm = $connection->getSchemaManager();
-                $schema = $sm->createSchema();
+                $schema = $connection->createSchemaManager()->createSchema();
                 $stmts = $schema->toDropSql($connection->getDatabasePlatform());
                 foreach ($stmts as $stmt) {
                     $connection->exec($stmt);
