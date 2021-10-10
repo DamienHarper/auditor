@@ -18,10 +18,10 @@ trait ConnectionTrait
             self::$connections[$name] = $this->createConnection($params);
         }
 
-        if (false === self::$connections[$name]->ping()) {
-            self::$connections[$name]->close();
-            self::$connections[$name]->connect();
-        }
+//        if (false === self::$connections[$name]->ping()) {
+//            self::$connections[$name]->close();
+//            self::$connections[$name]->connect();
+//        }
 
         return self::$connections[$name];
     }

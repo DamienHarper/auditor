@@ -42,9 +42,9 @@ class DummyEntity
     protected $php_array;
 
     /**
-     * @ORM\Column(type="json_array", nullable=true)
+     * @ORM\Column(type="json", nullable=true)
      */
-    #[ORM\Column(type: 'json_array', nullable: true)]
+    #[ORM\Column(type: 'json', nullable: true)]
     protected $json_array;
 
     /**
