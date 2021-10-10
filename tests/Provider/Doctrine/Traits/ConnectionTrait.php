@@ -33,12 +33,25 @@ trait ConnectionTrait
         if ('pdo_sqlite' === $params['driver']) {
             // SQLite
             $connection = DriverManager::getConnection($params);
-            $sm = $connection->getSchemaManager();
-            $schema = $sm->createSchema();
+            $schema = $connection->createSchemaManager()->createSchema();
             $stmts = $schema->toDropSql($connection->getDatabasePlatform());
             foreach ($stmts as $stmt) {
-                $connection->exec($stmt);
+                $connection->executeStatement($stmt);
             }
+        } elseif ('pdo_pgsql' === $params['driver']) {
+            // PostgreSQL
+            $tmpParams = $params;
+            $dbname = $params['dbname'];
+            unset($tmpParams['dbname']);
+
+            $connection = DriverManager::getConnection($tmpParams);
+
+            // Closes active connections
+            $connection->executeStatement(
+                'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '.$connection->getDatabasePlatform()->quoteStringLiteral($dbname)
+            );
+
+            $connection->createSchemaManager()->dropAndCreateDatabase($dbname);
         } else {
             // Other
             $tmpParams = $params;
@@ -53,7 +66,7 @@ trait ConnectionTrait
                 $schema = $connection->createSchemaManager()->createSchema();
                 $stmts = $schema->toDropSql($connection->getDatabasePlatform());
                 foreach ($stmts as $stmt) {
-                    $connection->exec($stmt);
+                    $connection->executeStatement($stmt);
                 }
             }
         }
