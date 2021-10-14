@@ -109,6 +109,8 @@ final class UpdateSchemaCommandTest extends TestCase
      */
     public function testExecuteNothingToUpdate(): void
     {
+        $this->provider->getConfiguration()->setEntities([]);
+
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute(['--force' => true]);
