@@ -109,8 +109,6 @@ final class UpdateSchemaCommandTest extends TestCase
      */
     public function testExecuteNothingToUpdate(): void
     {
-        $this->provider->getConfiguration()->setEntities([]);   // workaround because above fails on Travis CI with PHP 7.3.17
-
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute(['--force' => true]);
