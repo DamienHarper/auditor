@@ -11,6 +11,7 @@ use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\RangeFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Exception;
 
 class Query
@@ -66,9 +67,16 @@ class Query
     public function execute(): array
     {
         $queryBuilder = $this->buildQueryBuilder();
-        $statement = $queryBuilder->executeQuery();
+        if (method_exists($queryBuilder, 'executeQuery')) {
+            // doctrine/dbal v3.x
+            $statement = $queryBuilder->executeQuery();
+        } else {
+            // doctrine/dbal v2.13.x
+            $statement = $queryBuilder->execute();
+        }
 
         $result = [];
+        \assert($statement instanceof Result);
         foreach ($statement->fetchAllAssociative() as $row) {
             $result[] = Entry::fromArray($row);
         }
@@ -81,15 +89,27 @@ class Query
         $queryBuilder = $this->buildQueryBuilder();
 
         try {
-            $result = $queryBuilder
+            $queryBuilder
                 ->resetQueryPart('select')
                 ->resetQueryPart('orderBy')
                 ->setMaxResults(null)
                 ->setFirstResult(null)
                 ->select('COUNT(id)')
-                ->executeQuery()
-                ->fetchOne()
             ;
+
+            if (method_exists($queryBuilder, 'executeQuery')) {
+                // doctrine/dbal v3.x
+                $result = $queryBuilder
+                    ->executeQuery()
+                    ->fetchOne()
+                ;
+            } else {
+                // doctrine/dbal v2.13.x
+                $result = $queryBuilder
+                    ->execute()
+                    ->fetchColumn(0)
+                ;
+            }
         } catch (Exception $e) {
             $result = false;
         }
