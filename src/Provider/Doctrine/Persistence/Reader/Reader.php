@@ -152,6 +152,8 @@ class Reader
             'nextPage' => $hasNextPage ? $currentPage + 1 : null,
             'numPages' => (int) ceil($numResults / $pageSize),
             'haveToPaginate' => $numResults > $pageSize,
+            'numResults' => $numResults,
+            'pageSize' => $pageSize,
         ];
     }
 
