@@ -1,4 +1,4 @@
-name: CI
+name: auditor 2.x CI
 
 on:
   schedule:
