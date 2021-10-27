@@ -153,6 +153,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: 1.x
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
