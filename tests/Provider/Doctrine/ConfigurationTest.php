@@ -3,7 +3,6 @@
 namespace DH\Auditor\Tests\Provider\Doctrine;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation\AuditableButUnauditedEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation\AuditedEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
@@ -118,17 +117,17 @@ final class ConfigurationTest extends TestCase
     {
         $extraFields = [
             'example_int_field' => [
-                'type'  =>  'integer',
+                'type' => 'integer',
                 'options' => [
-                    'notnull' => true
-                ]
+                    'notnull' => true,
+                ],
             ],
             'example_string_field' => [
-                'type'  =>  'string',
+                'type' => 'string',
                 'options' => [
                     'notnull' => false,
-                    'length' => 50
-                ]
+                    'length' => 50,
+                ],
             ],
         ];
 
@@ -144,8 +143,8 @@ final class ConfigurationTest extends TestCase
         $extraIndices = [
             'example_default_index' => null,
             'example_configured_index' => [
-                'type'  =>  'primary',
-                'name_prefix' => 'another_prefix'
+                'type' => 'primary',
+                'name_prefix' => 'another_prefix',
             ],
         ];
 
@@ -161,8 +160,8 @@ final class ConfigurationTest extends TestCase
         $extraIndicesConfig = [
             'example_default_index' => null,
             'example_configured_index' => [
-                'type'  =>  'primary',
-                'name_prefix' => 'another_prefix'
+                'type' => 'primary',
+                'name_prefix' => 'another_prefix',
             ],
         ];
         $tableName = 'test_table';
@@ -170,11 +169,11 @@ final class ConfigurationTest extends TestCase
         $extraIndicesExpected = [
             'example_default_index' => [
                 'type' => 'index',
-                'name' => 'example_default_index_' . md5($tableName) . '_idx',
+                'name' => 'example_default_index_'.md5($tableName).'_idx',
             ],
             'example_configured_index' => [
-                'type'  =>  'primary',
-                'name' => 'another_prefix_' . md5($tableName) . '_idx',
+                'type' => 'primary',
+                'name' => 'another_prefix_'.md5($tableName).'_idx',
             ],
         ];
 

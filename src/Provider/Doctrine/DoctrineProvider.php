@@ -96,7 +96,7 @@ class DoctrineProvider extends AbstractProvider
         unset($payload['table'], $payload['entity']);
 
         $fields = array_combine(array_keys($payload), array_map(function ($x) {return ":{$x}"; }, array_keys($payload)));
-        \assert(is_array($fields));    // helps PHPStan
+        \assert(\is_array($fields));    // helps PHPStan
 
         $query = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',

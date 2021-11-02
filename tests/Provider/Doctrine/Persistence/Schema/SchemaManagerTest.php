@@ -62,15 +62,15 @@ final class SchemaManagerTest extends TestCase
             'extra_field' => [
                 'type' => 'integer',
                 'options' => [
-                    'notnull' => true
-                ]
-            ]
+                    'notnull' => true,
+                ],
+            ],
         ];
         $extraIndices = [
             'extra_field' => [
                 'type' => 'index',
-                'name_prefix' => 'other_prefix'
-            ]
+                'name_prefix' => 'other_prefix',
+            ],
         ];
         /** @var Configuration $configuration */
         $configuration = $this->provider->getConfiguration();
@@ -108,8 +108,8 @@ final class SchemaManagerTest extends TestCase
             [
                 'extra_field' => [
                     'type' => 'index',
-                    'name' => 'other_prefix_' . md5($authorAuditTable->getName()) . '_idx'
-                ]
+                    'name' => 'other_prefix_'.md5($authorAuditTable->getName()).'_idx',
+                ],
             ]
         );
         foreach ($expected as $name => $options) {

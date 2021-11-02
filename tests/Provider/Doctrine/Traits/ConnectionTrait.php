@@ -2,6 +2,7 @@
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
+use DH\Auditor\Provider\Doctrine\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 

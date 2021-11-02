@@ -47,7 +47,11 @@ class Reader
         /** @var StorageService $storageService */
         $storageService = $this->provider->getStorageServiceForEntity($entity);
 
-        $query = new Query($this->getEntityAuditTableName($entity), $storageService->getEntityManager()->getConnection());
+        $query = new Query(
+            $this->getEntityAuditTableName($entity),
+            $storageService->getEntityManager()->getConnection(),
+            $this->provider->getConfiguration()
+        );
         $query
             ->addOrderBy(Query::CREATED_AT, 'DESC')
             ->addOrderBy(Query::ID, 'DESC')
@@ -80,6 +84,12 @@ class Reader
             $query->addFilter(Query::DISCRIMINATOR, $entity);
         }
 
+        foreach ($this->provider->getConfiguration()->getExtraIndices() as $indexedField => $extraIndexConfig) {
+            if (null !== $config[$indexedField]) {
+                $query->addFilter($indexedField, $config[$indexedField]);
+            }
+        }
+
         return $query;
     }
 
@@ -108,6 +118,11 @@ class Reader
                 return null === $value || $value >= 1;
             })
         ;
+
+        foreach ($this->provider->getConfiguration()->getExtraIndices() as $indexedField => $extraIndexConfig) {
+            $resolver->setDefault($indexedField, null);
+            $resolver->setAllowedTypes($indexedField, ['null', 'int', 'string', 'array']);
+        }
     }
 
     /**
