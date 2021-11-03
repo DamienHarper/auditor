@@ -155,9 +155,14 @@ class Entry
      *
      * @return array
      */
-    public function getDiffs(): ?array
+    public function getDiffs(bool $includeMedadata = false): ?array
     {
-        return $this->sort(json_decode($this->diffs, true));
+        $diffs = $this->sort(json_decode($this->diffs, true));
+        if (!$includeMedadata) {
+            unset($diffs['@source']);
+        }
+
+        return $diffs;
     }
 
     public static function fromArray(array $row): self
