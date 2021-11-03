@@ -37,7 +37,7 @@ trait AuditTrait
         /**
          * Primary key is not part of fieldMapping.
          *
-         * @see https://github.com/DamienHarper/Auditor\Provider\Doctrine/issues/40
+         * @see https://github.com/DamienHarper/auditor-bundle/issues/40
          * @see https://www.doctrine-project.org/projects/doctrine-orm/en/latest/tutorials/composite-primary-keys.html#identity-through-foreign-entities
          * We try to get it from associationMapping (will throw a MappingException if not available)
          */
@@ -115,11 +115,18 @@ trait AuditTrait
     private function diff(EntityManagerInterface $entityManager, $entity, array $changeset): array
     {
         $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
-        $diff = [];
+        $diff = [
+            '@source' => $this->summarize($entityManager, $entity),
+        ];
 
         foreach ($changeset as $fieldName => [$old, $new]) {
             $o = null;
             $n = null;
+
+            // skip if $old and $new are null
+            if (null === $old && null === $new) {
+                continue;
+            }
 
             if (
                 !isset($meta->embeddedClasses[$fieldName])
@@ -164,17 +171,14 @@ trait AuditTrait
 
         $entityManager->getUnitOfWork()->initializeObject($entity); // ensure that proxies are initialized
         $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
+
+        $pkValue = $extra['id'] ?? $this->id($entityManager, $entity);
         $pkName = $meta->getSingleIdentifierFieldName();
-        $pkValue = $id ?? $this->id($entityManager, $entity);
-        // An added guard for proxies that fail to initialize.
-        if (null === $pkValue) {
-            return null;
-        }
 
         if (method_exists($entity, '__toString')) {
             $label = (string) $entity;
         } else {
-            $label = DoctrineHelper::getRealClassName($entity).'#'.$pkValue;
+            $label = DoctrineHelper::getRealClassName($entity).(null === $pkValue ? '' : '#'.$pkValue);
         }
 
         return [
