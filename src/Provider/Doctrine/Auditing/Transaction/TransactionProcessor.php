@@ -71,6 +71,8 @@ class TransactionProcessor implements TransactionProcessorInterface
     private function update(EntityManagerInterface $entityManager, object $entity, array $ch, string $transactionHash): void
     {
         $diff = $this->diff($entityManager, $entity, $ch);
+        unset($diff['@source']);
+
         if (0 === \count($diff)) {
             return; // if there is no entity diff, do not log it
         }
@@ -100,7 +102,7 @@ class TransactionProcessor implements TransactionProcessorInterface
         $this->audit([
             'action' => 'remove',
             'blame' => $this->blame(),
-            'diff' => $this->summarize($entityManager, $entity, $id),
+            'diff' => $this->summarize($entityManager, $entity, ['id' => $id]),
             'table' => $meta->getTableName(),
             'schema' => $meta->getSchemaName(),
             'id' => $id,
@@ -177,8 +179,8 @@ class TransactionProcessor implements TransactionProcessorInterface
             'action' => $type,
             'blame' => $this->blame(),
             'diff' => [
-                'source' => $this->summarize($entityManager, $source),
-                'target' => $this->summarize($entityManager, $target),
+                'source' => $this->summarize($entityManager, $source, ['field' => $mapping['fieldName']]),
+                'target' => $this->summarize($entityManager, $target, ['field' => $mapping['isOwningSide'] ? $mapping['inversedBy'] : $mapping['mappedBy']]),
                 'is_owning_side' => $mapping['isOwningSide'],
             ],
             'table' => $meta->getTableName(),

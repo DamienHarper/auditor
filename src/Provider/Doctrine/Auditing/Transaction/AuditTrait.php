@@ -161,9 +161,9 @@ trait AuditTrait
      * Returns an array describing an entity.
      *
      * @param null|mixed $entity
-     * @param null|mixed $id
+     * @param array $extra
      */
-    private function summarize(EntityManagerInterface $entityManager, $entity = null, $id = null): ?array
+    private function summarize(EntityManagerInterface $entityManager, $entity = null, array $extra = []): ?array
     {
         if (null === $entity) {
             return null;
@@ -186,7 +186,7 @@ trait AuditTrait
             'class' => $meta->name,
             'label' => $label,
             'table' => $meta->getTableName(),
-        ];
+        ] + $extra;
     }
 
     /**
