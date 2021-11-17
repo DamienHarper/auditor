@@ -21,7 +21,7 @@ final class Security
     public const VIEW_SCOPE = 'view';
 
     /**
-     * @var string
+     * @var array
      * @Required
      */
     public $view;

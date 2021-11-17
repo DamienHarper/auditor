@@ -215,12 +215,14 @@ final class TransactionProcessorTest extends TestCase
             'is_owning_side' => false,
             'source' => [
                 'class' => Author::class,
+                'field' => 'posts',
                 'id' => 1,
                 'label' => Author::class.'#1',
                 'table' => $entityManager->getClassMetadata(Author::class)->getTableName(),
             ],
             'target' => [
                 'class' => Post::class,
+                'field' => 'author',
                 'id' => 1,
                 'label' => (string) $post,
                 'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
@@ -287,12 +289,14 @@ final class TransactionProcessorTest extends TestCase
             'is_owning_side' => false,
             'source' => [
                 'class' => Author::class,
+                'field' => 'posts',
                 'id' => 1,
                 'label' => Author::class.'#1',
                 'table' => $entityManager->getClassMetadata(Author::class)->getTableName(),
             ],
             'target' => [
                 'class' => Post::class,
+                'field' => 'author',
                 'id' => 1,
                 'label' => (string) $post,
                 'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
@@ -406,6 +410,7 @@ final class TransactionProcessorTest extends TestCase
             'is_owning_side' => true,
             'source' => [
                 'class' => Post::class,
+                'field' => 'tags',
                 'id' => 1,
                 'label' => (string) $post,
                 'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
@@ -413,6 +418,7 @@ final class TransactionProcessorTest extends TestCase
             'table' => 'post__tag',
             'target' => [
                 'class' => Tag::class,
+                'field' => 'posts',
                 'id' => 2,
                 'label' => Tag::class.'#2',
                 'table' => $entityManager->getClassMetadata(Tag::class)->getTableName(),
@@ -429,6 +435,7 @@ final class TransactionProcessorTest extends TestCase
             'is_owning_side' => true,
             'source' => [
                 'class' => Post::class,
+                'field' => 'tags',
                 'id' => 1,
                 'label' => (string) $post,
                 'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
@@ -436,6 +443,7 @@ final class TransactionProcessorTest extends TestCase
             'table' => 'post__tag',
             'target' => [
                 'class' => Tag::class,
+                'field' => 'posts',
                 'id' => 1,
                 'label' => Tag::class.'#1',
                 'table' => $entityManager->getClassMetadata(Tag::class)->getTableName(),
@@ -552,6 +560,7 @@ final class TransactionProcessorTest extends TestCase
             'is_owning_side' => true,
             'source' => [
                 'class' => Post::class,
+                'field' => 'tags',
                 'id' => 1,
                 'label' => 'First post',
                 'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
@@ -559,6 +568,7 @@ final class TransactionProcessorTest extends TestCase
             'table' => 'post__tag',
             'target' => [
                 'class' => Tag::class,
+                'field' => 'posts',
                 'id' => 2,
                 'label' => Tag::class.'#2',
                 'table' => $entityManager->getClassMetadata(Tag::class)->getTableName(),

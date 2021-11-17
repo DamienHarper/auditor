@@ -20,54 +20,6 @@ final class CleanAuditLogsCommandTest extends TestCase
     use LockableTrait;
     use SchemaSetupTrait;
 
-    public function testDeprecationOutput(): void
-    {
-        $command = $this->createCommand();
-        $commandTester = new CommandTester($command);
-        $commandTester->execute([
-            '--no-confirm' => true,
-            'keep' => 12,
-        ]);
-        $command->unlock();
-
-        // the output of the command in the console
-        $output = $commandTester->getDisplay();
-        self::assertStringContainsString("Providing an integer value for the 'keep' argument is deprecated. Please use the ISO 8601 duration format (e.g. P12M).", $output);
-    }
-
-    public function testExecuteFailsWithKeepNegative(): void
-    {
-        $command = $this->createCommand();
-        $commandTester = new CommandTester($command);
-        $commandTester->execute([
-            '--no-confirm' => true,
-            'keep' => -1,
-        ]);
-        $command->unlock();
-
-        // the output of the command in the console
-        $output = $commandTester->getDisplay();
-        self::assertStringContainsString("[ERROR] 'keep' argument must be a positive number.", $output);
-    }
-
-    /**
-     * @depends testExecuteFailsWithKeepNegative
-     */
-    public function testExecuteFailsWithKeepNull(): void
-    {
-        $command = $this->createCommand();
-        $commandTester = new CommandTester($command);
-        $commandTester->execute([
-            '--no-confirm' => true,
-            'keep' => 0,
-        ]);
-        $command->unlock();
-
-        // the output of the command in the console
-        $output = $commandTester->getDisplay();
-        self::assertStringContainsString("[ERROR] 'keep' argument must be a positive number.", $output);
-    }
-
     public function testExecuteFailsWithKeepWrongFormat(): void
     {
         $keep = 'WRONG';
@@ -82,7 +34,7 @@ final class CleanAuditLogsCommandTest extends TestCase
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString(sprintf("[ERROR] 'keep' argument must be a valid ISO 8601 date interval. '%s' given.", $keep), $output);
+        self::assertStringContainsString(sprintf("[ERROR] 'keep' argument must be a valid ISO 8601 date interval, '%s' given.", $keep), $output);
     }
 
     public function testExecute(): void

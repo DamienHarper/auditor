@@ -2,8 +2,8 @@
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
+use InvalidArgumentException;
 
 abstract class DoctrineHelper
 {
@@ -42,6 +42,10 @@ abstract class DoctrineHelper
 
     public static function getDoctrineType(string $type): string
     {
-        return \constant((class_exists(Types::class, false) ? Types::class : Type::class).'::'.$type);
+        if (!\defined(Types::class.'::'.$type)) {
+            throw new InvalidArgumentException(sprintf('Undefined Doctrine type "%s"', $type));
+        }
+
+        return \constant(Types::class.'::'.$type);
     }
 }

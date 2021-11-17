@@ -10,7 +10,7 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
 class AnnotationLoader
 {
     /**
-     * @var AnnotationReader
+     * @var null|AnnotationReader
      */
     private $reader;
 
@@ -42,14 +42,19 @@ class AnnotationLoader
 
     private function getEntityConfiguration(ClassMetadata $metadata): ?array
     {
+        $annotation = null;
+        $auditableAnnotation = null;
+        $securityAnnotation = null;
+        $annotationProperty = null;
         $reflection = $metadata->getReflectionClass();
 
         // Check that we have an Entity annotation
         if (\PHP_VERSION_ID >= 80000 && $attributes = $reflection->getAttributes(Entity::class)) {
             $annotation = $attributes[0]->newInstance();
-        } else {
+        } elseif (null !== $this->reader) {
             $annotation = $this->reader->getClassAnnotation($reflection, Entity::class);
         }
+
         if (null === $annotation) {
             return null;
         }
@@ -58,10 +63,11 @@ class AnnotationLoader
         if (\PHP_VERSION_ID >= 80000 && $attributes = $reflection->getAttributes(Auditable::class)) {
             /** @var ?Auditable $auditableAnnotation */
             $auditableAnnotation = $attributes[0]->newInstance();
-        } else {
+        } elseif (null !== $this->reader) {
             /** @var ?Auditable $auditableAnnotation */
             $auditableAnnotation = $this->reader->getClassAnnotation($reflection, Auditable::class);
         }
+
         if (null === $auditableAnnotation) {
             return null;
         }
@@ -70,10 +76,11 @@ class AnnotationLoader
         if (\PHP_VERSION_ID >= 80000 && $attributes = $reflection->getAttributes(Security::class)) {
             /** @var ?Security $securityAnnotation */
             $securityAnnotation = $attributes[0]->newInstance();
-        } else {
+        } elseif (null !== $this->reader) {
             /** @var ?Security $securityAnnotation */
             $securityAnnotation = $this->reader->getClassAnnotation($reflection, Security::class);
         }
+
         if (null === $securityAnnotation) {
             $roles = null;
         } else {
@@ -96,7 +103,7 @@ class AnnotationLoader
                 $annotationProperty = $this->reader->getPropertyAnnotation($property, Ignore::class);
             }
 
-            if ($annotationProperty) {
+            if (null !== $annotationProperty) {
                 // TODO: $property->getName() might not be the column name
                 $config['ignored_columns'][] = $property->getName();
             }

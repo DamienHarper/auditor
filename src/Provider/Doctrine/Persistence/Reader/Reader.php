@@ -8,6 +8,7 @@ use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMMetadata;
@@ -58,15 +59,15 @@ class Reader
         ;
 
         if (null !== $config['type']) {
-            $query->addFilter(Query::TYPE, $config['type']);
+            $query->addFilter(new SimpleFilter(Query::TYPE, $config['type']));
         }
 
         if (null !== $config['object_id']) {
-            $query->addFilter(Query::OBJECT_ID, $config['object_id']);
+            $query->addFilter(new SimpleFilter(Query::OBJECT_ID, $config['object_id']));
         }
 
         if (null !== $config['transaction_hash']) {
-            $query->addFilter(Query::TRANSACTION_HASH, $config['transaction_hash']);
+            $query->addFilter(new SimpleFilter(Query::TRANSACTION_HASH, $config['transaction_hash']));
         }
 
         if (null !== $config['page'] && null !== $config['page_size']) {
@@ -81,7 +82,7 @@ class Reader
             && $metadata instanceof ORMMetadata
             && ORMMetadata::INHERITANCE_TYPE_SINGLE_TABLE === $metadata->inheritanceType
         ) {
-            $query->addFilter(Query::DISCRIMINATOR, $entity);
+            $query->addFilter(new SimpleFilter(Query::DISCRIMINATOR, $entity));
         }
 
         foreach ($this->provider->getConfiguration()->getExtraIndices() as $indexedField => $extraIndexConfig) {
@@ -166,6 +167,8 @@ class Reader
             'nextPage' => $hasNextPage ? $currentPage + 1 : null,
             'numPages' => (int) ceil($numResults / $pageSize),
             'haveToPaginate' => $numResults > $pageSize,
+            'numResults' => $numResults,
+            'pageSize' => $pageSize,
         ];
     }
 

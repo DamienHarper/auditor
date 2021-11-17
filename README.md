@@ -40,7 +40,7 @@ so that even if something fails the global state remains clean.
 * SQLite
 
 `DoctrineProvider` should work with **any other** database supported by `Doctrine`. 
-Though, we can only really support the ones we can test with [Travis CI](https://travis-ci.com) / Github actions.
+Though, we can only really support the ones we can test with [GitHub Actions](https://github.com/features/actions).
 
 Basically you can track any change of any entity from audit logs.
 
@@ -54,7 +54,8 @@ Basically you can track any change of any entity from audit logs.
 ## Version Information
  Version   | Status                      | Requirements               | Badges
 :----------|:----------------------------|:---------------------------|:-----------
- 1.x       | Active development :rocket: | PHP >= 7.2, Symfony >= 3.4 | ![CI](https://github.com/DamienHarper/auditor/workflows/CI/badge.svg?branch=master) <br/>[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=master) <br/>[![codecov](https://codecov.io/gh/DamienHarper/auditor/branch/master/graph/badge.svg)](https://codecov.io/gh/DamienHarper/auditor)
+ 2.x       | Not yet released, active development :rocket: | PHP >= 7.3, Symfony >= 4.4 | ![CI](https://github.com/DamienHarper/auditor/workflows/CI/badge.svg?branch=master) <br/>[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=master) <br/>[![codecov](https://codecov.io/gh/DamienHarper/auditor/branch/master/graph/badge.svg)](https://codecov.io/gh/DamienHarper/auditor)
+ 1.x       | Active support | PHP >= 7.2, Symfony >= 3.4 | ![CI](https://github.com/DamienHarper/auditor/workflows/CI/badge.svg?branch=master) <br/>[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=master) <br/>[![codecov](https://codecov.io/gh/DamienHarper/auditor/branch/master/graph/badge.svg)](https://codecov.io/gh/DamienHarper/auditor)
  
 Changelog is available [here](https://damienharper.github.io/auditor-docs/docs/auditor/release-notes.html)
 

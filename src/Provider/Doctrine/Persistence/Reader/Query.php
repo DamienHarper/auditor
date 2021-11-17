@@ -2,7 +2,6 @@
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
 
-use DateTime;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Model\Entry;
 use DH\Auditor\Provider\ConfigurationInterface;
@@ -14,8 +13,8 @@ use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\RangeFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Exception;
-use PDO;
 
 class Query
 {
@@ -77,10 +76,21 @@ class Query
     public function execute(): array
     {
         $queryBuilder = $this->buildQueryBuilder();
-        $statement = $queryBuilder->execute();
-        $statement->setFetchMode(PDO::FETCH_CLASS, Entry::class);
+        if (method_exists($queryBuilder, 'executeQuery')) {
+            // doctrine/dbal v3.x
+            $statement = $queryBuilder->executeQuery();
+        } else {
+            // doctrine/dbal v2.13.x
+            $statement = $queryBuilder->execute();
+        }
 
-        return $statement->fetchAll();
+        $result = [];
+        \assert($statement instanceof Result);
+        foreach ($statement->fetchAllAssociative() as $row) {
+            $result[] = Entry::fromArray($row);
+        }
+
+        return $result;
     }
 
     public function count(): int
@@ -88,15 +98,27 @@ class Query
         $queryBuilder = $this->buildQueryBuilder();
 
         try {
-            $result = $queryBuilder
+            $queryBuilder
                 ->resetQueryPart('select')
                 ->resetQueryPart('orderBy')
                 ->setMaxResults(null)
                 ->setFirstResult(null)
                 ->select('COUNT(id)')
-                ->execute()
-                ->fetchColumn(0)
             ;
+
+            if (method_exists($queryBuilder, 'executeQuery')) {
+                // doctrine/dbal v3.x
+                $result = $queryBuilder
+                    ->executeQuery()
+                    ->fetchOne()
+                ;
+            } else {
+                // doctrine/dbal v2.13.x
+                $result = $queryBuilder
+                    ->execute()
+                    ->fetchColumn(0)
+                ;
+            }
         } catch (Exception $e) {
             $result = false;
         }
@@ -104,42 +126,12 @@ class Query
         return false === $result ? 0 : $result;
     }
 
-    /**
-     * @param FilterInterface|string $value
-     * @param mixed                  $value
-     * @param mixed                  $filter
-     */
-    public function addFilter($filter, $value = null): self
+    public function addFilter(FilterInterface $filter): self
     {
-        if ($filter instanceof FilterInterface) {
-            $this->checkFilter($filter->getName());
-            $this->filters[$filter->getName()][] = $filter;
-        } else {
-            @trigger_error('Passing name and value is deprecated, you should pass a FilterInterface object instead.', E_USER_DEPRECATED);
-
-            $this->checkFilter($filter);
-            $this->filters[$filter][] = new SimpleFilter($filter, $value);
-        }
+        $this->checkFilter($filter->getName());
+        $this->filters[$filter->getName()][] = $filter;
 
         return $this;
-    }
-
-    /**
-     * @param mixed $minValue
-     * @param mixed $maxValue
-     */
-    public function addRangeFilter(string $name, $minValue = null, $maxValue = null): self
-    {
-        @trigger_error('Deprecated method, you should call Query::addFilter(...) instead and pass it a RangeFilter object.', E_USER_DEPRECATED);
-
-        return $this->addFilter(new RangeFilter($name, $minValue, $maxValue));
-    }
-
-    public function addDateRangeFilter(string $name, ?DateTime $minValue = null, ?DateTime $maxValue = null): self
-    {
-        @trigger_error('Deprecated method, you should call Query::addFilter(...) instead and pass it a DateRangeFilter object.', E_USER_DEPRECATED);
-
-        return $this->addFilter(new DateRangeFilter($name, $minValue, $maxValue));
     }
 
     public function addOrderBy(string $field, string $direction = 'DESC'): self

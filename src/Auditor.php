@@ -7,7 +7,6 @@ use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Exception\ProviderException;
 use DH\Auditor\Provider\ProviderInterface;
 use ReflectionException;
-use ReflectionMethod;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Auditor
@@ -38,11 +37,6 @@ class Auditor
     private $dispatcher;
 
     /**
-     * @var bool
-     */
-    private $is_pre43_dispatcher;
-
-    /**
      * @throws ReflectionException
      */
     public function __construct(Configuration $configuration, EventDispatcherInterface $dispatcher)
@@ -50,17 +44,8 @@ class Auditor
         $this->configuration = $configuration;
         $this->dispatcher = $dispatcher;
 
-        $r = new ReflectionMethod($this->dispatcher, 'dispatch');
-        $p = $r->getParameters();
-        $this->is_pre43_dispatcher = 2 === \count($p) && 'event' !== $p[0]->name;
-
         // Attach persistence event subscriber to provided dispatcher
         $dispatcher->addSubscriber(new AuditEventSubscriber($this));
-    }
-
-    public function isPre43Dispatcher(): bool
-    {
-        return $this->is_pre43_dispatcher;
     }
 
     public function getEventDispatcher(): EventDispatcherInterface
