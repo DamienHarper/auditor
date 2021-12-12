@@ -70,7 +70,7 @@ class CreateSchemaListener implements EventSubscriber
     /**
      * {@inheritdoc}
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             ToolEvents::postGenerateSchemaTable,

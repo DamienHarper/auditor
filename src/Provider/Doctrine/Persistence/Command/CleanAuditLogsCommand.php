@@ -56,7 +56,7 @@ class CleanAuditLogsCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->lock()) {
             $output->writeln('The command is already running in another process.');
