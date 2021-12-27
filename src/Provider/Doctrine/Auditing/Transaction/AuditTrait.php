@@ -161,7 +161,6 @@ trait AuditTrait
      * Returns an array describing an entity.
      *
      * @param null|mixed $entity
-     * @param array $extra
      */
     private function summarize(EntityManagerInterface $entityManager, $entity = null, array $extra = []): ?array
     {
