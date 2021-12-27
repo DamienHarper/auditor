@@ -107,7 +107,7 @@ trait BlogSchemaSetupTrait
         $post3 = new Post();
         $post3
             ->setAuthor($author2)
-            ->setTitle('Second post')
+            ->setTitle('Third post')
             ->setBody('Here is another body')
             ->setCreatedAt(new DateTime())
         ;
@@ -138,7 +138,7 @@ trait BlogSchemaSetupTrait
 
         $author3 = new Author();
         $author3
-            ->setFullname('Luke Slywalker')
+            ->setFullname('Luke Skywalker')
             ->setEmail('luke.skywalker@gmail.com')
         ;
         $auditingServices[Author::class]->getEntityManager()->persist($author3);
@@ -146,7 +146,7 @@ trait BlogSchemaSetupTrait
         $post4 = new Post();
         $post4
             ->setAuthor($author3)
-            ->setTitle('First post')
+            ->setTitle('Fourth post')
             ->setBody('Here is the body')
             ->setCreatedAt(new DateTime())
         ;
