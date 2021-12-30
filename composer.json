@@ -36,12 +36,12 @@
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.0",
     "gedmo/doctrine-extensions": "^2.4|^3.0",
-    "korbeil/phpstan-generic-rules": "^0.2",
-    "phpstan/phpstan": "^0.12",
-    "phpstan/phpstan-deprecation-rules": "^0.12",
-    "phpstan/phpstan-doctrine": "^0.12",
-    "phpstan/phpstan-strict-rules": "^0.12",
-    "phpunit/phpunit": "^8.0|^9.0",
+    "phpstan/phpstan": "^1.0",
+    "korbeil/phpstan-generic-rules": "^1.0",
+    "phpstan/phpstan-deprecation-rules": "^1.0",
+    "phpstan/phpstan-doctrine": "^1.0",
+    "phpstan/phpstan-strict-rules": "^1.0",
+    "phpunit/phpunit": "^9.0",
     "symfony/var-dumper": "^4.0|^5.0"
   },
   "conflict": {

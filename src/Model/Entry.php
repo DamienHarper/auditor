@@ -157,7 +157,7 @@ class Entry
      */
     public function getDiffs(bool $includeMedadata = false): ?array
     {
-        $diffs = $this->sort(json_decode($this->diffs, true));
+        $diffs = $this->sort(json_decode($this->diffs, true));  // @phpstan-ignore-line
         if (!$includeMedadata) {
             unset($diffs['@source']);
         }
