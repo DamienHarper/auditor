@@ -155,7 +155,7 @@ class SchemaManager
     /**
      * Creates an audit table.
      *
-     * @param mixed $table
+     * @param object|string $table
      */
     public function createAuditTable(string $entity, $table, ?Schema $schema = null): Schema
     {
