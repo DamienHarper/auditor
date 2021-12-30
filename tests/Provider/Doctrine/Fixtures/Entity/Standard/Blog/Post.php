@@ -239,8 +239,6 @@ class Post
     /**
      * Add Comment entity to collection (one to many).
      *
-     * @param \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Basic\Blog\DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Comment $comment
-     *
      * @return Post
      */
     public function addComment(Comment $comment): self
@@ -252,8 +250,6 @@ class Post
 
     /**
      * Remove Comment entity from collection (one to many).
-     *
-     * @param \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Basic\Blog\DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Comment $comment
      *
      * @return Post
      */
