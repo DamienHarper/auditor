@@ -13,7 +13,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\Table(name="post", indexes={@ORM\Index(name="fk_author_id", columns={"author_id"})})
  * @Gedmo\SoftDeleteable(fieldName="deleted_at", timeAware=false)
  */
-#[ORM\Entity, ORM\Table(name: 'post'), ORM\Index(name: 'fk_author_id', columns: ['author_id'])]
+#[ORM\Entity, ORM\Table(name: 'post'), ORM\Index(columns: ['author_id'], name: 'fk_author_id')]
 class Post
 {
     /**
@@ -52,14 +52,14 @@ class Post
     /**
      * @ORM\Column(type="integer", options={"unsigned": true}, nullable=true)
      */
-    #[ORM\Column(type: 'integer', options: ['unsigned' => true], nullable: true)]
+    #[ORM\Column(type: 'integer', nullable: true, options: ['unsigned' => true])]
     protected $author_id;
 
     /**
      * @ORM\OneToMany(targetEntity="Comment", mappedBy="post", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="id", referencedColumnName="post_id", nullable=true)
      */
-    #[ORM\OneToMany(targetEntity: 'Comment', mappedBy: 'post', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(mappedBy: 'post', targetEntity: 'Comment', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'id', referencedColumnName: 'post_id', nullable: true)]
     protected $comments;
 
@@ -67,7 +67,7 @@ class Post
      * @ORM\ManyToOne(targetEntity="Author", inversedBy="posts", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="author_id", referencedColumnName="id", nullable=true)
      */
-    #[ORM\ManyToOne(targetEntity: 'Author', inversedBy: 'posts', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: 'Author', cascade: ['persist', 'remove'], inversedBy: 'posts')]
     #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id', nullable: true)]
     protected $author;
 
@@ -239,8 +239,6 @@ class Post
     /**
      * Add Comment entity to collection (one to many).
      *
-     * @param \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Basic\Blog\DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Comment $comment
-     *
      * @return Post
      */
     public function addComment(Comment $comment): self
@@ -252,8 +250,6 @@ class Post
 
     /**
      * Remove Comment entity from collection (one to many).
-     *
-     * @param \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Basic\Blog\DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Comment $comment
      *
      * @return Post
      */
