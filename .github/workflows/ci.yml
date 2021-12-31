@@ -48,7 +48,7 @@ jobs:
         symfony:
           - '3.4.*'
           - '4.4.*'
-          - '5.*'
+          - '5.4'
         db:
           - 'sqlite'
           - 'mysql'
@@ -57,7 +57,7 @@ jobs:
 
     steps:
       - name: Shutdown Ubuntu MySQL (SUDO)
-        run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+        run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please do not remove it
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -94,8 +94,8 @@ jobs:
         run: SYMFONY_REQUIRE="^4.4" composer update --no-progress --ansi --prefer-stable
 
       - name: Update project dependencies (5.*)
-        if: matrix.symfony == '5.*'
-        run: composer update --no-progress --ansi --prefer-stable
+        if: matrix.symfony == '5.4'
+        run: SYMFONY_REQUIRE="^5.4" composer update --no-progress --ansi --prefer-stable
 
       - name: Validate composer
         run: composer validate --strict --no-check-lock
@@ -137,8 +137,10 @@ jobs:
       matrix:
         php:
           - '8.0'
+          - '8.1'
         symfony:
-          - '5.*'
+          - '5.4'
+          - '6.*'
         db:
           - 'sqlite'
           - 'mysql'
@@ -175,8 +177,12 @@ jobs:
           key: ${{ matrix.php }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ matrix.php }}-composer-
 
+      - name: Update project dependencies (5.4)
+        if: matrix.symfony == '5.4'
+        run: SYMFONY_REQUIRE="^5.4" composer update --no-progress --ansi --prefer-stable
+
       - name: Update project dependencies (5.*)
-        if: matrix.symfony == '5.*'
+        if: matrix.symfony == '6.*'
         run: composer update --no-progress --ansi --prefer-stable
 
       - name: Validate composer
