@@ -48,7 +48,7 @@ jobs:
         symfony:
           - '3.4.*'
           - '4.4.*'
-          - '5.4'
+          - '5.4.*'
         db:
           - 'sqlite'
           - 'mysql'
@@ -93,8 +93,8 @@ jobs:
         if: matrix.symfony == '4.4.*'
         run: SYMFONY_REQUIRE="^4.4" composer update --no-progress --ansi --prefer-stable
 
-      - name: Update project dependencies (5.*)
-        if: matrix.symfony == '5.4'
+      - name: Update project dependencies (5.4.*)
+        if: matrix.symfony == '5.4.*'
         run: SYMFONY_REQUIRE="^5.4" composer update --no-progress --ansi --prefer-stable
 
       - name: Validate composer
@@ -177,11 +177,11 @@ jobs:
           key: ${{ matrix.php }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ matrix.php }}-composer-
 
-      - name: Update project dependencies (5.4)
+      - name: Update project dependencies (5.4.*)
         if: matrix.symfony == '5.4'
         run: SYMFONY_REQUIRE="^5.4" composer update --no-progress --ansi --prefer-stable
 
-      - name: Update project dependencies (5.*)
+      - name: Update project dependencies (6.*)
         if: matrix.symfony == '6.*'
         run: composer update --no-progress --ansi --prefer-stable
 
