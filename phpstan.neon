@@ -1,6 +1,6 @@
 includes:
-    - vendor/phpstan/phpstan-doctrine/extension.neon
-    - vendor/phpstan/phpstan-doctrine/rules.neon
+    - tools/phpstan/vendor/phpstan/phpstan-doctrine/extension.neon
+    - tools/phpstan/vendor/phpstan/phpstan-doctrine/rules.neon
 
 parameters:
     level: max
