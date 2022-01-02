@@ -15,12 +15,12 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema\SchemaManagerTest
+ */
 class SchemaManager
 {
-    /**
-     * @var DoctrineProvider
-     */
-    private $provider;
+    private DoctrineProvider $provider;
 
     public function __construct(DoctrineProvider $provider)
     {

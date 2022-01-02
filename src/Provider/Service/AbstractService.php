@@ -4,10 +4,7 @@ namespace DH\Auditor\Provider\Service;
 
 abstract class AbstractService implements ServiceInterface
 {
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
     public function __construct(string $name)
     {
