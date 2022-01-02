@@ -10,7 +10,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\Entity
  * @ORM\Table(name="`comment`", indexes={@ORM\Index(name="fk_post_id", columns={"post_id"})})
  */
-#[ORM\Entity, ORM\Table(name: '`comment`'), ORM\Index(name: 'fk_post_id', columns: ['post_id'])]
+#[ORM\Entity, ORM\Table(name: '`comment`'), ORM\Index(columns: ['post_id'], name: 'fk_post_id')]
 class Comment
 {
     /**
@@ -52,7 +52,7 @@ class Comment
      * @ORM\ManyToOne(targetEntity="Post", inversedBy="comments", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="post_id", referencedColumnName="id", nullable=false)
      */
-    #[ORM\ManyToOne(targetEntity: 'Post', inversedBy: 'comments', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: 'Post', cascade: ['persist', 'remove'], inversedBy: 'comments')]
     #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id', nullable: false)]
     protected $post;
 
