@@ -7,10 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 abstract class DoctrineService extends AbstractService
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
     public function __construct(string $name, EntityManagerInterface $entityManager)
     {
