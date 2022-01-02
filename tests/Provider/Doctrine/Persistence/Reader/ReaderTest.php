@@ -101,64 +101,79 @@ final class ReaderTest extends TestCase
             self::assertRegExp('#\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}#', $audits[0]->getCreatedAt());
         }
 
-        $i = 0;
-        self::assertCount(5, $audits, 'result count is ok.');
-        self::assertSame(Transaction::REMOVE, $audits[$i++]->getType(), 'entry'.$i.' is a remove operation.');
-        self::assertSame(Transaction::UPDATE, $audits[$i++]->getType(), 'entry'.$i.' is an update operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
+        $expected = [
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#2: [email: chuck.norris@gmail.com, fullname: Chuck Norris]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#1: [email: john.doe@gmail.com, fullname: John]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3: [email: luke.skywalker@gmail.com, fullname: Luke Skywalker]',
+            'Updated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#1: [fullname: John => John Doe]',
+            'Deleted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3',
+        ];
 
         /** @var Entry[] $audits */
-        $audits = $reader->createQuery(Post::class)->execute();
+        $audits = $reader->createQuery(Author::class)->resetOrderBy()->execute();
+        for ($i = 0; $i < 5; ++$i) {
+            self::assertSame($expected[$i], self::explain($audits[$i], Author::class));
+        }
 
-        $i = 0;
-        self::assertCount(15, $audits, 'result count is ok.');
-        self::assertSame(Transaction::UPDATE, $audits[$i++]->getType(), 'entry'.$i.' is an update operation.');
-        self::assertSame(Transaction::DISSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is a dissociate operation.');
-        self::assertSame(Transaction::DISSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is a dissociate operation.');
-        self::assertSame(Transaction::ASSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is an associate operation.');
-        self::assertSame(Transaction::ASSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is an associate operation.');
-        self::assertSame(Transaction::ASSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is an associate operation.');
-        self::assertSame(Transaction::ASSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is an associate operation.');
-        self::assertSame(Transaction::ASSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is an associate operation.');
-        self::assertSame(Transaction::ASSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is an associate operation.');
-        self::assertSame(Transaction::ASSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is an associate operation.');
-        self::assertSame(Transaction::ASSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is an associate operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
-
-        /** @var Entry[] $audits */
-        $audits = $reader->createQuery(Comment::class)->execute();
-
-        $i = 0;
-        self::assertCount(3, $audits, 'result count is ok.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
+        $expected = [
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3: [author: DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#2, body: Here is another body, created_at: 2020-01-17 22:17:34, title: Third post]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#2: [author: DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#1, body: Here is another body, created_at: 2020-01-17 22:17:34, title: Second post]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#1: [author: DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#1, body: Here is the body, created_at: 2020-01-17 22:17:34, title: First post]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4: [author: DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3, body: Here is the body, created_at: 2020-01-17 22:17:34, title: Fourth post]',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#2 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#2)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#4 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#4)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3 (Third post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#1 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#1)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3 (Third post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#3 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#3)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3 (Third post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#1 (First post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#1 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#1)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#1 (First post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#2 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#2)',
+            'Dissociated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post) from DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#4 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#4)',
+            'Dissociated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post) from DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5)',
+            'Updated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4: [author: DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3 => null]',
+        ];
 
         /** @var Entry[] $audits */
-        $audits = $reader->createQuery(Tag::class)->execute();
+        $audits = $reader->createQuery(Post::class)->resetOrderBy()->execute();
+        for ($i = 0; $i < 15; ++$i) {
+            self::assertSame($expected[$i], self::explain($audits[$i], Post::class));
+        }
 
-        $i = 0;
-        self::assertCount(15, $audits, 'result count is ok.');
-        self::assertSame(Transaction::DISSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is a dissociate operation.');
-        self::assertSame(Transaction::DISSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is a dissociate operation.');
-        self::assertSame(Transaction::ASSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is an associate operation.');
-        self::assertSame(Transaction::ASSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is an associate operation.');
-        self::assertSame(Transaction::ASSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is an associate operation.');
-        self::assertSame(Transaction::ASSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is an associate operation.');
-        self::assertSame(Transaction::ASSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is an associate operation.');
-        self::assertSame(Transaction::ASSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is an associate operation.');
-        self::assertSame(Transaction::ASSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is an associate operation.');
-        self::assertSame(Transaction::ASSOCIATE, $audits[$i++]->getType(), 'entry'.$i.' is an associate operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
+        $expected = [
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Comment#3: [author: Mario, body: Second comment about post #3, created_at: 2020-01-17 22:17:34, post: Third post]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Comment#2: [author: Yoshi, body: First comment about post #3, created_at: 2020-01-17 22:17:34, post: Third post]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Comment#1: [author: Dark Vador, body: First comment about post #1, created_at: 2020-01-17 22:17:34, post: First post]',
+        ];
+
+        /** @var Entry[] $audits */
+        $audits = $reader->createQuery(Comment::class)->resetOrderBy()->execute();
+        for ($i = 0; $i < 3; ++$i) {
+            self::assertSame($expected[$i], self::explain($audits[$i], Comment::class));
+        }
+
+        $expected = [
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5: [title: gabber]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#4: [title: jungle]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#3: [title: hardcore]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#2: [title: house]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#1: [title: techno]',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3 (Third post)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#4 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#4) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#3 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#3) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3 (Third post)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#2 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#2) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#1 (First post)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#2 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#2) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#1 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#1) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#1 (First post)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#1 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#1) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3 (Third post)',
+            'Dissociated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5) from DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post)',
+            'Dissociated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#4 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#4) from DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post)',
+        ];
+
+        /** @var Entry[] $audits */
+        $audits = $reader->createQuery(Tag::class)->resetOrderBy()->execute();
+        for ($i = 0; $i < 15; ++$i) {
+            self::assertSame($expected[$i], self::explain($audits[$i], Tag::class));
+        }
 
         $this->expectException(OptionsResolverInvalidArgumentException::class);
         $reader->createQuery(Author::class, ['page' => 0])->execute();
@@ -205,20 +220,24 @@ final class ReaderTest extends TestCase
     {
         $reader = $this->createReader();
 
+        $expected = [
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#2: [email: chuck.norris@gmail.com, fullname: Chuck Norris]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#1: [email: john.doe@gmail.com, fullname: John]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3: [email: luke.skywalker@gmail.com, fullname: Luke Skywalker]',
+            'Updated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#1: [fullname: John => John Doe]',
+            'Deleted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3',
+        ];
+
         /** @var Entry[] $audits */
         $audits = $reader
             ->createQuery(Author::class)
             ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTime('-1 day')))
+            ->resetOrderBy()
             ->execute()
         ;
-
-        $i = 0;
-        self::assertCount(5, $audits, 'result count is ok.');
-        self::assertSame(Transaction::REMOVE, $audits[$i++]->getType(), 'entry'.$i.' is a remove operation.');
-        self::assertSame(Transaction::UPDATE, $audits[$i++]->getType(), 'entry'.$i.' is an update operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
-        self::assertSame(Transaction::INSERT, $audits[$i++]->getType(), 'entry'.$i.' is an insert operation.');
+        for ($i = 0; $i < 5; ++$i) {
+            self::assertSame($expected[$i], self::explain($audits[$i], Author::class));
+        }
 
         /** @var Entry[] $audits */
         $audits = $reader
@@ -432,5 +451,61 @@ final class ReaderTest extends TestCase
         self::assertCount(2, $audits, 'Reader::getAllAuditsByTransactionHash() is ok.');
         self::assertCount(1, $audits[Author::class], 'Reader::getAllAuditsByTransactionHash() is ok.');
         self::assertCount(2, $audits[Post::class], 'Reader::getAllAuditsByTransactionHash() is ok.');
+    }
+
+    protected function explain(Entry $entry, string $class, bool $verbose = true): string
+    {
+        $diff = $entry->getDiffs() ?? [];
+
+        switch ($entry->getType()) {
+            case Transaction::REMOVE:
+                return 'Deleted '.$class.'#'.$entry->getObjectId();
+            case Transaction::UPDATE:
+                $changeset = function (array $diff) use ($verbose) {
+                    $changes = [];
+                    foreach ($diff as $key => $value) {
+                        $old = $value['old'] ?? 'null';
+                        $old = \is_array($old) ? $old['label'] : $old;
+
+                        $new = $value['new'] ?? 'null';
+                        $new = \is_array($new) ? $new['label'] : $new;
+
+                        $changes[] = $verbose ? ($key.': '.$old.' => '.$new) : $key;
+                    }
+
+                    return implode(', ', $changes);
+                };
+
+                return 'Updated '.$class.'#'.$entry->getObjectId().': ['.$changeset($diff).']';
+            case Transaction::INSERT:
+                $changeset = function (array $diff) use ($verbose) {
+                    $changes = [];
+                    foreach ($diff as $key => $value) {
+                        $old = $value['old'] ?? 'null';
+                        $old = \is_array($old) ? $old['label'] : $old;
+
+                        $new = $value['new'] ?? 'null';
+                        $new = \is_array($new) ? $new['label'] : $new;
+
+                        $changes[] = $verbose ? ($key.': '.$new) : $key;
+                    }
+
+                    return implode(', ', $changes);
+                };
+
+                return 'Inserted '.$class.'#'.$entry->getObjectId().': ['.$changeset($diff).']';
+            case Transaction::DISSOCIATE:
+                $source = $diff['source']['class'].'#'.$diff['source']['id'].($verbose ? ' ('.$diff['source']['label'].')' : '');
+                $target = $diff['target']['class'].'#'.$diff['target']['id'].($verbose ? ' ('.$diff['target']['label'].')' : '');
+
+                return 'Dissociated '.$source.' from '.$target;
+            case Transaction::ASSOCIATE:
+                $source = $diff['source']['class'].'#'.$diff['source']['id'].($verbose ? ' ('.$diff['source']['label'].')' : '');
+                $target = $diff['target']['class'].'#'.$diff['target']['id'].($verbose ? ' ('.$diff['target']['label'].')' : '');
+
+                return 'Associated '.$source.' to '.$target;
+            default:
+                return 'Unknown';
+        }
     }
 }

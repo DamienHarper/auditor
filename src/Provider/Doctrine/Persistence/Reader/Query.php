@@ -147,6 +147,13 @@ class Query
         return $this;
     }
 
+    public function resetOrderBy(): self
+    {
+        $this->orderBy = [];
+
+        return $this;
+    }
+
     public function limit(int $limit, int $offset = 0): self
     {
         if (0 > $limit) {

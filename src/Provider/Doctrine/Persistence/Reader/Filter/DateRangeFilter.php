@@ -2,12 +2,22 @@
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter;
 
-use DateTime;
+use DateTimeInterface;
 use DH\Auditor\Exception\InvalidArgumentException;
 
 class DateRangeFilter extends RangeFilter
 {
-    public function __construct(string $name, ?DateTime $minValue, ?DateTime $maxValue = null)
+    /**
+     * @var DateTimeInterface
+     */
+    protected $minValue;
+
+    /**
+     * @var DateTimeInterface
+     */
+    protected $maxValue;
+
+    public function __construct(string $name, ?DateTimeInterface $minValue, ?DateTimeInterface $maxValue = null)
     {
         parent::__construct($name, $minValue, $maxValue);
 
@@ -22,17 +32,17 @@ class DateRangeFilter extends RangeFilter
     }
 
     /**
-     * @return DateTime
+     * @return DateTimeInterface
      */
-    public function getMinValue(): ?DateTime
+    public function getMinValue(): ?DateTimeInterface
     {
         return $this->minValue;
     }
 
     /**
-     * @return DateTime
+     * @return DateTimeInterface
      */
-    public function getMaxValue(): ?DateTime
+    public function getMaxValue(): ?DateTimeInterface
     {
         return $this->maxValue;
     }
