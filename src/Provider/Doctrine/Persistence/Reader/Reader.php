@@ -14,14 +14,14 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMMetadata;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader\ReaderTest
+ */
 class Reader
 {
     public const PAGE_SIZE = 50;
 
-    /**
-     * @var DoctrineProvider
-     */
-    private $provider;
+    private DoctrineProvider $provider;
 
     /**
      * Reader constructor.
@@ -102,12 +102,8 @@ class Reader
             ->setAllowedTypes('page', ['null', 'int'])
             ->setAllowedTypes('page_size', ['null', 'int'])
             ->setAllowedTypes('strict', ['null', 'bool'])
-            ->setAllowedValues('page', static function ($value) {
-                return null === $value || $value >= 1;
-            })
-            ->setAllowedValues('page_size', static function ($value) {
-                return null === $value || $value >= 1;
-            })
+            ->setAllowedValues('page', static fn ($value) => null === $value || $value >= 1)
+            ->setAllowedValues('page_size', static fn ($value) => null === $value || $value >= 1)
         ;
     }
 

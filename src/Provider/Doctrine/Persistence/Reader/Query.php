@@ -14,6 +14,9 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Exception;
 
+/**
+ * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader\QueryTest
+ */
 class Query
 {
     public const TYPE = 'type';
@@ -24,35 +27,17 @@ class Query
     public const ID = 'id';
     public const DISCRIMINATOR = 'discriminator';
 
-    /**
-     * @var array
-     */
-    private $filters = [];
+    private array $filters = [];
 
-    /**
-     * @var array
-     */
-    private $orderBy = [];
+    private array $orderBy = [];
 
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
-    /**
-     * @var string
-     */
-    private $table;
+    private string $table;
 
-    /**
-     * @var int
-     */
-    private $offset = 0;
+    private int $offset = 0;
 
-    /**
-     * @var int
-     */
-    private $limit = 0;
+    private int $limit = 0;
 
     public function __construct(string $table, Connection $connection)
     {
@@ -236,7 +221,7 @@ class Query
     private function buildWhere(QueryBuilder $queryBuilder): QueryBuilder
     {
         foreach ($this->filters as $name => $rawFilters) {
-            if (0 === \count($rawFilters)) {
+            if (0 === (is_countable($rawFilters) ? \count($rawFilters) : 0)) {
                 continue;
             }
 
