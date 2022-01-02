@@ -2,6 +2,7 @@
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
+use DH\Auditor\Provider\Doctrine\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 
@@ -33,7 +34,7 @@ trait ConnectionTrait
         if ('pdo_sqlite' === $params['driver']) {
             // SQLite
             $connection = DriverManager::getConnection($params);
-            $schema = $connection->createSchemaManager()->createSchema();
+            $schema = $connection->getSchemaManager()->createSchema();
             $stmts = $schema->toDropSql($connection->getDatabasePlatform());
             foreach ($stmts as $stmt) {
                 $connection->executeStatement($stmt);
@@ -51,7 +52,7 @@ trait ConnectionTrait
                 'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '.$connection->getDatabasePlatform()->quoteStringLiteral($dbname)
             );
 
-            $connection->createSchemaManager()->dropAndCreateDatabase($dbname);
+            $connection->getSchemaManager()->dropAndCreateDatabase($dbname);
         } else {
             // Other
             $tmpParams = $params;
@@ -61,9 +62,9 @@ trait ConnectionTrait
             $connection = DriverManager::getConnection($tmpParams);
 
             if ($connection->getDatabasePlatform()->supportsCreateDropDatabase()) {
-                $connection->createSchemaManager()->dropAndCreateDatabase($dbname);
+                $connection->getSchemaManager()->dropAndCreateDatabase($dbname);
             } else {
-                $schema = $connection->createSchemaManager()->createSchema();
+                $schema = $connection->getSchemaManager()->createSchema();
                 $stmts = $schema->toDropSql($connection->getDatabasePlatform());
                 foreach ($stmts as $stmt) {
                     $connection->executeStatement($stmt);
