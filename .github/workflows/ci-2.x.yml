@@ -93,8 +93,20 @@ jobs:
         if: matrix.symfony == '5.*'
         run: composer update --no-progress --ansi --prefer-stable
 
+      - name: Install PHPStan
+        run: composer install --no-progress --ansi --prefer-stable --working-dir=tools/phpstan
+
+      - name: Install PHP-CS-Fixer
+        run: composer install --no-progress --ansi --prefer-stable --working-dir=tools/php-cs-fixer
+
       - name: Validate composer
         run: composer validate --strict --no-check-lock
+
+      - name: Run PHP-CS-Fixer
+        run: composer cs-check
+
+      - name: Run PHPStan
+        run: composer phpstan
 
       - name: Run tests
         run: vendor/bin/phpunit -c phpunit.${{ matrix.db }}.xml
