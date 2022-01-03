@@ -167,8 +167,6 @@ class CleanAuditLogsCommand extends Command
 
     private function validateKeepArgument(string $keep, SymfonyStyle $io): ?DateTimeImmutable
     {
-        $until = new DateTimeImmutable();
-
         try {
             $dateInterval = new DateInterval($keep);
         } catch (Exception $e) {
@@ -178,9 +176,7 @@ class CleanAuditLogsCommand extends Command
             return null;
         }
 
-        $until->sub($dateInterval);
-
-        return $until;
+        return (new DateTimeImmutable())->sub($dateInterval);
     }
 
     private function collectAuditableEntities(DoctrineProvider $provider, SchemaManager $schemaManager, array $repository, int $count): array
