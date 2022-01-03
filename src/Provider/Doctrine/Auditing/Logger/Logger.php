@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine\Auditing\Logger;
 
 use Doctrine\DBAL\Logging\SQLLogger;
@@ -23,7 +25,7 @@ class Logger implements SQLLogger
     {
         // right before commit insert all audit entries
         if ('"COMMIT"' === $sql) {
-            \call_user_func($this->flusher);
+            ($this->flusher)();
         }
         // on rollback remove flusher callback
         if ('"ROLLBACK"' === $sql) {

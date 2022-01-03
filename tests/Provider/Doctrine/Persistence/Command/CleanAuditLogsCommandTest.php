@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Command;
 
 use DH\Auditor\Provider\Doctrine\Persistence\Command\CleanAuditLogsCommand;
@@ -14,6 +16,8 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * @internal
+ *
+ * @small
  */
 final class CleanAuditLogsCommandTest extends TestCase
 {

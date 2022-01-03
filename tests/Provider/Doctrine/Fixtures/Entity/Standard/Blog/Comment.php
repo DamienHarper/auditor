@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
@@ -138,7 +141,7 @@ class Comment
      *
      * @return Comment
      */
-    public function setCreatedAt(?DateTime $created_at): self
+    public function setCreatedAt(?DateTimeImmutable $created_at): self
     {
         $this->created_at = $created_at;
 
@@ -150,7 +153,7 @@ class Comment
      *
      * @return ?DateTime
      */
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->created_at;
     }

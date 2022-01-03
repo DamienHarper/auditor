@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;

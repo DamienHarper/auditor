@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Issues;
 
 use DH\Auditor\Model\Transaction;
@@ -10,6 +12,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
+ *
+ * @small
  */
 final class Issue44Test extends TestCase
 {

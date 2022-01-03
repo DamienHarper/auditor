@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\EventSubscriber;
 
 use DH\Auditor\Auditor;
@@ -7,12 +9,12 @@ use DH\Auditor\Event\LifecycleEvent;
 use Exception;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * @see \DH\Auditor\Tests\EventSubscriber\AuditEventSubscriberTest
+ */
 class AuditEventSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Auditor
-     */
-    private $auditor;
+    private Auditor $auditor;
 
     public function __construct(Auditor $auditor)
     {
@@ -23,7 +25,7 @@ class AuditEventSubscriber implements EventSubscriberInterface
     {
         return [
             LifecycleEvent::class => [
-                ['onAuditEvent', -1000000],  // should be fired last
+                ['onAuditEvent', -1_000_000],  // should be fired last
             ],
         ];
     }

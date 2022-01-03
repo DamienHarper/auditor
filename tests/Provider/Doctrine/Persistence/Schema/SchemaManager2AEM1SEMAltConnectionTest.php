@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema;
 
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
@@ -18,6 +20,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
+ *
+ * @small
  */
 final class SchemaManager2AEM1SEMAltConnectionTest extends TestCase
 {
@@ -64,9 +68,7 @@ final class SchemaManager2AEM1SEMAltConnectionTest extends TestCase
         foreach ($storageServices as $name => $storageService) {
             $schemaManager = $storageService->getEntityManager()->getConnection()->getSchemaManager();
             $tables = array_map(
-                static function ($t) {
-                    return $t->getName();
-                },
+                static fn ($t) => $t->getName(),
                 $schemaManager->listTables()
             );
             sort($tables);

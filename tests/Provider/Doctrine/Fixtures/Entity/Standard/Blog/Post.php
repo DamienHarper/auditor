@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -173,7 +176,7 @@ class Post
      *
      * @return Post
      */
-    public function setCreatedAt(?DateTime $created_at): self
+    public function setCreatedAt(?DateTimeImmutable $created_at): self
     {
         $this->created_at = $created_at;
 
@@ -185,7 +188,7 @@ class Post
      *
      * @return ?DateTime
      */
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->created_at;
     }
@@ -197,7 +200,7 @@ class Post
      *
      * @return Post
      */
-    public function setDeletedAt(?DateTime $deleted_at): self
+    public function setDeletedAt(?DateTimeImmutable $deleted_at): self
     {
         $this->deleted_at = $deleted_at;
 
@@ -209,7 +212,7 @@ class Post
      *
      * @return ?DateTime
      */
-    public function getDeletedAt(): ?DateTime
+    public function getDeletedAt(): ?DateTimeImmutable
     {
         return $this->deleted_at;
     }

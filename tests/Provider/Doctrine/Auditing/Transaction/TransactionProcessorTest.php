@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Auditing\Transaction;
 
-use DateTime;
+use DateTimeImmutable;
 use DH\Auditor\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionProcessor;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
@@ -17,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
+ *
+ * @small
  */
 final class TransactionProcessorTest extends TestCase
 {
@@ -176,7 +180,7 @@ final class TransactionProcessorTest extends TestCase
             ->setAuthor($author)
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new DateTime())
+            ->setCreatedAt(new DateTimeImmutable())
         ;
 
         $mapping = [
@@ -253,7 +257,7 @@ final class TransactionProcessorTest extends TestCase
             ->setAuthor($author)
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new DateTime())
+            ->setCreatedAt(new DateTimeImmutable())
         ;
 
         $mapping = [
@@ -327,7 +331,7 @@ final class TransactionProcessorTest extends TestCase
             ->setAuthor($author)
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new DateTime())
+            ->setCreatedAt(new DateTimeImmutable())
         ;
 
         $tag1 = new Tag();
@@ -475,7 +479,7 @@ final class TransactionProcessorTest extends TestCase
             ->setAuthor($author)
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new DateTime())
+            ->setCreatedAt(new DateTimeImmutable())
         ;
 
         $tag1 = new Tag();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation as Audit;
@@ -29,12 +31,10 @@ class AuditedEntity
     public $ignoredField;
 
     /**
-     * @var int
-     *
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      * @ORM\Column(type="integer")
      */
     #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer')]
-    private $id;
+    private int $id;
 }

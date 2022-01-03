@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Event;
 
 use DH\Auditor\Exception\InvalidArgumentException;
@@ -8,10 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class AuditEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $payload;
+    private array $payload;
 
     public function __construct(array $payload)
     {

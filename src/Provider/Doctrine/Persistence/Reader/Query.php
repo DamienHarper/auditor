@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
 
 use DH\Auditor\Exception\InvalidArgumentException;
@@ -99,7 +101,7 @@ class Query
             $result = false;
         }
 
-        return false === $result ? 0 : $result;
+        return false === $result ? 0 : (int) $result;
     }
 
     public function addFilter(FilterInterface $filter): self
@@ -234,6 +236,7 @@ class Query
                         $filters = [$this->mergeSimpleFilters($filters)];
 
                         break;
+
                     case RangeFilter::class:
                     case DateRangeFilter::class:
                         break;

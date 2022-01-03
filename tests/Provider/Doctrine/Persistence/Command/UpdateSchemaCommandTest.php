@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Command;
 
 use DH\Auditor\Provider\Doctrine\Configuration;
@@ -19,6 +21,8 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * @internal
+ *
+ * @small
  */
 final class UpdateSchemaCommandTest extends TestCase
 {

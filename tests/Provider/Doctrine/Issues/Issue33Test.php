@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Issues;
 
 use DH\Auditor\Exception\MappingException;
@@ -15,6 +17,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
+ *
+ * @small
  */
 final class Issue33Test extends TestCase
 {

@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\User;
 
 class User implements UserInterface
 {
     /**
-     * @var null|int|string
+     * @var null|string
      */
     protected $id;
 
@@ -25,7 +27,7 @@ class User implements UserInterface
 
     public function getIdentifier(): ?string
     {
-        return \is_int($this->id) ? (string) $this->id : $this->id;
+        return $this->id;
     }
 
     public function getUsername(): ?string

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine\Auditing\Transaction;
 
 use DH\Auditor\Exception\MappingException;
@@ -50,7 +52,7 @@ trait AuditTrait
         $pk = $meta->getSingleIdentifierFieldName();
         $type = Type::getType($meta->fieldMappings[$pk]['type']);
 
-        \assert(\is_object($targetEntity) || null === $targetEntity);
+        \assert(\is_object($targetEntity));
 
         return $this->value($entityManager, $type, $meta->getReflectionProperty($pk)->getValue($targetEntity));
     }
@@ -75,17 +77,20 @@ trait AuditTrait
                 $convertedValue = (string) $value;  // @phpstan-ignore-line
 
                 break;
+
             case DoctrineHelper::getDoctrineType('INTEGER'):
             case DoctrineHelper::getDoctrineType('SMALLINT'):
                 $convertedValue = (int) $value; // @phpstan-ignore-line
 
                 break;
+
             case DoctrineHelper::getDoctrineType('DECIMAL'):
             case DoctrineHelper::getDoctrineType('FLOAT'):
             case DoctrineHelper::getDoctrineType('BOOLEAN'):
                 $convertedValue = $type->convertToPHPValue($value, $platform);
 
                 break;
+
             case 'uuid_binary':
             case 'uuid_binary_ordered_time':
             case 'uuid':
@@ -94,6 +99,7 @@ trait AuditTrait
                 $convertedValue = (string) $value;  // @phpstan-ignore-line
 
                 break;
+
             case DoctrineHelper::getDoctrineType('BINARY'):
                 if (\is_resource($value)) {
                     // let's replace resources with a "simple" representation: resourceType#resourceId
@@ -103,6 +109,7 @@ trait AuditTrait
                 }
 
                 break;
+
             default:
                 $convertedValue = $type->convertToDatabaseValue($value, $platform);
         }

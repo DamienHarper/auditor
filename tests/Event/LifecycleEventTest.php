@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Event;
 
 use DH\Auditor\Event\LifecycleEvent;
@@ -9,6 +11,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
+ *
+ * @small
  */
 final class LifecycleEventTest extends TestCase
 {

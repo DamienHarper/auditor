@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine\Persistence\Command;
 
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use DH\Auditor\Auditor;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
@@ -21,16 +23,16 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+/**
+ * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Command\CleanAuditLogsCommandTest
+ */
 class CleanAuditLogsCommand extends Command
 {
     use LockableTrait;
 
     protected static $defaultName = 'audit:clean';
 
-    /**
-     * @var Auditor
-     */
-    private $auditor;
+    private Auditor $auditor;
 
     public function unlock(): void
     {
@@ -163,10 +165,8 @@ class CleanAuditLogsCommand extends Command
         return 0;
     }
 
-    private function validateKeepArgument(string $keep, SymfonyStyle $io): ?DateTime
+    private function validateKeepArgument(string $keep, SymfonyStyle $io): ?DateTimeImmutable
     {
-        $until = new DateTime();
-
         try {
             $dateInterval = new DateInterval($keep);
         } catch (Exception $e) {
@@ -176,9 +176,7 @@ class CleanAuditLogsCommand extends Command
             return null;
         }
 
-        $until->sub($dateInterval);
-
-        return $until;
+        return (new DateTimeImmutable())->sub($dateInterval);
     }
 
     private function collectAuditableEntities(DoctrineProvider $provider, SchemaManager $schemaManager, array $repository, int $count): array
