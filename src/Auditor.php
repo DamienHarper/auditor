@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor;
 
 use DH\Auditor\EventSubscriber\AuditEventSubscriber;

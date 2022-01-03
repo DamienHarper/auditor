@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -80,10 +82,8 @@ class DummyEntity
      * Set the value of name.
      *
      * @param mixed $label
-     *
-     * @return DummyEntity
      */
-    public function setLabel($label)
+    public function setLabel($label): self
     {
         $this->label = $label;
 

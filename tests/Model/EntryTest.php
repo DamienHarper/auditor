@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Model;
 
 use DH\Auditor\Model\Entry;
@@ -8,6 +10,8 @@ use ReflectionClass;
 
 /**
  * @internal
+ *
+ * @small
  */
 final class EntryTest extends TestCase
 {

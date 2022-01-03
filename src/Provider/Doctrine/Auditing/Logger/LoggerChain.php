@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine\Auditing\Logger;
 
 use Doctrine\DBAL\Logging\SQLLogger;
@@ -42,7 +44,7 @@ class LoggerChain implements SQLLogger
     /**
      * @return SQLLogger[]
      */
-    public function getLoggers()
+    public function getLoggers(): array
     {
         return $this->loggers;
     }

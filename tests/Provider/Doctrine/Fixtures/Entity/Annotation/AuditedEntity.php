@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation as Audit;

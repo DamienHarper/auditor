@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine\Auditing\Annotation;
 
 use Doctrine\Common\Annotations\AnnotationReader;

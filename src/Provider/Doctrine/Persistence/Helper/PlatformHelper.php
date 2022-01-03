@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
 use Doctrine\DBAL\Connection;
@@ -37,11 +39,8 @@ abstract class PlatformHelper
             return true;
         }
 
-        if (!$mariadb && version_compare(self::getOracleMysqlVersionNumber($version), '5.7.7', '<')) {
-            return true;
-        }
-
-        return false;
+        return (bool) (!$mariadb && version_compare(self::getOracleMysqlVersionNumber($version), '5.7.7', '<'))
+         ;
     }
 
     public static function getServerVersion(Connection $connection): ?string
@@ -63,14 +62,13 @@ abstract class PlatformHelper
         }
 
         $mariadb = false !== mb_stripos($version, 'mariadb');
-        if ($mariadb && version_compare(self::getMariaDbMysqlVersionNumber($version), '10.2.7', '<')) {
+
+        return !($mariadb && version_compare(self::getMariaDbMysqlVersionNumber($version), '10.2.7', '<'))
             // JSON wasn't supported on MariaDB before 10.2.7
             // @see https://mariadb.com/kb/en/json-data-type/
-            return false;
-        }
 
         // Assume JSON is supported
-        return true;
+         ;
     }
 
     /**

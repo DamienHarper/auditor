@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Service;
 
 abstract class AbstractService implements ServiceInterface

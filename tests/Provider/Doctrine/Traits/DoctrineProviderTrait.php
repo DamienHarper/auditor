@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
 use DH\Auditor\Provider\Doctrine\Configuration;
@@ -47,14 +49,10 @@ trait DoctrineProviderTrait
         $provider->registerAuditingService(new AuditingService('default', $entityManager));
 
         // Set a fake user provider that always returns the same User
-        $provider->getAuditor()->getConfiguration()->setUserProvider(function () {
-            return new User(1, 'dark.vador');
-        });
+        $provider->getAuditor()->getConfiguration()->setUserProvider(static fn () => new User('1', 'dark.vador'));
 
         // Set a fake security provider that always returns the same IP and firewall name
-        $provider->getAuditor()->getConfiguration()->setSecurityProvider(function () {
-            return ['1.2.3.4', 'main'];
-        });
+        $provider->getAuditor()->getConfiguration()->setSecurityProvider(static fn () => ['1.2.3.4', 'main']);
 
         return $provider;
     }
@@ -110,9 +108,7 @@ trait DoctrineProviderTrait
         $auditor->registerProvider($provider);
 
         // Set a storage mapper that maps entities to db1 or db2
-        $provider->getConfiguration()->setStorageMapper(function (string $entity, array $storageServices): StorageServiceInterface {
-            return \in_array($entity, [Author::class, Post::class, Comment::class, Tag::class], true) ? $storageServices['db1'] : $storageServices['db2'];
-        });
+        $provider->getConfiguration()->setStorageMapper(static fn (string $entity, array $storageServices): StorageServiceInterface => \in_array($entity, [Author::class, Post::class, Comment::class, Tag::class], true) ? $storageServices['db1'] : $storageServices['db2']);
 
         return $provider;
     }

@@ -1,13 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Model;
 
 class Entry
 {
-    /**
-     * @var int
-     */
-    protected $id;
+    protected int $id;
 
     /**
      * @var string
@@ -171,7 +170,7 @@ class Entry
 
         foreach ($row as $key => $value) {
             if (property_exists($entry, $key)) {
-                $entry->{$key} = $value;
+                $entry->{$key} = 'id' === $key ? (int) $value : $value;
             }
         }
 

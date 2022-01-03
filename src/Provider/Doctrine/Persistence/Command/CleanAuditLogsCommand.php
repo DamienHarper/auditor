@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine\Persistence\Command;
 
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use DH\Auditor\Auditor;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
@@ -163,9 +165,9 @@ class CleanAuditLogsCommand extends Command
         return 0;
     }
 
-    private function validateKeepArgument(string $keep, SymfonyStyle $io): ?DateTime
+    private function validateKeepArgument(string $keep, SymfonyStyle $io): ?DateTimeImmutable
     {
-        $until = new DateTime();
+        $until = new DateTimeImmutable();
 
         try {
             $dateInterval = new DateInterval($keep);

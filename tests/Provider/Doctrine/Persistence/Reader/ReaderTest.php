@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader;
 
-use DateTime;
+use DateTimeImmutable;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Model\Entry;
 use DH\Auditor\Model\Transaction;
@@ -22,6 +24,8 @@ use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException as Opti
 
 /**
  * @internal
+ *
+ * @small
  */
 final class ReaderTest extends TestCase
 {
@@ -231,7 +235,7 @@ final class ReaderTest extends TestCase
         /** @var Entry[] $audits */
         $audits = $reader
             ->createQuery(Author::class)
-            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTime('-1 day')))
+            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTimeImmutable('-1 day')))
             ->resetOrderBy()
             ->execute()
         ;
@@ -242,7 +246,7 @@ final class ReaderTest extends TestCase
         /** @var Entry[] $audits */
         $audits = $reader
             ->createQuery(Author::class)
-            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTime('-5 days'), new DateTime('-4 days')))
+            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTimeImmutable('-5 days'), new DateTimeImmutable('-4 days')))
             ->execute()
         ;
         self::assertCount(0, $audits, 'result count is ok.');
@@ -250,7 +254,7 @@ final class ReaderTest extends TestCase
         /** @var Entry[] $audits */
         $audits = $reader
             ->createQuery(Author::class, ['page_size' => 2])
-            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTime('-1 day')))
+            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTimeImmutable('-1 day')))
             ->execute()
         ;
         self::assertCount(2, $audits, 'result count is ok.');
@@ -258,7 +262,7 @@ final class ReaderTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $reader
             ->createQuery(Post::class)
-            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTime('now'), new DateTime('-1 day')))
+            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTimeImmutable('now'), new DateTimeImmutable('-1 day')))
             ->execute()
         ;
     }
@@ -377,7 +381,7 @@ final class ReaderTest extends TestCase
             ->setAuthor($author)
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new DateTime())
+            ->setCreatedAt(new DateTimeImmutable())
         ;
 
         $post2 = new Post();
@@ -385,7 +389,7 @@ final class ReaderTest extends TestCase
             ->setAuthor($author)
             ->setTitle('Second post')
             ->setBody('Here is another body')
-            ->setCreatedAt(new DateTime())
+            ->setCreatedAt(new DateTimeImmutable())
         ;
 
         $storageService->getEntityManager()->persist($post1);
@@ -422,7 +426,7 @@ final class ReaderTest extends TestCase
             ->setAuthor($author)
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new DateTime())
+            ->setCreatedAt(new DateTimeImmutable())
         ;
 
         $post2 = new Post();
@@ -430,7 +434,7 @@ final class ReaderTest extends TestCase
             ->setAuthor($author)
             ->setTitle('Second post')
             ->setBody('Here is another body')
-            ->setCreatedAt(new DateTime())
+            ->setCreatedAt(new DateTimeImmutable())
         ;
 
         $storageService->getEntityManager()->persist($post1);
@@ -460,8 +464,9 @@ final class ReaderTest extends TestCase
         switch ($entry->getType()) {
             case Transaction::REMOVE:
                 return 'Deleted '.$class.'#'.$entry->getObjectId();
+
             case Transaction::UPDATE:
-                $changeset = function (array $diff) use ($verbose) {
+                $changeset = static function (array $diff) use ($verbose) {
                     $changes = [];
                     foreach ($diff as $key => $value) {
                         $old = $value['old'] ?? 'null';
@@ -477,8 +482,9 @@ final class ReaderTest extends TestCase
                 };
 
                 return 'Updated '.$class.'#'.$entry->getObjectId().': ['.$changeset($diff).']';
+
             case Transaction::INSERT:
-                $changeset = function (array $diff) use ($verbose) {
+                $changeset = static function (array $diff) use ($verbose) {
                     $changes = [];
                     foreach ($diff as $key => $value) {
                         $old = $value['old'] ?? 'null';
@@ -494,16 +500,19 @@ final class ReaderTest extends TestCase
                 };
 
                 return 'Inserted '.$class.'#'.$entry->getObjectId().': ['.$changeset($diff).']';
+
             case Transaction::DISSOCIATE:
                 $source = $diff['source']['class'].'#'.$diff['source']['id'].($verbose ? ' ('.$diff['source']['label'].')' : '');
                 $target = $diff['target']['class'].'#'.$diff['target']['id'].($verbose ? ' ('.$diff['target']['label'].')' : '');
 
                 return 'Dissociated '.$source.' from '.$target;
+
             case Transaction::ASSOCIATE:
                 $source = $diff['source']['class'].'#'.$diff['source']['id'].($verbose ? ' ('.$diff['source']['label'].')' : '');
                 $target = $diff['target']['class'].'#'.$diff['target']['id'].($verbose ? ' ('.$diff['target']['label'].')' : '');
 
                 return 'Associated '.$source.' to '.$target;
+
             default:
                 return 'Unknown';
         }

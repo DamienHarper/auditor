@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine;
 
 use DH\Auditor\Event\LifecycleEvent;
@@ -144,12 +146,11 @@ class DoctrineProvider extends AbstractProvider
         $class = DoctrineHelper::getRealClassName($entity);
         // is $entity part of audited entities?
         \assert($this->configuration instanceof Configuration);   // helps PHPStan
-        if (!\array_key_exists($class, $this->configuration->getEntities())) {
-            // no => $entity is not audited
-            return false;
-        }
 
-        return true;
+        return !(!\array_key_exists($class, $this->configuration->getEntities()))
+            // no => $entity is not audited
+
+         ;
     }
 
     /**
@@ -216,13 +217,11 @@ class DoctrineProvider extends AbstractProvider
         }
 
         // are columns excluded and is field part of them?
-        if (isset($entityOptions['ignored_columns'])
-            && \in_array($field, $entityOptions['ignored_columns'], true)) {
+        return !(isset($entityOptions['ignored_columns'])
+            && \in_array($field, $entityOptions['ignored_columns'], true))
             // yes => $field is not audited
-            return false;
-        }
 
-        return true;
+         ;
     }
 
     public function supportsStorage(): bool
