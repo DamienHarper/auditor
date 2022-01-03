@@ -10,10 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class AuditEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $payload;
+    private array $payload;
 
     public function __construct(array $payload)
     {

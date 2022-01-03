@@ -6,17 +6,14 @@ namespace DH\Auditor;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @see \DH\Auditor\Tests\ConfigurationTest
+ */
 class Configuration
 {
-    /**
-     * @var bool
-     */
-    private $enabled;
+    private bool $enabled;
 
-    /**
-     * @var string
-     */
-    private $timezone;
+    private string $timezone;
 
     /**
      * @var callable

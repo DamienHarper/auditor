@@ -14,12 +14,12 @@ use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
 use Exception;
 
+/**
+ * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Event\CreateSchemaListenerTest
+ */
 class CreateSchemaListener implements EventSubscriber
 {
-    /**
-     * @var DoctrineProvider
-     */
-    private $provider;
+    private DoctrineProvider $provider;
 
     public function __construct(DoctrineProvider $provider)
     {

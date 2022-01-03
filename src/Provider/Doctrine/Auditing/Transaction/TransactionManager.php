@@ -12,15 +12,9 @@ use DH\Auditor\Transaction\TransactionProcessorInterface;
 
 class TransactionManager implements TransactionManagerInterface
 {
-    /**
-     * @var TransactionProcessorInterface
-     */
-    private $processor;
+    private TransactionProcessorInterface $processor;
 
-    /**
-     * @var TransactionHydratorInterface
-     */
-    private $hydrator;
+    private TransactionHydratorInterface $hydrator;
 
     public function __construct(DoctrineProvider $provider)
     {

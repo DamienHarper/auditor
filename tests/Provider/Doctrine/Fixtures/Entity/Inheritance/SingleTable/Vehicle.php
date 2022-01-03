@@ -27,22 +27,18 @@ class Vehicle
     protected $label;
 
     /**
-     * @var int
-     *
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      * @ORM\Column(type="integer")
      */
     #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer')]
-    private $id;
+    private int $id;
 
     /**
-     * @var int
-     *
      * @ORM\Column(type="integer")
      */
     #[ORM\Column(type: 'integer')]
-    private $wheels;
+    private int $wheels;
 
     public function getWheels(): int
     {

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Model;
 
+/**
+ * @see \DH\Auditor\Tests\Model\EntryTest
+ */
 class Entry
 {
     protected int $id;
@@ -156,7 +159,7 @@ class Entry
      */
     public function getDiffs(bool $includeMedadata = false): ?array
     {
-        $diffs = $this->sort(json_decode($this->diffs, true));  // @phpstan-ignore-line
+        $diffs = $this->sort(json_decode($this->diffs, true, 512, JSON_THROW_ON_ERROR));  // @phpstan-ignore-line
         if (!$includeMedadata) {
             unset($diffs['@source']);
         }

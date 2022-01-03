@@ -22,12 +22,12 @@ use DH\Auditor\Provider\Service\StorageServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 
+/**
+ * @see \DH\Auditor\Tests\Provider\Doctrine\DoctrineProviderTest
+ */
 class DoctrineProvider extends AbstractProvider
 {
-    /**
-     * @var TransactionManager
-     */
-    private $transactionManager;
+    private TransactionManager $transactionManager;
 
     public function __construct(ConfigurationInterface $configuration)
     {
@@ -245,7 +245,7 @@ class DoctrineProvider extends AbstractProvider
         \assert($this->configuration instanceof Configuration);   // helps PHPStan
         $annotationLoader = new AnnotationLoader($entityManager);
         $this->configuration->setEntities(array_merge(
-            null === $entities ? $this->configuration->getEntities() : $entities,
+            $entities ?? $this->configuration->getEntities(),
             $annotationLoader->load()
         ));
 

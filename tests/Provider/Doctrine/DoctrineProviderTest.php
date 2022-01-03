@@ -149,10 +149,7 @@ final class DoctrineProviderTest extends TestCase
 
         self::assertNull($provider->getConfiguration()->getStorageMapper(), 'Mapping closure is not set.');
 
-        $provider->getConfiguration()->setStorageMapper(static function (string $entity, array $storageServices): StorageServiceInterface {
-            // Audit records regarding entities starting with "foo" are mapped to "EM1", others are mapped to "EM2"
-            return 0 === mb_strpos($entity, 'Foo') ? $storageServices['EM1'] : $storageServices['EM2'];
-        });
+        $provider->getConfiguration()->setStorageMapper(static fn (string $entity, array $storageServices): StorageServiceInterface => 0 === mb_strpos($entity, 'Foo') ? $storageServices['EM1'] : $storageServices['EM2']);
 
         self::assertNotNull($provider->getConfiguration()->getStorageMapper(), 'Mapping closure is set.');
 

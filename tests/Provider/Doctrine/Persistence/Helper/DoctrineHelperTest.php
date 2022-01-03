@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DH\Auditor\Tests\Provider\Doctrine\Helper;
+namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Helper;
 
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use PHPUnit\Framework\TestCase;

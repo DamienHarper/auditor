@@ -15,15 +15,9 @@ use Doctrine\ORM\Events;
 
 class DoctrineSubscriber implements EventSubscriber
 {
-    /**
-     * @var TransactionManager
-     */
-    private $transactionManager;
+    private TransactionManager $transactionManager;
 
-    /**
-     * @var ?SQLLogger
-     */
-    private $loggerBackup;
+    private ?SQLLogger $loggerBackup = null;
 
     public function __construct(TransactionManager $transactionManager)
     {

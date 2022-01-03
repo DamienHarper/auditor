@@ -11,7 +11,7 @@ class LoggerChain implements SQLLogger
     /**
      * @var SQLLogger[]
      */
-    private $loggers = [];
+    private array $loggers = [];
 
     /**
      * Adds a logger in the chain.

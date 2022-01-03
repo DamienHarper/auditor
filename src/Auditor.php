@@ -11,32 +11,29 @@ use DH\Auditor\Provider\ProviderInterface;
 use ReflectionException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * @see \DH\Auditor\Tests\AuditorTest
+ */
 class Auditor
 {
-    /**
-     * @var Configuration
-     */
-    private $configuration;
+    private Configuration $configuration;
 
     /**
      * @var ProviderInterface[]
      */
-    private $providers = [];
+    private array $providers = [];
 
     /**
      * @var ProviderInterface[]
      */
-    private $storageProviders = [];
+    private array $storageProviders = [];
 
     /**
      * @var ProviderInterface[]
      */
-    private $auditProviders = [];
+    private array $auditProviders = [];
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     /**
      * @throws ReflectionException

@@ -7,6 +7,9 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 use Doctrine\DBAL\Types\Types;
 use InvalidArgumentException;
 
+/**
+ * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Helper\DoctrineHelperTest
+ */
 abstract class DoctrineHelper
 {
     /**

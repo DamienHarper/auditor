@@ -16,6 +16,9 @@ use DH\Auditor\Transaction\TransactionProcessorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+/**
+ * @see \DH\Auditor\Tests\Provider\Doctrine\Auditing\Transaction\TransactionProcessorTest
+ */
 class TransactionProcessor implements TransactionProcessorInterface
 {
     use AuditTrait;
@@ -218,7 +221,7 @@ class TransactionProcessor implements TransactionProcessorInterface
             'object_id' => (string) $data['id'],
             'discriminator' => $data['discriminator'],
             'transaction_hash' => (string) $data['transaction_hash'],
-            'diffs' => json_encode($data['diff']),
+            'diffs' => json_encode($data['diff'], JSON_THROW_ON_ERROR),
             'blame_id' => $data['blame']['user_id'],
             'blame_user' => $data['blame']['username'],
             'blame_user_fqdn' => $data['blame']['user_fqdn'],

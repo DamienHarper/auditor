@@ -102,7 +102,7 @@ final class ReaderTest extends TestCase
         if (method_exists(self::class, 'assertMatchesRegularExpression')) {
             self::assertMatchesRegularExpression('#\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}#', $audits[0]->getCreatedAt());
         } else {
-            self::assertRegExp('#\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}#', $audits[0]->getCreatedAt());
+            self::assertMatchesRegularExpression('#\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}#', $audits[0]->getCreatedAt());
         }
 
         $expected = [

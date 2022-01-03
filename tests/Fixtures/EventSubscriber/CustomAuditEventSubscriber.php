@@ -10,10 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CustomAuditEventSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Auditor
-     */
-    private $auditor;
+    private Auditor $auditor;
 
     public function __construct(Auditor $auditor)
     {

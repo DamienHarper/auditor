@@ -11,15 +11,9 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
 
 class AnnotationLoader
 {
-    /**
-     * @var null|AnnotationReader
-     */
-    private $reader;
+    private ?AnnotationReader $reader = null;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
