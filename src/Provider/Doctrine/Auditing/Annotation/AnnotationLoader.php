@@ -45,7 +45,7 @@ class AnnotationLoader
         $reflection = $metadata->getReflectionClass();
 
         // Check that we have an Entity annotation
-        if (\PHP_VERSION_ID >= 80000 && $attributes = $reflection->getAttributes(Entity::class)) {
+        if (\PHP_VERSION_ID >= 80000 && $attributes = $reflection->getAttributes(Entity::class)) {  // @phpstan-ignore-line
             $annotation = $attributes[0]->newInstance();
         } elseif (null !== $this->reader) {
             $annotation = $this->reader->getClassAnnotation($reflection, Entity::class);
@@ -56,7 +56,7 @@ class AnnotationLoader
         }
 
         // Check that we have an Auditable annotation
-        if (\PHP_VERSION_ID >= 80000 && $attributes = $reflection->getAttributes(Auditable::class)) {
+        if (\PHP_VERSION_ID >= 80000 && $attributes = $reflection->getAttributes(Auditable::class)) {   // @phpstan-ignore-line
             /** @var ?Auditable $auditableAnnotation */
             $auditableAnnotation = $attributes[0]->newInstance();
         } elseif (null !== $this->reader) {
@@ -69,7 +69,7 @@ class AnnotationLoader
         }
 
         // Check that we have an Security annotation
-        if (\PHP_VERSION_ID >= 80000 && $attributes = $reflection->getAttributes(Security::class)) {
+        if (\PHP_VERSION_ID >= 80000 && $attributes = $reflection->getAttributes(Security::class)) {    // @phpstan-ignore-line
             /** @var ?Security $securityAnnotation */
             $securityAnnotation = $attributes[0]->newInstance();
         } elseif (null !== $this->reader) {
@@ -93,7 +93,7 @@ class AnnotationLoader
 
         // Are there any Ignore annotations?
         foreach ($reflection->getProperties() as $property) {
-            if (\PHP_VERSION_ID >= 80000 && $attributes = $property->getAttributes(Ignore::class)) {
+            if (\PHP_VERSION_ID >= 80000 && $attributes = $property->getAttributes(Ignore::class)) {    // @phpstan-ignore-line
                 $annotationProperty = $attributes[0]->newInstance();
             } elseif (null !== $this->reader) {
                 $annotationProperty = $this->reader->getPropertyAnnotation($property, Ignore::class);

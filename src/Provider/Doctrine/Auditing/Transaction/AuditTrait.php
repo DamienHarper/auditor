@@ -52,7 +52,7 @@ trait AuditTrait
         $pk = $meta->getSingleIdentifierFieldName();
         $type = Type::getType($meta->fieldMappings[$pk]['type']);
 
-        \assert(\is_object($targetEntity) || null === $targetEntity);
+        \assert(\is_object($targetEntity));
 
         return $this->value($entityManager, $type, $meta->getReflectionProperty($pk)->getValue($targetEntity));
     }

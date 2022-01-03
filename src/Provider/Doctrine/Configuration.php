@@ -224,7 +224,7 @@ class Configuration implements ConfigurationInterface
         return $this->storageMapper;
     }
 
-    public function getProvider(): DoctrineProvider
+    public function getProvider(): ?DoctrineProvider
     {
         return $this->provider;
     }
