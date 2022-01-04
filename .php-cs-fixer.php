@@ -9,8 +9,8 @@ $config
         '@PhpCsFixer' => true,
         '@PhpCsFixer:risky' => true,
         '@PHP74Migration:risky' => true,
-        '@PHP80Migration' => true,
-        '@PHP80Migration:risky' => true,
+//        '@PHP80Migration' => true,
+//        '@PHP80Migration:risky' => true,
         '@DoctrineAnnotation' => true,
         '@PHPUnit84Migration:risky' => true,
         'date_time_immutable' => true,
@@ -39,7 +39,7 @@ $config
         'regular_callable_call' => true,
         'self_static_accessor' => true,
         'simplified_if_return' => true,
-        'simplified_null_return' => true,
+        'simplified_null_return' => false,
         'static_lambda' => true,
     ])
     ->setFinder(PhpCsFixer\Finder::create()->in(__DIR__))
