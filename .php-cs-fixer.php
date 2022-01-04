@@ -39,7 +39,7 @@ $config
         'regular_callable_call' => true,
         'self_static_accessor' => true,
         'simplified_if_return' => true,
-        'simplified_null_return' => true,
+        'simplified_null_return' => false,
         'static_lambda' => true,
     ])
     ->setFinder(PhpCsFixer\Finder::create()->in(__DIR__))
