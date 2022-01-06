@@ -1,62 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine;
 
 use DH\Auditor\Provider\ConfigurationInterface;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @see \DH\Auditor\Tests\Provider\Doctrine\ConfigurationTest
+ */
 class Configuration implements ConfigurationInterface
 {
-    /**
-     * @var DoctrineProvider
-     */
-    private $provider;
+    private ?DoctrineProvider $provider = null;
 
-    /**
-     * @var string
-     */
-    private $tablePrefix;
+    private string $tablePrefix;
 
-    /**
-     * @var string
-     */
-    private $tableSuffix;
+    private string $tableSuffix;
 
-    /**
-     * @var array
-     */
-    private $ignoredColumns;
+    private array $ignoredColumns;
 
-    /**
-     * @var null|array
-     */
-    private $entities;
+    private ?array $entities = null;
 
-    /**
-     * @var array
-     */
-    private $storageServices = [];
+    private array $storageServices = [];
 
-    /**
-     * @var array
-     */
-    private $auditingServices = [];
+    private array $auditingServices = [];
 
-    /**
-     * @var bool
-     */
-    private $isViewerEnabled;
+    private bool $isViewerEnabled;
 
     /**
      * @var callable
      */
     private $storageMapper;
 
-    /**
-     * @var array
-     */
-    private $annotationLoaded = [];
+    private array $annotationLoaded = [];
 
     public function __construct(array $options)
     {
@@ -190,13 +168,13 @@ class Configuration implements ConfigurationInterface
             foreach ($auditingServices as $auditingService) {
                 // do not load annotations if they're already loaded
                 if (!isset($this->annotationLoaded[$auditingService->getName()]) || !$this->annotationLoaded[$auditingService->getName()]) {
-                    $this->provider->loadAnnotations($auditingService->getEntityManager(), null === $this->entities ? [] : $this->entities);
+                    $this->provider->loadAnnotations($auditingService->getEntityManager(), $this->entities ?? []);
                     $this->annotationLoaded[$auditingService->getName()] = true;
                 }
             }
         }
 
-        return null === $this->entities ? [] : $this->entities;
+        return $this->entities ?? [];
     }
 
     /**
@@ -246,7 +224,7 @@ class Configuration implements ConfigurationInterface
         return $this->storageMapper;
     }
 
-    public function getProvider(): DoctrineProvider
+    public function getProvider(): ?DoctrineProvider
     {
         return $this->provider;
     }

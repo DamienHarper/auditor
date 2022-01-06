@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader;
 
-use DateTime;
+use DateTimeImmutable;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\DateRangeFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\RangeFilter;
@@ -14,6 +16,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
+ *
+ * @small
  */
 final class QueryTest extends TestCase
 {
@@ -105,8 +109,8 @@ final class QueryTest extends TestCase
      */
     public function testAddDateRangeFilter(): void
     {
-        $min = new DateTime('-1 day');
-        $max = new DateTime('+1 day');
+        $min = new DateTimeImmutable('-1 day');
+        $max = new DateTimeImmutable('+1 day');
 
         // only min bound
         $query = new Query('author_audit', $this->createConnection());
@@ -365,8 +369,8 @@ final class QueryTest extends TestCase
      */
     public function testBuildQueryBuilderDateRangeFilter(): void
     {
-        $min = new DateTime('-1 day');
-        $max = new DateTime('+1 day');
+        $min = new DateTimeImmutable('-1 day');
+        $max = new DateTimeImmutable('+1 day');
 
         // test SQL query with a date range filter, min bound only
         $query = new Query('author_audit', $this->createConnection());

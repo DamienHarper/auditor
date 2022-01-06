@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine\Persistence\Event;
 
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
@@ -12,12 +14,12 @@ use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
 use Exception;
 
+/**
+ * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Event\CreateSchemaListenerTest
+ */
 class CreateSchemaListener implements EventSubscriber
 {
-    /**
-     * @var DoctrineProvider
-     */
-    private $provider;
+    private DoctrineProvider $provider;
 
     public function __construct(DoctrineProvider $provider)
     {
@@ -70,7 +72,7 @@ class CreateSchemaListener implements EventSubscriber
     /**
      * {@inheritdoc}
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             ToolEvents::postGenerateSchemaTable,

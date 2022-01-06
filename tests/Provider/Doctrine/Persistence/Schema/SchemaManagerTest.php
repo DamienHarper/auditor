@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema;
 
 use DH\Auditor\Provider\Doctrine\Configuration;
@@ -28,6 +30,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
+ *
+ * @small
  */
 final class SchemaManagerTest extends TestCase
 {

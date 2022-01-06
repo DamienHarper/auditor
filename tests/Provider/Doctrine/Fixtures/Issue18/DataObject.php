@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue18;
 
 use Doctrine\ORM\Mapping as ORM;

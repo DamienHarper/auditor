@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests;
 
 use DH\Auditor\Configuration;
@@ -15,6 +17,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * @internal
+ *
+ * @small
  */
 final class AuditorTest extends TestCase
 {

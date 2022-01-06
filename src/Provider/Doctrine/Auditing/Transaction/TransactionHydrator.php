@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine\Auditing\Transaction;
 
 use DH\Auditor\Model\TransactionInterface;
@@ -84,6 +86,7 @@ class TransactionHydrator implements TransactionHydratorInterface
             $owner = $collection->getOwner();
             if ($this->provider->isAudited($owner)) {
                 $mapping = $collection->getMapping();
+                /** @var object $entity */
                 foreach ($collection->getInsertDiff() as $entity) {
                     if ($this->provider->isAudited($entity)) {
                         $transaction->trackAuditEvent(Transaction::ASSOCIATE, [
@@ -93,6 +96,7 @@ class TransactionHydrator implements TransactionHydratorInterface
                         ]);
                     }
                 }
+                /** @var object $entity */
                 foreach ($collection->getDeleteDiff() as $entity) {
                     if ($this->provider->isAudited($entity)) {
                         $transaction->trackAuditEvent(Transaction::DISSOCIATE, [
@@ -116,6 +120,7 @@ class TransactionHydrator implements TransactionHydratorInterface
             $owner = $collection->getOwner();
             if ($this->provider->isAudited($owner)) {
                 $mapping = $collection->getMapping();
+                /** @var object $entity */
                 foreach ($collection->toArray() as $entity) {
                     if ($this->provider->isAudited($entity)) {
                         $transaction->trackAuditEvent(Transaction::DISSOCIATE, [

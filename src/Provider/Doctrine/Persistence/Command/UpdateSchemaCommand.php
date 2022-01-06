@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine\Persistence\Command;
 
 use DH\Auditor\Auditor;
@@ -13,16 +15,16 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+/**
+ * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Command\UpdateSchemaCommandTest
+ */
 class UpdateSchemaCommand extends Command
 {
     use LockableTrait;
 
     protected static $defaultName = 'audit:schema:update';
 
-    /**
-     * @var Auditor
-     */
-    private $auditor;
+    private Auditor $auditor;
 
     public function unlock(): void
     {
@@ -46,7 +48,7 @@ class UpdateSchemaCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->lock()) {
             $output->writeln('The command is already running in another process.');
@@ -67,7 +69,7 @@ class UpdateSchemaCommand extends Command
 
         $count = 0;
         foreach ($sqls as $name => $queries) {
-            $count += \count($queries);
+            $count += is_countable($queries) ? \count($queries) : 0;
         }
 
         if (0 === $count) {

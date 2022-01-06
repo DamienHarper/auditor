@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests;
 
 use DH\Auditor\Tests\Traits\AuditorConfigurationTrait;
@@ -7,6 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
+ *
+ * @small
  */
 final class ConfigurationTest extends TestCase
 {

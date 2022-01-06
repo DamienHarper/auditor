@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine\Auditing\Transaction;
 
 use DH\Auditor\Model\TransactionInterface;
@@ -10,15 +12,9 @@ use DH\Auditor\Transaction\TransactionProcessorInterface;
 
 class TransactionManager implements TransactionManagerInterface
 {
-    /**
-     * @var TransactionProcessorInterface
-     */
-    private $processor;
+    private TransactionProcessorInterface $processor;
 
-    /**
-     * @var TransactionHydratorInterface
-     */
-    private $hydrator;
+    private TransactionHydratorInterface $hydrator;
 
     public function __construct(DoctrineProvider $provider)
     {

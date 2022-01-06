@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine\Persistence\Schema;
 
 use DH\Auditor\Provider\Doctrine\Configuration;
@@ -15,12 +17,12 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema\SchemaManagerTest
+ */
 class SchemaManager
 {
-    /**
-     * @var DoctrineProvider
-     */
-    private $provider;
+    private DoctrineProvider $provider;
 
     public function __construct(DoctrineProvider $provider)
     {
@@ -155,7 +157,7 @@ class SchemaManager
     /**
      * Creates an audit table.
      *
-     * @param mixed $table
+     * @param object|string $table
      */
     public function createAuditTable(string $entity, $table, ?Schema $schema = null): Schema
     {

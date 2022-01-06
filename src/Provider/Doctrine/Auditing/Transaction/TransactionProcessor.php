@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine\Auditing\Transaction;
 
-use DateTime;
+use DateTimeImmutable;
 use DateTimeZone;
 use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\Model\TransactionInterface;
@@ -14,6 +16,9 @@ use DH\Auditor\Transaction\TransactionProcessorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+/**
+ * @see \DH\Auditor\Tests\Provider\Doctrine\Auditing\Transaction\TransactionProcessorTest
+ */
 class TransactionProcessor implements TransactionProcessorInterface
 {
     use AuditTrait;
@@ -207,7 +212,7 @@ class TransactionProcessor implements TransactionProcessorInterface
         $configuration = $this->provider->getConfiguration();
         $schema = $data['schema'] ? $data['schema'].'.' : '';
         $auditTable = $schema.$configuration->getTablePrefix().$data['table'].$configuration->getTableSuffix();
-        $dt = new DateTime('now', new DateTimeZone($this->provider->getAuditor()->getConfiguration()->getTimezone()));
+        $dt = new DateTimeImmutable('now', new DateTimeZone($this->provider->getAuditor()->getConfiguration()->getTimezone()));
 
         $payload = [
             'entity' => $data['entity'],
@@ -216,7 +221,7 @@ class TransactionProcessor implements TransactionProcessorInterface
             'object_id' => (string) $data['id'],
             'discriminator' => $data['discriminator'],
             'transaction_hash' => (string) $data['transaction_hash'],
-            'diffs' => json_encode($data['diff']),
+            'diffs' => json_encode($data['diff'], JSON_THROW_ON_ERROR),
             'blame_id' => $data['blame']['user_id'],
             'blame_user' => $data['blame']['username'],
             'blame_user_fqdn' => $data['blame']['user_fqdn'],

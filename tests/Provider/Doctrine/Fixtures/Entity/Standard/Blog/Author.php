@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -37,7 +39,7 @@ class Author
      * @ORM\OneToMany(targetEntity="Post", mappedBy="author", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="id", referencedColumnName="author_id", nullable=false)
      */
-    #[ORM\OneToMany(targetEntity: 'Post', mappedBy: 'author', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: 'Post', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'id', referencedColumnName: 'author_id', nullable: false)]
     protected $posts;
 

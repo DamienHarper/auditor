@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine;
 
 use DH\Auditor\Exception\ProviderException;
@@ -23,6 +25,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
+ *
+ * @small
  */
 final class DoctrineProviderTest extends TestCase
 {
@@ -145,10 +149,7 @@ final class DoctrineProviderTest extends TestCase
 
         self::assertNull($provider->getConfiguration()->getStorageMapper(), 'Mapping closure is not set.');
 
-        $provider->getConfiguration()->setStorageMapper(function (string $entity, array $storageServices): StorageServiceInterface {
-            // Audit records regarding entities starting with "foo" are mapped to "EM1", others are mapped to "EM2"
-            return 0 === mb_strpos($entity, 'Foo') ? $storageServices['EM1'] : $storageServices['EM2'];
-        });
+        $provider->getConfiguration()->setStorageMapper(static fn (string $entity, array $storageServices): StorageServiceInterface => 0 === mb_strpos($entity, 'Foo') ? $storageServices['EM1'] : $storageServices['EM2']);
 
         self::assertNotNull($provider->getConfiguration()->getStorageMapper(), 'Mapping closure is set.');
 

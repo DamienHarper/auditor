@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Provider\Doctrine\Auditing\Event;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Logger\Logger;
@@ -13,15 +15,9 @@ use Doctrine\ORM\Events;
 
 class DoctrineSubscriber implements EventSubscriber
 {
-    /**
-     * @var TransactionManager
-     */
-    private $transactionManager;
+    private TransactionManager $transactionManager;
 
-    /**
-     * @var ?SQLLogger
-     */
-    private $loggerBackup;
+    private ?SQLLogger $loggerBackup = null;
 
     public function __construct(TransactionManager $transactionManager)
     {

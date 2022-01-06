@@ -13,11 +13,11 @@ on:
 jobs:
   tests:
     name: Tests PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, ${{ matrix.db }}
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: auditor
@@ -95,8 +95,22 @@ jobs:
         if: matrix.symfony == '5.*' || matrix.symfony == '6.*'
         run: composer update --no-progress --ansi --prefer-stable
 
+      - name: Install PHPStan
+        run: composer install --no-progress --ansi --working-dir=tools/phpstan
+
+      - name: Install PHP-CS-Fixer
+        run: composer install --no-progress --ansi --working-dir=tools/php-cs-fixer
+
       - name: Validate composer
         run: composer validate --strict --no-check-lock
+
+      - name: Run PHP-CS-Fixer
+        run: |
+          sed -i "s/'phpdoc_to_return_type' => true/'phpdoc_to_return_type' => false/g" .php-cs-fixer.php
+          composer cs-check
+
+      - name: Run PHPStan
+        run: composer phpstan
 
       - name: Run tests
         run: vendor/bin/phpunit -c phpunit.${{ matrix.db }}.xml

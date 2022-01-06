@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
@@ -10,7 +13,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\Entity
  * @ORM\Table(name="`comment`", indexes={@ORM\Index(name="fk_post_id", columns={"post_id"})})
  */
-#[ORM\Entity, ORM\Table(name: '`comment`'), ORM\Index(name: 'fk_post_id', columns: ['post_id'])]
+#[ORM\Entity, ORM\Table(name: '`comment`'), ORM\Index(columns: ['post_id'], name: 'fk_post_id')]
 class Comment
 {
     /**
@@ -52,7 +55,7 @@ class Comment
      * @ORM\ManyToOne(targetEntity="Post", inversedBy="comments", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="post_id", referencedColumnName="id", nullable=false)
      */
-    #[ORM\ManyToOne(targetEntity: 'Post', inversedBy: 'comments', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: 'Post', cascade: ['persist', 'remove'], inversedBy: 'comments')]
     #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id', nullable: false)]
     protected $post;
 
@@ -138,7 +141,7 @@ class Comment
      *
      * @return Comment
      */
-    public function setCreatedAt(?DateTime $created_at): self
+    public function setCreatedAt(?DateTimeImmutable $created_at): self
     {
         $this->created_at = $created_at;
 
@@ -150,7 +153,7 @@ class Comment
      *
      * @return ?DateTime
      */
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->created_at;
     }

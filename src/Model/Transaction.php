@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Model;
 
+/**
+ * @see \DH\Auditor\Tests\Model\TransactionTest
+ */
 class Transaction implements TransactionInterface
 {
     public const INSERT = 'insert';
@@ -10,35 +15,13 @@ class Transaction implements TransactionInterface
     public const ASSOCIATE = 'associate';
     public const DISSOCIATE = 'dissociate';
 
-    /**
-     * @var null|string
-     */
-    private $transaction_hash;
+    private ?string $transaction_hash = null;
 
-    /**
-     * @var array
-     */
-    private $inserted = [];     // [$source, $changeset]
-
-    /**
-     * @var array
-     */
-    private $updated = [];      // [$source, $changeset]
-
-    /**
-     * @var array
-     */
-    private $removed = [];      // [$source, $id]
-
-    /**
-     * @var array
-     */
-    private $associated = [];   // [$source, $target, $mapping]
-
-    /**
-     * @var array
-     */
-    private $dissociated = [];  // [$source, $target, $id, $mapping]
+    private array $inserted = [];     // [$source, $changeset]
+    private array $updated = [];      // [$source, $changeset]
+    private array $removed = [];      // [$source, $id]
+    private array $associated = [];   // [$source, $target, $mapping]
+    private array $dissociated = [];  // [$source, $target, $id, $mapping]
 
     /**
      * Returns transaction hash.
@@ -94,18 +77,22 @@ class Transaction implements TransactionInterface
                 $this->inserted[] = $data;
 
                 break;
+
             case self::UPDATE:
                 $this->updated[] = $data;
 
                 break;
+
             case self::REMOVE:
                 $this->removed[] = $data;
 
                 break;
+
             case self::ASSOCIATE:
                 $this->associated[] = $data;
 
                 break;
+
             case self::DISSOCIATE:
                 $this->dissociated[] = $data;
 
