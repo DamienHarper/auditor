@@ -13,14 +13,16 @@ use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 
 trait AuditTrait
 {
+
     /**
      * Returns the primary key value of an entity.
      *
-     * @param object $entity
-     *
      * @return mixed
+     * @throws \DH\Auditor\Exception\MappingException
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\ORM\Mapping\MappingException
      */
-    private function id(EntityManagerInterface $entityManager, $entity)
+    private function id(EntityManagerInterface $entityManager, object $entity)
     {
         $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
 
@@ -60,9 +62,12 @@ trait AuditTrait
     /**
      * Type converts the input value and returns it.
      *
-     * @param mixed $value
+     * @param mixed                                $value
      *
-     * @return mixed
+     * @return mixed|void
+     *
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Types\ConversionException
      */
     private function value(EntityManagerInterface $entityManager, Type $type, $value)
     {
@@ -120,9 +125,12 @@ trait AuditTrait
     /**
      * Computes a usable diff.
      *
-     * @param object $entity
+     * @throws \DH\Auditor\Exception\MappingException
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Types\ConversionException
+     * @throws \Doctrine\ORM\Mapping\MappingException
      */
-    private function diff(EntityManagerInterface $entityManager, $entity, array $changeset): array
+    private function diff(EntityManagerInterface $entityManager, object $entity, array $changeset): array
     {
         $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
         $diff = [
@@ -170,9 +178,11 @@ trait AuditTrait
     /**
      * Returns an array describing an entity.
      *
-     * @param null|object $entity
+     * @throws \DH\Auditor\Exception\MappingException
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\ORM\Mapping\MappingException
      */
-    private function summarize(EntityManagerInterface $entityManager, $entity = null, array $extra = []): ?array
+    private function summarize(EntityManagerInterface $entityManager, ?object $entity = null, array $extra = []): ?array
     {
         if (null === $entity) {
             return null;

@@ -31,8 +31,6 @@ class DieselCase
 
     /**
      * Get the value of name.
-     *
-     * @return mixed
      */
     public function getName()
     {

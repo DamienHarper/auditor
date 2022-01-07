@@ -11,7 +11,7 @@ class RangeFilter implements FilterInterface
     /**
      * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
      * @var mixed
