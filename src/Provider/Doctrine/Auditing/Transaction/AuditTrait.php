@@ -13,11 +13,9 @@ use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 
 trait AuditTrait
 {
-
     /**
      * Returns the primary key value of an entity.
      *
-     * @return mixed
      * @throws \DH\Auditor\Exception\MappingException
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\ORM\Mapping\MappingException
@@ -62,17 +60,17 @@ trait AuditTrait
     /**
      * Type converts the input value and returns it.
      *
-     * @param mixed                                $value
-     *
-     * @return mixed|void
+     * @param mixed $value
      *
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\DBAL\Types\ConversionException
+     *
+     * @return mixed
      */
     private function value(EntityManagerInterface $entityManager, Type $type, $value)
     {
         if (null === $value) {
-            return;
+            return null;
         }
 
         $platform = $entityManager->getConnection()->getDatabasePlatform();

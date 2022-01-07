@@ -8,9 +8,6 @@ use DH\Auditor\Exception\InvalidArgumentException;
 
 class RangeFilter implements FilterInterface
 {
-    /**
-     * @var string
-     */
     protected string $name;
 
     /**
@@ -39,17 +36,11 @@ class RangeFilter implements FilterInterface
         return $this->name;
     }
 
-    /**
-     * @return mixed
-     */
     public function getMinValue()
     {
         return $this->minValue;
     }
 
-    /**
-     * @return mixed
-     */
     public function getMaxValue()
     {
         return $this->maxValue;
