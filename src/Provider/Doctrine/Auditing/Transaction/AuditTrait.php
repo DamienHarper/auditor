@@ -19,6 +19,8 @@ trait AuditTrait
      * @throws \DH\Auditor\Exception\MappingException
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\ORM\Mapping\MappingException
+     *
+     * @return mixed
      */
     private function id(EntityManagerInterface $entityManager, object $entity)
     {
