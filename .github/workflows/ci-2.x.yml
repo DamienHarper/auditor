@@ -92,8 +92,12 @@ jobs:
         run: SYMFONY_REQUIRE="^4.4" composer update --no-progress --ansi --prefer-stable
 
       - name: Update project dependencies (5.*)
-        if: matrix.symfony == '5.*' || matrix.symfony == '6.*'
-        run: composer update --no-progress --ansi --prefer-stable
+        if: matrix.symfony == '5.*'
+        run: SYMFONY_REQUIRE="^5.4" composer update --no-progress --ansi --prefer-stable
+
+      - name: Update project dependencies (6.*)
+        if: matrix.symfony == '6.*'
+        run: SYMFONY_REQUIRE="^6.0" composer update --no-progress --ansi --prefer-stable
 
       - name: Install PHPStan
         run: composer install --no-progress --ansi --working-dir=tools/phpstan
