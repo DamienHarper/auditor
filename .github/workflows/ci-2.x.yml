@@ -23,7 +23,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
+          php-version: 8.1
           extensions: composer:v2
 
       - name: Install PHP-CS-Fixer
@@ -128,7 +128,16 @@ jobs:
         run: composer phpstan
 
       - name: Run tests
-        run: vendor/bin/phpunit -c phpunit.${{ matrix.db }}.xml
+        run: |
+          RAW_CODECOV_REPORT="php-${{ matrix.php }}-sf-${{ matrix.symfony }}-${{ matrix.db }}-coverage"
+          echo "CODECOV_REPORT=$(echo $RAW_CODECOV_REPORT | sed 's/\.\*//')" >> $GITHUB_ENV
+          vendor/bin/phpunit -c phpunit.${{ matrix.db }}.xml --coverage-clover=coverage.xml
+
+      - name: Upload coverage file
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.CODECOV_REPORT }}
+          path: coverage.xml
 
   tests_sf_6:
     name: Tests PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, ${{ matrix.db }}
@@ -215,4 +224,37 @@ jobs:
         run: composer phpstan
 
       - name: Run tests
-        run: vendor/bin/phpunit -c phpunit.${{ matrix.db }}.xml
+        run: |
+          RAW_CODECOV_REPORT="php-${{ matrix.php }}-sf-${{ matrix.symfony }}-${{ matrix.db }}-coverage"
+          echo "CODECOV_REPORT=$(echo $RAW_CODECOV_REPORT | sed 's/\.\*//')" >> $GITHUB_ENV
+          vendor/bin/phpunit -c phpunit.${{ matrix.db }}.xml --coverage-clover=coverage.xml
+
+      - name: Upload coverage file
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.CODECOV_REPORT }}
+          path: coverage.xml
+
+  upload_coverage:
+    name: "Upload coverage to Codecov"
+    runs-on: "ubuntu-latest"
+    needs:
+      - tests_sf4_sf5
+      - tests_sf_6
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+        with:
+          fetch-depth: 2
+
+      - name: "Download coverage files"
+        uses: "actions/download-artifact@v2"
+        with:
+          path: "reports"
+
+      - name: "Upload to Codecov"
+        uses: "codecov/codecov-action@v2"
+        with:
+          directory: reports
+          verbose: true
