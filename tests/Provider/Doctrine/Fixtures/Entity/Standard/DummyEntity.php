@@ -70,8 +70,6 @@ class DummyEntity
 
     /**
      * Get the value of name.
-     *
-     * @return mixed
      */
     public function getLabel()
     {

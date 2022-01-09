@@ -16,11 +16,13 @@ trait AuditTrait
     /**
      * Returns the primary key value of an entity.
      *
-     * @param object $entity
+     * @throws \DH\Auditor\Exception\MappingException
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\ORM\Mapping\MappingException
      *
      * @return mixed
      */
-    private function id(EntityManagerInterface $entityManager, $entity)
+    private function id(EntityManagerInterface $entityManager, object $entity)
     {
         $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
 
@@ -62,12 +64,15 @@ trait AuditTrait
      *
      * @param mixed $value
      *
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Types\ConversionException
+     *
      * @return mixed
      */
     private function value(EntityManagerInterface $entityManager, Type $type, $value)
     {
         if (null === $value) {
-            return;
+            return null;
         }
 
         $platform = $entityManager->getConnection()->getDatabasePlatform();
@@ -120,9 +125,12 @@ trait AuditTrait
     /**
      * Computes a usable diff.
      *
-     * @param object $entity
+     * @throws \DH\Auditor\Exception\MappingException
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Types\ConversionException
+     * @throws \Doctrine\ORM\Mapping\MappingException
      */
-    private function diff(EntityManagerInterface $entityManager, $entity, array $changeset): array
+    private function diff(EntityManagerInterface $entityManager, object $entity, array $changeset): array
     {
         $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
         $diff = [
@@ -170,9 +178,11 @@ trait AuditTrait
     /**
      * Returns an array describing an entity.
      *
-     * @param null|object $entity
+     * @throws \DH\Auditor\Exception\MappingException
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\ORM\Mapping\MappingException
      */
-    private function summarize(EntityManagerInterface $entityManager, $entity = null, array $extra = []): ?array
+    private function summarize(EntityManagerInterface $entityManager, ?object $entity = null, array $extra = []): ?array
     {
         if (null === $entity) {
             return null;
