@@ -257,4 +257,4 @@ jobs:
         uses: "codecov/codecov-action@v2"
         with:
           directory: reports
-          verbose: true
+          token: ${{ env.CODECOV_TOKEN }}
