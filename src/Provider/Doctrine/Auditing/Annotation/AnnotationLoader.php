@@ -49,7 +49,8 @@ class AnnotationLoader
         $reflection = $metadata->getReflectionClass();
 
         // Check that we have an Entity annotation
-        if (\PHP_VERSION_ID >= 80000 && $attributes = $reflection->getAttributes(Entity::class)) {
+        $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Entity::class) : null;
+        if (\is_array($attributes) && \count($attributes) > 0) {
             $annotation = $attributes[0]->newInstance();
         } elseif (null !== $this->reader) {
             $annotation = $this->reader->getClassAnnotation($reflection, Entity::class);
@@ -60,11 +61,10 @@ class AnnotationLoader
         }
 
         // Check that we have an Auditable annotation
-        if (\PHP_VERSION_ID >= 80000 && $attributes = $reflection->getAttributes(Auditable::class)) {
-            /** @var ?Auditable $auditableAnnotation */
+        $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Auditable::class) : null;
+        if (\is_array($attributes) && \count($attributes) > 0) {
             $auditableAnnotation = $attributes[0]->newInstance();
         } elseif (null !== $this->reader) {
-            /** @var ?Auditable $auditableAnnotation */
             $auditableAnnotation = $this->reader->getClassAnnotation($reflection, Auditable::class);
         }
 
@@ -72,22 +72,15 @@ class AnnotationLoader
             return null;
         }
 
-        // Check that we have an Security annotation
-        if (\PHP_VERSION_ID >= 80000 && $attributes = $reflection->getAttributes(Security::class)) {
-            /** @var ?Security $securityAnnotation */
+        // Check that we have a Security annotation
+        $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Security::class) : null;
+        if (\is_array($attributes) && \count($attributes) > 0) {
             $securityAnnotation = $attributes[0]->newInstance();
         } elseif (null !== $this->reader) {
-            /** @var ?Security $securityAnnotation */
             $securityAnnotation = $this->reader->getClassAnnotation($reflection, Security::class);
         }
 
-        if (null === $securityAnnotation) {
-            $roles = null;
-        } else {
-            $roles = [
-                Security::VIEW_SCOPE => $securityAnnotation->view,
-            ];
-        }
+        $roles = null === $securityAnnotation ? null : [Security::VIEW_SCOPE => $securityAnnotation->view];
 
         $config = [
             'ignored_columns' => [],
@@ -97,8 +90,9 @@ class AnnotationLoader
 
         // Are there any Ignore annotations?
         foreach ($reflection->getProperties() as $property) {
-            if (\PHP_VERSION_ID >= 80000 && $attributes = $property->getAttributes(Ignore::class)) {
-                $annotationProperty = $attributes[0]->newInstance();
+            if (\PHP_VERSION_ID >= 80000 && method_exists($property, 'getAttributes')) {
+                $attributes = $property->getAttributes(Ignore::class);
+                $annotationProperty = \count($attributes) > 0 ? $attributes[0]->newInstance() : null;
             } elseif (null !== $this->reader) {
                 $annotationProperty = $this->reader->getPropertyAnnotation($property, Ignore::class);
             }

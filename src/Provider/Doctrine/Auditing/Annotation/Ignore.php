@@ -7,7 +7,6 @@ use Doctrine\Common\Annotations\Annotation;
 
 /**
  * @Annotation
- *
  * @Target("PROPERTY")
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
