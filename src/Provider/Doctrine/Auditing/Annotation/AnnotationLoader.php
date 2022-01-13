@@ -45,9 +45,9 @@ class AnnotationLoader
         $reflection = $metadata->getReflectionClass();
 
         // Check that we have an Entity annotation
-        if (\PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes')) {
-            $attributes = $reflection->getAttributes(Entity::class);
-            $annotation = \count($attributes) > 0 ? $attributes[0]->newInstance() : null;
+        $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Entity::class) : null;
+        if (\is_array($attributes) && \count($attributes) > 0) {
+            $annotation = $attributes[0]->newInstance();
         } elseif (null !== $this->reader) {
             $annotation = $this->reader->getClassAnnotation($reflection, Entity::class);
         }
@@ -57,9 +57,9 @@ class AnnotationLoader
         }
 
         // Check that we have an Auditable annotation
-        if (\PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes')) {
-            $attributes = $reflection->getAttributes(Auditable::class);
-            $auditableAnnotation = \count($attributes) > 0 ? $attributes[0]->newInstance() : null;
+        $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Auditable::class) : null;
+        if (\is_array($attributes) && \count($attributes) > 0) {
+            $auditableAnnotation = $attributes[0]->newInstance();
         } elseif (null !== $this->reader) {
             $auditableAnnotation = $this->reader->getClassAnnotation($reflection, Auditable::class);
         }
@@ -68,10 +68,10 @@ class AnnotationLoader
             return null;
         }
 
-        // Check that we have an Security annotation
-        if (\PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes')) {
-            $attributes = $reflection->getAttributes(Security::class);
-            $securityAnnotation = \count($attributes) > 0 ? $attributes[0]->newInstance() : null;
+        // Check that we have a Security annotation
+        $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Security::class) : null;
+        if (\is_array($attributes) && \count($attributes) > 0) {
+            $securityAnnotation = $attributes[0]->newInstance();
         } elseif (null !== $this->reader) {
             $securityAnnotation = $this->reader->getClassAnnotation($reflection, Security::class);
         }

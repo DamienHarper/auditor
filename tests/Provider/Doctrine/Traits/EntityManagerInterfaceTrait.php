@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
+use Doctrine\Common\Annotations\Annotation;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Setup;
@@ -28,6 +29,7 @@ trait EntityManagerInterfaceTrait
             false
         );
 
+        class_exists(Annotation::class, true);
         DoctrineExtensions::registerAnnotations();
 
         $connection = $this->getConnection($connectionName, $params);
