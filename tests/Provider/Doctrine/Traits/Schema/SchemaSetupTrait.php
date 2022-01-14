@@ -165,6 +165,7 @@ trait SchemaSetupTrait
     private function flushAll(array $storageServices): void
     {
         $done = [];
+
         /**
          * @var string         $entity
          * @var StorageService $storageService

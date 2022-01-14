@@ -366,6 +366,7 @@ final class ReaderTest extends TestCase
     public function testGetAuditByTransactionHash(): void
     {
         $reader = $this->createReader();
+
         /** @var StorageService $storageService */
         $storageService = $this->provider->getStorageServiceForEntity(Author::class);
 
@@ -411,6 +412,7 @@ final class ReaderTest extends TestCase
     public function testGetAllAuditsByTransactionHash(): void
     {
         $reader = $this->createReader();
+
         /** @var StorageService $storageService */
         $storageService = $this->provider->getStorageServiceForEntity(Author::class);
 

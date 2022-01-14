@@ -80,12 +80,14 @@ class TransactionHydrator implements TransactionHydratorInterface
     private function hydrateWithScheduledCollectionUpdates(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
         $uow = $entityManager->getUnitOfWork();
+
         /** @var PersistentCollection $collection */
         foreach (array_reverse($uow->getScheduledCollectionUpdates()) as $collection) {
             /** @var object $owner */
             $owner = $collection->getOwner();
             if ($this->provider->isAudited($owner)) {
                 $mapping = $collection->getMapping();
+
                 /** @var object $entity */
                 foreach ($collection->getInsertDiff() as $entity) {
                     if ($this->provider->isAudited($entity)) {
@@ -96,6 +98,7 @@ class TransactionHydrator implements TransactionHydratorInterface
                         ]);
                     }
                 }
+
                 /** @var object $entity */
                 foreach ($collection->getDeleteDiff() as $entity) {
                     if ($this->provider->isAudited($entity)) {
@@ -114,12 +117,14 @@ class TransactionHydrator implements TransactionHydratorInterface
     private function hydrateWithScheduledCollectionDeletions(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
         $uow = $entityManager->getUnitOfWork();
+
         /** @var PersistentCollection $collection */
         foreach (array_reverse($uow->getScheduledCollectionDeletions()) as $collection) {
             /** @var object $owner */
             $owner = $collection->getOwner();
             if ($this->provider->isAudited($owner)) {
                 $mapping = $collection->getMapping();
+
                 /** @var object $entity */
                 foreach ($collection->toArray() as $entity) {
                     if ($this->provider->isAudited($entity)) {
