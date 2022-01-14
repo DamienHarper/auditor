@@ -86,9 +86,9 @@ class AnnotationLoader
 
         // Are there any Ignore annotations?
         foreach ($reflection->getProperties() as $property) {
-            if (\PHP_VERSION_ID >= 80000 && method_exists($property, 'getAttributes')) {
-                $attributes = $property->getAttributes(Ignore::class);
-                $annotationProperty = \count($attributes) > 0 ? $attributes[0]->newInstance() : null;
+            $attributes = \PHP_VERSION_ID >= 80000 && method_exists($property, 'getAttributes') ? $property->getAttributes(Security::class) : null;
+            if (\is_array($attributes) && \count($attributes) > 0) {
+                $annotationProperty = $attributes[0]->newInstance();
             } elseif (null !== $this->reader) {
                 $annotationProperty = $this->reader->getPropertyAnnotation($property, Ignore::class);
             }
