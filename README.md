@@ -2,7 +2,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/damienharper/auditor/v/stable)](https://packagist.org/packages/damienharper/auditor)
 [![Latest Unstable Version](https://poser.pugx.org/damienharper/auditor/v/unstable)](https://packagist.org/packages/damienharper/auditor)
-![CI](https://github.com/DamienHarper/auditor/workflows/CI/badge.svg?branch=master)
+[![auditor 1.x CI](https://github.com/DamienHarper/auditor/actions/workflows/ci-1.x.yml/badge.svg)](https://github.com/DamienHarper/auditor/actions/workflows/ci-1.x.yml)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=master)
 [![codecov](https://codecov.io/gh/DamienHarper/auditor/branch/master/graph/badge.svg)](https://codecov.io/gh/DamienHarper/auditor)
 [![License](https://poser.pugx.org/damienharper/auditor/license)](https://packagist.org/packages/damienharper/auditor)
@@ -54,8 +54,9 @@ Basically you can track any change of any entity from audit logs.
 ## Version Information
  Version   | Status                      | Requirements               | Badges
 :----------|:----------------------------|:---------------------------|:-----------
- 1.x       | Active development :rocket: | PHP >= 7.2, Symfony >= 3.4 | ![CI](https://github.com/DamienHarper/auditor/workflows/CI/badge.svg?branch=master) <br/>[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=master) <br/>[![codecov](https://codecov.io/gh/DamienHarper/auditor/branch/master/graph/badge.svg)](https://codecov.io/gh/DamienHarper/auditor)
- 
+ 2.x       | Not yet released, active development :rocket: | PHP >= 7.4, Symfony >= 4.4 | [![auditor 2.x CI](https://github.com/DamienHarper/auditor/actions/workflows/ci-2.x.yml/badge.svg)](https://github.com/DamienHarper/auditor/actions/workflows/ci-2.x.yml) <br/>[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=master) <br/>[![codecov](https://codecov.io/gh/DamienHarper/auditor/branch/master/graph/badge.svg)](https://codecov.io/gh/DamienHarper/auditor)
+ 1.x       | Active support | PHP >= 7.2, Symfony >= 3.4 | [![auditor 1.x CI](https://github.com/DamienHarper/auditor/actions/workflows/ci-1.x.yml/badge.svg)](https://github.com/DamienHarper/auditor/actions/workflows/ci-1.x.yml) <br/>[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=1.x)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=1.x) <br/>[![codecov](https://codecov.io/gh/DamienHarper/auditor/branch/1.x/graph/badge.svg)](https://codecov.io/gh/DamienHarper/auditor)
+
 Changelog is available [here](https://damienharper.github.io/auditor-docs/docs/auditor/release-notes.html)
 
 

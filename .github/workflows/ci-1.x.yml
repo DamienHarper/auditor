@@ -2,11 +2,13 @@ name: CI
 
 on:
   schedule:
-    - cron: 0 0 * * *
+    - cron: 0 1 * * *
   pull_request:
+    branches:
+      - 1.x
   push:
     branches:
-      - master
+      - 1.x
 
 jobs:
   tests:
@@ -61,6 +63,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: 1.x
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -101,7 +105,16 @@ jobs:
         run: composer validate --strict --no-check-lock
 
       - name: Run tests
-        run: vendor/bin/phpunit -c phpunit.${{ matrix.db }}.xml
+        run: |
+          RAW_CODECOV_REPORT="php-${{ matrix.php }}-sf-${{ matrix.symfony }}-${{ matrix.db }}-coverage"
+          echo "CODECOV_REPORT=$(echo $RAW_CODECOV_REPORT | sed 's/\.\*//')" >> $GITHUB_ENV
+          vendor/bin/phpunit -c phpunit.${{ matrix.db }}.xml --coverage-clover=coverage.xml
+
+      - name: Upload coverage file
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.CODECOV_REPORT }}
+          path: coverage.xml
 
   tests-symfony-next:
     name: Tests PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, ${{ matrix.db }}
@@ -151,6 +164,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: 1.x
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -183,4 +198,38 @@ jobs:
         run: composer validate --strict --no-check-lock
 
       - name: Run tests
-        run: vendor/bin/phpunit -c phpunit.${{ matrix.db }}.xml
+        run: |
+          RAW_CODECOV_REPORT="php-${{ matrix.php }}-sf-${{ matrix.symfony }}-${{ matrix.db }}-coverage"
+          echo "CODECOV_REPORT=$(echo $RAW_CODECOV_REPORT | sed 's/\.\*//')" >> $GITHUB_ENV
+          vendor/bin/phpunit -c phpunit.${{ matrix.db }}.xml --coverage-clover=coverage.xml
+
+      - name: Upload coverage file
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.CODECOV_REPORT }}
+          path: coverage.xml
+
+  upload_coverage:
+    name: "Upload coverage to Codecov"
+    runs-on: "ubuntu-latest"
+    needs:
+      - tests
+      - tests-symfony-next
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+        with:
+          fetch-depth: 2
+          ref: 1.x
+
+      - name: "Download coverage files"
+        uses: "actions/download-artifact@v2"
+        with:
+          path: "reports"
+
+      - name: "Upload to Codecov"
+        uses: "codecov/codecov-action@v2"
+        with:
+          directory: reports
+          token: ${{ env.CODECOV_TOKEN }}
