@@ -7,43 +7,30 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter;
 use DateTimeInterface;
 use DH\Auditor\Exception\InvalidArgumentException;
 
-class DateRangeFilter extends RangeFilter
+class DateRangeFilter implements FilterInterface
 {
-    /**
-     * @var DateTimeInterface
-     */
-    protected $minValue;
+    protected string $name;
 
-    /**
-     * @var DateTimeInterface
-     */
-    protected $maxValue;
+    protected ?DateTimeInterface $minValue;
+
+    protected ?DateTimeInterface $maxValue;
 
     public function __construct(string $name, ?DateTimeInterface $minValue, ?DateTimeInterface $maxValue = null)
     {
-        parent::__construct($name, $minValue, $maxValue);
-
         if (null !== $minValue && null !== $maxValue && $minValue > $maxValue) {
             throw new InvalidArgumentException('Max bound has to be later than min bound.');
         }
 
-//        $this->filters[$name][] = [
-//            null === $minValue ? null : $minValue->format('Y-m-d H:i:s'),
-//            null === $maxValue ? null : $maxValue->format('Y-m-d H:i:s'),
-//        ];
+        $this->name = $name;
+        $this->minValue = $minValue;
+        $this->maxValue = $maxValue;
     }
 
-    /**
-     * @return DateTimeInterface
-     */
     public function getMinValue(): ?DateTimeInterface
     {
         return $this->minValue;
     }
 
-    /**
-     * @return DateTimeInterface
-     */
     public function getMaxValue(): ?DateTimeInterface
     {
         return $this->maxValue;
@@ -68,5 +55,10 @@ class DateRangeFilter extends RangeFilter
             'sql' => implode(' AND ', $sqls),
             'params' => $params,
         ];
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 }

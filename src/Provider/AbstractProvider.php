@@ -11,25 +11,19 @@ use DH\Auditor\Provider\Service\StorageServiceInterface;
 
 abstract class AbstractProvider implements ProviderInterface
 {
-    /**
-     * @var Auditor
-     */
-    protected $auditor;
+    protected ?Auditor $auditor = null;
 
-    /**
-     * @var ConfigurationInterface
-     */
-    protected $configuration;
+    protected ConfigurationInterface $configuration;
 
     /**
      * @var StorageServiceInterface[]
      */
-    protected $storageServices = [];
+    protected array $storageServices = [];
 
     /**
      * @var AuditingServiceInterface[]
      */
-    protected $auditingServices = [];
+    protected array $auditingServices = [];
 
     public function getConfiguration(): ConfigurationInterface
     {
@@ -45,6 +39,10 @@ abstract class AbstractProvider implements ProviderInterface
 
     public function getAuditor(): Auditor
     {
+        if (null === $this->auditor) {
+            throw new ProviderException('This provider has not been registered.');
+        }
+
         return $this->auditor;
     }
 

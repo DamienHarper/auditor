@@ -15,10 +15,7 @@ class TransactionHydrator implements TransactionHydratorInterface
 {
     use AuditTrait;
 
-    /**
-     * @var DoctrineProvider
-     */
-    private $provider;
+    private DoctrineProvider $provider;
 
     public function __construct(DoctrineProvider $provider)
     {
@@ -105,7 +102,6 @@ class TransactionHydrator implements TransactionHydratorInterface
                         $transaction->trackAuditEvent(Transaction::DISSOCIATE, [
                             $collection->getOwner(),
                             $entity,
-                            $this->id($entityManager, $entity),
                             $mapping,
                         ]);
                     }

@@ -23,10 +23,9 @@ final class Security
     public const VIEW_SCOPE = 'view';
 
     /**
-     * @var array
      * @Required
      */
-    public $view;
+    public array $view;
 
     public function __construct(array $view)
     {

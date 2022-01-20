@@ -6,10 +6,7 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter;
 
 class SimpleFilter implements FilterInterface
 {
-    /**
-     * @var string
-     */
-    protected $name;
+    protected string $name;
 
     /**
      * @var array|string

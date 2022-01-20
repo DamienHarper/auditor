@@ -160,6 +160,7 @@ class DoctrineProvider extends AbstractProvider
      */
     public function isAudited($entity): bool
     {
+        \assert(null !== $this->auditor);
         if (!$this->auditor->getConfiguration()->isEnabled()) {
             return false;
         }

@@ -10,10 +10,7 @@ trait DefaultSchemaSetupTrait
 {
     use SchemaSetupTrait;
 
-    /**
-     * @var DoctrineProvider
-     */
-    private $provider;
+    private DoctrineProvider $provider;
 
     private function createAndInitDoctrineProvider(): void
     {
