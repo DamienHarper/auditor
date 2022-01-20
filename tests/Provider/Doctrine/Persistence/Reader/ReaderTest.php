@@ -115,6 +115,7 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class)->resetOrderBy()->execute();
+        self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
         for ($i = 0; $i < 5; ++$i) {
             self::assertSame($expected[$i], self::explain($audits[$i], Author::class));
         }
@@ -139,6 +140,7 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Post::class)->resetOrderBy()->execute();
+        self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
         for ($i = 0; $i < 15; ++$i) {
             self::assertSame($expected[$i], self::explain($audits[$i], Post::class));
         }
@@ -151,6 +153,7 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Comment::class)->resetOrderBy()->execute();
+        self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
         for ($i = 0; $i < 3; ++$i) {
             self::assertSame($expected[$i], self::explain($audits[$i], Comment::class));
         }
@@ -175,6 +178,7 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Tag::class)->resetOrderBy()->execute();
+        self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
         for ($i = 0; $i < 15; ++$i) {
             self::assertSame($expected[$i], self::explain($audits[$i], Tag::class));
         }
