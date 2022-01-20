@@ -12,7 +12,7 @@ trait ConnectionTrait
     /**
      * @var Connection[]
      */
-    private static $connections = [];
+    private static array $connections = [];
 
     private function getConnection(string $name = 'default', ?array $params = null): Connection
     {

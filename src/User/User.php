@@ -6,15 +6,9 @@ namespace DH\Auditor\User;
 
 class User implements UserInterface
 {
-    /**
-     * @var null|string
-     */
-    protected $id;
+    protected ?string $id;
 
-    /**
-     * @var null|string
-     */
-    protected $username;
+    protected ?string $username;
 
     /**
      * User constructor.

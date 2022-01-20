@@ -16,10 +16,7 @@ trait SchemaSetupTrait
 {
     use DoctrineProviderTrait;
 
-    /**
-     * @var DoctrineProvider
-     */
-    private $provider;
+    private DoctrineProvider $provider;
 
     protected function setUp(): void
     {

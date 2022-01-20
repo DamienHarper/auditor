@@ -17,10 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[Audit\Auditable]
 class AuditedEntity
 {
-    /**
-     * @var string
-     */
-    public $auditedField;
+    public string $auditedField;
 
     /**
      * @var string

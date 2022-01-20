@@ -18,10 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[Audit\Auditable(enabled: false), Audit\Security(view: ['ROLE1', 'ROLE2'])]
 class AuditableButUnauditedEntity
 {
-    /**
-     * @var string
-     */
-    public $auditedField;
+    public string $auditedField;
 
     /**
      * @var string

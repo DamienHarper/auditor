@@ -11,60 +11,30 @@ class Entry
 {
     protected int $id;
 
-    /**
-     * @var string
-     */
-    protected $type;
+    protected string $type;
 
-    /**
-     * @var string
-     */
-    protected $object_id;
+    protected string $object_id;
 
-    /**
-     * @var null|string
-     */
-    protected $discriminator;
+    protected ?string $discriminator;
 
-    /**
-     * @var null|string
-     */
-    protected $transaction_hash;
+    protected ?string $transaction_hash;
 
-    /**
-     * @var string
-     */
-    protected $diffs;
+    protected string $diffs;
 
     /**
      * @var null|int|string
      */
     protected $blame_id;
 
-    /**
-     * @var string
-     */
-    protected $blame_user;
+    protected ?string $blame_user = null;
 
-    /**
-     * @var string
-     */
-    protected $blame_user_fqdn;
+    protected ?string $blame_user_fqdn = null;
 
-    /**
-     * @var string
-     */
-    protected $blame_user_firewall;
+    protected ?string $blame_user_firewall = null;
 
-    /**
-     * @var string
-     */
-    protected $ip;
+    protected ?string $ip = null;
 
-    /**
-     * @var string
-     */
-    protected $created_at;
+    protected string $created_at;
 
     /**
      * Get the value of id.

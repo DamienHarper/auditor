@@ -19,10 +19,7 @@ use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 #[Attribute(Attribute::TARGET_CLASS)]
 final class Auditable
 {
-    /**
-     * @var bool
-     */
-    public $enabled = true;
+    public bool $enabled = true;
 
     public function __construct(bool $enabled = true)
     {
