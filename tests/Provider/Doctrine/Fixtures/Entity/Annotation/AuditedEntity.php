@@ -13,25 +13,19 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @Audit\Auditable
  */
-#[ORM\Entity, ORM\Table(name: 'audited_entity')]
-#[Audit\Auditable]
 class AuditedEntity
 {
     public string $auditedField;
 
     /**
-     * @var string
-     *
      * @Audit\Ignore
      */
-    #[Audit\Ignore]
-    public $ignoredField;
+    public string $ignoredField;
 
     /**
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      * @ORM\Column(type="integer")
      */
-    #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer')]
     private int $id;
 }

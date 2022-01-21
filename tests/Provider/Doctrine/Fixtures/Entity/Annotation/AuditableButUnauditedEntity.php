@@ -14,25 +14,19 @@ use Doctrine\ORM\Mapping as ORM;
  * @Audit\Auditable(enabled=false)
  * @Audit\Security(view={"ROLE1", "ROLE2"})
  */
-#[ORM\Entity, ORM\Table(name: 'auditable_but_unaudited_entity')]
-#[Audit\Auditable(enabled: false), Audit\Security(view: ['ROLE1', 'ROLE2'])]
 class AuditableButUnauditedEntity
 {
     public string $auditedField;
 
     /**
-     * @var string
-     *
      * @Audit\Ignore
      */
-    #[Audit\Ignore]
-    public $ignoredField;
+    public string $ignoredField;
 
     /**
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      * @ORM\Column(type="integer")
      */
-    #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer')]
     private int $id;
 }
