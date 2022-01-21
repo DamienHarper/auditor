@@ -106,25 +106,35 @@ final class ReaderTest extends TestCase
         }
 
         $expected = [
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3: [email: luke.skywalker@gmail.com, fullname: Luke Skywalker]',
             'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#2: [email: chuck.norris@gmail.com, fullname: Chuck Norris]',
             'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#1: [email: john.doe@gmail.com, fullname: John]',
-            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3: [email: luke.skywalker@gmail.com, fullname: Luke Skywalker]',
             'Updated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#1: [fullname: John => John Doe]',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3 (Luke Skywalker) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#2 (Chuck Norris) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3 (Third post)',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#4: [email: luke.skywalker@gmail.com, fullname: Luke Skywalker]',
+            'Dissociated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#4 (Luke Skywalker) from DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post)',
             'Deleted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3',
         ];
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class)->resetOrderBy()->execute();
         self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
-        for ($i = 0; $i < 5; ++$i) {
+        for ($i = 0; $i < \count($expected); ++$i) {
             self::assertSame($expected[$i], self::explain($audits[$i], Author::class));
         }
 
         $expected = [
-            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3: [author: Chuck Norris, body: Here is another body, created_at: 2020-01-17 22:17:34, title: Third post]',
-            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#2: [author: John, body: Here is another body, created_at: 2020-01-17 22:17:34, title: Second post]',
-            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#1: [author: John, body: Here is the body, created_at: 2020-01-17 22:17:34, title: First post]',
-            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4: [author: Luke Skywalker, body: Here is the body, created_at: 2020-01-17 22:17:34, title: Fourth post]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4: [body: Here is the body, created_at: 2020-01-17 22:17:34, title: Fourth post]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3: [body: Here is another body, created_at: 2020-01-17 22:17:34, title: Third post]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#2: [body: Here is another body, created_at: 2020-01-17 22:17:34, title: Second post]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#1: [body: Here is the body, created_at: 2020-01-17 22:17:34, title: First post]',
+            'Updated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3: [coauthor: null => Luke Skywalker]',
+            'Updated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#2: [author: null => John Doe]',
+            'Updated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#1: [author: null => John Doe, coauthor: null => Chuck Norris]',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3 (Third post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Comment#2 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Comment#2)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3 (Third post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Comment#3 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Comment#3)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#1 (First post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Comment#1 (DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Comment#1)',
             'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#2 (house)',
             'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#4 (jungle)',
             'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5 (gabber)',
@@ -135,26 +145,25 @@ final class ReaderTest extends TestCase
             'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#1 (First post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#2 (house)',
             'Dissociated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post) from DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#4 (jungle)',
             'Dissociated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post) from DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5 (gabber)',
-            'Updated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4: [author: Luke Skywalker => null]',
         ];
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Post::class)->resetOrderBy()->execute();
         self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
-        for ($i = 0; $i < 15; ++$i) {
+        for ($i = 0; $i < \count($expected); ++$i) {
             self::assertSame($expected[$i], self::explain($audits[$i], Post::class));
         }
 
         $expected = [
-            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Comment#3: [author: Mario, body: Second comment about post #3, created_at: 2020-01-17 22:17:34, post: Third post]',
-            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Comment#2: [author: Yoshi, body: First comment about post #3, created_at: 2020-01-17 22:17:34, post: Third post]',
-            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Comment#1: [author: Dark Vador, body: First comment about post #1, created_at: 2020-01-17 22:17:34, post: First post]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Comment#3: [author: Mario, body: Second comment about post #3, created_at: 2020-01-17 22:17:34]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Comment#2: [author: Yoshi, body: First comment about post #3, created_at: 2020-01-17 22:17:34]',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Comment#1: [author: Dark Vador, body: First comment about post #1, created_at: 2020-01-17 22:17:34]',
         ];
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Comment::class)->resetOrderBy()->execute();
         self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
-        for ($i = 0; $i < 3; ++$i) {
+        for ($i = 0; $i < \count($expected); ++$i) {
             self::assertSame($expected[$i], self::explain($audits[$i], Comment::class));
         }
 
@@ -179,7 +188,7 @@ final class ReaderTest extends TestCase
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Tag::class)->resetOrderBy()->execute();
         self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
-        for ($i = 0; $i < 15; ++$i) {
+        for ($i = 0; $i < \count($expected); ++$i) {
             self::assertSame($expected[$i], self::explain($audits[$i], Tag::class));
         }
 
@@ -203,7 +212,7 @@ final class ReaderTest extends TestCase
         self::assertFalse($pager['hasPreviousPage'], 'Pager is at page 1.');
         self::assertTrue($pager['hasNextPage'], 'Pager has next page.');
         self::assertTrue($pager['haveToPaginate'], 'Pager has to paginate.');
-        self::assertSame(3, $pager['numPages'], 'Pager has 3 pages.');
+        self::assertSame(5, $pager['numPages'], 'Pager has 5 pages.');
     }
 
     public function testMultipleFilters(): void
@@ -212,13 +221,13 @@ final class ReaderTest extends TestCase
 
         $query = $reader->createQuery(Author::class);
         $audits = $query->execute();
-        self::assertCount(5, $audits);
+        self::assertCount(9, $audits);
 
         $query = $reader->createQuery(Author::class);
         $query->addFilter(new SimpleFilter('object_id', 1));
         $query->addFilter(new SimpleFilter('object_id', 2));
         $audits = $query->execute();
-        self::assertCount(3, $audits);
+        self::assertCount(4, $audits);
     }
 
     /**
@@ -229,10 +238,14 @@ final class ReaderTest extends TestCase
         $reader = $this->createReader();
 
         $expected = [
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3: [email: luke.skywalker@gmail.com, fullname: Luke Skywalker]',
             'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#2: [email: chuck.norris@gmail.com, fullname: Chuck Norris]',
             'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#1: [email: john.doe@gmail.com, fullname: John]',
-            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3: [email: luke.skywalker@gmail.com, fullname: Luke Skywalker]',
             'Updated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#1: [fullname: John => John Doe]',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3 (Luke Skywalker) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post)',
+            'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#2 (Chuck Norris) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3 (Third post)',
+            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#4: [email: luke.skywalker@gmail.com, fullname: Luke Skywalker]',
+            'Dissociated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#4 (Luke Skywalker) from DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post)',
             'Deleted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3',
         ];
 
@@ -243,7 +256,8 @@ final class ReaderTest extends TestCase
             ->resetOrderBy()
             ->execute()
         ;
-        for ($i = 0; $i < 5; ++$i) {
+        self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
+        for ($i = 0; $i < \count($expected); ++$i) {
             self::assertSame($expected[$i], self::explain($audits[$i], Author::class));
         }
 
@@ -280,7 +294,7 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $count = $reader->createQuery(Author::class)->count();
-        self::assertSame(5, $count, 'count is ok.');
+        self::assertSame(9, $count, 'count is ok.');
     }
 
     /**
@@ -296,7 +310,7 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Post::class, ['object_id' => 1])->execute();
-        self::assertCount(3, $audits, 'result count is ok.');
+        self::assertCount(5, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Comment::class, ['object_id' => 1])->execute();
@@ -324,7 +338,7 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['page' => 3, 'page_size' => 2])->execute();
-        self::assertCount(1, $audits, 'result count is ok.');
+        self::assertCount(2, $audits, 'result count is ok.');
     }
 
     public function testReaderHonorsPaging(): void
@@ -349,7 +363,7 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['type' => Transaction::INSERT])->execute();
-        self::assertCount(3, $audits, 'result count is ok.');
+        self::assertCount(4, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['type' => Transaction::REMOVE])->execute();
@@ -357,11 +371,11 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['type' => Transaction::ASSOCIATE])->execute();
-        self::assertCount(0, $audits, 'result count is ok.');
+        self::assertCount(2, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['type' => Transaction::DISSOCIATE])->execute();
-        self::assertCount(0, $audits, 'result count is ok.');
+        self::assertCount(1, $audits, 'result count is ok.');
     }
 
     /**
