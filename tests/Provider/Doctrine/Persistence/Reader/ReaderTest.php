@@ -112,8 +112,6 @@ final class ReaderTest extends TestCase
             'Updated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#1: [fullname: John => John Doe]',
             'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3 (Luke Skywalker) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post)',
             'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#2 (Chuck Norris) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3 (Third post)',
-            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#4: [email: luke.skywalker@gmail.com, fullname: Luke Skywalker]',
-            'Dissociated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#4 (Luke Skywalker) from DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post)',
             'Deleted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3',
         ];
 
@@ -143,6 +141,7 @@ final class ReaderTest extends TestCase
             'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3 (Third post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5 (gabber)',
             'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#1 (First post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#1 (techno)',
             'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#1 (First post) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#2 (house)',
+            'Updated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3: [coauthor: Luke Skywalker => null]',
             'Dissociated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post) from DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#4 (jungle)',
             'Dissociated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post) from DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Tag#5 (gabber)',
         ];
@@ -212,7 +211,7 @@ final class ReaderTest extends TestCase
         self::assertFalse($pager['hasPreviousPage'], 'Pager is at page 1.');
         self::assertTrue($pager['hasNextPage'], 'Pager has next page.');
         self::assertTrue($pager['haveToPaginate'], 'Pager has to paginate.');
-        self::assertSame(5, $pager['numPages'], 'Pager has 5 pages.');
+        self::assertSame(4, $pager['numPages'], 'Pager has 4 pages.');
     }
 
     public function testMultipleFilters(): void
@@ -221,7 +220,7 @@ final class ReaderTest extends TestCase
 
         $query = $reader->createQuery(Author::class);
         $audits = $query->execute();
-        self::assertCount(9, $audits);
+        self::assertCount(7, $audits);
 
         $query = $reader->createQuery(Author::class);
         $query->addFilter(new SimpleFilter('object_id', 1));
@@ -244,8 +243,6 @@ final class ReaderTest extends TestCase
             'Updated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#1: [fullname: John => John Doe]',
             'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3 (Luke Skywalker) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post)',
             'Associated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#2 (Chuck Norris) to DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#3 (Third post)',
-            'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#4: [email: luke.skywalker@gmail.com, fullname: Luke Skywalker]',
-            'Dissociated DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#4 (Luke Skywalker) from DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Post#4 (Fourth post)',
             'Deleted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3',
         ];
 
@@ -294,7 +291,7 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $count = $reader->createQuery(Author::class)->count();
-        self::assertSame(9, $count, 'count is ok.');
+        self::assertSame(7, $count, 'count is ok.');
     }
 
     /**
@@ -363,7 +360,7 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['type' => Transaction::INSERT])->execute();
-        self::assertCount(4, $audits, 'result count is ok.');
+        self::assertCount(3, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['type' => Transaction::REMOVE])->execute();
@@ -375,7 +372,7 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['type' => Transaction::DISSOCIATE])->execute();
-        self::assertCount(1, $audits, 'result count is ok.');
+        self::assertCount(0, $audits, 'result count is ok.');
     }
 
     /**
