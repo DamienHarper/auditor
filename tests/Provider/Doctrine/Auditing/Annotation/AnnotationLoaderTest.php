@@ -33,19 +33,21 @@ final class AnnotationLoaderTest extends TestCase
         $loaded = $annotationLoader->load();
         self::assertCount(0, $loaded, 'No annotation loaded using annotation driver');
 
-        $entityManager = $this->createEntityManager(
-            [
-                __DIR__.'/../../../../../src/Provider/Doctrine/Auditing/Annotation',
-                __DIR__.'/../../Traits',
-            ],
-            'default',
-            null,
-            true
-        );
+        if (\PHP_VERSION_ID >= 80000) {
+            $entityManager = $this->createEntityManager(
+                [
+                    __DIR__.'/../../../../../src/Provider/Doctrine/Auditing/Annotation',
+                    __DIR__.'/../../Traits',
+                ],
+                'default',
+                null,
+                true
+            );
 
-        $annotationLoader = new AnnotationLoader($entityManager);
-        $loaded = $annotationLoader->load();
-        self::assertCount(0, $loaded, 'No annotation loaded using attribute driver');
+            $annotationLoader = new AnnotationLoader($entityManager);
+            $loaded = $annotationLoader->load();
+            self::assertCount(0, $loaded, 'No annotation loaded using attribute driver');
+        }
     }
 
     public function testLoadWithAnnotationsOnly(): void
