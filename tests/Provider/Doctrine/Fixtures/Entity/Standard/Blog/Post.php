@@ -17,7 +17,8 @@ use Stringable;
  * @Gedmo\SoftDeleteable(fieldName="deleted_at", timeAware=false, hardDelete=false)
  */
 #[ORM\Entity]
-#[ORM\Table(name: 'post', indexes: [new ORM\Index(name: 'fk_1_idx', columns: ['author_id'])])]
+#[ORM\Table(name: 'post')]
+#[ORM\Index(name: 'fk_1_idx', columns: ['author_id'])]
 class Post implements Stringable
 {
     /**
@@ -93,7 +94,7 @@ class Post implements Stringable
      * )
      */
     #[ORM\ManyToMany(targetEntity: 'Tag', inversedBy: 'posts', cascade: ['persist', 'remove'])]
-    #[ORM\JoinTable(name: 'post__tag', joinColumns: [new ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id', nullable: false)], inverseJoinColumns: [new ORM\JoinColumn(name: 'tag_id', referencedColumnName: 'id', nullable: false)])]
+//    #[ORM\JoinTable(name: 'post__tag', joinColumns: [new ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id', nullable: false)], inverseJoinColumns: [new ORM\JoinColumn(name: 'tag_id', referencedColumnName: 'id', nullable: false)])]
     protected $tags;
 
     public function __construct()

@@ -13,7 +13,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\Table(name="`comment`", indexes={@ORM\Index(name="fk_post_id", columns={"post_id"})})
  */
 #[ORM\Entity]
-#[ORM\Table(name: '`comment`', indexes: [new ORM\Index(name: 'fk__idx', columns: ['post_id'])])]
+#[ORM\Table(name: '`comment`')]
+#[ORM\Index(name: 'fk__idx', columns: ['post_id'])]
 class Comment
 {
     /**
