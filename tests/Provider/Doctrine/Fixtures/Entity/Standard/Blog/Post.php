@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 
 use DateTimeImmutable;
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation as Audit;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,7 +18,6 @@ use Stringable;
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'post', indexes: [new ORM\Index(name: 'fk_1_idx', columns: ['author_id'])])]
-//#[Audit\Auditable(enabled: true)]
 class Post implements Stringable
 {
     /**

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 
-use DateTime;
 use DateTimeImmutable;
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation as Audit;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
@@ -16,7 +14,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 #[ORM\Entity]
 #[ORM\Table(name: '`comment`', indexes: [new ORM\Index(name: 'fk__idx', columns: ['post_id'])])]
-//#[Audit\Auditable(enabled: true)]
 class Comment
 {
     /**

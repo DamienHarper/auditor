@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation as Audit;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,7 +15,6 @@ use Stringable;
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'tag')]
-//#[Audit\Auditable(enabled: true)]
 class Tag implements Stringable
 {
     /**
