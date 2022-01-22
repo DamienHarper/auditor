@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -13,7 +12,9 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\Entity
  * @ORM\Table(name="`comment`", indexes={@ORM\Index(name="fk_post_id", columns={"post_id"})})
  */
-#[ORM\Entity, ORM\Table(name: '`comment`'), ORM\Index(columns: ['post_id'], name: 'fk_post_id')]
+#[ORM\Entity]
+#[ORM\Table(name: '`comment`')]
+#[ORM\Index(name: 'fk__idx', columns: ['post_id'])]
 class Comment
 {
     /**
@@ -21,7 +22,9 @@ class Comment
      * @ORM\Column(type="integer", options={"unsigned": true})
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     protected $id;
 
     /**
@@ -46,17 +49,17 @@ class Comment
     protected $created_at;
 
     /**
-     * @ORM\Column(type="integer", options={"unsigned": true})
+     * @ORM\Column(type="integer", options={"unsigned": true}, nullable=true)
      */
-    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true], nullable: true)]
     protected $post_id;
 
     /**
      * @ORM\ManyToOne(targetEntity="Post", inversedBy="comments", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(name="post_id", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="post_id", referencedColumnName="id", nullable=true)
      */
-    #[ORM\ManyToOne(targetEntity: 'Post', cascade: ['persist', 'remove'], inversedBy: 'comments')]
-    #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id', nullable: false)]
+    #[ORM\ManyToOne(targetEntity: 'Post', inversedBy: 'comments', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id', nullable: true)]
     protected $post;
 
     public function __construct()
@@ -70,8 +73,6 @@ class Comment
 
     /**
      * Set the value of id.
-     *
-     * @return Comment
      */
     public function setId(int $id): self
     {
@@ -92,8 +93,6 @@ class Comment
 
     /**
      * Set the value of body.
-     *
-     * @return Comment
      */
     public function setBody(string $body): self
     {
@@ -114,8 +113,6 @@ class Comment
 
     /**
      * Set the value of author.
-     *
-     * @return Comment
      */
     public function setAuthor(string $author): self
     {
@@ -136,10 +133,6 @@ class Comment
 
     /**
      * Set the value of created_at.
-     *
-     * @param ?DateTime $created_at
-     *
-     * @return Comment
      */
     public function setCreatedAt(?DateTimeImmutable $created_at): self
     {
@@ -150,8 +143,6 @@ class Comment
 
     /**
      * Get the value of created_at.
-     *
-     * @return ?DateTime
      */
     public function getCreatedAt(): ?DateTimeImmutable
     {
@@ -160,8 +151,6 @@ class Comment
 
     /**
      * Set the value of post_id.
-     *
-     * @return Comment
      */
     public function setPostId(int $post_id): self
     {
@@ -182,10 +171,6 @@ class Comment
 
     /**
      * Set Post entity (many to one).
-     *
-     * @param ?Post $post
-     *
-     * @return Comment
      */
     public function setPost(?Post $post): self
     {
@@ -196,8 +181,6 @@ class Comment
 
     /**
      * Get Post entity (many to one).
-     *
-     * @return ?Post
      */
     public function getPost(): ?Post
     {

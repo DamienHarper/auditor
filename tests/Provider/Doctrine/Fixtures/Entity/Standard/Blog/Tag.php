@@ -7,20 +7,24 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Stringable;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="tag")
  */
-#[ORM\Entity, ORM\Table(name: 'tag')]
-class Tag
+#[ORM\Entity]
+#[ORM\Table(name: 'tag')]
+class Tag implements Stringable
 {
     /**
      * @ORM\Id
      * @ORM\Column(type="integer", options={"unsigned": true})
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     protected $id;
 
     /**
@@ -40,6 +44,11 @@ class Tag
         $this->posts = new ArrayCollection();
     }
 
+    public function __toString(): string
+    {
+        return (string) $this->title;
+    }
+
     public function __sleep()
     {
         return ['id', 'title'];
@@ -47,8 +56,6 @@ class Tag
 
     /**
      * Set the value of id.
-     *
-     * @return Tag
      */
     public function setId(int $id): self
     {
@@ -69,8 +76,6 @@ class Tag
 
     /**
      * Set the value of title.
-     *
-     * @return Tag
      */
     public function setTitle(string $title): self
     {
@@ -91,8 +96,6 @@ class Tag
 
     /**
      * Add Post entity to collection.
-     *
-     * @return Tag
      */
     public function addPost(Post $post): self
     {
@@ -103,8 +106,6 @@ class Tag
 
     /**
      * Remove Post entity from collection.
-     *
-     * @return Tag
      */
     public function removePost(Post $post): self
     {

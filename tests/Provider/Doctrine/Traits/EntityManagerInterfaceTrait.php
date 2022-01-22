@@ -14,20 +14,29 @@ trait EntityManagerInterfaceTrait
 {
     use ConnectionTrait;
 
-    private $fixturesPath = [
+    private array $fixturesPath = [
         __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
         __DIR__.'/../Fixtures',
     ];
 
-    private function createEntityManager(?array $paths = null, string $connectionName = 'default', ?array $params = null): EntityManagerInterface
+    private function createEntityManager(?array $paths = null, string $connectionName = 'default', ?array $params = null, bool $usePHP8Attributes = false): EntityManagerInterface
     {
-        $configuration = Setup::createAnnotationMetadataConfiguration(
-            $paths ?? $this->fixturesPath,
-            true,
-            null,
-            null,
-            false
-        );
+        if ($usePHP8Attributes) {
+            $configuration = Setup::createAttributeMetadataConfiguration(
+                $paths ?? $this->fixturesPath,
+                true,
+                null,
+                null
+            );
+        } else {
+            $configuration = Setup::createAnnotationMetadataConfiguration(
+                $paths ?? $this->fixturesPath,
+                true,
+                null,
+                null,
+                false
+            );
+        }
 
         class_exists(Annotation::class, true);
         DoctrineExtensions::registerAnnotations();

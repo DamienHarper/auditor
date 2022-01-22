@@ -7,20 +7,24 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Stringable;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="author")
  */
-#[ORM\Entity, ORM\Table(name: 'author')]
-class Author
+#[ORM\Entity]
+#[ORM\Table(name: 'author')]
+class Author implements Stringable
 {
     /**
      * @ORM\Id
      * @ORM\Column(type="integer", options={"unsigned": true})
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     protected $id;
 
     /**
@@ -39,13 +43,18 @@ class Author
      * @ORM\OneToMany(targetEntity="Post", mappedBy="author", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="id", referencedColumnName="author_id", nullable=false)
      */
-    #[ORM\OneToMany(mappedBy: 'author', targetEntity: 'Post', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'id', referencedColumnName: 'author_id', nullable: false)]
+    #[ORM\OneToMany(targetEntity: 'Post', mappedBy: 'author', cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'id', referencedColumnName: 'author_id', nullable: true)]
     protected $posts;
 
     public function __construct()
     {
         $this->posts = new ArrayCollection();
+    }
+
+    public function __toString(): string
+    {
+        return $this->getFullname() ?? self::class.'#'.$this->getId();
     }
 
     public function __sleep()
@@ -55,8 +64,6 @@ class Author
 
     /**
      * Set the value of id.
-     *
-     * @return Author
      */
     public function setId(int $id): self
     {
@@ -77,8 +84,6 @@ class Author
 
     /**
      * Set the value of fullname.
-     *
-     * @return Author
      */
     public function setFullname(string $fullname): self
     {
@@ -99,8 +104,6 @@ class Author
 
     /**
      * Set the value of email.
-     *
-     * @return Author
      */
     public function setEmail(string $email): self
     {
@@ -121,8 +124,6 @@ class Author
 
     /**
      * Add Post entity to collection (one to many).
-     *
-     * @return Author
      */
     public function addPost(Post $post): self
     {
@@ -133,8 +134,6 @@ class Author
 
     /**
      * Remove Post entity from collection (one to many).
-     *
-     * @return Author
      */
     public function removePost(Post $post): self
     {
