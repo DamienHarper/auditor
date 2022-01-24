@@ -123,7 +123,7 @@ class Entry
     }
 
     /**
-     * Get the value of created_at.
+     * Get diff values.
      *
      * @return array
      */
