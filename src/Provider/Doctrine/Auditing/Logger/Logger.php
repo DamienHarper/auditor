@@ -23,7 +23,7 @@ class Logger implements SQLLogger
      */
     public function startQuery($sql, ?array $params = null, ?array $types = null): void
     {
-        // right before commit insert all audit entries
+        // insert all audit entries right before commit
         if ('"COMMIT"' === $sql) {
             ($this->flusher)();
         }
