@@ -50,7 +50,6 @@ class DoctrineSubscriber implements EventSubscriber
 
         // Initialize a new LoggerChain with the new AuditLogger + the existing SQLLoggers.
         $loggerChain = new LoggerChain();
-        $loggerChain->addLogger($auditLogger);
         if ($this->loggerBackup instanceof LoggerChain) {
             foreach ($this->loggerBackup->getLoggers() as $logger) {
                 $loggerChain->addLogger($logger);
@@ -58,6 +57,7 @@ class DoctrineSubscriber implements EventSubscriber
         } elseif ($this->loggerBackup instanceof SQLLogger) {
             $loggerChain->addLogger($this->loggerBackup);
         }
+        $loggerChain->addLogger($auditLogger);
         $entityManager->getConnection()->getConfiguration()->setSQLLogger($loggerChain);
 
         // Populate transaction
