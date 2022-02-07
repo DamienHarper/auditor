@@ -30,6 +30,8 @@ class CleanAuditLogsCommand extends Command
 {
     use LockableTrait;
 
+    private const UNTIL_DATE_FORMAT = 'Y-m-d H:i:s';
+
     protected static $defaultName = 'audit:clean';
 
     private Auditor $auditor;
@@ -93,7 +95,7 @@ class CleanAuditLogsCommand extends Command
 
         $message = sprintf(
             "You are about to clean audits created before <comment>%s</comment>: %d entities involved.\n Do you want to proceed?",
-            $until->format('Y-m-d'),
+            $until->format(self::UNTIL_DATE_FORMAT),
             $count
         );
 
@@ -124,11 +126,11 @@ class CleanAuditLogsCommand extends Command
                     $queryBuilder
                         ->delete($auditTable)
                         ->where('created_at < :until')
-                        ->setParameter('until', $until->format('Y-m-d'))
+                        ->setParameter('until', $until->format(self::UNTIL_DATE_FORMAT))
                     ;
 
                     if ($dumpSQL) {
-                        $queries[] = str_replace(':until', "'".$until->format('Y-m-d')."'", $queryBuilder->getSQL());
+                        $queries[] = str_replace(':until', "'".$until->format(self::UNTIL_DATE_FORMAT)."'", $queryBuilder->getSQL());
                     }
 
                     if (!$dryRun) {
