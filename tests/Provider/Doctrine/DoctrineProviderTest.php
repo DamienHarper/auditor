@@ -21,6 +21,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Traits\DoctrineProviderTrait;
 use DH\Auditor\User\User;
 use DH\Auditor\User\UserInterface;
 use DH\Auditor\User\UserProviderInterface;
+use Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -179,6 +180,9 @@ final class DoctrineProviderTest extends TestCase
         // unregistered provider
         $provider = $this->createUnregisteredDoctrineProvider();
         self::assertFalse($provider->isRegistered(), 'Provider is not registered.');
+
+        self::expectException(Exception::class);
+        $auditor = $provider->getAuditor();
 
         // registered provider
         $provider = $this->createDoctrineProvider();
