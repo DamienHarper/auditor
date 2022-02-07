@@ -30,12 +30,12 @@ final class Issue44Test extends TestCase
         $entity->setLabel('entity1');
         $em->persist($entity);
         $em->flush();
-        $em->flush();
+//        $em->flush();
         $em->commit();
-        for ($n = 1; $n <= 10; ++$n) {
-            $em->beginTransaction();
-            $em->commit();
-        }
+//        for ($n = 1; $n <= 10; ++$n) {
+//            $em->beginTransaction();
+//            $em->commit();
+//        }
 
         $audits = $reader->createQuery(DummyEntity::class)->execute();
         self::assertCount(1, $audits, 'results count ok.');

@@ -15,10 +15,10 @@ class AnnotationLoader
 
     private EntityManagerInterface $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, bool $useAttributesOnly = false)
     {
         $this->entityManager = $entityManager;
-        $this->reader = class_exists(AnnotationReader::class) ? new AnnotationReader() : null;
+        $this->reader = class_exists(AnnotationReader::class) && !$useAttributesOnly ? new AnnotationReader() : null;
     }
 
     public function load(): array
@@ -44,7 +44,7 @@ class AnnotationLoader
         $annotationProperty = null;
         $reflection = $metadata->getReflectionClass();
 
-        // Check that we have an Entity annotation
+        // Check that we have an Entity annotation or attribute
         $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Entity::class) : null;
         if (\is_array($attributes) && \count($attributes) > 0) {
             $annotation = $attributes[0]->newInstance();
@@ -56,7 +56,7 @@ class AnnotationLoader
             return null;
         }
 
-        // Check that we have an Auditable annotation
+        // Check that we have an Auditable annotation or attribute
         $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Auditable::class) : null;
         if (\is_array($attributes) && \count($attributes) > 0) {
             $auditableAnnotation = $attributes[0]->newInstance();
@@ -68,7 +68,7 @@ class AnnotationLoader
             return null;
         }
 
-        // Check that we have a Security annotation
+        // Check that we have a Security annotation or attribute
         $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Security::class) : null;
         if (\is_array($attributes) && \count($attributes) > 0) {
             $securityAnnotation = $attributes[0]->newInstance();
@@ -84,7 +84,7 @@ class AnnotationLoader
             'roles' => $roles,
         ];
 
-        // Are there any Ignore annotations?
+        // Are there any Ignore annotation or attribute?
         foreach ($reflection->getProperties() as $property) {
             $attributes = \PHP_VERSION_ID >= 80000 && method_exists($property, 'getAttributes') ? $property->getAttributes(Ignore::class) : null;
             if (\is_array($attributes) && \count($attributes) > 0) {

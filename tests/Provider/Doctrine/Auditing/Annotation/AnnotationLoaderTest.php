@@ -17,7 +17,7 @@ final class AnnotationLoaderTest extends TestCase
 {
     use EntityManagerInterfaceTrait;
 
-    public function testLoadWithoutAnnotationAndAttribute(): void
+    public function testLoadEntitiesWithoutAnnotationAndAttribute(): void
     {
         $entityManager = $this->createEntityManager(
             [
@@ -50,7 +50,7 @@ final class AnnotationLoaderTest extends TestCase
         }
     }
 
-    public function testLoadWithAnnotationsOnly(): void
+    public function testLoadEntitiesWithAnnotationsOnly(): void
     {
         $entityManager = $this->createEntityManager(
             [
@@ -66,7 +66,7 @@ final class AnnotationLoaderTest extends TestCase
         self::assertCount(2, $loaded);
     }
 
-    public function testLoadWithAttributesOnly(): void
+    public function testLoadEntitiesWithAttributesOnly(): void
     {
         if (\PHP_VERSION_ID < 80000) {
             self::markTestSkipped('PHP 8.0+ is required.');
@@ -84,5 +84,25 @@ final class AnnotationLoaderTest extends TestCase
         $annotationLoader = new AnnotationLoader($entityManager);
         $loaded = $annotationLoader->load();
         self::assertCount(2, $loaded);
+    }
+
+    public function testLoadEntitiesWithAnnotationsOnlyButNoAnnotationReader(): void
+    {
+        if (\PHP_VERSION_ID < 80000) {
+            self::markTestSkipped('PHP 8.0+ is required.');
+        }
+
+        $entityManager = $this->createEntityManager(
+            [
+                __DIR__.'/../../../../../src/Provider/Doctrine/Auditing/Annotation',
+                __DIR__.'/../../Fixtures/Entity/Annotation',
+            ],
+            'default',
+            null,
+            false
+        );
+        $annotationLoader = new AnnotationLoader($entityManager, true);
+        $loaded = $annotationLoader->load();
+        self::assertCount(0, $loaded);
     }
 }
