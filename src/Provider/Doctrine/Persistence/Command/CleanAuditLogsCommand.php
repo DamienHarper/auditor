@@ -29,7 +29,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class CleanAuditLogsCommand extends Command
 {
     use LockableTrait;
-    
+
     private const UNTIL_DATE_FORMAT = 'Y-m-d H:i:s';
 
     protected static $defaultName = 'audit:clean';
