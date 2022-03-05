@@ -21,6 +21,13 @@ final class ConfigurationTest extends TestCase
 {
     use ProviderConfigurationTrait;
 
+    public function testGetProvider(): void
+    {
+        $configuration = $this->createProviderConfiguration();
+
+        self::assertNull($configuration->getProvider(), 'provider is null by default.');
+    }
+
     public function testDefaultTablePrefix(): void
     {
         $configuration = $this->createProviderConfiguration();

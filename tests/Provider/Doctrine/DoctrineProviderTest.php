@@ -21,6 +21,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Traits\DoctrineProviderTrait;
 use DH\Auditor\User\User;
 use DH\Auditor\User\UserInterface;
 use DH\Auditor\User\UserProviderInterface;
+use Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -149,7 +150,7 @@ final class DoctrineProviderTest extends TestCase
 
         self::assertNull($provider->getConfiguration()->getStorageMapper(), 'Mapping closure is not set.');
 
-        $provider->getConfiguration()->setStorageMapper(static fn (string $entity, array $storageServices): StorageServiceInterface => 0 === mb_strpos($entity, 'Foo') ? $storageServices['EM1'] : $storageServices['EM2']);
+        $provider->setStorageMapper(static fn (string $entity, array $storageServices): StorageServiceInterface => 0 === mb_strpos($entity, 'Foo') ? $storageServices['EM1'] : $storageServices['EM2']);
 
         self::assertNotNull($provider->getConfiguration()->getStorageMapper(), 'Mapping closure is set.');
 
@@ -179,6 +180,9 @@ final class DoctrineProviderTest extends TestCase
         // unregistered provider
         $provider = $this->createUnregisteredDoctrineProvider();
         self::assertFalse($provider->isRegistered(), 'Provider is not registered.');
+
+        self::expectException(Exception::class);
+        $auditor = $provider->getAuditor();
 
         // registered provider
         $provider = $this->createDoctrineProvider();
