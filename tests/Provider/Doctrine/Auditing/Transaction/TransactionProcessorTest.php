@@ -152,7 +152,7 @@ final class TransactionProcessorTest extends TestCase
         self::assertSame([
             'class' => Author::class,
             'id' => 1,
-            'label' => 'John Doe',  //Author::class.'#1',
+            'label' => 'John Doe',  // Author::class.'#1',
             'table' => $entityManager->getClassMetadata(Author::class)->getTableName(),
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
     }
@@ -221,7 +221,7 @@ final class TransactionProcessorTest extends TestCase
                 'class' => Author::class,
                 'field' => 'posts',
                 'id' => 1,
-                'label' => 'John Doe',  //Author::class.'#1',
+                'label' => 'John Doe',  // Author::class.'#1',
                 'table' => $entityManager->getClassMetadata(Author::class)->getTableName(),
             ],
             'target' => [
@@ -295,7 +295,7 @@ final class TransactionProcessorTest extends TestCase
                 'class' => Author::class,
                 'field' => 'posts',
                 'id' => 1,
-                'label' => 'John Doe',  //Author::class.'#1',
+                'label' => 'John Doe',  // Author::class.'#1',
                 'table' => $entityManager->getClassMetadata(Author::class)->getTableName(),
             ],
             'target' => [
@@ -424,7 +424,7 @@ final class TransactionProcessorTest extends TestCase
                 'class' => Tag::class,
                 'field' => 'posts',
                 'id' => 2,
-                'label' => 'house',     //Tag::class.'#2',
+                'label' => 'house',     // Tag::class.'#2',
                 'table' => $entityManager->getClassMetadata(Tag::class)->getTableName(),
             ],
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
@@ -449,7 +449,7 @@ final class TransactionProcessorTest extends TestCase
                 'class' => Tag::class,
                 'field' => 'posts',
                 'id' => 1,
-                'label' => 'techno',    //Tag::class.'#1',
+                'label' => 'techno',    // Tag::class.'#1',
                 'table' => $entityManager->getClassMetadata(Tag::class)->getTableName(),
             ],
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
@@ -574,7 +574,7 @@ final class TransactionProcessorTest extends TestCase
                 'class' => Tag::class,
                 'field' => 'posts',
                 'id' => 2,
-                'label' => 'house',     //Tag::class.'#2',
+                'label' => 'house',     // Tag::class.'#2',
                 'table' => $entityManager->getClassMetadata(Tag::class)->getTableName(),
             ],
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
