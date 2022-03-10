@@ -92,7 +92,7 @@ class Query
                 ;
             } else {
                 // doctrine/dbal v2.13.x
-                $result = $queryBuilder
+                $result = $queryBuilder // @phpstan-ignore-line
                     ->execute()
                     ->fetchColumn(0)
                 ;
