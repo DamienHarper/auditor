@@ -159,7 +159,7 @@ class TransactionProcessor implements TransactionProcessorInterface
 
     private function processDissociations(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
-        foreach ($transaction->getDissociated() as [$source, $target, $id, $mapping]) {
+        foreach ($transaction->getDissociated() as [$source, $target, $mapping]) {
             $this->dissociate($entityManager, $source, $target, $mapping, $transaction->getTransactionHash());
         }
     }

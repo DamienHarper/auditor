@@ -102,7 +102,6 @@ class TransactionHydrator implements TransactionHydratorInterface
                         $transaction->trackAuditEvent(Transaction::DISSOCIATE, [
                             $collection->getOwner(),
                             $entity,
-                            $this->id($entityManager, $entity),
                             $mapping,
                         ]);
                     }
@@ -128,7 +127,6 @@ class TransactionHydrator implements TransactionHydratorInterface
                         $transaction->trackAuditEvent(Transaction::DISSOCIATE, [
                             $collection->getOwner(),
                             $entity,
-                            $this->id($entityManager, $entity),
                             $mapping,
                         ]);
                     }
