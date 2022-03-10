@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine\Auditing\Transaction;
 
 use DateTimeImmutable;
-use DH\Auditor\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionProcessor;
+use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
@@ -578,6 +578,228 @@ final class TransactionProcessorTest extends TestCase
                 'table' => $entityManager->getClassMetadata(Tag::class)->getTableName(),
             ],
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
+    }
+
+    public function testProcessInsertions(): void
+    {
+        $reader = new Reader($this->provider);
+        $processor = new TransactionProcessor($this->provider);
+
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $entityManager = $storageService->getEntityManager();
+
+        $transaction = new Transaction($entityManager);
+
+        $author = new Author();
+        $author
+            ->setId(1)
+            ->setFullname('John Doe')
+            ->setEmail('john.doe@gmail.com')
+        ;
+
+        $transaction->trackAuditEvent(Transaction::INSERT, [
+            $author,
+            [
+                'fullname' => [null, 'John Doe'],
+                'email' => [null, 'john.doe@gmail.com'],
+            ],
+        ]);
+
+        $processor->process($transaction);
+
+        $audits = $reader->createQuery(Author::class)->execute();
+        self::assertCount(1, $audits, 'TransactionProcessor::processInsertions() creates an "'.Transaction::INSERT.'" audit entry.');
+    }
+
+    public function testProcessUpdates(): void
+    {
+        $reader = new Reader($this->provider);
+        $processor = new TransactionProcessor($this->provider);
+
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $entityManager = $storageService->getEntityManager();
+
+        $transaction = new Transaction($entityManager);
+
+        $author = new Author();
+        $author
+            ->setId(1)
+            ->setFullname('John Doze')
+            ->setEmail('john.doze@gmail.com')
+        ;
+
+        $transaction->trackAuditEvent(Transaction::UPDATE, [
+            $author,
+            [
+                'fullname' => ['John Doe', 'John Doze'],
+                'email' => ['john.doe@gmail.com', 'john.doze@gmail.com'],
+            ],
+        ]);
+
+        $processor->process($transaction);
+
+        $audits = $reader->createQuery(Author::class)->execute();
+        self::assertCount(1, $audits, 'TransactionProcessor::processUpdates() creates an "'.Transaction::UPDATE.'" audit entry.');
+
+        $transaction->reset();
+
+        $transaction->trackAuditEvent(Transaction::UPDATE, [
+            $author,
+            [],
+        ]);
+
+        $processor->process($transaction);
+
+        $audits = $reader->createQuery(Author::class)->execute();
+        self::assertCount(1, $audits, 'TransactionProcessor::processUpdates() does not create an "'.Transaction::UPDATE.'" audit entry with empty diffs.');
+    }
+
+    public function testProcessAssociations(): void
+    {
+        $reader = new Reader($this->provider);
+        $processor = new TransactionProcessor($this->provider);
+
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $entityManager = $storageService->getEntityManager();
+
+        $transaction = new Transaction($entityManager);
+
+        $author = new Author();
+        $author
+            ->setId(1)
+            ->setFullname('John Doe')
+            ->setEmail('john.doe@gmail.com')
+        ;
+
+        $post = new Post();
+        $post
+            ->setId(1)
+            ->setAuthor($author)
+            ->setTitle('First post')
+            ->setBody('Here is the body')
+            ->setCreatedAt(new DateTimeImmutable())
+        ;
+
+        $mapping = [
+            'fieldName' => 'posts',
+            'mappedBy' => 'author',
+            'targetEntity' => Post::class,
+            'cascade' => [
+                0 => 'persist',
+                1 => 'remove',
+            ],
+            'orphanRemoval' => false,
+            'fetch' => 2,
+            'type' => 4,
+            'inversedBy' => null,
+            'isOwningSide' => false,
+            'sourceEntity' => Author::class,
+            'isCascadeRemove' => true,
+            'isCascadePersist' => true,
+            'isCascadeRefresh' => false,
+            'isCascadeMerge' => false,
+            'isCascadeDetach' => false,
+        ];
+
+        $transaction->trackAuditEvent(Transaction::ASSOCIATE, [
+            $author,
+            $post,
+            $mapping,
+        ]);
+
+        $processor->process($transaction);
+
+        $audits = $reader->createQuery(Author::class)->execute();
+        self::assertCount(1, $audits, 'TransactionProcessor::processAssociations() creates an "'.Transaction::ASSOCIATE.'" audit entry.');
+    }
+
+    public function testProcessDissociations(): void
+    {
+        $reader = new Reader($this->provider);
+        $processor = new TransactionProcessor($this->provider);
+
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $entityManager = $storageService->getEntityManager();
+
+        $transaction = new Transaction($entityManager);
+
+        $author = new Author();
+        $author
+            ->setId(1)
+            ->setFullname('John Doe')
+            ->setEmail('john.doe@gmail.com')
+        ;
+
+        $post = new Post();
+        $post
+            ->setId(1)
+            ->setAuthor($author)
+            ->setTitle('First post')
+            ->setBody('Here is the body')
+            ->setCreatedAt(new DateTimeImmutable())
+        ;
+
+        $mapping = [
+            'fieldName' => 'posts',
+            'mappedBy' => 'author',
+            'targetEntity' => Post::class,
+            'cascade' => ['persist', 'remove'],
+            'orphanRemoval' => false,
+            'fetch' => 2,
+            'type' => 4,
+            'inversedBy' => null,
+            'isOwningSide' => false,
+            'sourceEntity' => Author::class,
+            'isCascadeRemove' => true,
+            'isCascadePersist' => true,
+            'isCascadeRefresh' => false,
+            'isCascadeMerge' => false,
+            'isCascadeDetach' => false,
+        ];
+
+        $transaction->trackAuditEvent(Transaction::DISSOCIATE, [
+            $author,
+            $post,
+            $mapping,
+        ]);
+
+        $processor->process($transaction);
+
+        $audits = $reader->createQuery(Author::class)->execute();
+        self::assertCount(1, $audits, 'TransactionProcessor::processDissociations() creates an "'.Transaction::DISSOCIATE.'" audit entry.');
+    }
+
+    public function testProcessDeletions(): void
+    {
+        $reader = new Reader($this->provider);
+        $processor = new TransactionProcessor($this->provider);
+
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $entityManager = $storageService->getEntityManager();
+
+        $transaction = new Transaction($entityManager);
+
+        $author = new Author();
+        $author
+            ->setId(1)
+            ->setFullname('John Doe')
+            ->setEmail('john.doe@gmail.com')
+        ;
+
+        $transaction->trackAuditEvent(Transaction::REMOVE, [
+            $author,
+            1,
+        ]);
+
+        $processor->process($transaction);
+
+        $audits = $reader->createQuery(Author::class)->execute();
+        self::assertCount(1, $audits, 'TransactionProcessor::processDeletions() creates a "'.Transaction::REMOVE.'" audit entry.');
     }
 
     private function configureEntities(): void
