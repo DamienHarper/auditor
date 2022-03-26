@@ -6,8 +6,14 @@ namespace DH\Auditor\Event\Dto;
 
 final class DissociateEventDto extends AbstractAssociationEventDto
 {
+    /**
+     * @var mixed
+     */
     private $id;
 
+    /**
+     * @param mixed $id
+     */
     public function __construct(object $source, object $target, $id, array $mapping)
     {
         \assert(!empty($id));
@@ -17,6 +23,9 @@ final class DissociateEventDto extends AbstractAssociationEventDto
         $this->id = $id;
     }
 
+    /**
+     * @return mixed
+     */
     public function getId()
     {
         return $this->id;

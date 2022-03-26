@@ -143,6 +143,9 @@ class Transaction implements TransactionInterface
         $this->updated[] = new UpdateEventDto($source, $changeset);
     }
 
+    /**
+     * @param mixed $id
+     */
     public function remove(object $source, $id): void
     {
         $this->removed[] = new RemoveEventDto($source, $id);
@@ -153,6 +156,9 @@ class Transaction implements TransactionInterface
         $this->associated[] = new AssociateEventDto($source, $target, $mapping);
     }
 
+    /**
+     * @param mixed $id
+     */
     public function dissociate(object $source, object $target, $id, array $mapping): void
     {
         $this->dissociated[] = new DissociateEventDto($source, $target, $id, $mapping);
