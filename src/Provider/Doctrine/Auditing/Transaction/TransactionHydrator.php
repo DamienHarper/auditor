@@ -39,10 +39,10 @@ class TransactionHydrator implements TransactionHydratorInterface
         $uow = $entityManager->getUnitOfWork();
         foreach (array_reverse($uow->getScheduledEntityInsertions()) as $entity) {
             if ($this->provider->isAudited($entity)) {
-                $transaction->trackAuditEvent(Transaction::INSERT, [
+                $transaction->insert(
                     $entity,
                     $uow->getEntityChangeSet($entity),
-                ]);
+                );
             }
         }
     }
@@ -52,10 +52,10 @@ class TransactionHydrator implements TransactionHydratorInterface
         $uow = $entityManager->getUnitOfWork();
         foreach (array_reverse($uow->getScheduledEntityUpdates()) as $entity) {
             if ($this->provider->isAudited($entity)) {
-                $transaction->trackAuditEvent(Transaction::UPDATE, [
+                $transaction->update(
                     $entity,
                     $uow->getEntityChangeSet($entity),
-                ]);
+                );
             }
         }
     }
@@ -66,10 +66,10 @@ class TransactionHydrator implements TransactionHydratorInterface
         foreach (array_reverse($uow->getScheduledEntityDeletions()) as $entity) {
             if ($this->provider->isAudited($entity)) {
                 $uow->initializeObject($entity);
-                $transaction->trackAuditEvent(Transaction::REMOVE, [
+                $transaction->remove(
                     $entity,
                     $this->id($entityManager, $entity),
-                ]);
+                );
             }
         }
     }
@@ -88,23 +88,23 @@ class TransactionHydrator implements TransactionHydratorInterface
                 /** @var object $entity */
                 foreach ($collection->getInsertDiff() as $entity) {
                     if ($this->provider->isAudited($entity)) {
-                        $transaction->trackAuditEvent(Transaction::ASSOCIATE, [
+                        $transaction->associate(
                             $collection->getOwner(),
                             $entity,
                             $mapping,
-                        ]);
+                        );
                     }
                 }
 
                 /** @var object $entity */
                 foreach ($collection->getDeleteDiff() as $entity) {
                     if ($this->provider->isAudited($entity)) {
-                        $transaction->trackAuditEvent(Transaction::DISSOCIATE, [
+                        $transaction->dissociate(
                             $collection->getOwner(),
                             $entity,
                             $this->id($entityManager, $entity),
                             $mapping,
-                        ]);
+                        );
                     }
                 }
             }
@@ -125,11 +125,12 @@ class TransactionHydrator implements TransactionHydratorInterface
                 /** @var object $entity */
                 foreach ($collection->toArray() as $entity) {
                     if ($this->provider->isAudited($entity)) {
-                        $transaction->trackAuditEvent(Transaction::DISSOCIATE, [
+                        $transaction->dissociate(
                             $collection->getOwner(),
                             $entity,
+                            $this->id($entityManager, $entity),
                             $mapping,
-                        ]);
+                        );
                     }
                 }
             }

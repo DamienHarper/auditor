@@ -133,41 +133,41 @@ class TransactionProcessor implements TransactionProcessorInterface
     private function processInsertions(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
         $uow = $entityManager->getUnitOfWork();
-        foreach ($transaction->getInserted() as [$entity, $ch]) {
+        foreach ($transaction->getInserted() as $dto) {
             // the changeset might be updated from UOW extra updates
-            $ch = array_merge($ch, $uow->getEntityChangeSet($entity));
-            $this->insert($entityManager, $entity, $ch, $transaction->getTransactionHash());
+            $ch = array_merge($dto->getChangeset(), $uow->getEntityChangeSet($dto->getSource()));
+            $this->insert($entityManager, $dto->getSource(), $ch, $transaction->getTransactionHash());
         }
     }
 
     private function processUpdates(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
         $uow = $entityManager->getUnitOfWork();
-        foreach ($transaction->getUpdated() as [$entity, $ch]) {
+        foreach ($transaction->getUpdated() as $dto) {
             // the changeset might be updated from UOW extra updates
-            $ch = array_merge($ch, $uow->getEntityChangeSet($entity));
-            $this->update($entityManager, $entity, $ch, $transaction->getTransactionHash());
+            $ch = array_merge($dto->getChangeset(), $uow->getEntityChangeSet($dto->getSource()));
+            $this->update($entityManager, $dto->getSource(), $ch, $transaction->getTransactionHash());
         }
     }
 
     private function processAssociations(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
-        foreach ($transaction->getAssociated() as [$source, $target, $mapping]) {
-            $this->associate($entityManager, $source, $target, $mapping, $transaction->getTransactionHash());
+        foreach ($transaction->getAssociated() as $dto) {
+            $this->associate($entityManager, $dto->getSource(), $dto->getTarget(), $dto->getMapping(), $transaction->getTransactionHash());
         }
     }
 
     private function processDissociations(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
-        foreach ($transaction->getDissociated() as [$source, $target, $id, $mapping]) {
-            $this->dissociate($entityManager, $source, $target, $mapping, $transaction->getTransactionHash());
+        foreach ($transaction->getDissociated() as $dto) {
+            $this->dissociate($entityManager, $dto->getSource(), $dto->getTarget(), $dto->getMapping(), $transaction->getTransactionHash());
         }
     }
 
     private function processDeletions(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
-        foreach ($transaction->getRemoved() as [$entity, $id]) {
-            $this->remove($entityManager, $entity, $id, $transaction->getTransactionHash());
+        foreach ($transaction->getRemoved() as $dto) {
+            $this->remove($entityManager, $dto->getSource(), $dto->getId(), $transaction->getTransactionHash());
         }
     }
 

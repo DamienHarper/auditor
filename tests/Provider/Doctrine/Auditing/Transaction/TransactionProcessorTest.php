@@ -598,13 +598,13 @@ final class TransactionProcessorTest extends TestCase
             ->setEmail('john.doe@gmail.com')
         ;
 
-        $transaction->trackAuditEvent(Transaction::INSERT, [
+        $transaction->insert(
             $author,
             [
                 'fullname' => [null, 'John Doe'],
                 'email' => [null, 'john.doe@gmail.com'],
             ],
-        ]);
+        );
 
         $processor->process($transaction);
 
@@ -630,13 +630,13 @@ final class TransactionProcessorTest extends TestCase
             ->setEmail('john.doze@gmail.com')
         ;
 
-        $transaction->trackAuditEvent(Transaction::UPDATE, [
+        $transaction->update(
             $author,
             [
                 'fullname' => ['John Doe', 'John Doze'],
                 'email' => ['john.doe@gmail.com', 'john.doze@gmail.com'],
             ],
-        ]);
+        );
 
         $processor->process($transaction);
 
@@ -645,10 +645,10 @@ final class TransactionProcessorTest extends TestCase
 
         $transaction->reset();
 
-        $transaction->trackAuditEvent(Transaction::UPDATE, [
+        $transaction->update(
             $author,
             [],
-        ]);
+        );
 
         $processor->process($transaction);
 
@@ -704,11 +704,11 @@ final class TransactionProcessorTest extends TestCase
             'isCascadeDetach' => false,
         ];
 
-        $transaction->trackAuditEvent(Transaction::ASSOCIATE, [
+        $transaction->associate(
             $author,
             $post,
             $mapping,
-        ]);
+        );
 
         $processor->process($transaction);
 
@@ -761,11 +761,12 @@ final class TransactionProcessorTest extends TestCase
             'isCascadeDetach' => false,
         ];
 
-        $transaction->trackAuditEvent(Transaction::DISSOCIATE, [
+        $transaction->dissociate(
             $author,
             $post,
+            $post->getId(),
             $mapping,
-        ]);
+        );
 
         $processor->process($transaction);
 
@@ -791,10 +792,10 @@ final class TransactionProcessorTest extends TestCase
             ->setEmail('john.doe@gmail.com')
         ;
 
-        $transaction->trackAuditEvent(Transaction::REMOVE, [
+        $transaction->remove(
             $author,
             1,
-        ]);
+        );
 
         $processor->process($transaction);
 
