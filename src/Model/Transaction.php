@@ -100,6 +100,8 @@ class Transaction implements TransactionInterface
      */
     public function trackAuditEvent(string $type, array $data): void
     {
+        @trigger_error('This method is deprecated, use one of the Transaction::insert(), Transaction::update(), Transaction::remove(), Transaction::associate(), Transaction::dissociate() methods instead.', E_USER_DEPRECATED);
+
         switch ($type) {
             case self::INSERT:
                 \assert(2 === \count($data));
@@ -156,11 +158,8 @@ class Transaction implements TransactionInterface
         $this->associated[] = new AssociateEventDto($source, $target, $mapping);
     }
 
-    /**
-     * @param mixed $id
-     */
-    public function dissociate(object $source, object $target, $id, array $mapping): void
+    public function dissociate(object $source, object $target, array $mapping): void
     {
-        $this->dissociated[] = new DissociateEventDto($source, $target, $id, $mapping);
+        $this->dissociated[] = new DissociateEventDto($source, $target, $mapping);
     }
 }

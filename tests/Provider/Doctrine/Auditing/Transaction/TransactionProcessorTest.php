@@ -764,7 +764,6 @@ final class TransactionProcessorTest extends TestCase
         $transaction->dissociate(
             $author,
             $post,
-            $post->getId(),
             $mapping,
         );
 

@@ -82,7 +82,7 @@ class TransactionHydrator implements TransactionHydratorInterface
         foreach (array_reverse($uow->getScheduledCollectionUpdates()) as $collection) {
             $owner = $collection->getOwner();
 
-            if ($owner && $this->provider->isAudited($owner)) {
+            if (null !== $owner && $this->provider->isAudited($owner)) {
                 $mapping = $collection->getMapping();
 
                 if (null === $mapping) {
@@ -106,7 +106,6 @@ class TransactionHydrator implements TransactionHydratorInterface
                         $transaction->dissociate(
                             $owner,
                             $entity,
-                            $this->id($entityManager, $entity),
                             $mapping,
                         );
                     }
@@ -123,7 +122,7 @@ class TransactionHydrator implements TransactionHydratorInterface
         foreach (array_reverse($uow->getScheduledCollectionDeletions()) as $collection) {
             $owner = $collection->getOwner();
 
-            if ($owner && $this->provider->isAudited($owner)) {
+            if (null !== $owner && $this->provider->isAudited($owner)) {
                 $mapping = $collection->getMapping();
 
                 if (null === $mapping) {
@@ -136,7 +135,6 @@ class TransactionHydrator implements TransactionHydratorInterface
                         $transaction->dissociate(
                             $owner,
                             $entity,
-                            $this->id($entityManager, $entity),
                             $mapping,
                         );
                     }
