@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Model;
 
+use DH\Auditor\Event\Dto\AssociateEventDto;
+use DH\Auditor\Event\Dto\DissociateEventDto;
+use DH\Auditor\Event\Dto\InsertEventDto;
+use DH\Auditor\Event\Dto\RemoveEventDto;
+use DH\Auditor\Event\Dto\UpdateEventDto;
+
 /**
  * @see \DH\Auditor\Tests\Model\TransactionTest
  */
@@ -17,11 +23,30 @@ class Transaction implements TransactionInterface
 
     private ?string $transaction_hash = null;
 
-    private array $inserted = [];     // [$source, $changeset]
-    private array $updated = [];      // [$source, $changeset]
-    private array $removed = [];      // [$source, $id]
-    private array $associated = [];   // [$source, $target, $mapping]
-    private array $dissociated = [];  // [$source, $target, $id, $mapping]
+    /**
+     * @var InsertEventDto[]
+     */
+    private array $inserted = [];
+
+    /**
+     * @var UpdateEventDto[]
+     */
+    private array $updated = [];
+
+    /**
+     * @var RemoveEventDto[]
+     */
+    private array $removed = [];
+
+    /**
+     * @var AssociateEventDto[]
+     */
+    private array $associated = [];
+
+    /**
+     * @var DissociateEventDto[]
+     */
+    private array $dissociated = [];
 
     /**
      * Returns transaction hash.
@@ -70,33 +95,73 @@ class Transaction implements TransactionInterface
         $this->dissociated = [];
     }
 
+    /**
+     * @internal
+     *
+     * @deprecated use one of the insert/update/remove/associate/dissociate methods instead
+     */
     public function trackAuditEvent(string $type, array $data): void
     {
+        @trigger_error('This method is deprecated, use one of the Transaction::insert(), Transaction::update(), Transaction::remove(), Transaction::associate(), Transaction::dissociate() methods instead.', E_USER_DEPRECATED);
+
         switch ($type) {
             case self::INSERT:
-                $this->inserted[] = $data;
+                \assert(2 === \count($data));
+                $this->insert(...$data);
 
                 break;
 
             case self::UPDATE:
-                $this->updated[] = $data;
+                \assert(2 === \count($data));
+                $this->update(...$data);
 
                 break;
 
             case self::REMOVE:
-                $this->removed[] = $data;
+                \assert(2 === \count($data));
+                $this->remove(...$data);
 
                 break;
 
             case self::ASSOCIATE:
-                $this->associated[] = $data;
+                \assert(3 === \count($data));
+                $this->associate(...$data);
 
                 break;
 
             case self::DISSOCIATE:
-                $this->dissociated[] = $data;
+                \assert(4 === \count($data));
+                $this->dissociate(...$data);
 
                 break;
         }
+    }
+
+    public function insert(object $source, array $changeset): void
+    {
+        $this->inserted[] = new InsertEventDto($source, $changeset);
+    }
+
+    public function update(object $source, array $changeset): void
+    {
+        $this->updated[] = new UpdateEventDto($source, $changeset);
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function remove(object $source, $id): void
+    {
+        $this->removed[] = new RemoveEventDto($source, $id);
+    }
+
+    public function associate(object $source, object $target, array $mapping): void
+    {
+        $this->associated[] = new AssociateEventDto($source, $target, $mapping);
+    }
+
+    public function dissociate(object $source, object $target, array $mapping): void
+    {
+        $this->dissociated[] = new DissociateEventDto($source, $target, $mapping);
     }
 }
