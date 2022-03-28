@@ -96,6 +96,8 @@ class Transaction implements TransactionInterface
     }
 
     /**
+     * @internal
+     *
      * @deprecated use one of the insert/update/remove/associate/dissociate methods instead
      */
     public function trackAuditEvent(string $type, array $data): void
