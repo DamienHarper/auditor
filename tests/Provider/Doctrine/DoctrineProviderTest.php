@@ -151,8 +151,15 @@ final class DoctrineProviderTest extends TestCase
         self::assertNull($provider->getConfiguration()->getStorageMapper(), 'Mapping closure is not set.');
 
         $provider->setStorageMapper(static fn (string $entity, array $storageServices): StorageServiceInterface => 0 === mb_strpos($entity, 'Foo') ? $storageServices['EM1'] : $storageServices['EM2']);
-
         self::assertNotNull($provider->getConfiguration()->getStorageMapper(), 'Mapping closure is set.');
+
+        self::assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo1')->getEntityManager(), 'EM1 is used.');
+        self::assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo2')->getEntityManager(), 'EM1 is used.');
+        self::assertSame($entityManager2, $provider->getStorageServiceForEntity('Bar1')->getEntityManager(), 'EM2 is used.');
+        self::assertSame($entityManager2, $provider->getStorageServiceForEntity('Bar2')->getEntityManager(), 'EM2 is used.');
+
+        $provider->setStorageMapper(new FakeStorageMapper());
+        self::assertNotNull($provider->getConfiguration()->getStorageMapper(), 'StorageMapper is set.');
 
         self::assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo1')->getEntityManager(), 'EM1 is used.');
         self::assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo2')->getEntityManager(), 'EM1 is used.');
@@ -513,6 +520,14 @@ final class DoctrineProviderTest extends TestCase
         self::assertNotSame($before, $after, 'RoleChecker has changed.');
 
         self::assertIsBool($after('', ''), 'RoleChecker returns a bool.');
+    }
+}
+
+class FakeStorageMapper
+{
+    public function __invoke(string $entity, array $storageServices): StorageServiceInterface
+    {
+        return 0 === mb_strpos($entity, 'Foo') ? $storageServices['EM1'] : $storageServices['EM2'];
     }
 }
 
