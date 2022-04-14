@@ -21,3 +21,4 @@ parameters:
         - '~Method DH\\Auditor\\Provider\\Doctrine\\Persistence\\Reader\\Filter\\SimpleFilter\:\:__construct\(\) has parameter \$value with no type specified.~'
         - '~Property DH\\Auditor\\Provider\\Doctrine\\Configuration\:\:\$(auditing|storage)Services is never read, only written\.~'
         - '~Method DH\\Auditor\\Provider\\Doctrine\\Persistence\\Helper\\DoctrineHelper\:\:getDoctrineType\(\) should return string but returns mixed\.~'
+        - '~Dead catch - Throwable is never thrown in the try block~'
