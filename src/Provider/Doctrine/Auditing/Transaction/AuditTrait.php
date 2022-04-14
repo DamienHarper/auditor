@@ -10,6 +10,7 @@ use DH\Auditor\User\UserInterface;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
+use Throwable;
 
 trait AuditTrait
 {
@@ -195,7 +196,11 @@ trait AuditTrait
         $pkName = $meta->getSingleIdentifierFieldName();
 
         if (method_exists($entity, '__toString')) {
-            $label = (string) $entity;
+            try {
+                $label = (string) $entity;
+            } catch (Throwable $throwable) {
+                $label = DoctrineHelper::getRealClassName($entity).(null === $pkValue ? '' : '#'.$pkValue);
+            }
         } else {
             $label = DoctrineHelper::getRealClassName($entity).(null === $pkValue ? '' : '#'.$pkValue);
         }
