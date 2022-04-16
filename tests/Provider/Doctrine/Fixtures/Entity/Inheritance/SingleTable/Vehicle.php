@@ -19,12 +19,10 @@ use Doctrine\ORM\Mapping as ORM;
 class Vehicle
 {
     /**
-     * @var string
-     *
      * @ORM\Column(type="string", length=50)
      */
     #[ORM\Column(type: 'string', length: 50)]
-    protected $label;
+    protected string $label;
 
     /**
      * @ORM\Id
