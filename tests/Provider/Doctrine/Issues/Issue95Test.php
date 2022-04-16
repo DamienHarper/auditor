@@ -54,7 +54,7 @@ final class Issue95Test extends TestCase
 
         $fixtures = [
             new DummyEntityData(),
-            new RelatedDummyEntityData()
+            new RelatedDummyEntityData(),
         ];
 
         $executor = new ORMExecutor($em);

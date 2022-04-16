@@ -7,14 +7,21 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue95;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Stringable;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="dummy_entity")
  */
 #[ORM\Entity, ORM\Table(name: 'dummy_entity')]
-class DummyEntity implements \Stringable
+class DummyEntity implements Stringable
 {
+    /**
+     * @ORM\Column(type="string", length=50)
+     */
+    #[ORM\Column(type: 'string', length: 50)]
+    protected string $label;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -24,22 +31,21 @@ class DummyEntity implements \Stringable
     private ?int $id = null;
 
     /**
-     * @ORM\Column(type="string", length=50)
-     */
-    #[ORM\Column(type: 'string', length: 50)]
-    protected string $label;
-
-    /**
      * @var Collection<array-key, RelatedDummyEntity>
      * @ORM\OneToMany(targetEntity="RelatedDummyEntity", mappedBy="parent")
      */
-    #[ORM\OneToMany(targetEntity: "RelatedDummyEntity", mappedBy: "parent")]
+    #[ORM\OneToMany(targetEntity: 'RelatedDummyEntity', mappedBy: 'parent')]
     private Collection $children;
 
     public function __construct(string $label)
     {
         $this->label = $label;
         $this->children = new ArrayCollection();
+    }
+
+    public function __toString()
+    {
+        return $this->label;
     }
 
     public function getId(): ?int
@@ -55,12 +61,7 @@ class DummyEntity implements \Stringable
         return $this->label;
     }
 
-    public function __toString()
-    {
-        return $this->label;
-    }
-
-    public function addChild(RelatedDummyEntity $param)
+    public function addChild(RelatedDummyEntity $param): void
     {
         $this->children->add($param);
     }

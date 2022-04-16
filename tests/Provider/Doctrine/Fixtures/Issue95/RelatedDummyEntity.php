@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue95;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -11,14 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity, ORM\Table(name: 'related_dummy_entity')]
 class RelatedDummyEntity
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @ORM\Column(type="integer")
-     */
-    #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer')]
-    private ?int $id = null;
-
     /**
      * @ORM\Column(type="string", length=50)
      */
@@ -33,6 +27,14 @@ class RelatedDummyEntity
     #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', nullable: true)]
     protected ?DummyEntity $parent;
 
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\Column(type="integer")
+     */
+    #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer')]
+    private ?int $id = null;
+
     public function __construct(?DummyEntity $parent, string $label)
     {
         $this->parent = $parent;
@@ -40,6 +42,11 @@ class RelatedDummyEntity
             $parent->addChild($this);
         }
         $this->label = $label;
+    }
+
+    public function __toString()
+    {
+        return $this->label;
     }
 
     public function getId(): ?int
@@ -55,16 +62,8 @@ class RelatedDummyEntity
         return $this->label;
     }
 
-    /**
-     * @return DummyEntity
-     */
     public function getParent(): DummyEntity
     {
         return $this->parent;
-    }
-
-    public function __toString()
-    {
-        return $this->label;
     }
 }
