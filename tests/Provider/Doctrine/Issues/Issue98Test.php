@@ -8,11 +8,9 @@ use DH\Auditor\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
-use DH\Auditor\Provider\Service\StorageServiceInterface;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue98\Issue98;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
-use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -31,7 +29,7 @@ final class Issue98Test extends TestCase
 
         $em = $this->provider->getStorageServiceForEntity(Issue98::class)->getEntityManager();
         $entity = new Issue98();
-        $entity->setData(fopen('data://text/plain,true', 'rb'));
+        $entity->setData(fopen('data://text/plain,true', 'r'));
         $em->persist($entity);
         $em->flush();
 
