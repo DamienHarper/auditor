@@ -106,6 +106,7 @@ trait AuditTrait
 
                 break;
 
+            case DoctrineHelper::getDoctrineType('BLOB'):
             case DoctrineHelper::getDoctrineType('BINARY'):
                 if (\is_resource($value)) {
                     // let's replace resources with a "simple" representation: resourceType#resourceId
