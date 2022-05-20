@@ -1,5 +1,5 @@
 {
-  "name": "damienharper/auditor",
+  "name": "iva3682/auditor",
   "type": "library",
   "description": "The missing audit log library.",
   "keywords": ["doctrine", "audit", "audit-log", "audit-trail"],
