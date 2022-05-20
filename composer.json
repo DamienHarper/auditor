@@ -55,11 +55,6 @@
       "composer/package-versions-deprecated": true
     }
   },
-  "extra": {
-    "branch-alias": {
-      "dev-master": "2.x-dev"
-    }
-  },
   "replace": {
     "damienharper/auditor": "2.0.1"
   }
