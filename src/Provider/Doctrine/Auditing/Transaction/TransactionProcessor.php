@@ -73,9 +73,8 @@ class TransactionProcessor implements TransactionProcessorInterface
     private function update(EntityManagerInterface $entityManager, object $entity, array $ch, string $transactionHash): void
     {
         $diff = $this->diff($entityManager, $entity, $ch);
-        unset($diff['@source']);
 
-        if (0 === \count($diff)) {
+        if (0 === \count($diff) - 1) {
             return; // if there is no entity diff, do not log it
         }
 
