@@ -54,8 +54,5 @@
     "allow-plugins": {
       "composer/package-versions-deprecated": true
     }
-  },
-  "replace": {
-    "damienharper/auditor": "2.0.3"
   }
 }
