@@ -44,7 +44,7 @@ class UpdateSchemaCommand extends Command
             ->setDescription('Update audit tables structure')
             ->addOption('dump-sql', null, InputOption::VALUE_NONE, 'Dumps the generated SQL statements to the screen (does not execute them).')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Causes the generated SQL statements to be physically executed against your database.')
-            ->setName(self::$defaultName)
+            ->setName(self::$defaultName) // @phpstan-ignore-line
         ;
     }
 

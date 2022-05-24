@@ -20,6 +20,12 @@ class RangeFilter implements FilterInterface
      */
     protected $maxValue;
 
+    /**
+     * @param mixed $minValue
+     * @param mixed $maxValue
+     *
+     * @throws InvalidArgumentException
+     */
     public function __construct(string $name, $minValue, $maxValue = null)
     {
         if (null === $minValue && null === $maxValue) {

@@ -80,7 +80,7 @@ class Query
                 ->resetQueryPart('select')
                 ->resetQueryPart('orderBy')
                 ->setMaxResults(null)
-                ->setFirstResult(null)
+                ->setFirstResult(0)
                 ->select('COUNT(id)')
             ;
 
