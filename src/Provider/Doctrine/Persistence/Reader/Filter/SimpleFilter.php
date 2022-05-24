@@ -13,6 +13,9 @@ class SimpleFilter implements FilterInterface
      */
     protected $value;
 
+    /**
+     * @param array|string $value
+     */
     public function __construct(string $name, $value)
     {
         $this->name = $name;
