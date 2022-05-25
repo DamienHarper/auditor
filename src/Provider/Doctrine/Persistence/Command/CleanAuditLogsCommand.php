@@ -52,7 +52,7 @@ class CleanAuditLogsCommand extends Command
     {
         $this
             ->setDescription('Cleans audit tables')
-            ->setName(self::$defaultName)
+            ->setName(self::$defaultName) // @phpstan-ignore-line
             ->addOption('no-confirm', null, InputOption::VALUE_NONE, 'No interaction mode')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Do not execute SQL queries.')
             ->addOption('dump-sql', null, InputOption::VALUE_NONE, 'Prints SQL related queries.')
@@ -82,7 +82,6 @@ class CleanAuditLogsCommand extends Command
         $provider = $this->auditor->getProvider(DoctrineProvider::class);
         $schemaManager = new SchemaManager($provider);
 
-//        $entities = $this->provider->getConfiguration()->getEntities();
         /** @var StorageService[] $storageServices */
         $storageServices = $provider->getStorageServices();
 

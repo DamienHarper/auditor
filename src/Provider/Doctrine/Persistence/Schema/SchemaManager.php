@@ -16,6 +16,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\EntityManagerInterface;
+use RuntimeException;
 
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema\SchemaManagerTest
@@ -136,12 +137,17 @@ class SchemaManager
                         $tableName
                     );
 
+                    $entityFQCN = $findEntityByTablename($tableName);
+                    if (null === $entityFQCN) {
+                        throw new RuntimeException(sprintf('Unable to find entity for table "%s".', $tableName));
+                    }
+
                     if ($storageSchema->hasTable($auditTablename)) {
                         // Audit table exists, let's update it if needed
-                        $this->updateAuditTable($findEntityByTablename($tableName), $storageSchema->getTable($auditTablename), $storageSchema);
+                        $this->updateAuditTable($entityFQCN, $storageSchema->getTable($auditTablename), $storageSchema);
                     } else {
                         // Audit table does not exists, let's create it
-                        $this->createAuditTable($findEntityByTablename($tableName), $tableName, $storageSchema);
+                        $this->createAuditTable($entityFQCN, $tableName, $storageSchema);
                     }
 
                     $processed[] = $tableName;
