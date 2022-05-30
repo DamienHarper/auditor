@@ -20,12 +20,30 @@ final class Issue101Test extends TestCase
 {
     use SchemaSetupTrait;
 
-    public function testIssue101(): void
+    protected function setUp(): void
     {
         if (\PHP_VERSION_ID < 80000) {
             self::markTestSkipped('PHP > 8.0 is required.');
         }
 
+        parent::setUp();
+
+        // provider with 1 em for both storage and auditing
+        $this->createAndInitDoctrineProvider();
+
+        // declare audited entites
+        $this->configureEntities();
+
+        // setup entity and audit schemas
+        $this->setupEntitySchemas();
+        $this->setupAuditSchemas();
+
+        // setup (seed) entities
+        $this->setupEntities();
+    }
+
+    public function testIssue101(): void
+    {
         self::assertTrue($this->provider->isAudited(ChildEntity::class), '"'.ChildEntity::class.'" is audited.');
         self::assertTrue($this->provider->isAuditedField(ChildEntity::class, 'auditedField'), 'Field "'.ChildEntity::class.'::$auditedField" is audited.');
         self::assertFalse($this->provider->isAuditedField(ChildEntity::class, 'ignoredField'), 'Field "'.ChildEntity::class.'::$ignoredField" is ignored.');
