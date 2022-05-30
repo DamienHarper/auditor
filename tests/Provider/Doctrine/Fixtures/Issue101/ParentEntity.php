@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Attribute;
+namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue101;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation as Audit;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
-#[ORM\Table(name: 'audited_entity')]
+#[ORM\MappedSuperclass]
+#[ORM\Table(name: 'entity')]
 #[Audit\Auditable]
-class AuditedEntity
+class ParentEntity
 {
     public string $auditedField;
 

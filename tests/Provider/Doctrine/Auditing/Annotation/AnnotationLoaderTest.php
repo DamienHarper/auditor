@@ -69,7 +69,7 @@ final class AnnotationLoaderTest extends TestCase
     public function testLoadEntitiesWithAttributesOnly(): void
     {
         if (\PHP_VERSION_ID < 80000) {
-            self::markTestSkipped('PHP 8.0+ is required.');
+            self::markTestSkipped('PHP > 8.0 is required.');
         }
 
         $entityManager = $this->createEntityManager(
@@ -89,7 +89,7 @@ final class AnnotationLoaderTest extends TestCase
     public function testLoadEntitiesWithAnnotationsOnlyButNoAnnotationReader(): void
     {
         if (\PHP_VERSION_ID < 80000) {
-            self::markTestSkipped('PHP 8.0+ is required.');
+            self::markTestSkipped('PHP > 8.0 is required.');
         }
 
         $entityManager = $this->createEntityManager(
