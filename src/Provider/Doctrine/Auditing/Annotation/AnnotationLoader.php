@@ -8,6 +8,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\Mapping\ClassMetadata;
+use ReflectionClass;
 
 class AnnotationLoader
 {
@@ -41,7 +42,6 @@ class AnnotationLoader
         $annotation = null;
         $auditableAnnotation = null;
         $securityAnnotation = null;
-        $annotationProperty = null;
         $reflection = $metadata->getReflectionClass();
 
         // Check that we have an Entity annotation or attribute
@@ -78,13 +78,21 @@ class AnnotationLoader
 
         $roles = null === $securityAnnotation ? null : [Security::VIEW_SCOPE => $securityAnnotation->view];
 
-        $config = [
-            'ignored_columns' => [],
+        // Are there any Ignore annotation or attribute?
+        $ignoredColumns = $this->getAllProperties($reflection);
+
+        return [
+            'ignored_columns' => $ignoredColumns,
             'enabled' => $auditableAnnotation->enabled,
             'roles' => $roles,
         ];
+    }
 
-        // Are there any Ignore annotation or attribute?
+    private function getAllProperties(ReflectionClass $reflection): array
+    {
+        $annotationProperty = null;
+        $properties = [];
+
         foreach ($reflection->getProperties() as $property) {
             $attributes = \PHP_VERSION_ID >= 80000 && method_exists($property, 'getAttributes') ? $property->getAttributes(Ignore::class) : null;
             if (\is_array($attributes) && \count($attributes) > 0) {
@@ -94,11 +102,14 @@ class AnnotationLoader
             }
 
             if (null !== $annotationProperty) {
-                // TODO: $property->getName() might not be the column name
-                $config['ignored_columns'][] = $property->getName();
+                $properties[] = $property->getName();
             }
         }
 
-        return $config;
+        if (false !== $reflection->getParentClass()) {
+            $properties = array_unique(array_merge($this->getAllProperties($reflection->getParentClass()), $properties));
+        }
+
+        return $properties;
     }
 }
