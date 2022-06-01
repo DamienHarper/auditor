@@ -24,11 +24,11 @@ class Logger implements SQLLogger
     public function startQuery($sql, ?array $params = null, ?array $types = null): void
     {
         // insert all audit entries right before commit
-        if ('"COMMIT"' === $sql) {
+        if ('"COMMIT"' === $sql || '"RELEASE SAVEPOINT"' === $sql) {
             ($this->flusher)();
         }
         // on rollback remove flusher callback
-        if ('"ROLLBACK"' === $sql) {
+        if ('"ROLLBACK"' === $sql || '"ROLLBACK TO SAVEPOINT"' === $sql) {
             $this->flusher = static function (): void {};
         }
     }
