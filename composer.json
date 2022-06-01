@@ -1,5 +1,5 @@
 {
-  "name": "damienharper/auditor",
+  "name": "iva3682/auditor",
   "type": "library",
   "description": "The missing audit log library.",
   "keywords": ["doctrine", "audit", "audit-log", "audit-trail"],
@@ -53,12 +53,6 @@
     "sort-packages": true,
     "allow-plugins": {
       "composer/package-versions-deprecated": true
-    }
-  },
-  "extra": {
-    "branch-alias": {
-      "dev-master": "2.x-dev",
-      "dev-1.x": "1.x-dev"
     }
   }
 }
