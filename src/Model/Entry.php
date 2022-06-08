@@ -13,7 +13,7 @@ class Entry
 
     protected string $type;
 
-    protected string $object_id;
+    protected int $object_id;
 
     protected ?string $discriminator;
 
@@ -55,7 +55,7 @@ class Entry
     /**
      * Get the value of object_id.
      */
-    public function getObjectId(): string
+    public function getObjectId(): int
     {
         return $this->object_id;
     }
