@@ -39,8 +39,7 @@ abstract class PlatformHelper
             return true;
         }
 
-        return (bool) (!$mariadb && version_compare(self::getOracleMysqlVersionNumber($version), '5.7.7', '<'))
-         ;
+        return (bool) (!$mariadb && version_compare(self::getOracleMysqlVersionNumber($version), '5.7.7', '<'));
     }
 
     public static function getServerVersion(Connection $connection): ?string
@@ -64,11 +63,11 @@ abstract class PlatformHelper
         $mariadb = false !== mb_stripos($version, 'mariadb');
 
         return !($mariadb && version_compare(self::getMariaDbMysqlVersionNumber($version), '10.2.7', '<'))
-            // JSON wasn't supported on MariaDB before 10.2.7
-            // @see https://mariadb.com/kb/en/json-data-type/
+        // JSON wasn't supported on MariaDB before 10.2.7
+        // @see https://mariadb.com/kb/en/json-data-type/
 
         // Assume JSON is supported
-         ;
+        ;
     }
 
     /**

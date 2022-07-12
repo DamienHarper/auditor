@@ -147,10 +147,8 @@ class DoctrineProvider extends AbstractProvider
         // is $entity part of audited entities?
         \assert($this->configuration instanceof Configuration);   // helps PHPStan
 
-        return !(!\array_key_exists($class, $this->configuration->getEntities()))
-            // no => $entity is not audited
-
-         ;
+        // no => $entity is not audited
+        return !(!\array_key_exists($class, $this->configuration->getEntities()));
     }
 
     /**
@@ -218,11 +216,9 @@ class DoctrineProvider extends AbstractProvider
         }
 
         // are columns excluded and is field part of them?
+        // yes => $field is not audited
         return !(isset($entityOptions['ignored_columns'])
-            && \in_array($field, $entityOptions['ignored_columns'], true))
-            // yes => $field is not audited
-
-         ;
+            && \in_array($field, $entityOptions['ignored_columns'], true));
     }
 
     public function supportsStorage(): bool
