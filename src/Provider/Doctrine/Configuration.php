@@ -23,6 +23,10 @@ class Configuration implements ConfigurationInterface
 
     private ?array $entities = null;
 
+    private array $storageServices = [];
+
+    private array $auditingServices = [];
+
     private bool $isViewerEnabled;
 
     /**
@@ -49,6 +53,8 @@ class Configuration implements ConfigurationInterface
             }
         }
 
+        $this->storageServices = $config['storage_services'];
+        $this->auditingServices = $config['auditing_services'];
         $this->isViewerEnabled = $config['viewer'];
         $this->storageMapper = $config['storage_mapper'];
     }
@@ -62,6 +68,8 @@ class Configuration implements ConfigurationInterface
                 'table_suffix' => '_audit',
                 'ignored_columns' => [],
                 'entities' => [],
+                'storage_services' => [],
+                'auditing_services' => [],
                 'viewer' => true,
                 'storage_mapper' => null,
             ])
@@ -69,6 +77,8 @@ class Configuration implements ConfigurationInterface
             ->setAllowedTypes('table_suffix', 'string')
             ->setAllowedTypes('ignored_columns', 'array')
             ->setAllowedTypes('entities', 'array')
+            ->setAllowedTypes('storage_services', 'array')
+            ->setAllowedTypes('auditing_services', 'array')
             ->setAllowedTypes('viewer', 'bool')
             ->setAllowedTypes('storage_mapper', ['null', 'string', 'callable'])
         ;
