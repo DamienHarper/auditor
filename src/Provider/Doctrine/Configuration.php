@@ -23,9 +23,9 @@ class Configuration implements ConfigurationInterface
 
     private ?array $entities = null;
 
-    private array $storageServices = []; // @phpstan-ignore-line
+    private array $storageServices = [];
 
-    private array $auditingServices = []; // @phpstan-ignore-line
+    private array $auditingServices = [];
 
     private bool $isViewerEnabled;
 
