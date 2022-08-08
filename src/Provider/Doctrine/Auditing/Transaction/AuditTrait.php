@@ -50,8 +50,7 @@ trait AuditTrait
 
         $mapping = $meta->getAssociationMapping($pk);
 
-        \assert(\is_string($mapping['targetEntity']));
-        $meta = $entityManager->getClassMetadata($mapping['targetEntity']);
+        $meta = $entityManager->getClassMetadata($mapping['targetEntity']); //@phpstan-ignore-line
         $pk = $meta->getSingleIdentifierFieldName();
         $type = Type::getType($meta->fieldMappings[$pk]['type']);
 
