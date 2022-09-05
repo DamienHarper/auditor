@@ -53,8 +53,6 @@ class User
 
     /**
      * Set the value of id.
-     *
-     * @return User
      */
     public function setId(int $id): self
     {
@@ -73,8 +71,6 @@ class User
 
     /**
      * Set the value of username.
-     *
-     * @return User
      */
     public function setUsername(string $username): self
     {
@@ -85,8 +81,6 @@ class User
 
     /**
      * Set the value of locale_id.
-     *
-     * @return User
      */
     public function setLocaleId(string $locale_id): self
     {
@@ -109,8 +103,6 @@ class User
      * Set Locale entity (many to one).
      *
      * @param ?Locale $locale
-     *
-     * @return User
      */
     public function setLocale(?Locale $locale): self
     {

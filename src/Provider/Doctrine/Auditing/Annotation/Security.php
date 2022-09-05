@@ -11,7 +11,9 @@ use Doctrine\Common\Annotations\Annotation\Required;
 
 /**
  * @Annotation
+ *
  * @NamedArgumentConstructor
+ *
  * @Target("CLASS")
  * @Attributes({
  *     @Attribute("view", required=true, type="array<string>"),

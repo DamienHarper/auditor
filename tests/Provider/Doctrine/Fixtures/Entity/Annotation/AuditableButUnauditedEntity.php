@@ -10,7 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity
  * @ORM\Table(name="auditable_but_unaudited_entity")
- *
  * @Audit\Auditable(enabled=false)
  * @Audit\Security(view={"ROLE1", "ROLE2"})
  */

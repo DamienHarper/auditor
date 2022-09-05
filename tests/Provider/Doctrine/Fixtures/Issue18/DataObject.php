@@ -39,8 +39,6 @@ class DataObject
 
     /**
      * Set the value of id.
-     *
-     * @return DataObject
      */
     public function setId(int $id): self
     {
@@ -61,8 +59,6 @@ class DataObject
      * Set the value of data.
      *
      * @param mixed $data
-     *
-     * @return DataObject
      */
     public function setData($data): self
     {

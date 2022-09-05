@@ -41,8 +41,6 @@ class Locale
 
     /**
      * Set the value of id.
-     *
-     * @return Locale
      */
     public function setId(string $id): self
     {
@@ -61,8 +59,6 @@ class Locale
 
     /**
      * Set the value of name.
-     *
-     * @return Locale
      */
     public function setName(string $name): self
     {

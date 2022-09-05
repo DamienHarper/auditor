@@ -32,6 +32,7 @@ class DummyEntity implements Stringable
 
     /**
      * @var Collection<array-key, RelatedDummyEntity>
+     *
      * @ORM\OneToMany(targetEntity="RelatedDummyEntity", mappedBy="parent")
      */
     #[ORM\OneToMany(targetEntity: 'RelatedDummyEntity', mappedBy: 'parent')]

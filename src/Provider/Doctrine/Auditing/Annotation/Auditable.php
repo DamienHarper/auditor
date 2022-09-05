@@ -10,7 +10,9 @@ use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 
 /**
  * @Annotation
+ *
  * @NamedArgumentConstructor
+ *
  * @Target("CLASS")
  * @Attributes({
  *     @Attribute("enabled", required=false, type="bool"),
