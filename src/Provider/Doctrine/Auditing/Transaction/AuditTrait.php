@@ -17,11 +17,11 @@ trait AuditTrait
     /**
      * Returns the primary key value of an entity.
      *
+     * @return mixed
+     *
      * @throws \DH\Auditor\Exception\MappingException
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\ORM\Mapping\MappingException
-     *
-     * @return mixed
      */
     private function id(EntityManagerInterface $entityManager, object $entity)
     {
@@ -64,10 +64,10 @@ trait AuditTrait
      *
      * @param mixed $value
      *
+     * @return mixed
+     *
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\DBAL\Types\ConversionException
-     *
-     * @return mixed
      */
     private function value(EntityManagerInterface $entityManager, Type $type, $value)
     {
