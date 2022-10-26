@@ -37,9 +37,9 @@ final class Issue115Test extends TestCase
         $processor = new TransactionProcessor($this->provider);
         $transaction = new Transaction($entityManager);
         $entity = new DummyEntity();
-        $entity->setId(DummyEnum::getOldValue());
+        $entity->setId(DummyEnum::A);
         $transaction->insert($entity, [
-            'id' => [DummyEnum::getOldValue(), DummyEnum::getNewValue()],
+            'id' => [DummyEnum::A, DummyEnum::B],
         ]);
 
         $processor->process($transaction);

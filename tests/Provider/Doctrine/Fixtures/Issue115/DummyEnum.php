@@ -4,19 +4,17 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue115;
 
-enum DummyEnum: string
-{
-    case A = 'a';
-
-    case B = 'b';
-
-    public static function getOldValue(): DummyEnum
+if (\PHP_VERSION_ID < 81000) {
+    class DummyEnum
     {
-        return self::A;
+        public const A = 'a';
+        public const B = 'b';
     }
-
-    public static function getNewValue(): DummyEnum
+} else {
+    enum DummyEnum: string
     {
-        return self::B;
+        case A = 'a';
+
+        case B = 'b';
     }
 }
