@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Auditing\Transaction;
 
-use BackedEnum;
 use DH\Auditor\Exception\MappingException;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\User\UserInterface;
@@ -12,6 +11,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 use Throwable;
+use UnitEnum;
 
 trait AuditTrait
 {
@@ -75,8 +75,7 @@ trait AuditTrait
         if (null === $value) {
             return null;
         }
-
-        if (\PHP_VERSION_ID >= 81000 && class_exists(BackedEnum::class) && $value instanceof BackedEnum) {
+        if (\PHP_VERSION_ID >= 80100 && interface_exists(UnitEnum::class) && $value instanceof UnitEnum) {
             $value = $value->value;
         }
 
