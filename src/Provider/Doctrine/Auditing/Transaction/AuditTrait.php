@@ -76,7 +76,7 @@ trait AuditTrait
             return null;
         }
 
-        if (\PHP_VERSION_ID >= 81000 && $value instanceof BackedEnum) {
+        if (\PHP_VERSION_ID >= 81000 && class_exists(BackedEnum::class) && $value instanceof BackedEnum) {
             $value = $value->value;
         }
 
