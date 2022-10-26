@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  *
  * @small
+ *
  * @requires PHP >= 8.1
  */
 final class Issue115Test extends TestCase
