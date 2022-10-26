@@ -75,10 +75,8 @@ trait AuditTrait
         if (null === $value) {
             return null;
         }
-        if (\PHP_VERSION_ID >= 80100 && interface_exists(UnitEnum::class) && $value instanceof UnitEnum) {
-            if (property_exists($value, 'value')) {
-                $value = $value->value;
-            }
+        if (interface_exists(UnitEnum::class) && $value instanceof UnitEnum && property_exists($value, 'value')) {
+            $value = $value->value;
         }
 
         $platform = $entityManager->getConnection()->getDatabasePlatform();
