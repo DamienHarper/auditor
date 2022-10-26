@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  *
  * @small
+ * @requires PHP >= 8.1
  */
 final class Issue115Test extends TestCase
 {
@@ -26,9 +27,6 @@ final class Issue115Test extends TestCase
 
     public function testIssue115(): void
     {
-        if (\PHP_VERSION_ID < 81000) {
-            self::markTestSkipped('PHP > 8.1 is required.');
-        }
         $reader = new Reader($this->provider);
 
         /** @var StorageService $storageService */
