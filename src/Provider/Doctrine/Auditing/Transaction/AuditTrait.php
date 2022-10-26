@@ -75,6 +75,10 @@ trait AuditTrait
             return null;
         }
 
+        if ($value instanceof \BackedEnum) {
+            $value = $value->value;
+        }
+
         $platform = $entityManager->getConnection()->getDatabasePlatform();
 
         switch ($type->getName()) {
