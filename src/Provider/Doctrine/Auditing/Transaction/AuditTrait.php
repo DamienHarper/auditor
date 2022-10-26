@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Auditing\Transaction;
 
+use BackedEnum;
 use DH\Auditor\Exception\MappingException;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\User\UserInterface;
@@ -75,7 +76,7 @@ trait AuditTrait
             return null;
         }
 
-        if ($value instanceof \BackedEnum) {
+        if ($value instanceof BackedEnum) {
             $value = $value->value;
         }
 

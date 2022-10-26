@@ -1,24 +1,18 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Issues;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionProcessor;
-use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue115\DummyEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue115\DummyEnum;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
-use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -36,6 +30,7 @@ final class Issue115Test extends TestCase
             self::markTestSkipped('PHP > 8.0 is required.');
         }
         $reader = new Reader($this->provider);
+
         /** @var StorageService $storageService */
         $storageService = $this->provider->getStorageServiceForEntity(DummyEntity::class);
         $entityManager = $storageService->getEntityManager();
@@ -51,11 +46,12 @@ final class Issue115Test extends TestCase
 
         $audits = $reader->createQuery(DummyEntity::class)->execute();
         self::assertCount(1, $audits, 'results count ok.');
+
         /** @var \DH\Auditor\Model\Entry $audit */
         $audit = $audits[0];
         $diffs = $audit->getDiffs()['id'];
-        self::assertEquals('a', $diffs['old']);
-        self::assertEquals('b', $diffs['new']);
+        self::assertSame('a', $diffs['old']);
+        self::assertSame('b', $diffs['new']);
     }
 
     private function configureEntities(): void

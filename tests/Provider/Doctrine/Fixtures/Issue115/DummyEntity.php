@@ -1,11 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue115;
 
-
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Auditable;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -22,7 +20,6 @@ class DummyEntity
      */
     #[ORM\Id, ORM\GeneratedValue(strategy: 'NONE'), ORM\Column(type: 'bigint')]
     private DummyEnum $id;
-
 
     public function __construct()
     {
