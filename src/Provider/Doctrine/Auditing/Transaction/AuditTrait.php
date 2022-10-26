@@ -11,6 +11,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 use Throwable;
+use UnitEnum;
 
 trait AuditTrait
 {
@@ -73,6 +74,9 @@ trait AuditTrait
     {
         if (null === $value) {
             return null;
+        }
+        if (interface_exists(UnitEnum::class) && $value instanceof UnitEnum && property_exists($value, 'value')) {
+            $value = $value->value;
         }
 
         $platform = $entityManager->getConnection()->getDatabasePlatform();
