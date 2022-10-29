@@ -209,9 +209,12 @@ trait AuditTrait
             $label = DoctrineHelper::getRealClassName($entity).(null === $pkValue ? '' : '#'.$pkValue);
         }
 
+        if ($pkName !== 'id') {
+            $extra['pkName'] = $pkName;
+        }
+
         return [
             $pkName => $pkValue,
-            'pkName' => $pkName,
             'class' => $meta->name,
             'label' => $label,
             'table' => $meta->getTableName(),
