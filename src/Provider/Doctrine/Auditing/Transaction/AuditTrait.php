@@ -211,6 +211,7 @@ trait AuditTrait
 
         return [
             $pkName => $pkValue,
+            'pkName' => $pkName,
             'class' => $meta->name,
             'label' => $label,
             'table' => $meta->getTableName(),
