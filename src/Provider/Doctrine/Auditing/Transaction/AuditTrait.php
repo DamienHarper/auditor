@@ -10,6 +10,7 @@ use DH\Auditor\User\UserInterface;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Throwable;
 use UnitEnum;
 
@@ -137,11 +138,34 @@ trait AuditTrait
      */
     private function diff(EntityManagerInterface $entityManager, object $entity, array $changeset): array
     {
-        $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
+        $class = DoctrineHelper::getRealClassName($entity);
         $diff = [
             '@source' => $this->summarize($entityManager, $entity),
         ];
 
+        $cache = $entityManager->getConfiguration()->getMetadataCache() ?? null;
+
+        $cacheValues = [];
+        if ($cache !== null) {
+            try {
+                $item = $cache->getItem('AUDIT_' . $class);
+                if ($item->isHit()) {
+                    if (is_array($cached = $item->get())) {
+                        $cacheValues = $cached;
+                    }
+                }
+            } catch (\Throwable $exception) {
+            }
+        }
+
+        $getMeta = function () use ($entity, $entityManager): ClassMetadata {
+            static $meta;
+            if ($meta !== null) {
+                return $meta;
+            }
+            $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
+            return $meta;
+        };
         foreach ($changeset as $fieldName => [$old, $new]) {
             $o = null;
             $n = null;
@@ -151,22 +175,38 @@ trait AuditTrait
                 continue;
             }
 
+            $cachedMode = $cacheValues[$fieldName]['is'] ?? null;
             if (
-                !isset($meta->embeddedClasses[$fieldName])
-                && $meta->hasField($fieldName)
+                $cachedMode === 'SINGLE'
+                ||
+                ($cachedMode === null && !isset($meta->embeddedClasses[$fieldName])
+                && $getMeta()->hasField($fieldName)
                 && $this->provider->isAuditedField($entity, $fieldName)
+                )
             ) {
-                $mapping = $meta->fieldMappings[$fieldName];
-                $type = Type::getType($mapping['type']);
+                $cacheValues[$fieldName]['is'] = 'SINGLE';
+                if (!isset($cacheValues[$fieldName]['type'])) {
+                    $mapping = $getMeta()->fieldMappings[$fieldName];
+                    $type = Type::getType($mapping['type']);
+                    $cacheValues[$fieldName]['type'] = $type;
+                } else {
+                    $type = $cacheValues[$fieldName]['type'];
+                }
+
                 $o = $this->value($entityManager, $type, $old);
                 $n = $this->value($entityManager, $type, $new);
             } elseif (
-                $meta->hasAssociation($fieldName)
-                && $meta->isSingleValuedAssociation($fieldName)
-                && $this->provider->isAuditedField($entity, $fieldName)
+                $cachedMode === 'ASSOCIATION'
+                ||
+                ($cachedMode === null && $getMeta()->hasAssociation($fieldName)
+                && $getMeta()->isSingleValuedAssociation($fieldName)
+                && $this->provider->isAuditedField($entity, $fieldName))
             ) {
+                $cacheValues[$fieldName]['is'] = 'ASSOCIATION';
                 $o = $this->summarize($entityManager, $old);
                 $n = $this->summarize($entityManager, $new);
+            } else {
+                $cacheValues[$fieldName]['is'] = 'SKIPPED';
             }
 
             if ($o !== $n) {
@@ -175,6 +215,11 @@ trait AuditTrait
                     'old' => $o,
                 ];
             }
+        }
+
+        if ($cache !== null && isset($item)) {
+            $item->set($cacheValues);
+            $cache->save($item);
         }
 
         return $diff;
