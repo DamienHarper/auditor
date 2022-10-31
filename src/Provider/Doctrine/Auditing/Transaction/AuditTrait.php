@@ -157,7 +157,7 @@ trait AuditTrait
             if (
                 !isset($meta->embeddedClasses[$fieldName])
                 && $meta->hasField($fieldName)
-                && ($isAuditedField = $this->provider->isAuditedField($entity, $fieldName))
+                && $this->provider->isAuditedField($entity, $fieldName)
             ) {
                 $mapping = $meta->fieldMappings[$fieldName];
                 $type = Type::getType($mapping['type']);
@@ -166,7 +166,7 @@ trait AuditTrait
             } elseif (
                 $meta->hasAssociation($fieldName)
                 && $meta->isSingleValuedAssociation($fieldName)
-                && ($isAuditedField ?? $this->provider->isAuditedField($entity, $fieldName))
+                && $this->provider->isAuditedField($entity, $fieldName)
             ) {
                 $o = $this->summarize($entityManager, $old);
                 $n = $this->summarize($entityManager, $new);
