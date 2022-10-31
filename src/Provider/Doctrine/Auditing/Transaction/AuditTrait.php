@@ -120,6 +120,9 @@ trait AuditTrait
 
                 break;
 
+            case DoctrineHelper::getDoctrineType('JSON'):
+                return $value;
+
             default:
                 $convertedValue = $type->convertToDatabaseValue($value, $platform);
         }
@@ -154,7 +157,7 @@ trait AuditTrait
             if (
                 !isset($meta->embeddedClasses[$fieldName])
                 && $meta->hasField($fieldName)
-                && $this->provider->isAuditedField($entity, $fieldName)
+                && ($isAuditedField = $this->provider->isAuditedField($entity, $fieldName))
             ) {
                 $mapping = $meta->fieldMappings[$fieldName];
                 $type = Type::getType($mapping['type']);
@@ -163,7 +166,7 @@ trait AuditTrait
             } elseif (
                 $meta->hasAssociation($fieldName)
                 && $meta->isSingleValuedAssociation($fieldName)
-                && $this->provider->isAuditedField($entity, $fieldName)
+                && ($isAuditedField ?? $this->provider->isAuditedField($entity, $fieldName))
             ) {
                 $o = $this->summarize($entityManager, $old);
                 $n = $this->summarize($entityManager, $new);
