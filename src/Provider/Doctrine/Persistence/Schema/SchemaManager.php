@@ -69,7 +69,15 @@ class SchemaManager
         $audited = [];
         foreach ($entities as $entity) {
             if ($this->provider->isAuditable($entity)) {
-                $audited[$entity] = $entityManager->getClassMetadata($entity)->getTableName();
+                $metadata = $entityManager->getClassMetadata($entity);
+
+                // PostgreSQL allows tables to be placed in non-default DB schema
+                // See https://www.doctrine-project.org/projects/doctrine-orm/en/2.13/reference/attributes-reference.html#attrref_table
+                if ($metadata->getSchemaName()) {
+                    $audited[$entity] = $metadata->getSchemaName().'.'.$metadata->getTableName();
+                } else {
+                    $audited[$entity] = $metadata->getTableName();
+                }
             }
         }
         ksort($audited);
