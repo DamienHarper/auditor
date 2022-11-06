@@ -18,6 +18,8 @@ class DoctrineSubscriber implements EventSubscriber
 {
     private TransactionManager $transactionManager;
 
+    private ?SQLLogger $loggerBackup = null;
+
     public function __construct(TransactionManager $transactionManager)
     {
         $this->transactionManager = $transactionManager;
@@ -50,22 +52,22 @@ class DoctrineSubscriber implements EventSubscriber
         }
         trigger_deprecation('damienharper/auditor', '2.2', 'SQLLogger is deprecated. Use DHMiddleware instead');
         // extend the SQL logger
-        $loggerBackup = $entityManager->getConnection()->getConfiguration()->getSQLLogger();
-        $auditLogger = new Logger(function () use ($loggerBackup, $entityManager, $transaction): void {
+        $this->loggerBackup = $entityManager->getConnection()->getConfiguration()->getSQLLogger();
+        $auditLogger = new Logger(function () use ($entityManager, $transaction): void {
             // flushes pending data
-            $entityManager->getConnection()->getConfiguration()->setSQLLogger($loggerBackup);
+            $entityManager->getConnection()->getConfiguration()->setSQLLogger($this->loggerBackup);
             $this->transactionManager->process($transaction);
             $transaction->reset();
         });
 
         // Initialize a new LoggerChain with the new AuditLogger + the existing SQLLoggers.
         $loggerChain = new LoggerChain();
-        if ($loggerBackup instanceof LoggerChain) {
-            foreach ($loggerBackup->getLoggers() as $logger) {
+        if ($this->loggerBackup instanceof LoggerChain) {
+            foreach ($this->loggerBackup->getLoggers() as $logger) {
                 $loggerChain->addLogger($logger);
             }
-        } elseif ($loggerBackup instanceof SQLLogger) {
-            $loggerChain->addLogger($loggerBackup);
+        } elseif ($this->loggerBackup instanceof SQLLogger) {
+            $loggerChain->addLogger($this->loggerBackup);
         }
         $loggerChain->addLogger($auditLogger);
         $entityManager->getConnection()->getConfiguration()->setSQLLogger($loggerChain);
