@@ -4,27 +4,22 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware;
 
-use Doctrine\DBAL\Connection as DBALConnection;
-use Doctrine\DBAL\Driver\API\ExceptionConverter;
 use Doctrine\DBAL\Driver as DriverInterface;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 
 /**
  * @interal
  */
-final class DHDriver implements DriverInterface
+final class DHDriver extends AbstractDriverMiddleware
 {
     private DriverInterface $driver;
 
     /** @var array<callable> */
     private array $flusherList = [];
 
-    /**
-     * @internal this driver can be only instantiated by its middleware
-     */
     public function __construct(DriverInterface $driver)
     {
+        parent::__construct($driver);
         $this->driver = $driver;
     }
 
@@ -37,27 +32,6 @@ final class DHDriver implements DriverInterface
             $this->driver->connect($params),
             $this
         );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getDatabasePlatform(): AbstractPlatform
-    {
-        return $this->driver->getDatabasePlatform();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getSchemaManager(DBALConnection $conn, AbstractPlatform $platform): AbstractSchemaManager
-    {
-        return $this->driver->getSchemaManager($conn, $platform);
-    }
-
-    public function getExceptionConverter(): ExceptionConverter
-    {
-        return $this->driver->getExceptionConverter();
     }
 
     public function addDHFlusher(callable $flusher): void
