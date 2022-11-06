@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHMiddleware;
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 
@@ -32,9 +34,13 @@ trait ConnectionTrait
     {
         $params = self::getConnectionParameters($params);
 
+        $config = new Configuration();
+        $config->setMiddlewares([
+            new DHMiddleware(),
+        ]);
         if ('pdo_sqlite' === $params['driver']) {
             // SQLite
-            $connection = DriverManager::getConnection($params);
+            $connection = DriverManager::getConnection($params, $config);
             $schema = $connection->createSchemaManager()->createSchema();
             $stmts = $schema->toDropSql($connection->getDatabasePlatform());
             foreach ($stmts as $stmt) {
@@ -46,7 +52,7 @@ trait ConnectionTrait
             $dbname = $params['dbname'];
             unset($tmpParams['dbname']);
 
-            $connection = DriverManager::getConnection($tmpParams);
+            $connection = DriverManager::getConnection($tmpParams, $config);
 
             // Closes active connections
             $connection->executeStatement(
@@ -60,7 +66,7 @@ trait ConnectionTrait
             $dbname = $params['dbname'];
             unset($tmpParams['dbname']);
 
-            $connection = DriverManager::getConnection($tmpParams);
+            $connection = DriverManager::getConnection($tmpParams, $config);
 
             if ($connection->getDatabasePlatform()->supportsCreateDropDatabase()) {
                 $connection->createSchemaManager()->dropAndCreateDatabase($dbname);
@@ -75,7 +81,7 @@ trait ConnectionTrait
 
         $connection->close();
 
-        return DriverManager::getConnection($params);
+        return DriverManager::getConnection($params, $config);
     }
 
     private static function getConnectionParameters(?array $params = null): array
