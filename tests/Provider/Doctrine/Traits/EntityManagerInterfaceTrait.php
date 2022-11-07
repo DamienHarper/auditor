@@ -38,6 +38,14 @@ trait EntityManagerInterfaceTrait
 
         $connection = $this->getConnection($connectionName, $params);
 
-        return EntityManager::create($connection, $configuration);
+        $em = EntityManager::create($connection, $configuration);
+        $evm = $em->getEventManager();
+        foreach ($evm->getListeners() as $event => $listeners) {
+            foreach ($listeners as $listener) {
+                $evm->removeEventListener([$event], $listener);
+            }
+        }
+
+        return $em;
     }
 }
