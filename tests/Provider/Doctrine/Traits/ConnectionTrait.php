@@ -38,7 +38,7 @@ trait ConnectionTrait
             foreach ($stmts as $stmt) {
                 $connection->executeStatement($stmt);
             }
-        } else{
+        } else {
             $tmpParams = $params;
             $dbname = $params['dbname'];
             unset($tmpParams['dbname']);
@@ -48,7 +48,7 @@ trait ConnectionTrait
             if ('pdo_pgsql' === $params['driver']) {
                 // Closes active connections
                 $connection->executeStatement(
-                    'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = ' . $connection->getDatabasePlatform()->quoteStringLiteral($dbname)
+                    'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '.$connection->getDatabasePlatform()->quoteStringLiteral($dbname)
                 );
             }
 

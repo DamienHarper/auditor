@@ -94,7 +94,7 @@ final class SchemaManagerTest extends TestCase
         $expected = SchemaHelper::getAuditTableIndices($authorAuditTable->getName());
         foreach ($expected as $name => $options) {
             if ('primary' === $options['type']) {
-                self::assertNotNull($authorAuditTable->getPrimaryKey(),'audit table has a primary key named "'.$name.'".');
+                self::assertNotNull($authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
             } else {
                 self::assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
             }

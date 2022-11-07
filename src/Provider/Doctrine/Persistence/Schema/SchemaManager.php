@@ -12,12 +12,12 @@ use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
+use LogicException;
 use RuntimeException;
 
 /**
@@ -59,7 +59,6 @@ class SchemaManager
     /**
      * Returns an array of audit table names indexed by entity FQN.
      * Only auditable entities are considered.
-     *
      */
     public function getAuditableTableNames(EntityManagerInterface $entityManager): array
     {
@@ -166,6 +165,7 @@ class SchemaManager
      * Creates an audit table.
      *
      * @param object|string $table
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function createAuditTable(string $entity, $table, ?Schema $schema = null): Schema
@@ -182,7 +182,13 @@ class SchemaManager
         /** @var Configuration $configuration */
         $configuration = $this->provider->getConfiguration();
 
-        $tableName = $table instanceof Table ? $table->getName() : (string) $table;
+        if ($table instanceof Table) {
+            $tableName = $table->getName();
+        } elseif (\is_string($table)) {
+            $tableName = $table;
+        } else {
+            throw new LogicException('Can\'t get tableName');
+        }
 
         $auditTablename = preg_replace(
             sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($tableName, '#')),

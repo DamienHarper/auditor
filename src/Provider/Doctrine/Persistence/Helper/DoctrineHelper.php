@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -13,7 +12,6 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\ORMSetup;
@@ -70,8 +68,8 @@ final class DoctrineHelper
     }
 
     /**
-     * @param Statement|QueryBuilder $statement
-     * @return void
+     * @param QueryBuilder|Statement $statement
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public static function executeStatement($statement): void
@@ -84,11 +82,11 @@ final class DoctrineHelper
     }
 
     /**
-     * @param Statement|QueryBuilder $statement
-     * @return void
+     * @param QueryBuilder|Statement $statement
+     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public static function executeQuery(QueryBuilder $statement)
+    public static function executeQuery($statement): void
     {
         if (method_exists($statement, 'executeQuery')) {
             $statement->executeQuery();
@@ -113,6 +111,7 @@ final class DoctrineHelper
 
     /**
      * @return array<string>
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public static function getMigrateToSql(Connection $connection, Schema $fromSchema, Schema $toSchema): array
@@ -125,6 +124,7 @@ final class DoctrineHelper
                 $schemaComparator->compareSchemas($fromSchema, $toSchema)
             );
         }
+
         return $fromSchema->getMigrateToSql($toSchema, $platform);
     }
 
@@ -133,10 +133,11 @@ final class DoctrineHelper
         if (class_exists(ORMSetup::class)) {
             return ORMSetup::createAttributeMetadataConfiguration($paths, $isDevMode);
         }
-return        Setup::createAttributeMetadataConfiguration($paths, $isDevMode);
+
+        return Setup::createAttributeMetadataConfiguration($paths, $isDevMode);
     }
 
-    public static function createAnnotationMetadataConfiguration(array $paths, $isDevMode = false): Configuration
+    public static function createAnnotationMetadataConfiguration(array $paths, bool $isDevMode = false): Configuration
     {
         if (class_exists(ORMSetup::class)) {
             return ORMSetup::createAnnotationMetadataConfiguration($paths, $isDevMode);
