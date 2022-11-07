@@ -85,8 +85,9 @@ final class DoctrineHelper
     /**
      * @param QueryBuilder|Statement $statement
      *
+     * @return int|Result|string
+     *
      * @throws \Doctrine\DBAL\Exception
-     * @return Result|int|string
      */
     public static function executeQuery($statement)
     {
