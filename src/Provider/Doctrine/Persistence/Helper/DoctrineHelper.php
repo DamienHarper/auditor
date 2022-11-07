@@ -153,6 +153,6 @@ final class DoctrineHelper
 
     public static function getEntityManagerFromOnFlushEventArgs(OnFlushEventArgs $args): EntityManagerInterface
     {
-        return method_exists($args, '') ? $args->getObjectManager() : $args->getEntityManager();
+        return method_exists($args, 'getObjectManager') ? $args->getObjectManager() : $args->getEntityManager();
     }
 }
