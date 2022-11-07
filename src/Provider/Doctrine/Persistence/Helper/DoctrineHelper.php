@@ -86,8 +86,9 @@ final class DoctrineHelper
      * @param QueryBuilder|Statement $statement
      *
      * @throws \Doctrine\DBAL\Exception
+     * @return Result|int|string
      */
-    public static function executeQuery($statement): Result
+    public static function executeQuery($statement)
     {
         if (method_exists($statement, 'executeQuery')) {
             return $statement->executeQuery();
