@@ -6,6 +6,7 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
@@ -86,12 +87,12 @@ final class DoctrineHelper
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public static function executeQuery($statement): void
+    public static function executeQuery($statement): Result
     {
         if (method_exists($statement, 'executeQuery')) {
-            $statement->executeQuery();
+            return $statement->executeQuery();
         } else {
-            $statement->execute();
+            return $statement->execute();
         }
     }
 
