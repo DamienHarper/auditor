@@ -272,8 +272,8 @@ class SchemaManager
                 // column is part of expected columns
                 $table->dropColumn($column->getName());
 
-                if (DoctrineHelper::getDoctrineType('JSON') === $expectedColumns[$column->getName()]['type'] && $isJsonSupported) {
-                    $type = DoctrineHelper::getDoctrineType('TEXT');
+                if (Types::JSON === $expectedColumns[$column->getName()]['type'] && $isJsonSupported) {
+                    $type = Types::TEXT;
                 } else {
                     $type = $expectedColumns[$column->getName()]['type'];
                 }
@@ -289,13 +289,6 @@ class SchemaManager
 
         foreach ($expectedColumns as $columnName => $options) {
             if (!\in_array($columnName, $processed, true)) {
-                // expected column in not part of concrete ones so it's a new column, we need to add it
-                if (DoctrineHelper::getDoctrineType('JSON') === $options['type'] && $isJsonSupported) {
-                    $type = DoctrineHelper::getDoctrineType('TEXT');
-                } else {
-                    $type = $options['type'];
-                }
-
                 $table->addColumn($columnName, $options['type'], $options['options']);
             }
         }
