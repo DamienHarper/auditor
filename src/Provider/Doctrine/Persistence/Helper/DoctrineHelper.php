@@ -91,9 +91,9 @@ final class DoctrineHelper
     {
         if (method_exists($statement, 'executeQuery')) {
             return $statement->executeQuery();
-        } else {
-            return $statement->execute();
         }
+
+        return $statement->execute();
     }
 
     public static function createSchemaManager(Connection $connection): AbstractSchemaManager
@@ -141,10 +141,12 @@ final class DoctrineHelper
     public static function createAnnotationMetadataConfiguration(array $paths, bool $isDevMode = false): Configuration
     {
         if (class_exists(ORMSetup::class)) {
+            require_once __DIR__.'/../../../../../vendor/doctrine/orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php';
+
             return ORMSetup::createAnnotationMetadataConfiguration($paths, $isDevMode);
         }
 
-        return Setup::createAnnotationMetadataConfiguration($paths, $isDevMode);
+        return Setup::createAnnotationMetadataConfiguration($paths, $isDevMode, null, null, false);
     }
 
     public static function getEntityManagerFromOnFlushEventArgs(OnFlushEventArgs $args): EntityManagerInterface
