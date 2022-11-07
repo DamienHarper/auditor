@@ -12,9 +12,11 @@ use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 
@@ -39,9 +41,10 @@ class SchemaManager
         /** @var StorageService[] $storageServices */
         $storageServices = $this->provider->getStorageServices();
         foreach ($sqls as $name => $queries) {
+            $connection = $storageServices[$name]->getEntityManager()->getConnection();
             foreach ($queries as $index => $sql) {
-                $statement = $storageServices[$name]->getEntityManager()->getConnection()->prepare($sql);
-                $statement->execute();
+                $statement = $connection->prepare($sql);
+                DoctrineHelper::executeStatement($statement);
 
                 if (null !== $callback) {
                     $callback([
@@ -57,7 +60,6 @@ class SchemaManager
      * Returns an array of audit table names indexed by entity FQN.
      * Only auditable entities are considered.
      *
-     * @throws \Doctrine\ORM\ORMException
      */
     public function getAuditableTableNames(EntityManagerInterface $entityManager): array
     {
@@ -91,7 +93,7 @@ class SchemaManager
         // Collect auditable entities from auditing entity managers
         /** @var AuditingService[] $auditingServices */
         $auditingServices = $this->provider->getAuditingServices();
-        foreach ($auditingServices as $name => $auditingService) {
+        foreach ($auditingServices as $auditingService) {
             $classes = $this->getAuditableTableNames($auditingService->getEntityManager());
             // Populate the auditable entities repository
             foreach ($classes as $entity => $tableName) {
@@ -103,8 +105,8 @@ class SchemaManager
                 $repository[$key][$entity] = $tableName;
             }
         }
-        $findEntityByTablename = static function (string $tableName) use ($repository): ?string {
-            foreach ($repository as $emName => $map) {
+        $findEntityByTableName = static function (string $tableName) use ($repository): ?string {
+            foreach ($repository as $map) {
                 $result = array_search($tableName, $map, true);
                 if (false !== $result) {
                     return (string) $result;
@@ -117,14 +119,15 @@ class SchemaManager
         // Compute and collect SQL queries
         $sqls = [];
         foreach ($repository as $name => $classes) {
-            $storageSchemaManager = $storageServices[$name]->getEntityManager()->getConnection()->getSchemaManager();
+            $storageConnection = $storageServices[$name]->getEntityManager()->getConnection();
+            $storageSchemaManager = $storageConnection->createSchemaManager();
 
-            $storageSchema = $storageSchemaManager->createSchema();
+            $storageSchema = $storageSchemaManager->introspectSchema();
             $fromSchema = clone $storageSchema;
 
             $processed = [];
 
-            foreach ($classes as $entity => $tableName) {
+            foreach ($classes as $tableName) {
                 if (!\in_array($tableName, $processed, true)) {
                     /** @var string $auditTablename */
                     $auditTablename = preg_replace(
@@ -137,7 +140,7 @@ class SchemaManager
                         $tableName
                     );
 
-                    $entityFQCN = $findEntityByTablename($tableName);
+                    $entityFQCN = $findEntityByTableName($tableName);
                     if (null === $entityFQCN) {
                         throw new RuntimeException(sprintf('Unable to find entity for table "%s".', $tableName));
                     }
@@ -153,8 +156,7 @@ class SchemaManager
                     $processed[] = $tableName;
                 }
             }
-
-            $sqls[$name] = $fromSchema->getMigrateToSql($storageSchema, $storageSchemaManager->getDatabasePlatform());
+            $sqls[$name] = DoctrineHelper::getMigrateToSql($storageConnection, $fromSchema, $storageSchema);
         }
 
         return $sqls;
@@ -164,6 +166,7 @@ class SchemaManager
      * Creates an audit table.
      *
      * @param object|string $table
+     * @throws \Doctrine\DBAL\Exception
      */
     public function createAuditTable(string $entity, $table, ?Schema $schema = null): Schema
     {
@@ -172,8 +175,8 @@ class SchemaManager
         $connection = $storageService->getEntityManager()->getConnection();
 
         if (null === $schema) {
-            $schemaManager = $connection->getSchemaManager();
-            $schema = $schemaManager->createSchema();
+            $schemaManager = DoctrineHelper::createSchemaManager($connection);
+            $schema = DoctrineHelper::introspectSchema($schemaManager);
         }
 
         /** @var Configuration $configuration */
@@ -197,8 +200,8 @@ class SchemaManager
             // Add columns to audit table
             $isJsonSupported = PlatformHelper::isJsonSupported($connection);
             foreach (SchemaHelper::getAuditTableColumns() as $columnName => $struct) {
-                if (DoctrineHelper::getDoctrineType('JSON') === $struct['type'] && $isJsonSupported) {
-                    $type = DoctrineHelper::getDoctrineType('TEXT');
+                if (Types::JSON === $struct['type'] && $isJsonSupported) {
+                    $type = Types::TEXT;
                 } else {
                     $type = $struct['type'];
                 }
@@ -228,6 +231,7 @@ class SchemaManager
      * Ensures an audit table's structure is valid.
      *
      * @throws SchemaException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function updateAuditTable(string $entity, Table $table, ?Schema $schema = null): Schema
     {
@@ -235,9 +239,9 @@ class SchemaManager
         $storageService = $this->provider->getStorageServiceForEntity($entity);
         $connection = $storageService->getEntityManager()->getConnection();
 
-        $schemaManager = $connection->getSchemaManager();
+        $schemaManager = DoctrineHelper::createSchemaManager($connection);
         if (null === $schema) {
-            $schema = $schemaManager->createSchema();
+            $schema = DoctrineHelper::introspectSchema($schemaManager);
         }
 
         $table = $schema->getTable($table->getName());

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema;
 
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
@@ -66,7 +67,8 @@ final class SchemaManager2AEM1SEMAltConnectionTest extends TestCase
          * @var StorageService $storageService
          */
         foreach ($storageServices as $name => $storageService) {
-            $schemaManager = $storageService->getEntityManager()->getConnection()->getSchemaManager();
+            $connection = $storageService->getEntityManager()->getConnection();
+            $schemaManager = DoctrineHelper::createSchemaManager($connection);
             $tables = array_map(
                 static fn ($t) => $t->getName(),
                 $schemaManager->listTables()
