@@ -21,6 +21,7 @@ use InvalidArgumentException;
 
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Helper\DoctrineHelperTest
+ * @internal
  */
 final class DoctrineHelper
 {
