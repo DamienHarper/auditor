@@ -8,6 +8,7 @@ use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Throwable;
 
 trait ConnectionTrait
 {
@@ -96,7 +97,11 @@ trait ConnectionTrait
 
     private function dropAndCreateDatabase(AbstractSchemaManager $schemaManager, string $dbname): void
     {
-        $schemaManager->dropDatabase($dbname);
+        try {
+            $schemaManager->dropDatabase($dbname);
+        } catch (Throwable $exception) {
+            // do nothing
+        }
         $schemaManager->createDatabase($dbname);
     }
 }
