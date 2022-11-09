@@ -7,6 +7,7 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
@@ -67,8 +68,9 @@ final class SchemaManagerTest extends TestCase
         /** @var StorageService $storageService */
         $storageService = $this->provider->getStorageServiceForEntity(Author::class);
         $entityManager = $storageService->getEntityManager();
-        $schemaManager = $entityManager->getConnection()->getSchemaManager();
-        $fromSchema = $schemaManager->createSchema();
+        $storageConnection = $entityManager->getConnection();
+        $schemaManager = $storageConnection->createSchemaManager();
+        $fromSchema = $schemaManager->introspectSchema();
 
         // at this point, schema is populated but does not contain any audit table
         self::assertNull($this->getTable($schemaManager->listTables(), 'author_audit'), 'author_audit does not exist yet.');
@@ -76,7 +78,7 @@ final class SchemaManagerTest extends TestCase
         // create audit table for Author entity
         $authorTable = $this->getTable($schemaManager->listTables(), 'author');
         $toSchema = $updater->createAuditTable(Author::class, $authorTable);
-        $this->migrate($fromSchema, $toSchema, $entityManager, $schemaManager->getDatabasePlatform());
+        $this->migrate($fromSchema, $toSchema, $entityManager, $storageConnection->getDatabasePlatform());
 
         // check audit table has been created
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
@@ -92,7 +94,7 @@ final class SchemaManagerTest extends TestCase
         $expected = SchemaHelper::getAuditTableIndices($authorAuditTable->getName());
         foreach ($expected as $name => $options) {
             if ('primary' === $options['type']) {
-                self::assertTrue($authorAuditTable->hasPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
+                self::assertNotNull($authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
             } else {
                 self::assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
             }
@@ -109,15 +111,16 @@ final class SchemaManagerTest extends TestCase
         /** @var StorageService $storageService */
         $storageService = $this->provider->getStorageServiceForEntity(Author::class);
         $entityManager = $storageService->getEntityManager();
-        $schemaManager = $entityManager->getConnection()->getSchemaManager();
-        $fromSchema = $schemaManager->createSchema();
+        $storageConnection = $entityManager->getConnection();
+        $schemaManager = DoctrineHelper::createSchemaManager($storageConnection);
+        $fromSchema = DoctrineHelper::introspectSchema($schemaManager);
 
         // at this point, schema is populated but does not contain any audit table
         $authorTable = $this->getTable($schemaManager->listTables(), 'author');
 
         // create audit table for Author entity
         $toSchema = $updater->createAuditTable(Author::class, $authorTable);
-        $this->migrate($fromSchema, $toSchema, $entityManager, $schemaManager->getDatabasePlatform(), true);
+        $this->migrate($fromSchema, $toSchema, $entityManager, $storageConnection->getDatabasePlatform());
 
         // new/alternate structure
         $alternateColumns = [
@@ -219,7 +222,7 @@ final class SchemaManagerTest extends TestCase
         ];
 
         // apply new structure to author_audit table
-        $fromSchema = $schemaManager->createSchema();
+        $fromSchema = DoctrineHelper::introspectSchema($schemaManager);
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
         $table = $toSchema->getTable('author_audit');
         $columns = $schemaManager->listTableColumns($authorAuditTable->getName());
@@ -230,7 +233,7 @@ final class SchemaManagerTest extends TestCase
         $reflectedMethod = $this->reflectMethod($updater, 'processIndices');
         $reflectedMethod->invokeArgs($updater, [$table, $alternateIndices, $entityManager->getConnection()]);
 
-        $this->migrate($fromSchema, $toSchema, $entityManager, $schemaManager->getDatabasePlatform(), true);
+        $this->migrate($fromSchema, $toSchema, $entityManager, $storageConnection->getDatabasePlatform());
 
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
 
@@ -242,18 +245,18 @@ final class SchemaManagerTest extends TestCase
         // check expected alternate indices
         foreach ($alternateIndices as $name => $options) {
             if ('primary' === $options['type']) {
-                self::assertTrue($authorAuditTable->hasPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
+                self::assertNotNull($authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
             } else {
                 self::assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
             }
         }
 
         // run UpdateManager::updateAuditTable() to bring author_audit to expected structure
-        $fromSchema = $schemaManager->createSchema();
+        $fromSchema = DoctrineHelper::introspectSchema($schemaManager);
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
 
         $toSchema = $updater->updateAuditTable(Author::class, $authorAuditTable);
-        $this->migrate($fromSchema, $toSchema, $entityManager, $schemaManager->getDatabasePlatform(), true);
+        $this->migrate($fromSchema, $toSchema, $entityManager, $storageConnection->getDatabasePlatform());
 
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
 
@@ -265,19 +268,19 @@ final class SchemaManagerTest extends TestCase
         // check expected indices
         foreach (SchemaHelper::getAuditTableIndices($authorAuditTable->getName()) as $name => $options) {
             if ('primary' === $options['type']) {
-                self::assertTrue($authorAuditTable->hasPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
+                self::assertNotNull($authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
             } else {
                 self::assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
             }
         }
     }
 
-    private function migrate(Schema $fromSchema, Schema $toSchema, EntityManagerInterface $entityManager, AbstractPlatform $platform, bool $debug = false): void
+    private function migrate(Schema $fromSchema, Schema $toSchema, EntityManagerInterface $entityManager, AbstractPlatform $platform): void
     {
-        $sqls = $fromSchema->getMigrateToSql($toSchema, $platform);
+        $sqls = DoctrineHelper::getMigrateToSql($entityManager->getConnection(), $fromSchema, $toSchema);
         foreach ($sqls as $sql) {
             $statement = $entityManager->getConnection()->prepare($sql);
-            $statement->execute();
+            DoctrineHelper::executeStatement($statement);
         }
     }
 

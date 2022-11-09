@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Event;
 
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Dog;
@@ -77,8 +78,8 @@ final class CreateSchemaListenerTest extends TestCase
         $tableNames = [];
 
         /** @var StorageService $storageService */
-        foreach ($this->provider->getStorageServices() as $name => $storageService) {
-            $schemaManager = $storageService->getEntityManager()->getConnection()->getSchemaManager();
+        foreach ($this->provider->getStorageServices() as $storageService) {
+            $schemaManager = DoctrineHelper::createSchemaManager($storageService->getEntityManager()->getConnection());
 
             foreach ($schemaManager->listTables() as $table) {
                 $tableNames[] = $table->getName();

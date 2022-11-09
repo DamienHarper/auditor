@@ -4,13 +4,27 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\ORMSetup;
+use Doctrine\ORM\Tools\Setup;
 use InvalidArgumentException;
 
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Helper\DoctrineHelperTest
+ *
+ * @internal
  */
-abstract class DoctrineHelper
+final class DoctrineHelper
 {
     /**
      * Gets the real class name of a class name that could be a proxy.
@@ -54,5 +68,93 @@ abstract class DoctrineHelper
         \assert(\is_string(\constant(Types::class.'::'.$type)));
 
         return \constant(Types::class.'::'.$type);
+    }
+
+    /**
+     * @param QueryBuilder|Statement $statement
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public static function executeStatement($statement): void
+    {
+        if (method_exists($statement, 'executeStatement')) {
+            $statement->executeStatement();
+        } else {
+            $statement->execute();
+        }
+    }
+
+    /**
+     * @param QueryBuilder|Statement $statement
+     *
+     * @return int|Result|string
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public static function executeQuery($statement)
+    {
+        if (method_exists($statement, 'executeQuery')) {
+            return $statement->executeQuery();
+        }
+
+        return $statement->execute();
+    }
+
+    public static function createSchemaManager(Connection $connection): AbstractSchemaManager
+    {
+        return method_exists($connection, 'createSchemaManager')
+            ? $connection->createSchemaManager()
+            : $connection->getSchemaManager();
+    }
+
+    public static function introspectSchema(AbstractSchemaManager $schemaManager): Schema
+    {
+        return method_exists($schemaManager, 'introspectSchema')
+            ? $schemaManager->introspectSchema()
+            : $schemaManager->createSchema();
+    }
+
+    /**
+     * @return array<string>
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public static function getMigrateToSql(Connection $connection, Schema $fromSchema, Schema $toSchema): array
+    {
+        $schemaComparator = new Comparator();
+        $platform = $connection->getDatabasePlatform();
+
+        if (method_exists($platform, 'getAlterSchemaSQL')) {
+            return $platform->getAlterSchemaSQL(
+                $schemaComparator->compareSchemas($fromSchema, $toSchema)
+            );
+        }
+
+        return $fromSchema->getMigrateToSql($toSchema, $platform);
+    }
+
+    public static function createAttributeMetadataConfiguration(array $paths, bool $isDevMode = false): Configuration
+    {
+        if (class_exists(ORMSetup::class)) {
+            return ORMSetup::createAttributeMetadataConfiguration($paths, $isDevMode);
+        }
+
+        return Setup::createAttributeMetadataConfiguration($paths, $isDevMode);
+    }
+
+    public static function createAnnotationMetadataConfiguration(array $paths, bool $isDevMode = false): Configuration
+    {
+        if (class_exists(ORMSetup::class)) {
+            require_once __DIR__.'/../../../../../vendor/doctrine/orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php';
+
+            return ORMSetup::createAnnotationMetadataConfiguration($paths, $isDevMode);
+        }
+
+        return Setup::createAnnotationMetadataConfiguration($paths, $isDevMode, null, null, false);
+    }
+
+    public static function getEntityManagerFromOnFlushEventArgs(OnFlushEventArgs $args): EntityManagerInterface
+    {
+        return method_exists($args, 'getObjectManager') ? $args->getObjectManager() : $args->getEntityManager();
     }
 }

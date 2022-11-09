@@ -120,6 +120,9 @@ trait AuditTrait
 
                 break;
 
+            case DoctrineHelper::getDoctrineType('JSON'):
+                return $value;
+
             default:
                 $convertedValue = $type->convertToDatabaseValue($value, $platform);
         }
