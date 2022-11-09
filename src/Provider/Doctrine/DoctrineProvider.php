@@ -127,8 +127,7 @@ class DoctrineProvider extends AbstractProvider
         foreach ($payload as $key => $value) {
             $statement->bindValue($key, $value);
         }
-
-        $statement->execute();
+        DoctrineHelper::executeStatement($statement);
 
         // let's get the last inserted ID from the database so other providers can use that info
         $payload = $event->getPayload();

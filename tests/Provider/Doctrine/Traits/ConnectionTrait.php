@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Throwable;
 
 trait ConnectionTrait
 {
@@ -20,11 +23,6 @@ trait ConnectionTrait
             self::$connections[$name] = $this->createConnection($params);
         }
 
-//        if (false === self::$connections[$name]->ping()) {
-//            self::$connections[$name]->close();
-//            self::$connections[$name]->connect();
-//        }
-
         return self::$connections[$name];
     }
 
@@ -35,42 +33,27 @@ trait ConnectionTrait
         if ('pdo_sqlite' === $params['driver']) {
             // SQLite
             $connection = DriverManager::getConnection($params);
-            $schema = $connection->createSchemaManager()->createSchema();
+            $schemaManager = DoctrineHelper::createSchemaManager($connection);
+            $schema = DoctrineHelper::introspectSchema($schemaManager);
             $stmts = $schema->toDropSql($connection->getDatabasePlatform());
             foreach ($stmts as $stmt) {
                 $connection->executeStatement($stmt);
             }
-        } elseif ('pdo_pgsql' === $params['driver']) {
-            // PostgreSQL
-            $tmpParams = $params;
-            $dbname = $params['dbname'];
-            unset($tmpParams['dbname']);
-
-            $connection = DriverManager::getConnection($tmpParams);
-
-            // Closes active connections
-            $connection->executeStatement(
-                'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '.$connection->getDatabasePlatform()->quoteStringLiteral($dbname)
-            );
-
-            $connection->createSchemaManager()->dropAndCreateDatabase($dbname);
         } else {
-            // Other
             $tmpParams = $params;
             $dbname = $params['dbname'];
             unset($tmpParams['dbname']);
 
             $connection = DriverManager::getConnection($tmpParams);
 
-            if ($connection->getDatabasePlatform()->supportsCreateDropDatabase()) {
-                $connection->createSchemaManager()->dropAndCreateDatabase($dbname);
-            } else {
-                $schema = $connection->createSchemaManager()->createSchema();
-                $stmts = $schema->toDropSql($connection->getDatabasePlatform());
-                foreach ($stmts as $stmt) {
-                    $connection->executeStatement($stmt);
-                }
+            if ('pdo_pgsql' === $params['driver']) {
+                // Closes active connections
+                $connection->executeStatement(
+                    'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '.$connection->getDatabasePlatform()->quoteStringLiteral($dbname)
+                );
             }
+
+            $this->dropAndCreateDatabase($connection->createSchemaManager(), $dbname);
         }
 
         $connection->close();
@@ -110,5 +93,15 @@ trait ConnectionTrait
             'port' => $GLOBALS['db_port'],
             'charset' => $GLOBALS['db_charset'],
         ];
+    }
+
+    private function dropAndCreateDatabase(AbstractSchemaManager $schemaManager, string $dbname): void
+    {
+        try {
+            $schemaManager->dropDatabase($dbname);
+        } catch (Throwable $exception) {
+            // do nothing
+        }
+        $schemaManager->createDatabase($dbname);
     }
 }
