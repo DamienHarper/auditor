@@ -35,11 +35,12 @@ class TransactionProcessor implements TransactionProcessorInterface
      */
     public function process(TransactionInterface $transaction): void
     {
-        $this->processInsertions($transaction, $transaction->getEntityManager());
-        $this->processUpdates($transaction, $transaction->getEntityManager());
-        $this->processAssociations($transaction, $transaction->getEntityManager());
-        $this->processDissociations($transaction, $transaction->getEntityManager());
-        $this->processDeletions($transaction, $transaction->getEntityManager());
+        $em = $transaction->getEntityManager();
+        $this->processInsertions($transaction, $em);
+        $this->processUpdates($transaction, $em);
+        $this->processAssociations($transaction, $em);
+        $this->processDissociations($transaction, $em);
+        $this->processDeletions($transaction, $em);
     }
 
     private function notify(array $payload): void

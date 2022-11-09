@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHMiddleware;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -30,9 +32,13 @@ trait ConnectionTrait
     {
         $params = self::getConnectionParameters($params);
 
+        $config = new Configuration();
+        $config->setMiddlewares([
+            new DHMiddleware(),
+        ]);
         if ('pdo_sqlite' === $params['driver']) {
             // SQLite
-            $connection = DriverManager::getConnection($params);
+            $connection = DriverManager::getConnection($params, $config);
             $schemaManager = DoctrineHelper::createSchemaManager($connection);
             $schema = DoctrineHelper::introspectSchema($schemaManager);
             $stmts = $schema->toDropSql($connection->getDatabasePlatform());
@@ -44,7 +50,7 @@ trait ConnectionTrait
             $dbname = $params['dbname'];
             unset($tmpParams['dbname']);
 
-            $connection = DriverManager::getConnection($tmpParams);
+            $connection = DriverManager::getConnection($tmpParams, $config);
 
             if ('pdo_pgsql' === $params['driver']) {
                 // Closes active connections
@@ -58,7 +64,7 @@ trait ConnectionTrait
 
         $connection->close();
 
-        return DriverManager::getConnection($params);
+        return DriverManager::getConnection($params, $config);
     }
 
     private static function getConnectionParameters(?array $params = null): array

@@ -6,6 +6,7 @@ namespace DH\Auditor\Provider\Doctrine\Auditing\Event;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Logger\Logger;
 use DH\Auditor\Provider\Doctrine\Auditing\Logger\LoggerChain;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
@@ -35,7 +36,19 @@ class DoctrineSubscriber implements EventSubscriber
     {
         $entityManager = DoctrineHelper::getEntityManagerFromOnFlushEventArgs($args);
         $transaction = new Transaction($entityManager);
+        // Populate transaction
+        $this->transactionManager->populate($transaction);
 
+        $driver = $entityManager->getConnection()->getDriver();
+        if ($driver instanceof DHDriver) {
+            $driver->addDHFlusher(function () use ($transaction): void {
+                $this->transactionManager->process($transaction);
+                $transaction->reset();
+            });
+
+            return;
+        }
+        trigger_deprecation('damienharper/auditor', '2.2', 'SQLLogger is deprecated. Use DHMiddleware instead');
         // extend the SQL logger
         $this->loggerBackup = $entityManager->getConnection()->getConfiguration()->getSQLLogger();
         $auditLogger = new Logger(function () use ($entityManager, $transaction): void {
@@ -56,9 +69,6 @@ class DoctrineSubscriber implements EventSubscriber
         }
         $loggerChain->addLogger($auditLogger);
         $entityManager->getConnection()->getConfiguration()->setSQLLogger($loggerChain);
-
-        // Populate transaction
-        $this->transactionManager->populate($transaction);
     }
 
     /**
