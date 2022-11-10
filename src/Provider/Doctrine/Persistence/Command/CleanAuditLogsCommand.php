@@ -33,8 +33,6 @@ class CleanAuditLogsCommand extends Command
 
     private const UNTIL_DATE_FORMAT = 'Y-m-d H:i:s';
 
-    protected static $defaultName = 'audit:clean';
-
     private Auditor $auditor;
 
     public function unlock(): void
@@ -53,7 +51,7 @@ class CleanAuditLogsCommand extends Command
     {
         $this
             ->setDescription('Cleans audit tables')
-            ->setName(self::$defaultName) // @phpstan-ignore-line
+            ->setName('audit:clean')
             ->addOption('no-confirm', null, InputOption::VALUE_NONE, 'No interaction mode')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Do not execute SQL queries.')
             ->addOption('dump-sql', null, InputOption::VALUE_NONE, 'Prints SQL related queries.')
