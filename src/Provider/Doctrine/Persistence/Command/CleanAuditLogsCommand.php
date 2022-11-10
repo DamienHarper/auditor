@@ -28,7 +28,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Command\CleanAuditLogsCommandTest
  */
-#[AsCommand('audit:clean')]
 class CleanAuditLogsCommand extends Command
 {
     use LockableTrait;

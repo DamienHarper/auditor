@@ -19,7 +19,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Command\UpdateSchemaCommandTest
  */
-#[AsCommand('audit:schema:update')]
 class UpdateSchemaCommand extends Command
 {
     use LockableTrait;
