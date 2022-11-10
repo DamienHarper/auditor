@@ -52,8 +52,8 @@ class CleanAuditLogsCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName('audit:clean')
             ->setDescription('Cleans audit tables')
+            ->setName('audit:clean')
             ->addOption('no-confirm', null, InputOption::VALUE_NONE, 'No interaction mode')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Do not execute SQL queries.')
             ->addOption('dump-sql', null, InputOption::VALUE_NONE, 'Prints SQL related queries.')
