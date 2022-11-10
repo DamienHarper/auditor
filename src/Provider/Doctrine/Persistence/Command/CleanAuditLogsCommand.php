@@ -15,6 +15,7 @@ use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Exception;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -27,13 +28,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Command\CleanAuditLogsCommandTest
  */
+#[AsCommand('audit:clean')]
 class CleanAuditLogsCommand extends Command
 {
     use LockableTrait;
 
     private const UNTIL_DATE_FORMAT = 'Y-m-d H:i:s';
-
-    protected static $defaultName = 'audit:clean';
 
     private Auditor $auditor;
 
@@ -52,8 +52,8 @@ class CleanAuditLogsCommand extends Command
     protected function configure(): void
     {
         $this
+            ->setName('audit:clean')
             ->setDescription('Cleans audit tables')
-            ->setName(self::$defaultName) // @phpstan-ignore-line
             ->addOption('no-confirm', null, InputOption::VALUE_NONE, 'No interaction mode')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Do not execute SQL queries.')
             ->addOption('dump-sql', null, InputOption::VALUE_NONE, 'Prints SQL related queries.')
