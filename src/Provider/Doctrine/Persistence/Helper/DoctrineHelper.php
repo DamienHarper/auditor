@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
+use Composer\Autoload\ClassLoader;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
@@ -18,6 +19,7 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\ORMSetup;
 use Doctrine\ORM\Tools\Setup;
 use InvalidArgumentException;
+use ReflectionClass;
 
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Helper\DoctrineHelperTest
@@ -145,7 +147,7 @@ final class DoctrineHelper
     public static function createAnnotationMetadataConfiguration(array $paths, bool $isDevMode = false): Configuration
     {
         if (class_exists(ORMSetup::class)) {
-            require_once __DIR__.'/../../../../../vendor/doctrine/orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php';
+            require_once self::getVendorDir().'/doctrine/orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php';
 
             return ORMSetup::createAnnotationMetadataConfiguration($paths, $isDevMode);
         }
@@ -156,5 +158,12 @@ final class DoctrineHelper
     public static function getEntityManagerFromOnFlushEventArgs(OnFlushEventArgs $args): EntityManagerInterface
     {
         return method_exists($args, 'getObjectManager') ? $args->getObjectManager() : $args->getEntityManager();
+    }
+
+    public static function getVendorDir(): string
+    {
+        $reflection = new ReflectionClass(ClassLoader::class);
+
+        return \dirname($reflection->getFileName(), 2);
     }
 }
