@@ -163,7 +163,9 @@ final class DoctrineHelper
     public static function getVendorDir(): string
     {
         $reflection = new ReflectionClass(ClassLoader::class);
+        $filename = $reflection->getFileName();
+        \assert(\is_string($filename));
 
-        return \dirname($reflection->getFileName(), 2);
+        return \dirname($filename, 2);
     }
 }
