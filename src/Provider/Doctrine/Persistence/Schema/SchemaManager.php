@@ -12,13 +12,12 @@ use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
-use LogicException;
-use RuntimeException;
 
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema\SchemaManagerTest
@@ -78,18 +77,11 @@ class SchemaManager
         return $audited;
     }
 
-    public function getUpdateAuditSchemaSql(): array
+    public function collectAuditableEntities(): array
     {
-        /** @var Configuration $configuration */
-        $configuration = $this->provider->getConfiguration();
-
-        /** @var StorageService[] $storageServices */
-        $storageServices = $this->provider->getStorageServices();
-
         // auditable entities by storage entity manager
         $repository = [];
 
-        // Collect auditable entities from auditing entity managers
         /** @var AuditingService[] $auditingServices */
         $auditingServices = $this->provider->getAuditingServices();
         foreach ($auditingServices as $auditingService) {
@@ -104,16 +96,22 @@ class SchemaManager
                 $repository[$key][$entity] = $tableName;
             }
         }
-        $findEntityByTableName = static function (string $tableName) use ($repository): ?string {
-            foreach ($repository as $map) {
-                $result = array_search($tableName, $map, true);
-                if (false !== $result) {
-                    return (string) $result;
-                }
-            }
 
-            return null;
-        };
+        return $repository;
+    }
+
+    public function getUpdateAuditSchemaSql(): array
+    {
+        /** @var Configuration $configuration */
+        $configuration = $this->provider->getConfiguration();
+
+        /** @var StorageService[] $storageServices */
+        $storageServices = $this->provider->getStorageServices();
+
+        // Collect auditable entities from auditing entity managers
+        $repository = $this->collectAuditableEntities();
+
+        $entities = $configuration->getEntities();
 
         // Compute and collect SQL queries
         $sqls = [];
@@ -125,34 +123,20 @@ class SchemaManager
             $fromSchema = clone $storageSchema;
 
             $processed = [];
-
-            foreach ($classes as $tableName) {
-                if (!\in_array($tableName, $processed, true)) {
+            foreach ($classes as $entityFQCN => $tableName) {
+                if (!\in_array($entityFQCN, $processed, true)) {
                     /** @var string $auditTablename */
-                    $auditTablename = preg_replace(
-                        sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($tableName, '#')),
-                        sprintf(
-                            '$1%s$2%s',
-                            preg_quote($configuration->getTablePrefix(), '#'),
-                            preg_quote($configuration->getTableSuffix(), '#')
-                        ),
-                        $tableName
-                    );
-
-                    $entityFQCN = $findEntityByTableName($tableName);
-                    if (null === $entityFQCN) {
-                        throw new RuntimeException(sprintf('Unable to find entity for table "%s".', $tableName));
-                    }
+                    $auditTablename = $this->resolveAuditTableName($entities[$entityFQCN], $configuration, $storageConnection->getDatabasePlatform());
 
                     if ($storageSchema->hasTable($auditTablename)) {
                         // Audit table exists, let's update it if needed
-                        $this->updateAuditTable($entityFQCN, $storageSchema->getTable($auditTablename), $storageSchema);
+                        $this->updateAuditTable($entityFQCN, $storageSchema);
                     } else {
                         // Audit table does not exists, let's create it
-                        $this->createAuditTable($entityFQCN, $tableName, $storageSchema);
+                        $this->createAuditTable($entityFQCN, $storageSchema);
                     }
 
-                    $processed[] = $tableName;
+                    $processed[] = $entityFQCN;
                 }
             }
             $sqls[$name] = DoctrineHelper::getMigrateToSql($storageConnection, $fromSchema, $storageSchema);
@@ -164,11 +148,9 @@ class SchemaManager
     /**
      * Creates an audit table.
      *
-     * @param object|string $table
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function createAuditTable(string $entity, $table, ?Schema $schema = null): Schema
+    public function createAuditTable(string $entity, ?Schema $schema = null): Schema
     {
         /** @var StorageService $storageService */
         $storageService = $this->provider->getStorageServiceForEntity($entity);
@@ -181,24 +163,9 @@ class SchemaManager
 
         /** @var Configuration $configuration */
         $configuration = $this->provider->getConfiguration();
+        $entities = $configuration->getEntities();
 
-        if ($table instanceof Table) {
-            $tableName = $table->getName();
-        } elseif (\is_string($table)) {
-            $tableName = $table;
-        } else {
-            throw new LogicException('Can\'t get tableName');
-        }
-
-        $auditTablename = preg_replace(
-            sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($tableName, '#')),
-            sprintf(
-                '$1%s$2%s',
-                preg_quote($configuration->getTablePrefix(), '#'),
-                preg_quote($configuration->getTableSuffix(), '#')
-            ),
-            $tableName
-        );
+        $auditTablename = $this->resolveAuditTableName($entities[$entity], $configuration, $connection->getDatabasePlatform());
 
         if (null !== $auditTablename && !$schema->hasTable($auditTablename)) {
             $auditTable = $schema->createTable($auditTablename);
@@ -239,7 +206,7 @@ class SchemaManager
      * @throws SchemaException
      * @throws \Doctrine\DBAL\Exception
      */
-    public function updateAuditTable(string $entity, Table $table, ?Schema $schema = null): Schema
+    public function updateAuditTable(string $entity, ?Schema $schema = null): Schema
     {
         /** @var StorageService $storageService */
         $storageService = $this->provider->getStorageServiceForEntity($entity);
@@ -250,16 +217,72 @@ class SchemaManager
             $schema = DoctrineHelper::introspectSchema($schemaManager);
         }
 
-        $table = $schema->getTable($table->getName());
-        $columns = $schemaManager->listTableColumns($table->getName());
+        /** @var Configuration $configuration */
+        $configuration = $this->provider->getConfiguration();
+        $entities = $configuration->getEntities();
+
+        $auditTablename = $this->resolveAuditTableName($entities[$entity], $configuration, $connection->getDatabasePlatform());
+        \assert(\is_string($auditTablename));
+        $table = $schema->getTable($auditTablename);
 
         // process columns
-        $this->processColumns($table, $columns, SchemaHelper::getAuditTableColumns(), $connection);
+        $this->processColumns($table, $table->getColumns(), SchemaHelper::getAuditTableColumns(), $connection);
 
         // process indices
-        $this->processIndices($table, SchemaHelper::getAuditTableIndices($table->getName()), $connection);
+        $this->processIndices($table, SchemaHelper::getAuditTableIndices($auditTablename), $connection);
 
         return $schema;
+    }
+
+    /**
+     * Resolves table name, including namespace/schema.
+     */
+    public function resolveTableName(string $tableName, string $namespaceName, AbstractPlatform $platform): ?string
+    {
+        if (empty($namespaceName)) {
+            $prefix = '';
+        } elseif (!$platform->supportsSchemas()) {
+            $prefix = $namespaceName.'__';
+        } else {
+            $prefix = $namespaceName.'.';
+        }
+
+        return $prefix.$tableName;
+    }
+
+    /**
+     * Resolves audit table name, including namespace/schema.
+     */
+    public function resolveAuditTableName(array $entityOptions, Configuration $configuration, AbstractPlatform $platform): ?string
+    {
+        $tablename = $this->resolveTableName($entityOptions['table_name'], $entityOptions['audit_table_schema'], $platform);
+        \assert(\is_string($tablename));
+
+        return preg_replace(
+            sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($tablename, '#')),
+            sprintf(
+                '$1%s$2%s',
+                preg_quote($configuration->getTablePrefix(), '#'),
+                preg_quote($configuration->getTableSuffix(), '#')
+            ),
+            $tablename
+        );
+    }
+
+    /**
+     * Computes audit table name **without** namespace/schema.
+     */
+    public function computeAuditTablename(array $entityOptions, Configuration $configuration, AbstractPlatform $platform): ?string
+    {
+        return preg_replace(
+            sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($entityOptions['table_name'], '#')),
+            sprintf(
+                '$1%s$2%s',
+                preg_quote($configuration->getTablePrefix(), '#'),
+                preg_quote($configuration->getTableSuffix(), '#')
+            ),
+            $entityOptions['table_name']
+        );
     }
 
     private function processColumns(Table $table, array $columns, array $expectedColumns, Connection $connection): void

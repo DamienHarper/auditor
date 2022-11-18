@@ -56,13 +56,21 @@ final class SchemaManager2AEM1SEMTest extends TestCase
     public function testSchemaSetup(): void
     {
         $storageServices = $this->provider->getStorageServices();
+        $configuration = $this->provider->getConfiguration();
 
         $expected = [
-            'sem1' => [
-                'author', 'author_audit', 'comment', 'comment_audit', 'post', 'post_audit', 'tag', 'tag_audit', 'post__tag',
-                'animal', 'animal_audit', 'cat', 'cat_audit', 'dog', 'dog_audit', 'vehicle', 'vehicle_audit',
-            ],
+            'sem1' => ['post__tag'],
         ];
+        $entities = $configuration->getEntities();
+        foreach ($entities as $entity => $entityOptions) {
+            if (!\in_array($entityOptions['computed_table_name'], $expected['sem1'], true)) {
+                $expected['sem1'][] = $entityOptions['computed_table_name'];
+            }
+
+            if (!\in_array($entityOptions['computed_audit_table_name'], $expected['sem1'], true)) {
+                $expected['sem1'][] = $entityOptions['computed_audit_table_name'];
+            }
+        }
         sort($expected['sem1']);
 
         /**

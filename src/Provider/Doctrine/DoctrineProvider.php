@@ -13,6 +13,7 @@ use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
 use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
+use DH\Auditor\Provider\Doctrine\Persistence\Event\TableSchemaSubscriber;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
@@ -47,6 +48,7 @@ class DoctrineProvider extends AbstractProvider
         $evm = $entityManager->getEventManager();
 
         // Register subscribers
+        $evm->addEventSubscriber(new TableSchemaSubscriber($this));
         $evm->addEventSubscriber(new CreateSchemaListener($this));
         $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager));
 
@@ -252,13 +254,8 @@ class DoctrineProvider extends AbstractProvider
     {
         \assert($this->configuration instanceof Configuration);   // helps PHPStan
         if (null === $this->configuration->getStorageMapper() && $this->isStorageMapperRequired()) {
-            throw new ProviderException('You must provide a mapper function to map audits to storage.');
+            throw new ProviderException('You must provide a mapper callback to map audits to storage.');
         }
-
-//        if (null === $this->getStorageMapper() && 1 === count($this->getStorageServices())) {
-//            // No mapper and only 1 storage entity manager
-//            return array_values($this->storageServices)[0];
-//        }
 
         return $this;
     }

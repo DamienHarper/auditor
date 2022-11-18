@@ -66,7 +66,7 @@ class CreateSchemaListener implements EventSubscriber
             && array_values($auditingServices)[0]->getEntityManager() === array_values($storageServices)[0]->getEntityManager();
 
         $updater = new SchemaManager($this->provider);
-        $updater->createAuditTable($metadata->name, $eventArgs->getClassTable(), $isSameEntityManager ? $eventArgs->getSchema() : null);
+        $updater->createAuditTable($metadata->name, $isSameEntityManager ? $eventArgs->getSchema() : null);
     }
 
     /**

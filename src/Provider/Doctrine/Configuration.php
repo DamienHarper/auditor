@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace DH\Auditor\Provider\Doctrine;
 
 use DH\Auditor\Provider\ConfigurationInterface;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -163,13 +165,34 @@ class Configuration implements ConfigurationInterface
     public function getEntities(): array
     {
         if (null !== $this->provider) {
+            $schemaManager = new SchemaManager($this->provider);
+
             /** @var AuditingService[] $auditingServices */
             $auditingServices = $this->provider->getAuditingServices();
             foreach ($auditingServices as $auditingService) {
+                $entityManager = $auditingService->getEntityManager();
+                $platform = $entityManager->getConnection()->getDatabasePlatform();
+
                 // do not load annotations if they're already loaded
                 if (!isset($this->annotationLoaded[$auditingService->getName()]) || !$this->annotationLoaded[$auditingService->getName()]) {
-                    $this->provider->loadAnnotations($auditingService->getEntityManager(), $this->entities ?? []);
+                    $this->provider->loadAnnotations($entityManager, $this->entities ?? []);
                     $this->annotationLoaded[$auditingService->getName()] = true;
+                }
+
+                \assert(null !== $this->entities);
+                foreach ($this->entities as $entity => $config) {
+                    $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
+                    $tableName = $meta->getTableName();
+                    $namespaceName = $meta->getSchemaName() ?? '';
+
+                    $this->entities[$entity]['table_schema'] = $namespaceName;
+                    $this->entities[$entity]['table_name'] = $tableName;
+//                    $this->entities[$entity]['computed_table_name'] = $tableName;
+                    $this->entities[$entity]['computed_table_name'] = $schemaManager->resolveTableName($tableName, $namespaceName, $platform);
+                    $this->entities[$entity]['audit_table_schema'] = $namespaceName;
+                    $this->entities[$entity]['audit_table_name'] = $schemaManager->computeAuditTablename($this->entities[$entity], $this, $platform);
+//                    $this->entities[$entity]['computed_audit_table_name'] = $schemaManager->computeAuditTablename($this->entities[$entity], $this, $platform);
+                    $this->entities[$entity]['computed_audit_table_name'] = $schemaManager->resolveAuditTableName($this->entities[$entity], $this, $platform);
                 }
             }
         }

@@ -11,6 +11,7 @@ use DH\Auditor\Provider\Service\StorageServiceInterface;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\DoctrineProviderTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use Exception;
 
 trait SchemaSetupTrait
 {
@@ -62,10 +63,20 @@ trait SchemaSetupTrait
         foreach ($tables as $table) {
             $toSchema = $toSchema->dropTable($table->getName());
         }
+
         $sqls = DoctrineHelper::getMigrateToSql($storageConnection, $fromSchema, $toSchema);
         foreach ($sqls as $sql) {
             $statement = $storageConnection->prepare($sql);
             DoctrineHelper::executeStatement($statement);
+        }
+
+        try {
+            foreach ($schemaManager->listSchemaNames() as $schemaName) {
+                if ($storageConnection->getDatabasePlatform()->supportsSchemas() && 'public' !== $schemaName) {
+                    $entityManager->getConnection()->executeStatement('DROP SCHEMA IF EXISTS '.$schemaName);
+                }
+            }
+        } catch (Exception $e) {
         }
     }
 
@@ -121,11 +132,20 @@ trait SchemaSetupTrait
                 $schema->dropTable($table->getName());
             }
         }
-        $sqls = DoctrineHelper::getMigrateToSql($storageConnection, $fromSchema, $schema);
 
+        $sqls = DoctrineHelper::getMigrateToSql($storageConnection, $fromSchema, $schema);
         foreach ($sqls as $sql) {
             $statement = $storageConnection->prepare($sql);
             DoctrineHelper::executeStatement($statement);
+        }
+
+        try {
+            foreach ($schemaManager->listSchemaNames() as $schemaName) {
+                if ($storageConnection->getDatabasePlatform()->supportsSchemas() && 'public' !== $schemaName) {
+                    $entityManager->getConnection()->executeStatement('DROP SCHEMA IF EXISTS '.$schemaName);
+                }
+            }
+        } catch (Exception $e) {
         }
     }
 

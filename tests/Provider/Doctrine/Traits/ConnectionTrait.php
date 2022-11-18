@@ -62,8 +62,6 @@ trait ConnectionTrait
             $this->dropAndCreateDatabase($connection->createSchemaManager(), $dbname);
         }
 
-        $connection->close();
-
         return DriverManager::getConnection($params, $config);
     }
 

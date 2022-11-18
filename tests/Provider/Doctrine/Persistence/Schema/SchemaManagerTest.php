@@ -15,6 +15,8 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Dog;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Bike;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Car;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Vehicle;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
@@ -76,8 +78,8 @@ final class SchemaManagerTest extends TestCase
         self::assertNull($this->getTable($schemaManager->listTables(), 'author_audit'), 'author_audit does not exist yet.');
 
         // create audit table for Author entity
-        $authorTable = $this->getTable($schemaManager->listTables(), 'author');
-        $toSchema = $updater->createAuditTable(Author::class, $authorTable);
+        $this->doConfigureEntities();
+        $toSchema = $updater->createAuditTable(Author::class);
         $this->migrate($fromSchema, $toSchema, $entityManager, $storageConnection->getDatabasePlatform());
 
         // check audit table has been created
@@ -116,10 +118,11 @@ final class SchemaManagerTest extends TestCase
         $fromSchema = DoctrineHelper::introspectSchema($schemaManager);
 
         // at this point, schema is populated but does not contain any audit table
-        $authorTable = $this->getTable($schemaManager->listTables(), 'author');
+        self::assertNull($this->getTable($schemaManager->listTables(), 'author_audit'), 'author_audit does not exist yet.');
 
         // create audit table for Author entity
-        $toSchema = $updater->createAuditTable(Author::class, $authorTable);
+        $this->doConfigureEntities();
+        $toSchema = $updater->createAuditTable(Author::class);
         $this->migrate($fromSchema, $toSchema, $entityManager, $storageConnection->getDatabasePlatform());
 
         // new/alternate structure
@@ -253,9 +256,8 @@ final class SchemaManagerTest extends TestCase
 
         // run UpdateManager::updateAuditTable() to bring author_audit to expected structure
         $fromSchema = DoctrineHelper::introspectSchema($schemaManager);
-        $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
 
-        $toSchema = $updater->updateAuditTable(Author::class, $authorAuditTable);
+        $toSchema = $updater->updateAuditTable(Author::class);
         $this->migrate($fromSchema, $toSchema, $entityManager, $storageConnection->getDatabasePlatform());
 
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
@@ -323,5 +325,22 @@ final class SchemaManagerTest extends TestCase
         }
 
         return $provider;
+    }
+
+    private function doConfigureEntities(): void
+    {
+        $this->provider->getConfiguration()->setEntities([
+            Author::class => ['enabled' => true],
+            Post::class => ['enabled' => true],
+            Comment::class => ['enabled' => true],
+            Tag::class => ['enabled' => true],
+
+            Animal::class => ['enabled' => true],
+            Cat::class => ['enabled' => true],
+            Dog::class => ['enabled' => true],
+            Vehicle::class => ['enabled' => true],
+            Bike::class => ['enabled' => true],
+            Car::class => ['enabled' => true],
+        ]);
     }
 }
