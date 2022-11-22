@@ -15,10 +15,10 @@
     "ext-json": "*",
     "doctrine/annotations": "^1.8",
     "doctrine/orm": "^2.7",
-    "symfony/cache": "^4.0|^5.0",
-    "symfony/event-dispatcher": "^4.0|^5.0",
-    "symfony/lock": "^4.0|^5.0",
-    "symfony/options-resolver": "^4.0|^5.0"
+    "symfony/cache": "^4.0|^5.0|^6.0",
+    "symfony/event-dispatcher": "^4.0|^5.0|^6.0",
+    "symfony/lock": "^4.0|^5.0|^6.0",
+    "symfony/options-resolver": "^4.0|^5.0|^6.0"
   },
   "suggest": {
     "damienharper/auditor-bundle": "Integrate auditor library in your Symfony projects."
@@ -42,7 +42,7 @@
     "phpstan/phpstan-doctrine": "^1.0",
     "phpstan/phpstan-strict-rules": "^1.0",
     "phpunit/phpunit": "^9.0",
-    "symfony/var-dumper": "^4.0|^5.0"
+    "symfony/var-dumper": "^4.0|^5.0|^6.0"
   },
   "conflict": {
     "doctrine/persistence": "<1.3"
