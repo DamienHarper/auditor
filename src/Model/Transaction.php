@@ -96,6 +96,8 @@ class Transaction implements TransactionInterface
     }
 
     /**
+     * TODO: remove for next major release.
+     *
      * @internal
      *
      * @deprecated use one of the insert/update/remove/associate/dissociate methods instead
