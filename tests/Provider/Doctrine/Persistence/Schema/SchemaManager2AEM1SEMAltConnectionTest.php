@@ -56,17 +56,25 @@ final class SchemaManager2AEM1SEMAltConnectionTest extends TestCase
     public function testSchemaSetup(): void
     {
         $storageServices = $this->provider->getStorageServices();
-
-        $expected = [
-            'sem1' => ['animal_audit', 'cat_audit', 'dog_audit', 'author_audit', 'comment_audit', 'post_audit', 'tag_audit', 'vehicle_audit'],
-        ];
-        sort($expected['sem1']);
+        $configuration = $this->provider->getConfiguration();
+        $entities = $configuration->getEntities();
 
         /**
          * @var string         $name
          * @var StorageService $storageService
          */
         foreach ($storageServices as $name => $storageService) {
+            if (!isset($expected[$name])) {
+                $expected[$name] = [];
+            }
+
+            foreach ($entities as $entity => $entityOptions) {
+                if (!\in_array($entityOptions['computed_audit_table_name'], $expected[$name], true)) {
+                    $expected[$name][] = $entityOptions['computed_audit_table_name'];
+                }
+            }
+            sort($expected[$name]);
+
             $connection = $storageService->getEntityManager()->getConnection();
             $schemaManager = DoctrineHelper::createSchemaManager($connection);
             $tables = array_map(
@@ -74,6 +82,7 @@ final class SchemaManager2AEM1SEMAltConnectionTest extends TestCase
                 $schemaManager->listTables()
             );
             sort($tables);
+
             self::assertSame($expected[$name], $tables, 'Schema of "'.$name.'" is correct.');
         }
     }

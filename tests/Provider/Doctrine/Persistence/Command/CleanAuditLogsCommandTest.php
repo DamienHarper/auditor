@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Command;
 
+use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\Persistence\Command\CleanAuditLogsCommand;
+use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Dog;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
@@ -41,6 +46,38 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString(sprintf("[ERROR] 'keep' argument must be a valid ISO 8601 date interval, '%s' given.", $keep), $output);
     }
 
+    public function testDumpSQL(): void
+    {
+        $schemaManager = new SchemaManager($this->provider);
+
+        /** @var Configuration $configuration */
+        $configuration = $this->provider->getConfiguration();
+        $entities = $configuration->getEntities();
+
+        $command = $this->createCommand();
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            '--no-confirm' => true,
+            '--dump-sql' => true,
+        ]);
+        $command->unlock();
+
+        // the output of the command in the console
+        $output = $commandTester->getDisplay();
+
+        foreach ($entities as $entity => $entityOptions) {
+            $storageService = $this->provider->getStorageServiceForEntity($entity);
+            $platform = $storageService->getEntityManager()->getConnection()->getDatabasePlatform();
+            $expected = 'DELETE FROM '.$schemaManager->resolveAuditTableName($entityOptions, $configuration, $platform);
+            self::assertStringContainsString($expected, $output);
+        }
+
+        self::assertStringContainsString('[OK] Success', $output);
+    }
+
+    /**
+     * @depends testDumpSQL
+     */
     public function testExecute(): void
     {
         $command = $this->createCommand();
@@ -90,6 +127,10 @@ final class CleanAuditLogsCommandTest extends TestCase
             Post::class => ['enabled' => true],
             Comment::class => ['enabled' => true],
             Tag::class => ['enabled' => true],
+
+            Animal::class => ['enabled' => true],
+            Cat::class => ['enabled' => true],
+            Dog::class => ['enabled' => true],
         ]);
     }
 }

@@ -45,6 +45,7 @@ class AnnotationLoader
         $reflection = $metadata->getReflectionClass();
 
         // Check that we have an Entity annotation or attribute
+        // TODO: only rely on PHP attributes for next major release
         $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Entity::class) : null;
         if (\is_array($attributes) && \count($attributes) > 0) {
             $annotation = $attributes[0]->newInstance();
@@ -57,6 +58,7 @@ class AnnotationLoader
         }
 
         // Check that we have an Auditable annotation or attribute
+        // TODO: only rely on PHP attributes for next major release
         $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Auditable::class) : null;
         if (\is_array($attributes) && \count($attributes) > 0) {
             $auditableAnnotation = $attributes[0]->newInstance();
@@ -69,6 +71,7 @@ class AnnotationLoader
         }
 
         // Check that we have a Security annotation or attribute
+        // TODO: only rely on PHP attributes for next major release
         $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Security::class) : null;
         if (\is_array($attributes) && \count($attributes) > 0) {
             $securityAnnotation = $attributes[0]->newInstance();
@@ -94,6 +97,7 @@ class AnnotationLoader
         $properties = [];
 
         foreach ($reflection->getProperties() as $property) {
+            // TODO: only rely on PHP attributes for next major release
             $attributes = \PHP_VERSION_ID >= 80000 && method_exists($property, 'getAttributes') ? $property->getAttributes(Ignore::class) : null;
             if (\is_array($attributes) && \count($attributes) > 0) {
                 $annotationProperty = $attributes[0]->newInstance();

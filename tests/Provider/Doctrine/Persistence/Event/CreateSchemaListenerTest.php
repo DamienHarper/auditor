@@ -6,10 +6,12 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Event;
 
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Dog;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Bike;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Car;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Vehicle;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use PHPUnit\Framework\TestCase;
@@ -49,20 +51,23 @@ final class CreateSchemaListenerTest extends TestCase
      */
     public function testCorrectSchemaForJoinedTableInheritance(): void
     {
+        $configuration = $this->provider->getConfiguration();
+        $entities = $configuration->getEntities();
+        $classes = [Dog::class, Cat::class];
         $tableNames = $this->getTables();
 
-        self::assertContains('animal', $tableNames);
-        self::assertContains('dog', $tableNames);
-        self::assertContains('dog_audit', $tableNames);
-        self::assertContains('cat', $tableNames);
-        self::assertContains('cat_audit', $tableNames);
+        self::assertNotContains(Animal::class, $entities);
 
-        self::assertNotContains('animal_audit', $tableNames);
+        foreach ($classes as $entity) {
+            self::assertContains($entities[$entity]['computed_table_name'], $tableNames);
+            self::assertContains($entities[$entity]['computed_audit_table_name'], $tableNames);
+        }
     }
 
     private function configureEntities(): void
     {
         $this->provider->getConfiguration()->setEntities([
+            Vehicle::class => ['enabled' => true],
             Car::class => ['enabled' => true],
             Bike::class => ['enabled' => true],
 

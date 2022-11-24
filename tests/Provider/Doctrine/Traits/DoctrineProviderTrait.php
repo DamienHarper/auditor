@@ -66,49 +66,40 @@ trait DoctrineProviderTrait
         $auditor = $this->createAuditor();
         $provider = new DoctrineProvider($configuration ?? $this->createProviderConfiguration());
 
-        $db = self::getConnectionParameters();
-
         // Entity manager "db1" is used for storage only (db1 connection => db1.sqlite)
-//        if (!empty($db)) {
-//            $db['dbname'] = 'db1';
-//        } else {
-        $db = [
-            'driver' => 'pdo_sqlite',
-            'path' => __DIR__.'/../db1.sqlite',
-        ];
-//        }
-
         $provider->registerStorageService(new StorageService('db1', $this->createEntityManager([
             __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
             __DIR__.'/../Fixtures/Entity/Standard/Blog',
-        ], 'db1', $db)));
+        ], 'db1', [
+            'driver' => 'pdo_sqlite',
+            'path' => __DIR__.'/../db1.sqlite',
+        ])));
 
         // Entity manager "db2" is used for storage only (db2 connection => db2.sqlite)
-//        if (!empty($db)) {
-//            $db['dbname'] = 'db2';
-//        } else {
-        $db = [
-            'driver' => 'pdo_sqlite',
-            'path' => __DIR__.'/../db2.sqlite',
-        ];
-//        }
-
         $provider->registerStorageService(new StorageService('db2', $this->createEntityManager([
             __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
             __DIR__.'/../Fixtures/Entity/Inheritance',
-        ], 'db2', $db)));
+        ], 'db2', [
+            'driver' => 'pdo_sqlite',
+            'path' => __DIR__.'/../db2.sqlite',
+        ])));
 
         // Entity manager "aem1" is used for auditing only (default connection => in memory sqlite db)
         $provider->registerAuditingService(new AuditingService('aem1', $this->createEntityManager([
             __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
             __DIR__.'/../Fixtures/Entity/Standard/Blog',
             __DIR__.'/../Fixtures/Entity/Inheritance',
+        ], 'default', [
+            'driver' => 'pdo_sqlite',
+            'memory' => true,
         ])));
 
         $auditor->registerProvider($provider);
 
         // Set a storage mapper that maps entities to db1 or db2
-        $provider->getConfiguration()->setStorageMapper(static fn (string $entity, array $storageServices): StorageServiceInterface => \in_array($entity, [Author::class, Post::class, Comment::class, Tag::class], true) ? $storageServices['db1'] : $storageServices['db2']);
+        $provider->getConfiguration()->setStorageMapper(
+            static fn (string $entity, array $storageServices): StorageServiceInterface => \in_array($entity, [Author::class, Post::class, Comment::class, Tag::class], true) ? $storageServices['db1'] : $storageServices['db2']
+        );
 
         return $provider;
     }
@@ -122,24 +113,29 @@ trait DoctrineProviderTrait
         $auditor = $this->createAuditor();
         $provider = new DoctrineProvider($configuration ?? $this->createProviderConfiguration());
 
+        $params = [
+            'driver' => 'pdo_sqlite',
+            'memory' => true,
+        ];
+
         // Entity manager "sem1" is used for storage only (default connection => in memory sqlite db)
         $provider->registerStorageService(new StorageService('sem1', $this->createEntityManager([
             __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
             __DIR__.'/../Fixtures/Entity/Standard/Blog',
             __DIR__.'/../Fixtures/Entity/Inheritance',
-        ])));
+        ], 'default', $params)));
 
         // Entity manager "aem1" is used for auditing only (default connection => in memory sqlite db)
         $provider->registerAuditingService(new AuditingService('aem1', $this->createEntityManager([
             __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
             __DIR__.'/../Fixtures/Entity/Standard/Blog',
-        ])));
+        ], 'default', $params)));
 
         // Entity manager "aem2" is used for auditing only (default connection => in memory sqlite db)
         $provider->registerAuditingService(new AuditingService('aem2', $this->createEntityManager([
             __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
             __DIR__.'/../Fixtures/Entity/Inheritance',
-        ])));
+        ], 'default', $params)));
 
         $auditor->registerProvider($provider);
 
@@ -155,36 +151,32 @@ trait DoctrineProviderTrait
         $auditor = $this->createAuditor();
         $provider = new DoctrineProvider($configuration ?? $this->createProviderConfiguration());
 
-//        $db = self::getConnectionParameters();
-
-        // Entity manager "sem1" is used for storage only (db1 connection => db1.sqlite)
-//        if (!empty($db)) {
-//            $db['dbname'] = 'sem1';
-//        } else {
-        $db = [
+        $params = [
             'driver' => 'pdo_sqlite',
-            'path' => __DIR__.'/../sem1.sqlite',
+            'memory' => true,
         ];
-//        }
 
-        // Entity manager "sem1" is used for storage only (default connection => in memory sqlite db)
+        // Entity manager "sem1" is used for storage only (db1 connection => sem1.sqlite)
         $provider->registerStorageService(new StorageService('sem1', $this->createEntityManager([
             __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
             __DIR__.'/../Fixtures/Entity/Standard',
             __DIR__.'/../Fixtures/Entity/Inheritance',
-        ], 'sem1', $db)));
+        ], 'sem1', [
+            'driver' => 'pdo_sqlite',
+            'path' => __DIR__.'/../sem1.sqlite',
+        ])));
 
         // Entity manager "aem1" is used for auditing only (default connection => in memory sqlite db)
         $provider->registerAuditingService(new AuditingService('aem1', $this->createEntityManager([
             __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
             __DIR__.'/../Fixtures/Entity/Standard',
-        ])));
+        ], 'default', $params)));
 
         // Entity manager "aem2" is used for auditing only (default connection => in memory sqlite db)
         $provider->registerAuditingService(new AuditingService('aem2', $this->createEntityManager([
             __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
             __DIR__.'/../Fixtures/Entity/Inheritance',
-        ])));
+        ], 'default', $params)));
 
         $auditor->registerProvider($provider);
 
