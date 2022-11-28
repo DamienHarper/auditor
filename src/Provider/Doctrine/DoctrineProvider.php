@@ -62,7 +62,7 @@ class DoctrineProvider extends AbstractProvider
 
     public function getAuditingServiceForEntity(string $entity): AuditingServiceInterface
     {
-        foreach ($this->auditingServices as $name => $service) {
+        foreach ($this->auditingServices as $service) {
             \assert($service instanceof AuditingService);   // helps PHPStan
 
             try {
@@ -149,7 +149,7 @@ class DoctrineProvider extends AbstractProvider
         \assert($this->configuration instanceof Configuration);   // helps PHPStan
 
         // no => $entity is not audited
-        return (bool) \array_key_exists($class, $this->configuration->getEntities());
+        return \array_key_exists($class, $this->configuration->getEntities());
     }
 
     /**

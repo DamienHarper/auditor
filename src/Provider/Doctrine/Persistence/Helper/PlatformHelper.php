@@ -39,7 +39,7 @@ abstract class PlatformHelper
             return true;
         }
 
-        return (bool) (!$mariadb && version_compare(self::getOracleMysqlVersionNumber($version), '5.7.7', '<'));
+        return !$mariadb && version_compare(self::getOracleMysqlVersionNumber($version), '5.7.7', '<');
     }
 
     public static function getServerVersion(Connection $connection): ?string

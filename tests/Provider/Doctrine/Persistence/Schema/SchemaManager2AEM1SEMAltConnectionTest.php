@@ -68,7 +68,7 @@ final class SchemaManager2AEM1SEMAltConnectionTest extends TestCase
                 $expected[$name] = [];
             }
 
-            foreach ($entities as $entity => $entityOptions) {
+            foreach ($entities as $entityOptions) {
                 if (!\in_array($entityOptions['computed_audit_table_name'], $expected[$name], true)) {
                     $expected[$name][] = $entityOptions['computed_audit_table_name'];
                 }

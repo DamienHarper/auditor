@@ -12,7 +12,6 @@ use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
@@ -88,7 +87,7 @@ class CleanAuditLogsCommand extends Command
 
         // Collect auditable classes from auditing storage managers
         $repository = $schemaManager->collectAuditableEntities();
-        foreach ($repository as $name => $entities) {
+        foreach ($repository as $entities) {
             $count += is_countable($entities) ? \count($entities) : 0;
         }
 
@@ -120,9 +119,6 @@ class CleanAuditLogsCommand extends Command
                     $connection = $storageServices[$name]->getEntityManager()->getConnection();
                     $auditTable = $schemaManager->resolveAuditTableName($entities[$entity], $configuration, $connection->getDatabasePlatform());
 
-                    /**
-                     * @var QueryBuilder
-                     */
                     $queryBuilder = $connection->createQueryBuilder();
                     $queryBuilder
                         ->delete($auditTable)
@@ -173,7 +169,7 @@ class CleanAuditLogsCommand extends Command
         try {
             $dateInterval = new DateInterval($keep);
         } catch (Exception) {
-            $io->error(sprintf("'keep' argument must be a valid ISO 8601 date interval, '%s' given.", (string) $keep));
+            $io->error(sprintf("'keep' argument must be a valid ISO 8601 date interval, '%s' given.", $keep));
             $this->release();
 
             return null;

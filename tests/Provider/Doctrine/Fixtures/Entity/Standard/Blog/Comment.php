@@ -62,10 +62,6 @@ class Comment
     #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id', nullable: true)]
     protected $post;
 
-    public function __construct()
-    {
-    }
-
     public function __sleep()
     {
         return ['id', 'body', 'author', 'created_at', 'post_id'];

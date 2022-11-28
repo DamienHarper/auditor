@@ -62,7 +62,7 @@ final class SchemaManager2AEM1SEMTest extends TestCase
             'sem1' => ['post__tag'],
         ];
         $entities = $configuration->getEntities();
-        foreach ($entities as $entity => $entityOptions) {
+        foreach ($entities as $entityOptions) {
             if (!\in_array($entityOptions['computed_table_name'], $expected['sem1'], true)) {
                 $expected['sem1'][] = $entityOptions['computed_table_name'];
             }

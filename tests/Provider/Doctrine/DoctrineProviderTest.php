@@ -193,7 +193,7 @@ final class DoctrineProviderTest extends TestCase
         self::assertFalse($provider->isRegistered(), 'Provider is not registered.');
 
         self::expectException(Exception::class);
-        $auditor = $provider->getAuditor();
+        $provider->getAuditor();
 
         // registered provider
         $provider = $this->createDoctrineProvider();

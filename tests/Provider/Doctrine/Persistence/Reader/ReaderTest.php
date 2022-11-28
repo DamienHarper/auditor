@@ -99,11 +99,7 @@ final class ReaderTest extends TestCase
         self::assertIsString($audits[0]->getUserFqdn());
         self::assertSame('main', $audits[0]->getUserFirewall());
         self::assertIsString($audits[0]->getIp());
-        if (method_exists(self::class, 'assertMatchesRegularExpression')) {
-            self::assertMatchesRegularExpression('#\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}#', $audits[0]->getCreatedAt());
-        } else {
-            self::assertMatchesRegularExpression('#\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}#', $audits[0]->getCreatedAt());
-        }
+        self::assertMatchesRegularExpression('#\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}#', $audits[0]->getCreatedAt());
 
         $expected = [
             'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3: [email: luke.skywalker@gmail.com, fullname: Luke Skywalker]',
@@ -205,7 +201,6 @@ final class ReaderTest extends TestCase
     {
         $reader = $this->createReader();
 
-        /** @var Entry[] $audits */
         $pager = $reader->paginate($reader->createQuery(Author::class), 1, 2);
         self::assertIsArray($pager);
         self::assertFalse($pager['hasPreviousPage'], 'Pager is at page 1.');
@@ -289,7 +284,6 @@ final class ReaderTest extends TestCase
     {
         $reader = $this->createReader();
 
-        /** @var Entry[] $audits */
         $count = $reader->createQuery(Author::class)->count();
         self::assertSame(7, $count, 'count is ok.');
     }
