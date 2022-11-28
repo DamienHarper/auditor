@@ -180,18 +180,16 @@ class Configuration implements ConfigurationInterface
                 }
 
                 \assert(null !== $this->entities);
-                foreach ($this->entities as $entity => $config) {
+                foreach (array_keys($this->entities) as $entity) {
                     $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
                     $tableName = $meta->getTableName();
                     $namespaceName = $meta->getSchemaName() ?? '';
 
                     $this->entities[$entity]['table_schema'] = $namespaceName;
                     $this->entities[$entity]['table_name'] = $tableName;
-//                    $this->entities[$entity]['computed_table_name'] = $tableName;
                     $this->entities[$entity]['computed_table_name'] = $schemaManager->resolveTableName($tableName, $namespaceName, $platform);
                     $this->entities[$entity]['audit_table_schema'] = $namespaceName;
                     $this->entities[$entity]['audit_table_name'] = $schemaManager->computeAuditTablename($this->entities[$entity], $this, $platform);
-//                    $this->entities[$entity]['computed_audit_table_name'] = $schemaManager->computeAuditTablename($this->entities[$entity], $this, $platform);
                     $this->entities[$entity]['computed_audit_table_name'] = $schemaManager->resolveAuditTableName($this->entities[$entity], $this, $platform);
                 }
             }

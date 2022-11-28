@@ -118,8 +118,8 @@ final class ReaderTest extends TestCase
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class)->resetOrderBy()->execute();
         self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
-        for ($i = 0; $i < \count($expected); ++$i) {
-            self::assertSame($expected[$i], self::explain($audits[$i], Author::class));
+        foreach ($expected as $i => $singleExpected) {
+            self::assertSame($singleExpected, self::explain($audits[$i], Author::class));
         }
 
         $expected = [
@@ -149,8 +149,8 @@ final class ReaderTest extends TestCase
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Post::class)->resetOrderBy()->execute();
         self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
-        for ($i = 0; $i < \count($expected); ++$i) {
-            self::assertSame($expected[$i], self::explain($audits[$i], Post::class));
+        foreach ($expected as $i => $singleExpected) {
+            self::assertSame($singleExpected, self::explain($audits[$i], Post::class));
         }
 
         $expected = [
@@ -162,8 +162,8 @@ final class ReaderTest extends TestCase
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Comment::class)->resetOrderBy()->execute();
         self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
-        for ($i = 0; $i < \count($expected); ++$i) {
-            self::assertSame($expected[$i], self::explain($audits[$i], Comment::class));
+        foreach ($expected as $i => $singleExpected) {
+            self::assertSame($singleExpected, self::explain($audits[$i], Comment::class));
         }
 
         $expected = [
@@ -187,8 +187,8 @@ final class ReaderTest extends TestCase
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Tag::class)->resetOrderBy()->execute();
         self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
-        for ($i = 0; $i < \count($expected); ++$i) {
-            self::assertSame($expected[$i], self::explain($audits[$i], Tag::class));
+        foreach ($expected as $i => $singleExpected) {
+            self::assertSame($singleExpected, self::explain($audits[$i], Tag::class));
         }
 
         $this->expectException(OptionsResolverInvalidArgumentException::class);
@@ -254,8 +254,8 @@ final class ReaderTest extends TestCase
             ->execute()
         ;
         self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
-        for ($i = 0; $i < \count($expected); ++$i) {
-            self::assertSame($expected[$i], self::explain($audits[$i], Author::class));
+        foreach ($expected as $i => $singleExpected) {
+            self::assertSame($singleExpected, self::explain($audits[$i], Author::class));
         }
 
         /** @var Entry[] $audits */

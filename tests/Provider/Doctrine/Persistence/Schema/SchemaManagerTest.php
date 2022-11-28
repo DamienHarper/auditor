@@ -88,7 +88,7 @@ final class SchemaManagerTest extends TestCase
 
         // check expected columns
         $expected = SchemaHelper::getAuditTableColumns();
-        foreach ($expected as $name => $options) {
+        foreach (array_keys($expected) as $name) {
             self::assertTrue($authorAuditTable->hasColumn($name), 'audit table has a column named "'.$name.'".');
         }
 
@@ -241,7 +241,7 @@ final class SchemaManagerTest extends TestCase
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
 
         // check expected alternate columns
-        foreach ($alternateColumns as $name => $options) {
+        foreach (array_keys($alternateColumns) as $name) {
             self::assertTrue($authorAuditTable->hasColumn($name), 'audit table has a column named "'.$name.'".');
         }
 
@@ -263,7 +263,7 @@ final class SchemaManagerTest extends TestCase
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
 
         // check expected columns
-        foreach (SchemaHelper::getAuditTableColumns() as $name => $options) {
+        foreach (array_keys(SchemaHelper::getAuditTableColumns()) as $name) {
             self::assertTrue($authorAuditTable->hasColumn($name), 'audit table has a column named "'.$name.'".');
         }
 

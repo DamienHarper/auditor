@@ -149,7 +149,7 @@ class DoctrineProvider extends AbstractProvider
         \assert($this->configuration instanceof Configuration);   // helps PHPStan
 
         // no => $entity is not audited
-        return !(!\array_key_exists($class, $this->configuration->getEntities()));
+        return (bool) \array_key_exists($class, $this->configuration->getEntities());
     }
 
     /**

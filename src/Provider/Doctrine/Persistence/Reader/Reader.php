@@ -120,10 +120,10 @@ class Reader
         $results = [];
 
         $entities = $configuration->getEntities();
-        foreach ($entities as $entity => $tablename) {
+        foreach (array_keys($entities) as $entity) {
             try {
                 $audits = $this->createQuery($entity, ['transaction_hash' => $transactionHash])->execute();
-                if (\count($audits) > 0) {
+                if ([] !== $audits) {
                     $results[$entity] = $audits;
                 }
             } catch (AccessDeniedException) {

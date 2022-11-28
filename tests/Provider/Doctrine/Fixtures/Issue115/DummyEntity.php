@@ -19,11 +19,10 @@ class DummyEntity
      * @ORM\Column(type="bigint")
      */
     #[ORM\Id, ORM\GeneratedValue(strategy: 'NONE'), ORM\Column(type: 'bigint')]
-    private DummyEnum $id;
+    private DummyEnum $id = DummyEnum::A;
 
     public function __construct()
     {
-        $this->id = DummyEnum::A;
     }
 
     public function getId(): ?DummyEnum

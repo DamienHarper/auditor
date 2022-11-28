@@ -72,7 +72,7 @@ class CleanAuditLogsCommand extends Command
         $keep = (\is_array($keep) ? $keep[0] : $keep);
         $until = $this->validateKeepArgument($keep, $io);
 
-        if (null === $until) {
+        if (!$until instanceof DateTimeImmutable) {
             return 0;
         }
 

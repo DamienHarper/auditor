@@ -76,7 +76,7 @@ class TransactionProcessor implements TransactionProcessorInterface
         $diff = $this->diff($entityManager, $entity, $ch);
         unset($diff['@source']);
 
-        if (0 === \count($diff)) {
+        if ([] === $diff) {
             return; // if there is no entity diff, do not log it
         }
 

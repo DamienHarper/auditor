@@ -54,13 +54,7 @@ class Query
     public function execute(): array
     {
         $queryBuilder = $this->buildQueryBuilder();
-        if (method_exists($queryBuilder, 'executeQuery')) {
-            // doctrine/dbal v3.x
-            $statement = $queryBuilder->executeQuery();
-        } else {
-            // doctrine/dbal v2.13.x
-            $statement = $queryBuilder->execute();
-        }
+        $statement = method_exists($queryBuilder, 'executeQuery') ? $queryBuilder->executeQuery() : $queryBuilder->execute();
 
         $result = [];
         \assert($statement instanceof Result);
