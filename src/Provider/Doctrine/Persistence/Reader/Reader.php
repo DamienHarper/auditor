@@ -137,6 +137,9 @@ class Reader
         return $results;
     }
 
+    /**
+     * @return array{results: ArrayIterator<int|string, mixed>, currentPage: int, hasPreviousPage: bool, hasNextPage: bool, previousPage: null|int, nextPage: null|int, numPages: int, haveToPaginate: bool, numResults: int, pageSize: int}
+     */
     public function paginate(Query $query, int $page = 1, int $pageSize = self::PAGE_SIZE): array
     {
         $numResults = $query->count();

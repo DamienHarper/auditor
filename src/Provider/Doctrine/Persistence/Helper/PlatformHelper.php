@@ -20,10 +20,7 @@ abstract class PlatformHelper
         if (
             !isset($columns[$name])
             || $columns[$name]['type'] !== DoctrineHelper::getDoctrineType('STRING')
-            || (
-                isset($columns[$name]['options'], $columns[$name]['options']['length'])
-                && $columns[$name]['options']['length'] < 191
-            )
+            || (isset($columns[$name]['options']['length']) && $columns[$name]['options']['length'] < 191)
         ) {
             return false;
         }

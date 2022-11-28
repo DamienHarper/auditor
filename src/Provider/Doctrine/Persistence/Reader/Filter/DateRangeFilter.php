@@ -36,6 +36,9 @@ class DateRangeFilter implements FilterInterface
         return $this->maxValue;
     }
 
+    /**
+     * @return array{sql: string, params: array<string, string>}
+     */
     public function getSQL(): array
     {
         $sqls = [];

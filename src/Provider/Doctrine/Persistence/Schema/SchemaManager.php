@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Schema;
 
+use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
@@ -190,13 +191,15 @@ class SchemaManager
             foreach (SchemaHelper::getAuditTableIndices($auditTablename) as $columnName => $struct) {
                 if ('primary' === $struct['type']) {
                     $auditTable->setPrimaryKey([$columnName]);
-                } else {
+                } elseif (isset($struct['name'])) {
                     $auditTable->addIndex(
                         [$columnName],
                         $struct['name'],
                         [],
                         PlatformHelper::isIndexLengthLimited($columnName, $connection) ? ['lengths' => [191]] : []
                     );
+                } else {
+                    throw new InvalidArgumentException(sprintf("Missing key 'name' for column '%s'", $columnName));
                 }
             }
         }

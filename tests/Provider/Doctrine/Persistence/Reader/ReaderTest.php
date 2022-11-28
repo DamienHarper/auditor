@@ -478,7 +478,7 @@ final class ReaderTest extends TestCase
                 return 'Deleted '.$class.'#'.$entry->getObjectId();
 
             case Transaction::UPDATE:
-                $changeset = static function (array $diff) use ($verbose) {
+                $changeset = static function (array $diff) use ($verbose): string {
                     $changes = [];
                     foreach ($diff as $key => $value) {
                         $old = $value['old'] ?? 'null';
@@ -496,7 +496,7 @@ final class ReaderTest extends TestCase
                 return 'Updated '.$class.'#'.$entry->getObjectId().': ['.$changeset($diff).']';
 
             case Transaction::INSERT:
-                $changeset = static function (array $diff) use ($verbose) {
+                $changeset = static function (array $diff) use ($verbose): string {
                     $changes = [];
                     foreach ($diff as $key => $value) {
                         $old = $value['old'] ?? 'null';

@@ -19,7 +19,7 @@ class DataObject
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer', options: ['unsigned' => true])]
-    protected $id;
+    protected int $id;
 
     /**
      * @ORM\Column(type="binary")

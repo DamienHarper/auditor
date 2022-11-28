@@ -49,6 +49,9 @@ class RangeFilter implements FilterInterface
         return $this->maxValue;
     }
 
+    /**
+     * @return array{sql: string, params: array<string, mixed>}
+     */
     public function getSQL(): array
     {
         $sqls = [];

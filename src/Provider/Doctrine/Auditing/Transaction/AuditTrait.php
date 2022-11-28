@@ -221,6 +221,8 @@ trait AuditTrait
 
     /**
      * Blames an audit operation.
+     *
+     * @return array{client_ip: null|string, user_firewall: null|string, user_fqdn: null|string, user_id: null|string, username: null|string}
      */
     private function blame(): array
     {
