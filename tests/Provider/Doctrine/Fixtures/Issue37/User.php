@@ -4,56 +4,33 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue37;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="users")
- */
-#[ORM\Entity, ORM\Table(name: 'users')]
+#[ORM\Entity]
+#[ORM\Table(name: 'users')]
 class User
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", options={"unsigned": true})
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true])]
     protected int $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     protected string $username;
 
-    /**
-     * @ORM\Column(type="string", nullable=true, length=5)
-     */
-    #[ORM\Column(type: 'string', nullable: true, length: 5)]
+    #[ORM\Column(type: Types::STRING, nullable: true, length: 5)]
     protected ?string $locale_id = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Locale", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(name="locale_id", referencedColumnName="id", nullable=true)
-     */
     #[ORM\ManyToOne(targetEntity: 'Locale', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'locale_id', referencedColumnName: 'id', nullable: true)]
+    #[ORM\JoinColumn(name: 'locale_id')]
     protected ?Locale $locale = null;
 
-    /**
-     * Get the value of id.
-     *
-     * @return mixed
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * Set the value of id.
-     */
     public function setId(int $id): self
     {
         $this->id = $id;
@@ -61,17 +38,11 @@ class User
         return $this;
     }
 
-    /**
-     * Get the value of username.
-     */
     public function getUsername(): string
     {
         return $this->username;
     }
 
-    /**
-     * Set the value of username.
-     */
     public function setUsername(string $username): self
     {
         $this->username = $username;
@@ -79,9 +50,6 @@ class User
         return $this;
     }
 
-    /**
-     * Set the value of locale_id.
-     */
     public function setLocaleId(string $locale_id): self
     {
         $this->locale_id = $locale_id;
@@ -89,17 +57,11 @@ class User
         return $this;
     }
 
-    /**
-     * Get the value of locale_id.
-     */
     public function getLocaleId(): ?string
     {
         return $this->locale_id;
     }
 
-    /**
-     * Set Locale entity (many to one).
-     */
     public function setLocale(?Locale $locale): self
     {
         $this->locale = $locale;
@@ -107,9 +69,6 @@ class User
         return $this;
     }
 
-    /**
-     * Get Locale entity (many to one).
-     */
     public function getLocale(): ?Locale
     {
         return $this->locale;

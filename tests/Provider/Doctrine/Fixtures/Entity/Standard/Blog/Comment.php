@@ -5,62 +5,36 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 
 use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="`comment`", indexes={@ORM\Index(name="fk_post_id", columns={"post_id"})})
- */
 #[ORM\Entity]
 #[ORM\Table(name: '`comment`')]
-#[ORM\Index(name: 'fk__idx', columns: ['post_id'])]
+#[ORM\Index(name: 'fk_post_id', columns: ['post_id'])]
 class Comment
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", options={"unsigned": true})
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
     #[ORM\Id]
-    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true])]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     protected ?int $id = null;
 
-    /**
-     * @ORM\Column(type="text")
-     */
-    #[ORM\Column(type: 'text')]
+    #[ORM\Column(type: Types::TEXT)]
     protected ?string $body = null;
 
-    /**
-     * Comment author email.
-     *
-     * @ORM\Column(type="string", length=255)
-     */
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     protected ?string $author = null;
 
-    /**
-     * @Gedmo\Timestampable(on="create")
-     * @ORM\Column(type="datetime")
-     */
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Gedmo\Timestampable(on: 'create')]
     protected ?DateTimeImmutable $created_at = null;
 
-    /**
-     * @ORM\Column(type="integer", options={"unsigned": true}, nullable=true)
-     */
-    #[ORM\Column(type: 'integer', options: ['unsigned' => true], nullable: true)]
+    #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true], nullable: true)]
     protected ?int $post_id = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Post", inversedBy="comments", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(name="post_id", referencedColumnName="id", nullable=true)
-     */
     #[ORM\ManyToOne(targetEntity: 'Post', inversedBy: 'comments', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id', nullable: true)]
-    protected ?\DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post $post = null;
+    #[ORM\JoinColumn(name: 'post_id')]
+    protected ?Post $post = null;
 
     public function __sleep()
     {

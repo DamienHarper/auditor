@@ -19,20 +19,14 @@ trait EntityManagerInterfaceTrait
         __DIR__.'/../Fixtures',
     ];
 
-    private function createEntityManager(?array $paths = null, string $connectionName = 'default', ?array $params = null, bool $usePHP8Attributes = false): EntityManagerInterface
+    private function createEntityManager(?array $paths = null, string $connectionName = 'default', ?array $params = null): EntityManagerInterface
     {
-        if ($usePHP8Attributes) {
-            $configuration = DoctrineHelper::createAttributeMetadataConfiguration(
-                $paths ?? $this->fixturesPath,
-                true,
-            );
-        } else {
-            $configuration = DoctrineHelper::createAnnotationMetadataConfiguration(
-                $paths ?? $this->fixturesPath,
-                true,
-            );
-        }
+        $configuration = DoctrineHelper::createAttributeMetadataConfiguration(
+            $paths ?? $this->fixturesPath,
+            true,
+        );
 
+        // TODO: decide if we keep this
         class_exists(Annotation::class, true);
         DoctrineExtensions::registerAnnotations();
 

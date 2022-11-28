@@ -15,7 +15,6 @@ use DH\Auditor\Security\RoleCheckerInterface;
 use DH\Auditor\Security\SecurityProviderInterface;
 use DH\Auditor\Tests\Fixtures\Provider\AuditNoStorageProvider;
 use DH\Auditor\Tests\Fixtures\Provider\StorageNoAuditProvider;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation\AuditedEntity as AuditedEntityWithAnnotation;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Attribute\AuditedEntity as AuditedEntityWithAttribute;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
@@ -413,49 +412,15 @@ final class DoctrineProviderTest extends TestCase
         self::assertFalse($provider->isAuditedField(Comment::class, 'id'), 'Field "'.Comment::class.'::$id" is audited but "'.Comment::class.'" entity is not.');
     }
 
-    public function testLoadEntitiesWithAnnotationsOnly(): void
-    {
-        $entityManager = $this->createEntityManager(
-            [
-                __DIR__.'/../../../src/Provider/Doctrine/Auditing/Annotation',
-                __DIR__.'/Fixtures/Entity/Annotation',
-            ],
-            'default',
-            null,
-            false
-        );
-        $annotationLoader = new AnnotationLoader($entityManager);
-        $loaded = $annotationLoader->load();
-        self::assertCount(2, $loaded);
-
-        $auditor = $this->createAuditor();
-        $provider = new DoctrineProvider($this->createProviderConfiguration(['entities' => $loaded]));
-        $provider->registerStorageService(new StorageService('default', $entityManager));
-        $provider->registerAuditingService(new AuditingService('default', $entityManager));
-
-        $auditor->registerProvider($provider);
-
-        self::assertTrue($provider->isAudited(AuditedEntityWithAnnotation::class), '"'.AuditedEntityWithAnnotation::class.'" is audited.');
-        self::assertTrue($provider->isAuditedField(AuditedEntityWithAnnotation::class, 'auditedField'), 'Field "'.AuditedEntityWithAnnotation::class.'::$auditedField" is audited.');
-        self::assertFalse($provider->isAuditedField(AuditedEntityWithAnnotation::class, 'ignoredField'), 'Field "'.AuditedEntityWithAnnotation::class.'::$ignoredField" is ignored.');
-        self::assertFalse($provider->isAuditedField(AuditedEntityWithAnnotation::class, 'ignoredProtectedField'), 'Field "'.AuditedEntityWithAnnotation::class.'::$ignoredProtectedField" is ignored.');
-        self::assertFalse($provider->isAuditedField(AuditedEntityWithAnnotation::class, 'ignoredPrivateField'), 'Field "'.AuditedEntityWithAnnotation::class.'::$ignoredPrivateField" is ignored.');
-    }
-
     public function testLoadEntitiesWithAttributesOnly(): void
     {
-        if (\PHP_VERSION_ID < 80000) {
-            self::markTestSkipped('PHP > 8.0 is required.');
-        }
-
         $entityManager = $this->createEntityManager(
             [
                 __DIR__.'/../../../src/Provider/Doctrine/Auditing/Annotation',
                 __DIR__.'/Fixtures/Entity/Attribute',
             ],
             'default',
-            null,
-            true
+            null
         );
         $annotationLoader = new AnnotationLoader($entityManager);
         $loaded = $annotationLoader->load();

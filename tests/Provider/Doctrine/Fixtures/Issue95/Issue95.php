@@ -5,27 +5,21 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue95;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Auditable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="issue95")
- *
- * @Auditable
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'issue95')]
+#[Auditable]
 class Issue95 implements Stringable
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(type: Types::INTEGER)]
     private int $id;
 
-    /**
-     * @ORM\Column(type="string", name="type", length=50)
-     */
+    #[ORM\Column(type: 'string', name: 'type', length: 50)]
     private string $name;
 
     private string $type;   // uninitialized property

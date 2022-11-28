@@ -4,33 +4,22 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue40;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\HasLifecycleCallbacks
- * @ORM\Table(name="case_core")
- */
-#[ORM\Entity, ORM\HasLifecycleCallbacks, ORM\Table(name: 'case_core')]
+#[ORM\Entity]
+#[ORM\Table(name: 'case_core')]
+#[ORM\HasLifecycleCallbacks]
 class CoreCase
 {
-    /**
-     * @ORM\Column(type="string", name="type", length=50)
-     */
-    #[ORM\Column(type: 'string', name: 'type', length: 50)]
-    public $type;
+    #[ORM\Column(type: Types::STRING, name: 'type', length: 50)]
+    public ?string $type = null;
 
-    /**
-     * @ORM\Column(type="string", name="status", length=50)
-     */
-    #[ORM\Column(type: 'string', name: 'status', length: 50)]
-    public $status;
+    #[ORM\Column(type: Types::STRING, name: 'status', length: 50)]
+    public ?string $status = null;
 
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer')]
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 }

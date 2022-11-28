@@ -4,81 +4,49 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="dummy_entity")
- */
-#[ORM\Entity, ORM\Table(name: 'dummy_entity')]
+#[ORM\Entity]
+#[ORM\Table(name: 'dummy_entity')]
 class DummyEntity
 {
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
-    #[ORM\Column(type: 'string', length: 50)]
-    protected $label;
+    #[ORM\Column(type: Types::STRING, length: 50)]
+    protected ?string $label = null;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    #[ORM\Column(type: 'integer', nullable: true)]
-    protected $int_value;
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    protected ?int $int_value = null;
 
-    /**
-     * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
-     */
-    #[ORM\Column(type: 'decimal', precision: 8, scale: 2, nullable: true)]
-    protected $decimal_value;
+    #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2, nullable: true)]
+    protected ?string $decimal_value = null;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true, options={"default": "0"})
-     */
-    #[ORM\Column(type: 'boolean', nullable: true, options: ['default' => '0'])]
-    protected $bool_value;
+    #[ORM\Column(type: Types::BOOLEAN, nullable: true, options: ['default' => '0'])]
+    protected ?bool $bool_value = null;
 
-    /**
-     * @ORM\Column(type="array")
-     */
-    #[ORM\Column(type: 'array')]
+    #[ORM\Column(type: Types::ARRAY)]
     protected ?array $php_array = null;
 
-    /**
-     * @ORM\Column(type="json", nullable=true)
-     */
-    #[ORM\Column(type: 'json', nullable: true)]
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     protected $json_array;
 
-    /**
-     * @ORM\Column(type="simple_array", nullable=true)
-     */
-    #[ORM\Column(type: 'simple_array', nullable: true)]
+    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
     protected $simple_array;
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @ORM\Column(type="integer")
-     */
-    #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer')]
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * Get the value of name.
-     */
     public function getLabel()
     {
         return $this->label;
     }
 
-    /**
-     * Set the value of name.
-     */
     public function setLabel(mixed $label): self
     {
         $this->label = $label;
