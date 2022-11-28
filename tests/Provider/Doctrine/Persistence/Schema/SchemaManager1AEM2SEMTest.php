@@ -82,7 +82,7 @@ final class SchemaManager1AEM2SEMTest extends TestCase
             $connection = $storageService->getEntityManager()->getConnection();
             $schemaManager = DoctrineHelper::createSchemaManager($connection);
             $tables = array_map(
-                static fn ($t) => $t->getName(),
+                static fn ($t): string => $t->getName(),
                 $schemaManager->listTables()
             );
             sort($tables);

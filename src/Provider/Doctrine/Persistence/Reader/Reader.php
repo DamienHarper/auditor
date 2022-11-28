@@ -107,8 +107,8 @@ class Reader
             ->setAllowedTypes('page', ['null', 'int'])
             ->setAllowedTypes('page_size', ['null', 'int'])
             ->setAllowedTypes('strict', ['null', 'bool'])
-            ->setAllowedValues('page', static fn ($value) => null === $value || $value >= 1)
-            ->setAllowedValues('page_size', static fn ($value) => null === $value || $value >= 1)
+            ->setAllowedValues('page', static fn ($value): bool => null === $value || $value >= 1)
+            ->setAllowedValues('page_size', static fn ($value): bool => null === $value || $value >= 1)
         ;
     }
 
@@ -137,9 +137,6 @@ class Reader
         return $results;
     }
 
-    /**
-     * @return array{results: ArrayIterator<int|string, mixed>, currentPage: int, hasPreviousPage: bool, hasNextPage: bool, previousPage: null|int, nextPage: null|int, numPages: int, haveToPaginate: bool, numResults: int, pageSize: int}
-     */
     public function paginate(Query $query, int $page = 1, int $pageSize = self::PAGE_SIZE): array
     {
         $numResults = $query->count();

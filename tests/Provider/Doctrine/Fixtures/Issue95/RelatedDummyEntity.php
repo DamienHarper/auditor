@@ -64,7 +64,7 @@ class RelatedDummyEntity implements Stringable
         return $this->label;
     }
 
-    public function getParent(): DummyEntity
+    public function getParent(): ?DummyEntity
     {
         return $this->parent;
     }

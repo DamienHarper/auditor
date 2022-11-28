@@ -36,7 +36,7 @@ final class DoctrineHelper
      * credits
      * https://github.com/api-platform/core/blob/master/src/Util/ClassInfoTrait.php
      */
-    public static function getRealClassName($subject): string
+    public static function getRealClassName(object|string $subject): string
     {
         $subject = \is_object($subject) ? $subject::class : $subject;
 

@@ -65,6 +65,9 @@ trait ConnectionTrait
         return DriverManager::getConnection($params, $config);
     }
 
+    /**
+     * @return array<string, string>
+     */
     private static function getConnectionParameters(?array $params = null): array
     {
         if (null === $params && !isset(

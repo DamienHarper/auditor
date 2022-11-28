@@ -42,7 +42,7 @@ abstract class Animal
         return $this->label;
     }
 
-    final public function setLabel(string $label)
+    final public function setLabel(string $label): self
     {
         $this->label = $label;
 

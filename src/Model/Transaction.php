@@ -79,26 +79,41 @@ class Transaction implements TransactionInterface
         return $this->transaction_hash;
     }
 
+    /**
+     * @return array<InsertEventDto>
+     */
     public function getInserted(): array
     {
         return $this->inserted;
     }
 
+    /**
+     * @return array<UpdateEventDto>
+     */
     public function getUpdated(): array
     {
         return $this->updated;
     }
 
+    /**
+     * @return array<RemoveEventDto>
+     */
     public function getRemoved(): array
     {
         return $this->removed;
     }
 
+    /**
+     * @return array<AssociateEventDto>
+     */
     public function getAssociated(): array
     {
         return $this->associated;
     }
 
+    /**
+     * @return array<DissociateEventDto>
+     */
     public function getDissociated(): array
     {
         return $this->dissociated;

@@ -78,6 +78,9 @@ class Query
         }
     }
 
+    /**
+     * @return array<Entry>
+     */
     public function execute(): array
     {
         $queryBuilder = $this->buildQueryBuilder();
@@ -184,6 +187,9 @@ class Query
         return $this->orderBy;
     }
 
+    /**
+     * @return array<int>
+     */
     public function getLimit(): array
     {
         return [$this->limit, $this->offset];

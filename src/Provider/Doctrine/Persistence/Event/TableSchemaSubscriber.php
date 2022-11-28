@@ -37,6 +37,9 @@ class TableSchemaSubscriber implements EventSubscriber
         }
     }
 
+    /**
+     * @return array<string>
+     */
     public function getSubscribedEvents(): array
     {
         return ['loadClassMetadata'];

@@ -52,7 +52,7 @@ trait DoctrineProviderTrait
         $provider->getAuditor()->getConfiguration()->setUserProvider(static fn (): User => new User('1', 'dark.vador'));
 
         // Set a fake security provider that always returns the same IP and firewall name
-        $provider->getAuditor()->getConfiguration()->setSecurityProvider(static fn () => ['1.2.3.4', 'main']);
+        $provider->getAuditor()->getConfiguration()->setSecurityProvider(static fn (): array => ['1.2.3.4', 'main']);
 
         return $provider;
     }

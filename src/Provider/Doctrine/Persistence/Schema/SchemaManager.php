@@ -244,7 +244,7 @@ class SchemaManager
     /**
      * Resolves table name, including namespace/schema.
      */
-    public function resolveTableName(string $tableName, string $namespaceName, AbstractPlatform $platform): ?string
+    public function resolveTableName(string $tableName, string $namespaceName, AbstractPlatform $platform): string
     {
         if (empty($namespaceName)) {
             $prefix = '';

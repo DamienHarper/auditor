@@ -140,10 +140,8 @@ class DoctrineProvider extends AbstractProvider
 
     /**
      * Returns true if $entity is auditable.
-     *
-     * @param object|string $entity
      */
-    public function isAuditable($entity): bool
+    public function isAuditable(object|string $entity): bool
     {
         $class = DoctrineHelper::getRealClassName($entity);
         // is $entity part of audited entities?
@@ -155,10 +153,8 @@ class DoctrineProvider extends AbstractProvider
 
     /**
      * Returns true if $entity is audited.
-     *
-     * @param object|string $entity
      */
-    public function isAudited($entity): bool
+    public function isAudited(object|string $entity): bool
     {
         \assert(null !== $this->auditor);
         if (!$this->auditor->getConfiguration()->isEnabled()) {
@@ -191,10 +187,8 @@ class DoctrineProvider extends AbstractProvider
 
     /**
      * Returns true if $field is audited.
-     *
-     * @param object|string $entity
      */
-    public function isAuditedField($entity, string $field): bool
+    public function isAuditedField(object|string $entity, string $field): bool
     {
         // is $field is part of globally ignored columns?
         \assert($this->configuration instanceof Configuration);   // helps PHPStan

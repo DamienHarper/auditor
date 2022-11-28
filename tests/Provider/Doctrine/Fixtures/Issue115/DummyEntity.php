@@ -21,7 +21,7 @@ class DummyEntity
     #[ORM\Id, ORM\GeneratedValue(strategy: 'NONE'), ORM\Column(type: 'bigint')]
     private DummyEnum $id = DummyEnum::A;
 
-    public function getId(): ?DummyEnum
+    public function getId(): DummyEnum
     {
         return $this->id;
     }

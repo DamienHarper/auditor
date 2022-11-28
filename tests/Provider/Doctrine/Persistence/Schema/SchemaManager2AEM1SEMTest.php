@@ -81,7 +81,7 @@ final class SchemaManager2AEM1SEMTest extends TestCase
         foreach ($storageServices as $name => $storageService) {
             $connection = $storageService->getEntityManager()->getConnection();
             $schemaManager = DoctrineHelper::createSchemaManager($connection);
-            $tables = array_map(static fn ($t) => $t->getName(), $schemaManager->listTables());
+            $tables = array_map(static fn ($t): string => $t->getName(), $schemaManager->listTables());
             sort($tables);
             self::assertSame($expected[$name], $tables, 'Schema of "'.$name.'" is correct.');
         }

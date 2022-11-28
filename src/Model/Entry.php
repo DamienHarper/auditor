@@ -106,8 +106,6 @@ class Entry
 
     /**
      * Get the value of ip.
-     *
-     * @return string
      */
     public function getIp(): ?string
     {
@@ -124,10 +122,8 @@ class Entry
 
     /**
      * Get diff values.
-     *
-     * @return array
      */
-    public function getDiffs(bool $includeMedadata = false): ?array
+    public function getDiffs(bool $includeMedadata = false): array
     {
         $diffs = $this->sort(json_decode($this->diffs, true, 512, JSON_THROW_ON_ERROR));  // @phpstan-ignore-line
         if (!$includeMedadata) {

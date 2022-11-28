@@ -74,8 +74,6 @@ class Author implements Stringable
 
     /**
      * Get the value of id.
-     *
-     * @return int
      */
     public function getId(): ?int
     {
@@ -94,8 +92,6 @@ class Author implements Stringable
 
     /**
      * Get the value of fullname.
-     *
-     * @return string
      */
     public function getFullname(): ?string
     {
@@ -114,8 +110,6 @@ class Author implements Stringable
 
     /**
      * Get the value of email.
-     *
-     * @return string
      */
     public function getEmail(): ?string
     {
