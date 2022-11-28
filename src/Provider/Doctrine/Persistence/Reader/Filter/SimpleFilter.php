@@ -35,17 +35,15 @@ class SimpleFilter implements FilterInterface
     public function getSQL(): array
     {
         if (\is_array($this->value) && 1 < \count($this->value)) {
-            $data = [
+            return [
                 'sql' => sprintf('%s IN (:%s)', $this->name, $this->name),
                 'params' => [$this->name => $this->value],
             ];
-        } else {
-            $data = [
-                'sql' => sprintf('%s = :%s', $this->name, $this->name),
-                'params' => [$this->name => (\is_array($this->value) ? $this->value[0] : $this->value)],
-            ];
         }
 
-        return $data;
+        return [
+            'sql' => sprintf('%s = :%s', $this->name, $this->name),
+            'params' => [$this->name => (\is_array($this->value) ? $this->value[0] : $this->value)],
+        ];
     }
 }
