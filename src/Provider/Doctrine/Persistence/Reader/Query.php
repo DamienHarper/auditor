@@ -97,7 +97,7 @@ class Query
                     ->fetchColumn(0)
                 ;
             }
-        } catch (Exception $e) {
+        } catch (Exception) {
             $result = false;
         }
 
@@ -190,11 +190,10 @@ class Query
         $grouped = [];
 
         foreach ($filters as $filter) {
-            $class = \get_class($filter);
-            if (!isset($grouped[$class])) {
-                $grouped[$class] = [];
+            if (!isset($grouped[$filter::class])) {
+                $grouped[$filter::class] = [];
             }
-            $grouped[$class][] = $filter;
+            $grouped[$filter::class][] = $filter;
         }
 
         return $grouped;

@@ -9,7 +9,7 @@ class SimpleFilter implements FilterInterface
     protected string $name;
 
     /**
-     * @var array|string
+     * @var mixed
      */
     protected $value;
 
@@ -27,10 +27,7 @@ class SimpleFilter implements FilterInterface
         return $this->name;
     }
 
-    /**
-     * @return array|string
-     */
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }

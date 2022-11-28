@@ -78,10 +78,8 @@ class DummyEntity
 
     /**
      * Set the value of name.
-     *
-     * @param mixed $label
      */
-    public function setLabel($label): self
+    public function setLabel(mixed $label): self
     {
         $this->label = $label;
 

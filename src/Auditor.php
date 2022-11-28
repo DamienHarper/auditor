@@ -88,10 +88,10 @@ class Auditor
     public function registerProvider(ProviderInterface $provider): self
     {
         if (!$provider->supportsStorage() && !$provider->supportsAuditing()) {
-            throw new ProviderException(sprintf('Provider "%s" does not support storage and auditing.', \get_class($provider)));
+            throw new ProviderException(sprintf('Provider "%s" does not support storage and auditing.', $provider::class));
         }
 
-        $this->providers[\get_class($provider)] = $provider;
+        $this->providers[$provider::class] = $provider;
         $provider->setAuditor($this);
 
         if ($provider->supportsStorage()) {
@@ -111,10 +111,10 @@ class Auditor
     public function enableStorage(ProviderInterface $provider): self
     {
         if (!$provider->supportsStorage()) {
-            throw new ProviderException(sprintf('Provider "%s" does not support storage.', \get_class($provider)));
+            throw new ProviderException(sprintf('Provider "%s" does not support storage.', $provider::class));
         }
 
-        $this->storageProviders[\get_class($provider)] = $provider;
+        $this->storageProviders[$provider::class] = $provider;
 
         return $this;
     }
@@ -125,14 +125,14 @@ class Auditor
     public function disableStorage(ProviderInterface $provider): self
     {
         if (!$provider->supportsStorage()) {
-            throw new ProviderException(sprintf('Provider "%s" does not support storage.', \get_class($provider)));
+            throw new ProviderException(sprintf('Provider "%s" does not support storage.', $provider::class));
         }
 
         if (1 === \count($this->storageProviders)) {
             throw new ProviderException('At least one storage provider must be enabled.');
         }
 
-        unset($this->storageProviders[\get_class($provider)]);
+        unset($this->storageProviders[$provider::class]);
 
         return $this;
     }
@@ -142,7 +142,7 @@ class Auditor
      */
     public function isStorageEnabled(ProviderInterface $provider): bool
     {
-        $key = \get_class($provider);
+        $key = $provider::class;
         if (!$this->hasProvider($key)) {
             throw new InvalidArgumentException(sprintf('Unknown provider "%s"', $key));
         }
@@ -156,10 +156,10 @@ class Auditor
     public function enableAuditing(ProviderInterface $provider): self
     {
         if (!$provider->supportsAuditing()) {
-            throw new ProviderException(sprintf('Provider "%s" does not support audit hooks.', \get_class($provider)));
+            throw new ProviderException(sprintf('Provider "%s" does not support audit hooks.', $provider::class));
         }
 
-        $this->auditProviders[\get_class($provider)] = $provider;
+        $this->auditProviders[$provider::class] = $provider;
 
         return $this;
     }
@@ -170,14 +170,14 @@ class Auditor
     public function disableAuditing(ProviderInterface $provider): self
     {
         if (!$provider->supportsAuditing()) {
-            throw new ProviderException(sprintf('Provider "%s" does not support audit hooks.', \get_class($provider)));
+            throw new ProviderException(sprintf('Provider "%s" does not support audit hooks.', $provider::class));
         }
 
         if (1 === \count($this->auditProviders)) {
             throw new ProviderException('At least one auditing provider must be enabled.');
         }
 
-        unset($this->auditProviders[\get_class($provider)]);
+        unset($this->auditProviders[$provider::class]);
 
         return $this;
     }
@@ -187,11 +187,10 @@ class Auditor
      */
     public function isAuditingEnabled(ProviderInterface $provider): bool
     {
-        $key = \get_class($provider);
-        if (!$this->hasProvider($key)) {
-            throw new InvalidArgumentException(sprintf('Unknown provider "%s"', $key));
+        if (!$this->hasProvider($provider::class)) {
+            throw new InvalidArgumentException(sprintf('Unknown provider "%s"', $provider::class));
         }
 
-        return \array_key_exists($key, $this->auditProviders);
+        return \array_key_exists($provider::class, $this->auditProviders);
     }
 }

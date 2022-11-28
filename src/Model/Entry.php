@@ -15,9 +15,9 @@ class Entry
 
     protected string $object_id;
 
-    protected ?string $discriminator;
+    protected ?string $discriminator = null;
 
-    protected ?string $transaction_hash;
+    protected ?string $transaction_hash = null;
 
     protected string $diffs;
 

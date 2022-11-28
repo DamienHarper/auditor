@@ -149,10 +149,7 @@ class Transaction implements TransactionInterface
         $this->updated[] = new UpdateEventDto($source, $changeset);
     }
 
-    /**
-     * @param mixed $id
-     */
-    public function remove(object $source, $id): void
+    public function remove(object $source, mixed $id): void
     {
         $this->removed[] = new RemoveEventDto($source, $id);
     }

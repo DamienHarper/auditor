@@ -101,8 +101,6 @@ class User
 
     /**
      * Set Locale entity (many to one).
-     *
-     * @param ?Locale $locale
      */
     public function setLocale(?Locale $locale): self
     {
@@ -113,8 +111,6 @@ class User
 
     /**
      * Get Locale entity (many to one).
-     *
-     * @return ?Locale
      */
     public function getLocale(): ?Locale
     {

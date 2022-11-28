@@ -60,11 +60,9 @@ class Issue98
     /**
      * Set the value of data.
      *
-     * @param mixed $data
-     *
      * @return DataObject
      */
-    public function setData($data): self
+    public function setData(mixed $data): self
     {
         $this->data = $data;
 

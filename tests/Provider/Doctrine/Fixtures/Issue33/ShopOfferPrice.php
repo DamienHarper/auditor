@@ -34,7 +34,7 @@ class ShopOfferPrice
     /**
      * @var float|string Decimal
      */
-    private $value;
+    private float|string $value;
 
     public function __construct(Shop $shop, Offer $offer, float $value)
     {

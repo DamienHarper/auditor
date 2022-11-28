@@ -126,7 +126,7 @@ class Reader
                 if (\count($audits) > 0) {
                     $results[$entity] = $audits;
                 }
-            } catch (AccessDeniedException $e) {
+            } catch (AccessDeniedException) {
                 // acces denied
             }
         }

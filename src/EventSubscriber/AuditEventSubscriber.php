@@ -36,7 +36,7 @@ class AuditEventSubscriber implements EventSubscriberInterface
             if ($provider->supportsStorage()) {
                 try {
                     $provider->persist($event);
-                } catch (Exception $e) {
+                } catch (Exception) {
                     // do nothing to ensure other providers are called
                 }
             }

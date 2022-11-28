@@ -76,7 +76,7 @@ trait SchemaSetupTrait
                     $entityManager->getConnection()->executeStatement('DROP SCHEMA IF EXISTS '.$schemaName);
                 }
             }
-        } catch (Exception $e) {
+        } catch (Exception) {
         }
     }
 
@@ -145,7 +145,7 @@ trait SchemaSetupTrait
                     $entityManager->getConnection()->executeStatement('DROP SCHEMA IF EXISTS '.$schemaName);
                 }
             }
-        } catch (Exception $e) {
+        } catch (Exception) {
         }
     }
 

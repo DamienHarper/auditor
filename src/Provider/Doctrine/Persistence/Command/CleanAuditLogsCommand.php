@@ -89,7 +89,7 @@ class CleanAuditLogsCommand extends Command
         // Collect auditable classes from auditing storage managers
         $repository = $schemaManager->collectAuditableEntities();
         foreach ($repository as $name => $entities) {
-            $count += \count($entities);
+            $count += is_countable($entities) ? \count($entities) : 0;
         }
 
         $message = sprintf(
@@ -172,7 +172,7 @@ class CleanAuditLogsCommand extends Command
     {
         try {
             $dateInterval = new DateInterval($keep);
-        } catch (Exception $e) {
+        } catch (Exception) {
             $io->error(sprintf("'keep' argument must be a valid ISO 8601 date interval, '%s' given.", (string) $keep));
             $this->release();
 

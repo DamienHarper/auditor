@@ -103,7 +103,7 @@ trait ConnectionTrait
     {
         try {
             $schemaManager->dropDatabase($dbname);
-        } catch (Throwable $exception) {
+        } catch (Throwable) {
             // do nothing
         }
         $schemaManager->createDatabase($dbname);

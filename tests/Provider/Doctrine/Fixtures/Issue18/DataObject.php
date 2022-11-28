@@ -57,10 +57,8 @@ class DataObject
 
     /**
      * Set the value of data.
-     *
-     * @param mixed $data
      */
-    public function setData($data): self
+    public function setData(mixed $data): self
     {
         $this->data = $data;
 

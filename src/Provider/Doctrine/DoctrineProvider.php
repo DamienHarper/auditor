@@ -70,7 +70,7 @@ class DoctrineProvider extends AbstractProvider
                 $service->getEntityManager()->getClassMetadata($entity)->getTableName();
 
                 return $service;
-            } catch (Exception $e) {
+            } catch (Exception) {
             }
         }
 

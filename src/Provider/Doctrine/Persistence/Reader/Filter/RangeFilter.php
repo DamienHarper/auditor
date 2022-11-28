@@ -21,12 +21,9 @@ class RangeFilter implements FilterInterface
     protected $maxValue;
 
     /**
-     * @param mixed $minValue
-     * @param mixed $maxValue
-     *
      * @throws InvalidArgumentException
      */
-    public function __construct(string $name, $minValue, $maxValue = null)
+    public function __construct(string $name, mixed $minValue, mixed $maxValue = null)
     {
         if (null === $minValue && null === $maxValue) {
             throw new InvalidArgumentException('You must provide at least one of the two range bounds.');
