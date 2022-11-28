@@ -42,18 +42,12 @@ class RangeFilter implements FilterInterface
         return $this->name;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getMinValue()
+    public function getMinValue(): mixed
     {
         return $this->minValue;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getMaxValue()
+    public function getMaxValue(): mixed
     {
         return $this->maxValue;
     }

@@ -18,13 +18,11 @@ trait AuditTrait
     /**
      * Returns the primary key value of an entity.
      *
-     * @return mixed
-     *
      * @throws \DH\Auditor\Exception\MappingException
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\ORM\Mapping\MappingException
      */
-    private function id(EntityManagerInterface $entityManager, object $entity)
+    private function id(EntityManagerInterface $entityManager, object $entity): mixed
     {
         $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
 
@@ -65,12 +63,10 @@ trait AuditTrait
      *
      * @param mixed $value
      *
-     * @return mixed
-     *
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\DBAL\Types\ConversionException
      */
-    private function value(EntityManagerInterface $entityManager, Type $type, $value)
+    private function value(EntityManagerInterface $entityManager, Type $type, $value): mixed
     {
         if (null === $value) {
             return null;
