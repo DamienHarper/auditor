@@ -52,6 +52,7 @@ class CreateSchemaListener implements EventSubscriber
                     }
                 }
             }
+
             if (!$audited) {
                 return;
             }

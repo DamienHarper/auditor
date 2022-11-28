@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
@@ -15,6 +16,7 @@ return static function (RectorConfig $rectorConfig): void {
     // at the start of the class and in the constructor)
     $rectorConfig->skip([
         ClassPropertyAssignToConstructorPromotionRector::class,
+        RemoveUnusedPrivatePropertyRector::class,
     ]);
 
     // PHP rules
@@ -22,5 +24,7 @@ return static function (RectorConfig $rectorConfig): void {
         LevelSetList::UP_TO_PHP_80,
         SetList::CODE_QUALITY,
         SetList::DEAD_CODE,
+//        SetList::EARLY_RETURN,
+        SetList::CODING_STYLE,
     ]);
 };

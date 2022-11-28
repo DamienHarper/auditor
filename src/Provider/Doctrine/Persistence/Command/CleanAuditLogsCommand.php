@@ -29,6 +29,9 @@ class CleanAuditLogsCommand extends Command
 {
     use LockableTrait;
 
+    /**
+     * @var string
+     */
     private const UNTIL_DATE_FORMAT = 'Y-m-d H:i:s';
 
     private Auditor $auditor;
@@ -69,6 +72,7 @@ class CleanAuditLogsCommand extends Command
 
         $keep = $input->getArgument('keep');
         $keep = (\is_array($keep) ? $keep[0] : $keep);
+
         $until = $this->validateKeepArgument($keep, $io);
 
         if (!$until instanceof DateTimeImmutable) {
@@ -134,7 +138,7 @@ class CleanAuditLogsCommand extends Command
                         DoctrineHelper::executeStatement($queryBuilder);
                     }
 
-                    $progressBar->setMessage("Cleaning audit tables... (<info>{$auditTable}</info>)");
+                    $progressBar->setMessage(sprintf('Cleaning audit tables... (<info>%s</info>)', $auditTable));
                     $progressBar->advance();
                 }
             }

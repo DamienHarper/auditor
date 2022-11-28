@@ -432,6 +432,7 @@ final class DoctrineProviderTest extends TestCase
         $provider = new DoctrineProvider($this->createProviderConfiguration(['entities' => $loaded]));
         $provider->registerStorageService(new StorageService('default', $entityManager));
         $provider->registerAuditingService(new AuditingService('default', $entityManager));
+
         $auditor->registerProvider($provider);
 
         self::assertTrue($provider->isAudited(AuditedEntityWithAnnotation::class), '"'.AuditedEntityWithAnnotation::class.'" is audited.');
@@ -464,6 +465,7 @@ final class DoctrineProviderTest extends TestCase
         $provider = new DoctrineProvider($this->createProviderConfiguration(['entities' => $loaded]));
         $provider->registerStorageService(new StorageService('default', $entityManager));
         $provider->registerAuditingService(new AuditingService('default', $entityManager));
+
         $auditor->registerProvider($provider);
 
         self::assertTrue($provider->isAudited(AuditedEntityWithAttribute::class), '"'.AuditedEntityWithAttribute::class.'" is audited.');

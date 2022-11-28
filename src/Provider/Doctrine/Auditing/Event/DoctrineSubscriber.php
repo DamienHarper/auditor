@@ -48,6 +48,7 @@ class DoctrineSubscriber implements EventSubscriber
 
             return;
         }
+
         trigger_deprecation('damienharper/auditor', '2.2', 'SQLLogger is deprecated. Use DHMiddleware instead');
         // extend the SQL logger
         $this->loggerBackup = $entityManager->getConnection()->getConfiguration()->getSQLLogger();
@@ -67,6 +68,7 @@ class DoctrineSubscriber implements EventSubscriber
         } elseif ($this->loggerBackup instanceof SQLLogger) {
             $loggerChain->addLogger($this->loggerBackup);
         }
+
         $loggerChain->addLogger($auditLogger);
         $entityManager->getConnection()->getConfiguration()->setSQLLogger($loggerChain);
     }

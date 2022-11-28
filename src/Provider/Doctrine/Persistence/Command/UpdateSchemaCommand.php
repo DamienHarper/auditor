@@ -92,6 +92,7 @@ class UpdateSchemaCommand extends Command
             if ($dumpSql) {
                 $io->newLine();
             }
+
             $io->text('Updating database schema...');
             $io->newLine();
 

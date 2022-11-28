@@ -106,6 +106,7 @@ trait ConnectionTrait
         } catch (Throwable) {
             // do nothing
         }
+
         $schemaManager->createDatabase($dbname);
     }
 }

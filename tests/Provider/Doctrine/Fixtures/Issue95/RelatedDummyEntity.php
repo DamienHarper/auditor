@@ -42,6 +42,7 @@ class RelatedDummyEntity implements Stringable
         if (null !== $parent) {
             $parent->addChild($this);
         }
+
         $this->label = $label;
     }
 

@@ -47,9 +47,11 @@ final class DoctrineHelper
         if (false === $positionCg && false === $positionPm) {
             return $subject;
         }
+
         if (false !== $positionCg) {
             return mb_substr($subject, $positionCg + 8);
         }
+
         $className = ltrim($subject, '\\');
 
         return mb_substr(

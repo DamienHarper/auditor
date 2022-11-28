@@ -220,6 +220,7 @@ final class ReaderTest extends TestCase
         $query = $reader->createQuery(Author::class);
         $query->addFilter(new SimpleFilter('object_id', 1));
         $query->addFilter(new SimpleFilter('object_id', 2));
+
         $audits = $query->execute();
         self::assertCount(4, $audits);
     }

@@ -37,6 +37,7 @@ final class Issue115Test extends TestCase
         $transaction = new Transaction($entityManager);
         $entity = new DummyEntity();
         $entity->setId(DummyEnum::A);
+
         $transaction->insert($entity, [
             'id' => [DummyEnum::A, DummyEnum::B],
         ]);

@@ -21,6 +21,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class Reader
 {
+    /**
+     * @var int
+     */
     public const PAGE_SIZE = 50;
 
     private DoctrineProvider $provider;

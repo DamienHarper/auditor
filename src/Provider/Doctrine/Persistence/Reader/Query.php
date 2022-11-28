@@ -21,12 +21,39 @@ use Exception;
  */
 class Query
 {
+    /**
+     * @var string
+     */
     public const TYPE = 'type';
+
+    /**
+     * @var string
+     */
     public const CREATED_AT = 'created_at';
+
+    /**
+     * @var string
+     */
     public const TRANSACTION_HASH = 'transaction_hash';
+
+    /**
+     * @var string
+     */
     public const OBJECT_ID = 'object_id';
+
+    /**
+     * @var string
+     */
     public const USER_ID = 'blame_id';
+
+    /**
+     * @var string
+     */
     public const ID = 'id';
+
+    /**
+     * @var string
+     */
     public const DISCRIMINATOR = 'discriminator';
 
     private array $filters = [];
@@ -131,6 +158,7 @@ class Query
         if (0 > $limit) {
             throw new InvalidArgumentException('Limit cannot be negative.');
         }
+
         if (0 > $offset) {
             throw new InvalidArgumentException('Offset cannot be negative.');
         }
@@ -187,6 +215,7 @@ class Query
             if (!isset($grouped[$filter::class])) {
                 $grouped[$filter::class] = [];
             }
+
             $grouped[$filter::class][] = $filter;
         }
 
@@ -268,6 +297,7 @@ class Query
         if (0 < $this->limit) {
             $queryBuilder->setMaxResults($this->limit);
         }
+
         if (0 < $this->offset) {
             $queryBuilder->setFirstResult($this->offset);
         }

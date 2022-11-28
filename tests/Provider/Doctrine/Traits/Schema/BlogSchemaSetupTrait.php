@@ -225,6 +225,7 @@ trait BlogSchemaSetupTrait
 
         // Dissociation coauthor<->post
         $author3->removePost($post4);
+
         $post3->setCoauthor(null);
 
         // Delete author

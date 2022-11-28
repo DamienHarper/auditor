@@ -70,6 +70,7 @@ final class SchemaManager1AEM2SEMTest extends TestCase
                 $expected[$key][] = $entityOptions['computed_audit_table_name'];
             }
         }
+
         sort($expected['db1']);
         sort($expected['db2']);
 

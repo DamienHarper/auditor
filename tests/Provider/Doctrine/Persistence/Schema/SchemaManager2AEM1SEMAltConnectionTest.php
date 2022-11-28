@@ -73,6 +73,7 @@ final class SchemaManager2AEM1SEMAltConnectionTest extends TestCase
                     $expected[$name][] = $entityOptions['computed_audit_table_name'];
                 }
             }
+
             sort($expected[$name]);
 
             $connection = $storageService->getEntityManager()->getConnection();

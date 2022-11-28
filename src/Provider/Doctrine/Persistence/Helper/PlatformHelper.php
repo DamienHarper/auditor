@@ -81,7 +81,7 @@ abstract class PlatformHelper
     public static function getOracleMysqlVersionNumber(string $versionString): string
     {
         preg_match(
-            '/^(?P<major>\d+)(?:\.(?P<minor>\d+)(?:\.(?P<patch>\d+))?)?/',
+            '#^(?P<major>\d+)(?:\.(?P<minor>\d+)(?:\.(?P<patch>\d+))?)?#',
             $versionString,
             $versionParts
         );
@@ -108,7 +108,7 @@ abstract class PlatformHelper
     public static function getMariaDbMysqlVersionNumber(string $versionString): string
     {
         preg_match(
-            '/^(?:5\.5\.5-)?(mariadb-)?(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)/i',
+            '#^(?:5\.5\.5-)?(mariadb-)?(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)#i',
             $versionString,
             $versionParts
         );

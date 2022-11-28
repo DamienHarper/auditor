@@ -26,6 +26,7 @@ final class DHConnection extends AbstractConnectionMiddleware
         foreach ($flusherList as $flusher) {
             ($flusher)();
         }
+
         $this->DHDriver->resetDHFlusherList();
 
         return parent::commit();

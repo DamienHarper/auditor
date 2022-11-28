@@ -66,12 +66,14 @@ class SchemaManager
         if (null !== $metadataDriver) {
             $entities = $metadataDriver->getAllClassNames();
         }
+
         $audited = [];
         foreach ($entities as $entity) {
             if ($this->provider->isAuditable($entity)) {
                 $audited[$entity] = $entityManager->getClassMetadata($entity)->getTableName();
             }
         }
+
         ksort($audited);
 
         return $audited;
@@ -93,6 +95,7 @@ class SchemaManager
                 if (!isset($repository[$key])) {
                     $repository[$key] = [];
                 }
+
                 $repository[$key][$entity] = $tableName;
             }
         }
@@ -139,6 +142,7 @@ class SchemaManager
                     $processed[] = $entityFQCN;
                 }
             }
+
             $sqls[$name] = DoctrineHelper::getMigrateToSql($storageConnection, $fromSchema, $storageSchema);
         }
 
@@ -330,6 +334,7 @@ class SchemaManager
                 if ($table->hasIndex($options['name'])) {
                     $table->dropIndex($options['name']);
                 }
+
                 $table->addIndex(
                     [$columnName],
                     $options['name'],

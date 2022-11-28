@@ -22,6 +22,9 @@ use Doctrine\Common\Annotations\Annotation\Required;
 #[Attribute(Attribute::TARGET_CLASS)]
 final class Security
 {
+    /**
+     * @var string
+     */
     public const VIEW_SCOPE = 'view';
 
     /**

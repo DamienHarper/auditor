@@ -48,6 +48,7 @@ final class UpdateSchemaCommandTest extends TestCase
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute([]);
+
         $command->unlock();
 
         // the output of the command in the auditor
@@ -65,6 +66,7 @@ final class UpdateSchemaCommandTest extends TestCase
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute(['--dump-sql' => true]);
+
         $command->unlock();
 
         // the output of the command in the auditor
@@ -80,6 +82,7 @@ final class UpdateSchemaCommandTest extends TestCase
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute(['--force' => true]);
+
         $command->unlock();
 
         // the output of the command in the auditor
@@ -118,6 +121,7 @@ final class UpdateSchemaCommandTest extends TestCase
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute(['--force' => true]);
+
         $command->unlock();
 
         // the output of the command in the auditor
@@ -135,6 +139,7 @@ final class UpdateSchemaCommandTest extends TestCase
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute([]);
+
         $command->unlock();
 
         // the output of the command in the auditor
