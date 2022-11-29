@@ -2,28 +2,30 @@
 
 declare(strict_types=1);
 
-use Rector\Core\Configuration\Option;
-use Rector\Core\ValueObject\PhpVersion;
-use Rector\Php74\Rector\Property\TypedPropertyRector;
-use Rector\PHPUnit\Set\PHPUnitSetList;
+use Rector\Config\RectorConfig;
+use Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector;
+use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Set\ValueObject\LevelSetList;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Rector\Set\ValueObject\SetList;
 
-return static function (ContainerConfigurator $containerConfigurator): void {
-    $services = $containerConfigurator->services();
-    $services->set(TypedPropertyRector::class);
+return static function (RectorConfig $rectorConfig): void {
+    $rectorConfig->paths([__DIR__.'/src', __DIR__.'/tests']);
 
-    // get parameters
-    $parameters = $containerConfigurator->parameters();
-    $parameters->set(Option::PATHS, [__DIR__.'/src', __DIR__.'/tests']);
-    $parameters->set(Option::PHP_VERSION_FEATURES, PhpVersion::PHP_74);
-    $parameters->set(Option::BOOTSTRAP_FILES, [__DIR__.'/vendor/autoload.php']);
+    // Do not try to change simple property init and assign to constructor promotion
+    // to make code easier to read (no more class with properties declared both
+    // at the start of the class and in the constructor)
+    $rectorConfig->skip([
+        ClassPropertyAssignToConstructorPromotionRector::class,
+        RemoveUnusedPrivatePropertyRector::class,
+    ]);
 
-    // PHP Rules
-    $containerConfigurator->import(LevelSetList::UP_TO_PHP_74);
-
-    // PHPUnit Rules
-    $containerConfigurator->import(PHPUnitSetList::PHPUNIT_91);
-    $containerConfigurator->import(PHPUnitSetList::PHPUNIT_CODE_QUALITY);
-    $containerConfigurator->import(PHPUnitSetList::PHPUNIT_YIELD_DATA_PROVIDER);
+    // PHP rules
+    $rectorConfig->sets([
+        LevelSetList::UP_TO_PHP_80,
+        SetList::CODE_QUALITY,
+        SetList::DEAD_CODE,
+        SetList::CODING_STYLE,
+        SetList::TYPE_DECLARATION,
+        SetList::TYPE_DECLARATION_STRICT,
+    ]);
 };

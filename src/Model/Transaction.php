@@ -15,10 +15,29 @@ use DH\Auditor\Event\Dto\UpdateEventDto;
  */
 class Transaction implements TransactionInterface
 {
+    /**
+     * @var string
+     */
     public const INSERT = 'insert';
+
+    /**
+     * @var string
+     */
     public const UPDATE = 'update';
+
+    /**
+     * @var string
+     */
     public const REMOVE = 'remove';
+
+    /**
+     * @var string
+     */
     public const ASSOCIATE = 'associate';
+
+    /**
+     * @var string
+     */
     public const DISSOCIATE = 'dissociate';
 
     private ?string $transaction_hash = null;
@@ -60,26 +79,41 @@ class Transaction implements TransactionInterface
         return $this->transaction_hash;
     }
 
+    /**
+     * @return array<InsertEventDto>
+     */
     public function getInserted(): array
     {
         return $this->inserted;
     }
 
+    /**
+     * @return array<UpdateEventDto>
+     */
     public function getUpdated(): array
     {
         return $this->updated;
     }
 
+    /**
+     * @return array<RemoveEventDto>
+     */
     public function getRemoved(): array
     {
         return $this->removed;
     }
 
+    /**
+     * @return array<AssociateEventDto>
+     */
     public function getAssociated(): array
     {
         return $this->associated;
     }
 
+    /**
+     * @return array<DissociateEventDto>
+     */
     public function getDissociated(): array
     {
         return $this->dissociated;
@@ -149,10 +183,7 @@ class Transaction implements TransactionInterface
         $this->updated[] = new UpdateEventDto($source, $changeset);
     }
 
-    /**
-     * @param mixed $id
-     */
-    public function remove(object $source, $id): void
+    public function remove(object $source, mixed $id): void
     {
         $this->removed[] = new RemoveEventDto($source, $id);
     }

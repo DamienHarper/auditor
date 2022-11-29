@@ -70,6 +70,7 @@ final class SchemaManager1AEM2SEMTest extends TestCase
                 $expected[$key][] = $entityOptions['computed_audit_table_name'];
             }
         }
+
         sort($expected['db1']);
         sort($expected['db2']);
 
@@ -81,7 +82,7 @@ final class SchemaManager1AEM2SEMTest extends TestCase
             $connection = $storageService->getEntityManager()->getConnection();
             $schemaManager = DoctrineHelper::createSchemaManager($connection);
             $tables = array_map(
-                static fn ($t) => $t->getName(),
+                static fn ($t): string => $t->getName(),
                 $schemaManager->listTables()
             );
             sort($tables);

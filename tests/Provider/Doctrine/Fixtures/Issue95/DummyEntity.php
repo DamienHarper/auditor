@@ -44,7 +44,7 @@ class DummyEntity implements Stringable
         $this->children = new ArrayCollection();
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->label;
     }

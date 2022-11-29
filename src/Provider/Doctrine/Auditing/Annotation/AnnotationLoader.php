@@ -47,7 +47,7 @@ class AnnotationLoader
         // Check that we have an Entity annotation or attribute
         // TODO: only rely on PHP attributes for next major release
         $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Entity::class) : null;
-        if (\is_array($attributes) && \count($attributes) > 0) {
+        if (\is_array($attributes) && [] !== $attributes) {
             $annotation = $attributes[0]->newInstance();
         } elseif (null !== $this->reader) {
             $annotation = $this->reader->getClassAnnotation($reflection, Entity::class);
@@ -60,7 +60,7 @@ class AnnotationLoader
         // Check that we have an Auditable annotation or attribute
         // TODO: only rely on PHP attributes for next major release
         $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Auditable::class) : null;
-        if (\is_array($attributes) && \count($attributes) > 0) {
+        if (\is_array($attributes) && [] !== $attributes) {
             $auditableAnnotation = $attributes[0]->newInstance();
         } elseif (null !== $this->reader) {
             $auditableAnnotation = $this->reader->getClassAnnotation($reflection, Auditable::class);
@@ -73,7 +73,7 @@ class AnnotationLoader
         // Check that we have a Security annotation or attribute
         // TODO: only rely on PHP attributes for next major release
         $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Security::class) : null;
-        if (\is_array($attributes) && \count($attributes) > 0) {
+        if (\is_array($attributes) && [] !== $attributes) {
             $securityAnnotation = $attributes[0]->newInstance();
         } elseif (null !== $this->reader) {
             $securityAnnotation = $this->reader->getClassAnnotation($reflection, Security::class);
@@ -99,7 +99,7 @@ class AnnotationLoader
         foreach ($reflection->getProperties() as $property) {
             // TODO: only rely on PHP attributes for next major release
             $attributes = \PHP_VERSION_ID >= 80000 && method_exists($property, 'getAttributes') ? $property->getAttributes(Ignore::class) : null;
-            if (\is_array($attributes) && \count($attributes) > 0) {
+            if (\is_array($attributes) && [] !== $attributes) {
                 $annotationProperty = $attributes[0]->newInstance();
             } elseif (null !== $this->reader) {
                 $annotationProperty = $this->reader->getPropertyAnnotation($property, Ignore::class);

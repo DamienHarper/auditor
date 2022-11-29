@@ -21,12 +21,9 @@ class RangeFilter implements FilterInterface
     protected $maxValue;
 
     /**
-     * @param mixed $minValue
-     * @param mixed $maxValue
-     *
      * @throws InvalidArgumentException
      */
-    public function __construct(string $name, $minValue, $maxValue = null)
+    public function __construct(string $name, mixed $minValue, mixed $maxValue = null)
     {
         if (null === $minValue && null === $maxValue) {
             throw new InvalidArgumentException('You must provide at least one of the two range bounds.');
@@ -42,22 +39,19 @@ class RangeFilter implements FilterInterface
         return $this->name;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getMinValue()
+    public function getMinValue(): mixed
     {
         return $this->minValue;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getMaxValue()
+    public function getMaxValue(): mixed
     {
         return $this->maxValue;
     }
 
+    /**
+     * @return array{sql: string, params: array<string, mixed>}
+     */
     public function getSQL(): array
     {
         $sqls = [];

@@ -68,17 +68,18 @@ final class SchemaManager2AEM1SEMAltConnectionTest extends TestCase
                 $expected[$name] = [];
             }
 
-            foreach ($entities as $entity => $entityOptions) {
+            foreach ($entities as $entityOptions) {
                 if (!\in_array($entityOptions['computed_audit_table_name'], $expected[$name], true)) {
                     $expected[$name][] = $entityOptions['computed_audit_table_name'];
                 }
             }
+
             sort($expected[$name]);
 
             $connection = $storageService->getEntityManager()->getConnection();
             $schemaManager = DoctrineHelper::createSchemaManager($connection);
             $tables = array_map(
-                static fn ($t) => $t->getName(),
+                static fn ($t): string => $t->getName(),
                 $schemaManager->listTables()
             );
             sort($tables);

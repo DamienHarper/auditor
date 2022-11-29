@@ -32,17 +32,17 @@ abstract class Animal
     #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer')]
     private int $id;
 
-    final public function getId()
+    final public function getId(): int
     {
         return $this->id;
     }
 
-    final public function getLabel()
+    final public function getLabel(): string
     {
         return $this->label;
     }
 
-    final public function setLabel($label)
+    final public function setLabel(string $label): self
     {
         $this->label = $label;
 

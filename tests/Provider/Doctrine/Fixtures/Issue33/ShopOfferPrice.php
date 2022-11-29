@@ -20,7 +20,7 @@ class ShopOfferPrice
      */
     #[ORM\Id, ORM\ManyToOne(targetEntity: 'Shop', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'shop_id', referencedColumnName: 'id', nullable: true)]
-    private $shop;
+    private Shop $shop;
 
     /**
      * @ORM\Id
@@ -29,12 +29,12 @@ class ShopOfferPrice
      */
     #[ORM\Id, ORM\ManyToOne(targetEntity: 'Offer', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'offer_id', referencedColumnName: 'id', nullable: true)]
-    private $offer;
+    private Offer $offer;
 
     /**
      * @var float|string Decimal
      */
-    private $value;
+    private float|string $value;
 
     public function __construct(Shop $shop, Offer $offer, float $value)
     {

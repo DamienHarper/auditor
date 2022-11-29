@@ -62,7 +62,7 @@ class DoctrineProvider extends AbstractProvider
 
     public function getAuditingServiceForEntity(string $entity): AuditingServiceInterface
     {
-        foreach ($this->auditingServices as $name => $service) {
+        foreach ($this->auditingServices as $service) {
             \assert($service instanceof AuditingService);   // helps PHPStan
 
             try {
@@ -70,7 +70,7 @@ class DoctrineProvider extends AbstractProvider
                 $service->getEntityManager()->getClassMetadata($entity)->getTableName();
 
                 return $service;
-            } catch (Exception $e) {
+            } catch (Exception) {
             }
         }
 
@@ -129,6 +129,7 @@ class DoctrineProvider extends AbstractProvider
         foreach ($payload as $key => $value) {
             $statement->bindValue($key, $value);
         }
+
         DoctrineHelper::executeStatement($statement);
 
         // let's get the last inserted ID from the database so other providers can use that info
@@ -139,25 +140,21 @@ class DoctrineProvider extends AbstractProvider
 
     /**
      * Returns true if $entity is auditable.
-     *
-     * @param object|string $entity
      */
-    public function isAuditable($entity): bool
+    public function isAuditable(object|string $entity): bool
     {
         $class = DoctrineHelper::getRealClassName($entity);
         // is $entity part of audited entities?
         \assert($this->configuration instanceof Configuration);   // helps PHPStan
 
         // no => $entity is not audited
-        return !(!\array_key_exists($class, $this->configuration->getEntities()));
+        return \array_key_exists($class, $this->configuration->getEntities());
     }
 
     /**
      * Returns true if $entity is audited.
-     *
-     * @param object|string $entity
      */
-    public function isAudited($entity): bool
+    public function isAudited(object|string $entity): bool
     {
         \assert(null !== $this->auditor);
         if (!$this->auditor->getConfiguration()->isEnabled()) {
@@ -190,10 +187,8 @@ class DoctrineProvider extends AbstractProvider
 
     /**
      * Returns true if $field is audited.
-     *
-     * @param object|string $entity
      */
-    public function isAuditedField($entity, string $field): bool
+    public function isAuditedField(object|string $entity, string $field): bool
     {
         // is $field is part of globally ignored columns?
         \assert($this->configuration instanceof Configuration);   // helps PHPStan

@@ -50,17 +50,17 @@ class Vehicle
         return $this;
     }
 
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getLabel()
+    public function getLabel(): string
     {
         return $this->label;
     }
 
-    public function setLabel($label)
+    public function setLabel(string $label)
     {
         $this->label = $label;
 

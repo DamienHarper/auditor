@@ -49,10 +49,10 @@ trait DoctrineProviderTrait
         $provider->registerAuditingService(new AuditingService('default', $entityManager));
 
         // Set a fake user provider that always returns the same User
-        $provider->getAuditor()->getConfiguration()->setUserProvider(static fn () => new User('1', 'dark.vador'));
+        $provider->getAuditor()->getConfiguration()->setUserProvider(static fn (): User => new User('1', 'dark.vador'));
 
         // Set a fake security provider that always returns the same IP and firewall name
-        $provider->getAuditor()->getConfiguration()->setSecurityProvider(static fn () => ['1.2.3.4', 'main']);
+        $provider->getAuditor()->getConfiguration()->setSecurityProvider(static fn (): array => ['1.2.3.4', 'main']);
 
         return $provider;
     }

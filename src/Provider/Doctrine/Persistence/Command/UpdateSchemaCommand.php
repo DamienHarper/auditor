@@ -66,7 +66,7 @@ class UpdateSchemaCommand extends Command
         $sqls = $updateManager->getUpdateAuditSchemaSql();
 
         $count = 0;
-        foreach ($sqls as $name => $queries) {
+        foreach ($sqls as $queries) {
             $count += is_countable($queries) ? \count($queries) : 0;
         }
 
@@ -81,8 +81,8 @@ class UpdateSchemaCommand extends Command
             $io->text('The following SQL statements will be executed:');
             $io->newLine();
 
-            foreach ($sqls as $name => $queries) {
-                foreach ($queries as $index => $sql) {
+            foreach ($sqls as $queries) {
+                foreach ($queries as $sql) {
                     $io->text(sprintf('    %s;', $sql));
                 }
             }
@@ -92,6 +92,7 @@ class UpdateSchemaCommand extends Command
             if ($dumpSql) {
                 $io->newLine();
             }
+
             $io->text('Updating database schema...');
             $io->newLine();
 

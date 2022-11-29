@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue95;
 
 use Doctrine\ORM\Mapping as ORM;
+use Stringable;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="related_dummy_entity")
  */
 #[ORM\Entity, ORM\Table(name: 'related_dummy_entity')]
-class RelatedDummyEntity
+class RelatedDummyEntity implements Stringable
 {
     /**
      * @ORM\Column(type="string", length=50)
@@ -41,10 +42,11 @@ class RelatedDummyEntity
         if (null !== $parent) {
             $parent->addChild($this);
         }
+
         $this->label = $label;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->label;
     }
@@ -62,7 +64,7 @@ class RelatedDummyEntity
         return $this->label;
     }
 
-    public function getParent(): DummyEntity
+    public function getParent(): ?DummyEntity
     {
         return $this->parent;
     }

@@ -6,6 +6,7 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue95;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Auditable;
 use Doctrine\ORM\Mapping as ORM;
+use Stringable;
 
 /**
  * @ORM\Entity
@@ -13,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @Auditable
  */
-class Issue95
+class Issue95 implements Stringable
 {
     /**
      * @ORM\Id

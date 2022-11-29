@@ -25,13 +25,13 @@ class Comment
     #[ORM\Id]
     #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
-    protected $id;
+    protected ?int $id = null;
 
     /**
      * @ORM\Column(type="text")
      */
     #[ORM\Column(type: 'text')]
-    protected $body;
+    protected ?string $body = null;
 
     /**
      * Comment author email.
@@ -39,20 +39,20 @@ class Comment
      * @ORM\Column(type="string", length=255)
      */
     #[ORM\Column(type: 'string', length: 255)]
-    protected $author;
+    protected ?string $author = null;
 
     /**
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
      */
     #[ORM\Column(type: 'datetime')]
-    protected $created_at;
+    protected ?DateTimeImmutable $created_at = null;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned": true}, nullable=true)
      */
     #[ORM\Column(type: 'integer', options: ['unsigned' => true], nullable: true)]
-    protected $post_id;
+    protected ?int $post_id = null;
 
     /**
      * @ORM\ManyToOne(targetEntity="Post", inversedBy="comments", cascade={"persist", "remove"})
@@ -60,11 +60,7 @@ class Comment
      */
     #[ORM\ManyToOne(targetEntity: 'Post', inversedBy: 'comments', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id', nullable: true)]
-    protected $post;
-
-    public function __construct()
-    {
-    }
+    protected ?\DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post $post = null;
 
     public function __sleep()
     {
@@ -83,8 +79,6 @@ class Comment
 
     /**
      * Get the value of id.
-     *
-     * @return int
      */
     public function getId(): ?int
     {
@@ -103,8 +97,6 @@ class Comment
 
     /**
      * Get the value of body.
-     *
-     * @return string
      */
     public function getBody(): ?string
     {
@@ -123,8 +115,6 @@ class Comment
 
     /**
      * Get the value of author.
-     *
-     * @return string
      */
     public function getAuthor(): ?string
     {
@@ -161,8 +151,6 @@ class Comment
 
     /**
      * Get the value of post_id.
-     *
-     * @return int
      */
     public function getPostId(): ?int
     {

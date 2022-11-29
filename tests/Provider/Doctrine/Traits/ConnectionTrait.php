@@ -65,6 +65,9 @@ trait ConnectionTrait
         return DriverManager::getConnection($params, $config);
     }
 
+    /**
+     * @return array<string, string>
+     */
     private static function getConnectionParameters(?array $params = null): array
     {
         if (null === $params && !isset(
@@ -103,9 +106,10 @@ trait ConnectionTrait
     {
         try {
             $schemaManager->dropDatabase($dbname);
-        } catch (Throwable $exception) {
+        } catch (Throwable) {
             // do nothing
         }
+
         $schemaManager->createDatabase($dbname);
     }
 }

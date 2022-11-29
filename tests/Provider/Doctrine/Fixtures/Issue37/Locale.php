@@ -18,13 +18,13 @@ class Locale
      * @ORM\Column(type="string", length=5)
      */
     #[ORM\Id, ORM\Column(type: 'string', length: 5)]
-    protected $id;
+    protected string $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
     #[ORM\Column(type: 'string', length: 255)]
-    protected $name;
+    protected string $name;
 
     public function __sleep()
     {

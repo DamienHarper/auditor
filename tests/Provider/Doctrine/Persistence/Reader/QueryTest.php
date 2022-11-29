@@ -29,7 +29,7 @@ final class QueryTest extends TestCase
         $query = new Query('author_audit', $this->createConnection());
 
         $filters = $query->getFilters();
-        foreach ($filters as $filter => $values) {
+        foreach ($filters as $values) {
             self::assertSame([], $values, 'No filter by default.');
         }
     }

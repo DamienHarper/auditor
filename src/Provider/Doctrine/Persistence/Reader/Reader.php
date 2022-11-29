@@ -21,6 +21,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class Reader
 {
+    /**
+     * @var int
+     */
     public const PAGE_SIZE = 50;
 
     private DoctrineProvider $provider;
@@ -104,8 +107,8 @@ class Reader
             ->setAllowedTypes('page', ['null', 'int'])
             ->setAllowedTypes('page_size', ['null', 'int'])
             ->setAllowedTypes('strict', ['null', 'bool'])
-            ->setAllowedValues('page', static fn ($value) => null === $value || $value >= 1)
-            ->setAllowedValues('page_size', static fn ($value) => null === $value || $value >= 1)
+            ->setAllowedValues('page', static fn ($value): bool => null === $value || $value >= 1)
+            ->setAllowedValues('page_size', static fn ($value): bool => null === $value || $value >= 1)
         ;
     }
 
@@ -120,13 +123,13 @@ class Reader
         $results = [];
 
         $entities = $configuration->getEntities();
-        foreach ($entities as $entity => $tablename) {
+        foreach (array_keys($entities) as $entity) {
             try {
                 $audits = $this->createQuery($entity, ['transaction_hash' => $transactionHash])->execute();
-                if (\count($audits) > 0) {
+                if ([] !== $audits) {
                     $results[$entity] = $audits;
                 }
-            } catch (AccessDeniedException $e) {
+            } catch (AccessDeniedException) {
                 // acces denied
             }
         }

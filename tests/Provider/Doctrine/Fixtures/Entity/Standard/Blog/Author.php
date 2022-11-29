@@ -25,19 +25,19 @@ class Author implements Stringable
     #[ORM\Id]
     #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
-    protected $id;
+    protected ?int $id = null;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
     #[ORM\Column(type: 'string', length: 255)]
-    protected $fullname;
+    protected ?string $fullname = null;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
     #[ORM\Column(type: 'string', length: 255)]
-    protected $email;
+    protected ?string $email = null;
 
     /**
      * @ORM\OneToMany(targetEntity="Post", mappedBy="author", cascade={"persist", "remove"})
@@ -45,7 +45,7 @@ class Author implements Stringable
      */
     #[ORM\OneToMany(targetEntity: 'Post', mappedBy: 'author', cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'id', referencedColumnName: 'author_id', nullable: true)]
-    protected $posts;
+    protected \Doctrine\Common\Collections\Collection $posts;
 
     public function __construct()
     {
@@ -74,8 +74,6 @@ class Author implements Stringable
 
     /**
      * Get the value of id.
-     *
-     * @return int
      */
     public function getId(): ?int
     {
@@ -94,8 +92,6 @@ class Author implements Stringable
 
     /**
      * Get the value of fullname.
-     *
-     * @return string
      */
     public function getFullname(): ?string
     {
@@ -114,8 +110,6 @@ class Author implements Stringable
 
     /**
      * Get the value of email.
-     *
-     * @return string
      */
     public function getEmail(): ?string
     {

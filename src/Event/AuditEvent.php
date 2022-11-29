@@ -21,7 +21,7 @@ abstract class AuditEvent extends Event
         $this->payload = $payload;
     }
 
-    final public function setPayload(array $payload): Event
+    final public function setPayload(array $payload): self
     {
         if (!SchemaHelper::isValidPayload($payload)) {
             throw new InvalidArgumentException('Invalid payload.');

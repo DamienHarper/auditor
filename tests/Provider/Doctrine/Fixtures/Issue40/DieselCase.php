@@ -39,10 +39,8 @@ class DieselCase
 
     /**
      * Set the value of name.
-     *
-     * @param mixed $name
      */
-    public function setName($name): void
+    public function setName(mixed $name): void
     {
         $this->name = $name;
     }

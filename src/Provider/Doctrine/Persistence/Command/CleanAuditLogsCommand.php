@@ -12,7 +12,6 @@ use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
@@ -30,6 +29,9 @@ class CleanAuditLogsCommand extends Command
 {
     use LockableTrait;
 
+    /**
+     * @var string
+     */
     private const UNTIL_DATE_FORMAT = 'Y-m-d H:i:s';
 
     private Auditor $auditor;
@@ -70,9 +72,10 @@ class CleanAuditLogsCommand extends Command
 
         $keep = $input->getArgument('keep');
         $keep = (\is_array($keep) ? $keep[0] : $keep);
+
         $until = $this->validateKeepArgument($keep, $io);
 
-        if (null === $until) {
+        if (!$until instanceof DateTimeImmutable) {
             return 0;
         }
 
@@ -88,8 +91,8 @@ class CleanAuditLogsCommand extends Command
 
         // Collect auditable classes from auditing storage managers
         $repository = $schemaManager->collectAuditableEntities();
-        foreach ($repository as $name => $entities) {
-            $count += \count($entities);
+        foreach ($repository as $entities) {
+            $count += is_countable($entities) ? \count($entities) : 0;
         }
 
         $message = sprintf(
@@ -120,9 +123,6 @@ class CleanAuditLogsCommand extends Command
                     $connection = $storageServices[$name]->getEntityManager()->getConnection();
                     $auditTable = $schemaManager->resolveAuditTableName($entities[$entity], $configuration, $connection->getDatabasePlatform());
 
-                    /**
-                     * @var QueryBuilder
-                     */
                     $queryBuilder = $connection->createQueryBuilder();
                     $queryBuilder
                         ->delete($auditTable)
@@ -138,7 +138,7 @@ class CleanAuditLogsCommand extends Command
                         DoctrineHelper::executeStatement($queryBuilder);
                     }
 
-                    $progressBar->setMessage("Cleaning audit tables... (<info>{$auditTable}</info>)");
+                    $progressBar->setMessage(sprintf('Cleaning audit tables... (<info>%s</info>)', $auditTable));
                     $progressBar->advance();
                 }
             }
@@ -172,8 +172,8 @@ class CleanAuditLogsCommand extends Command
     {
         try {
             $dateInterval = new DateInterval($keep);
-        } catch (Exception $e) {
-            $io->error(sprintf("'keep' argument must be a valid ISO 8601 date interval, '%s' given.", (string) $keep));
+        } catch (Exception) {
+            $io->error(sprintf("'keep' argument must be a valid ISO 8601 date interval, '%s' given.", $keep));
             $this->release();
 
             return null;

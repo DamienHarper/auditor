@@ -62,7 +62,7 @@ final class SchemaManager2AEM1SEMTest extends TestCase
             'sem1' => ['post__tag'],
         ];
         $entities = $configuration->getEntities();
-        foreach ($entities as $entity => $entityOptions) {
+        foreach ($entities as $entityOptions) {
             if (!\in_array($entityOptions['computed_table_name'], $expected['sem1'], true)) {
                 $expected['sem1'][] = $entityOptions['computed_table_name'];
             }
@@ -71,6 +71,7 @@ final class SchemaManager2AEM1SEMTest extends TestCase
                 $expected['sem1'][] = $entityOptions['computed_audit_table_name'];
             }
         }
+
         sort($expected['sem1']);
 
         /**
@@ -80,7 +81,7 @@ final class SchemaManager2AEM1SEMTest extends TestCase
         foreach ($storageServices as $name => $storageService) {
             $connection = $storageService->getEntityManager()->getConnection();
             $schemaManager = DoctrineHelper::createSchemaManager($connection);
-            $tables = array_map(static fn ($t) => $t->getName(), $schemaManager->listTables());
+            $tables = array_map(static fn ($t): string => $t->getName(), $schemaManager->listTables());
             sort($tables);
             self::assertSame($expected[$name], $tables, 'Schema of "'.$name.'" is correct.');
         }

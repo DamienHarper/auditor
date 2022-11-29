@@ -29,38 +29,38 @@ class Post implements Stringable
     #[ORM\Id]
     #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
-    protected $id;
+    protected ?int $id = null;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
     #[ORM\Column(type: 'string', length: 255)]
-    protected $title;
+    protected ?string $title = null;
 
     /**
      * @ORM\Column(type="text")
      */
     #[ORM\Column(type: 'text')]
-    protected $body;
+    protected ?string $body = null;
 
     /**
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
      */
     #[ORM\Column(type: 'datetime')]
-    protected $created_at;
+    protected ?DateTimeImmutable $created_at = null;
 
     /**
      * @ORM\Column(type="datetime", nullable=true, options={"default": NULL})
      */
     #[ORM\Column(type: 'datetime', nullable: true, options: ['default' => 'NULL'])]
-    protected $deleted_at;
+    protected ?DateTimeImmutable $deleted_at = null;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned": true}, nullable=true)
      */
     #[ORM\Column(type: 'integer', options: ['unsigned' => true], nullable: true)]
-    protected $author_id;
+    protected ?int $author_id = null;
 
     /**
      * @ORM\OneToMany(targetEntity="Comment", mappedBy="post", cascade={"persist", "remove"})
@@ -68,7 +68,7 @@ class Post implements Stringable
      */
     #[ORM\OneToMany(targetEntity: 'Comment', mappedBy: 'post', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'id', referencedColumnName: 'post_id', nullable: true)]
-    protected $comments;
+    protected \Doctrine\Common\Collections\Collection $comments;
 
     /**
      * @ORM\ManyToOne(targetEntity="Author", inversedBy="posts", cascade={"persist", "remove"})
@@ -76,7 +76,7 @@ class Post implements Stringable
      */
     #[ORM\ManyToOne(targetEntity: 'Author', inversedBy: 'posts', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id', nullable: true)]
-    protected $author;
+    protected ?\DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author $author = null;
 
     /**
      * @ORM\ManyToOne(targetEntity="Author", inversedBy="posts", cascade={"persist", "remove"})
@@ -84,7 +84,7 @@ class Post implements Stringable
      */
     #[ORM\ManyToOne(targetEntity: 'Author', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'coauthor_id', referencedColumnName: 'id', nullable: true)]
-    protected $coauthor;
+    protected ?\DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author $coauthor = null;
 
     /**
      * @ORM\ManyToMany(targetEntity="Tag", inversedBy="posts", cascade={"persist", "remove"})
@@ -95,7 +95,7 @@ class Post implements Stringable
      */
     #[ORM\ManyToMany(targetEntity: 'Tag', inversedBy: 'posts', cascade: ['persist', 'remove'])]
 //    #[ORM\JoinTable(name: 'post__tag', joinColumns: [new ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id', nullable: false)], inverseJoinColumns: [new ORM\JoinColumn(name: 'tag_id', referencedColumnName: 'id', nullable: false)])]
-    protected $tags;
+    protected \Doctrine\Common\Collections\Collection $tags;
 
     public function __construct()
     {
@@ -125,8 +125,6 @@ class Post implements Stringable
 
     /**
      * Get the value of id.
-     *
-     * @return int
      */
     public function getId(): ?int
     {
@@ -145,8 +143,6 @@ class Post implements Stringable
 
     /**
      * Get the value of title.
-     *
-     * @return string
      */
     public function getTitle(): ?string
     {
@@ -165,8 +161,6 @@ class Post implements Stringable
 
     /**
      * Get the value of body.
-     *
-     * @return string
      */
     public function getBody(): ?string
     {
@@ -223,8 +217,6 @@ class Post implements Stringable
 
     /**
      * Get the value of author_id.
-     *
-     * @return int
      */
     public function getAuthorId(): ?int
     {

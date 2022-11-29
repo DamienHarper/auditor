@@ -20,10 +20,7 @@ abstract class PlatformHelper
         if (
             !isset($columns[$name])
             || $columns[$name]['type'] !== DoctrineHelper::getDoctrineType('STRING')
-            || (
-                isset($columns[$name]['options'], $columns[$name]['options']['length'])
-                && $columns[$name]['options']['length'] < 191
-            )
+            || (isset($columns[$name]['options']['length']) && $columns[$name]['options']['length'] < 191)
         ) {
             return false;
         }
@@ -39,7 +36,7 @@ abstract class PlatformHelper
             return true;
         }
 
-        return (bool) (!$mariadb && version_compare(self::getOracleMysqlVersionNumber($version), '5.7.7', '<'));
+        return !$mariadb && version_compare(self::getOracleMysqlVersionNumber($version), '5.7.7', '<');
     }
 
     public static function getServerVersion(Connection $connection): ?string
@@ -81,7 +78,7 @@ abstract class PlatformHelper
     public static function getOracleMysqlVersionNumber(string $versionString): string
     {
         preg_match(
-            '/^(?P<major>\d+)(?:\.(?P<minor>\d+)(?:\.(?P<patch>\d+))?)?/',
+            '#^(?P<major>\d+)(?:\.(?P<minor>\d+)(?:\.(?P<patch>\d+))?)?#',
             $versionString,
             $versionParts
         );
@@ -108,7 +105,7 @@ abstract class PlatformHelper
     public static function getMariaDbMysqlVersionNumber(string $versionString): string
     {
         preg_match(
-            '/^(?:5\.5\.5-)?(mariadb-)?(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)/i',
+            '#^(?:5\.5\.5-)?(mariadb-)?(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)#i',
             $versionString,
             $versionParts
         );

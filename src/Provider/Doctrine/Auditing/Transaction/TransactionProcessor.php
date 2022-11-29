@@ -76,7 +76,7 @@ class TransactionProcessor implements TransactionProcessorInterface
         $diff = $this->diff($entityManager, $entity, $ch);
         unset($diff['@source']);
 
-        if (0 === \count($diff)) {
+        if ([] === $diff) {
             return; // if there is no entity diff, do not log it
         }
 
@@ -96,10 +96,8 @@ class TransactionProcessor implements TransactionProcessorInterface
 
     /**
      * Adds a remove entry to the audit table.
-     *
-     * @param mixed $id
      */
-    private function remove(EntityManagerInterface $entityManager, object $entity, $id, string $transactionHash): void
+    private function remove(EntityManagerInterface $entityManager, object $entity, mixed $id, string $transactionHash): void
     {
         $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
         $this->audit([

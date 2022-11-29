@@ -21,12 +21,39 @@ use Exception;
  */
 class Query
 {
+    /**
+     * @var string
+     */
     public const TYPE = 'type';
+
+    /**
+     * @var string
+     */
     public const CREATED_AT = 'created_at';
+
+    /**
+     * @var string
+     */
     public const TRANSACTION_HASH = 'transaction_hash';
+
+    /**
+     * @var string
+     */
     public const OBJECT_ID = 'object_id';
+
+    /**
+     * @var string
+     */
     public const USER_ID = 'blame_id';
+
+    /**
+     * @var string
+     */
     public const ID = 'id';
+
+    /**
+     * @var string
+     */
     public const DISCRIMINATOR = 'discriminator';
 
     private array $filters = [];
@@ -51,16 +78,13 @@ class Query
         }
     }
 
+    /**
+     * @return array<Entry>
+     */
     public function execute(): array
     {
         $queryBuilder = $this->buildQueryBuilder();
-        if (method_exists($queryBuilder, 'executeQuery')) {
-            // doctrine/dbal v3.x
-            $statement = $queryBuilder->executeQuery();
-        } else {
-            // doctrine/dbal v2.13.x
-            $statement = $queryBuilder->execute();
-        }
+        $statement = method_exists($queryBuilder, 'executeQuery') ? $queryBuilder->executeQuery() : $queryBuilder->execute();
 
         $result = [];
         \assert($statement instanceof Result);
@@ -97,7 +121,7 @@ class Query
                     ->fetchColumn(0)
                 ;
             }
-        } catch (Exception $e) {
+        } catch (Exception) {
             $result = false;
         }
 
@@ -137,6 +161,7 @@ class Query
         if (0 > $limit) {
             throw new InvalidArgumentException('Limit cannot be negative.');
         }
+
         if (0 > $offset) {
             throw new InvalidArgumentException('Offset cannot be negative.');
         }
@@ -162,6 +187,9 @@ class Query
         return $this->orderBy;
     }
 
+    /**
+     * @return array<int>
+     */
     public function getLimit(): array
     {
         return [$this->limit, $this->offset];
@@ -190,11 +218,11 @@ class Query
         $grouped = [];
 
         foreach ($filters as $filter) {
-            $class = \get_class($filter);
-            if (!isset($grouped[$class])) {
-                $grouped[$class] = [];
+            if (!isset($grouped[$filter::class])) {
+                $grouped[$filter::class] = [];
             }
-            $grouped[$class][] = $filter;
+
+            $grouped[$filter::class][] = $filter;
         }
 
         return $grouped;
@@ -275,6 +303,7 @@ class Query
         if (0 < $this->limit) {
             $queryBuilder->setMaxResults($this->limit);
         }
+
         if (0 < $this->offset) {
             $queryBuilder->setFirstResult($this->offset);
         }

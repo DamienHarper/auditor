@@ -19,7 +19,7 @@ class DataObject
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer', options: ['unsigned' => true])]
-    protected $id;
+    protected int $id;
 
     /**
      * @ORM\Column(type="binary")
@@ -57,10 +57,8 @@ class DataObject
 
     /**
      * Set the value of data.
-     *
-     * @param mixed $data
      */
-    public function setData($data): self
+    public function setData(mixed $data): self
     {
         $this->data = $data;
 

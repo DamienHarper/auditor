@@ -24,7 +24,6 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use DH\Auditor\Tests\Traits\ReflectionTrait;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
@@ -80,7 +79,7 @@ final class SchemaManagerTest extends TestCase
         // create audit table for Author entity
         $this->doConfigureEntities();
         $toSchema = $updater->createAuditTable(Author::class);
-        $this->migrate($fromSchema, $toSchema, $entityManager, $storageConnection->getDatabasePlatform());
+        $this->migrate($fromSchema, $toSchema, $entityManager);
 
         // check audit table has been created
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
@@ -88,7 +87,7 @@ final class SchemaManagerTest extends TestCase
 
         // check expected columns
         $expected = SchemaHelper::getAuditTableColumns();
-        foreach ($expected as $name => $options) {
+        foreach (array_keys($expected) as $name) {
             self::assertTrue($authorAuditTable->hasColumn($name), 'audit table has a column named "'.$name.'".');
         }
 
@@ -123,7 +122,7 @@ final class SchemaManagerTest extends TestCase
         // create audit table for Author entity
         $this->doConfigureEntities();
         $toSchema = $updater->createAuditTable(Author::class);
-        $this->migrate($fromSchema, $toSchema, $entityManager, $storageConnection->getDatabasePlatform());
+        $this->migrate($fromSchema, $toSchema, $entityManager);
 
         // new/alternate structure
         $alternateColumns = [
@@ -236,12 +235,12 @@ final class SchemaManagerTest extends TestCase
         $reflectedMethod = $this->reflectMethod($updater, 'processIndices');
         $reflectedMethod->invokeArgs($updater, [$table, $alternateIndices, $entityManager->getConnection()]);
 
-        $this->migrate($fromSchema, $toSchema, $entityManager, $storageConnection->getDatabasePlatform());
+        $this->migrate($fromSchema, $toSchema, $entityManager);
 
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
 
         // check expected alternate columns
-        foreach ($alternateColumns as $name => $options) {
+        foreach (array_keys($alternateColumns) as $name) {
             self::assertTrue($authorAuditTable->hasColumn($name), 'audit table has a column named "'.$name.'".');
         }
 
@@ -258,12 +257,12 @@ final class SchemaManagerTest extends TestCase
         $fromSchema = DoctrineHelper::introspectSchema($schemaManager);
 
         $toSchema = $updater->updateAuditTable(Author::class);
-        $this->migrate($fromSchema, $toSchema, $entityManager, $storageConnection->getDatabasePlatform());
+        $this->migrate($fromSchema, $toSchema, $entityManager);
 
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
 
         // check expected columns
-        foreach (SchemaHelper::getAuditTableColumns() as $name => $options) {
+        foreach (array_keys(SchemaHelper::getAuditTableColumns()) as $name) {
             self::assertTrue($authorAuditTable->hasColumn($name), 'audit table has a column named "'.$name.'".');
         }
 
@@ -277,7 +276,7 @@ final class SchemaManagerTest extends TestCase
         }
     }
 
-    private function migrate(Schema $fromSchema, Schema $toSchema, EntityManagerInterface $entityManager, AbstractPlatform $platform): void
+    private function migrate(Schema $fromSchema, Schema $toSchema, EntityManagerInterface $entityManager): void
     {
         $sqls = DoctrineHelper::getMigrateToSql($entityManager->getConnection(), $fromSchema, $toSchema);
         foreach ($sqls as $sql) {

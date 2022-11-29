@@ -27,6 +27,7 @@ class Logger implements SQLLogger
         if ('"COMMIT"' === $sql) {
             ($this->flusher)();
         }
+
         // on rollback remove flusher callback
         if ('"ROLLBACK"' === $sql) {
             $this->flusher = static function (): void {};

@@ -33,14 +33,12 @@ final class DoctrineHelper
      *
      * @param object|string $subject
      *
-     * @return string
-     *
      * credits
      * https://github.com/api-platform/core/blob/master/src/Util/ClassInfoTrait.php
      */
-    public static function getRealClassName($subject): string
+    public static function getRealClassName(object|string $subject): string
     {
-        $subject = \is_object($subject) ? \get_class($subject) : $subject;
+        $subject = \is_object($subject) ? $subject::class : $subject;
 
         // __CG__: Doctrine Common Marker for Proxy (ODM < 2.0 and ORM < 3.0)
         // __PM__: Ocramius Proxy Manager (ODM >= 2.0)
@@ -49,9 +47,11 @@ final class DoctrineHelper
         if (false === $positionCg && false === $positionPm) {
             return $subject;
         }
+
         if (false !== $positionCg) {
             return mb_substr($subject, $positionCg + 8);
         }
+
         $className = ltrim($subject, '\\');
 
         return mb_substr(
@@ -73,11 +73,9 @@ final class DoctrineHelper
     }
 
     /**
-     * @param QueryBuilder|Statement $statement
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public static function executeStatement($statement): void
+    public static function executeStatement(QueryBuilder|Statement $statement): void
     {
         if (method_exists($statement, 'executeStatement')) {
             $statement->executeStatement();
@@ -87,13 +85,9 @@ final class DoctrineHelper
     }
 
     /**
-     * @param QueryBuilder|Statement $statement
-     *
-     * @return int|Result|string
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public static function executeQuery($statement)
+    public static function executeQuery(QueryBuilder|Statement $statement): int|Result|string
     {
         if (method_exists($statement, 'executeQuery')) {
             return $statement->executeQuery();

@@ -29,6 +29,7 @@ final class Issue112Test extends TestCase
         $entityManager = $this->createEntityManager();
         $entity = new DummyEntity();
         $entity->setPrimaryKey(2);
+
         $data = $this->summarize($entityManager, $entity);
         self::assertSame('primaryKey', $data['pkName']);
     }

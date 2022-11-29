@@ -19,19 +19,19 @@ class User
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer', options: ['unsigned' => true])]
-    protected $id;
+    protected int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
     #[ORM\Column(type: 'string', length: 255)]
-    protected $username;
+    protected string $username;
 
     /**
      * @ORM\Column(type="string", nullable=true, length=5)
      */
     #[ORM\Column(type: 'string', nullable: true, length: 5)]
-    protected $locale_id;
+    protected ?string $locale_id = null;
 
     /**
      * @ORM\ManyToOne(targetEntity="Locale", cascade={"persist", "remove"})
@@ -39,7 +39,7 @@ class User
      */
     #[ORM\ManyToOne(targetEntity: 'Locale', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'locale_id', referencedColumnName: 'id', nullable: true)]
-    protected $locale;
+    protected ?Locale $locale = null;
 
     /**
      * Get the value of id.
@@ -91,8 +91,6 @@ class User
 
     /**
      * Get the value of locale_id.
-     *
-     * @return string
      */
     public function getLocaleId(): ?string
     {
@@ -101,8 +99,6 @@ class User
 
     /**
      * Set Locale entity (many to one).
-     *
-     * @param ?Locale $locale
      */
     public function setLocale(?Locale $locale): self
     {
@@ -113,8 +109,6 @@ class User
 
     /**
      * Get Locale entity (many to one).
-     *
-     * @return ?Locale
      */
     public function getLocale(): ?Locale
     {

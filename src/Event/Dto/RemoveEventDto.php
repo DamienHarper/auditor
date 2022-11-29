@@ -20,10 +20,7 @@ final class RemoveEventDto extends AbstractEventDto
         $this->id = $id;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getId()
+    public function getId(): mixed
     {
         return $this->id;
     }

@@ -30,6 +30,7 @@ final class Issue98Test extends TestCase
         $em = $this->provider->getStorageServiceForEntity(Issue98::class)->getEntityManager();
         $entity = new Issue98();
         $entity->setData(fopen('data://text/plain,true', 'r'));
+
         $em->persist($entity);
         $em->flush();
 
