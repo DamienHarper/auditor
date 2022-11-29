@@ -26,8 +26,8 @@ return static function (RectorConfig $rectorConfig): void {
         SetList::CODE_QUALITY,
         SetList::DEAD_CODE,
         SetList::CODING_STYLE,
-//        SetList::TYPE_DECLARATION,
-//        SetList::TYPE_DECLARATION_STRICT,
+        //        SetList::TYPE_DECLARATION,
+        //        SetList::TYPE_DECLARATION_STRICT,
     ]);
 
     // Doctrine rules
