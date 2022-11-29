@@ -20,7 +20,7 @@ class DieselCase
     #[ORM\Column(type: Types::STRING, length: 50)]
     protected ?string $name = null;
 
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }

@@ -12,6 +12,8 @@ use Rector\Set\ValueObject\SetList;
 use Rector\Symfony\Rector\Class_\MakeCommandLazyRector;
 use Rector\Symfony\Set\SymfonySetList;
 use Rector\Transform\Rector\Attribute\AttributeKeyToClassConstFetchRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\AddArrayParamDocTypeRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\AddArrayReturnDocTypeRector;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([__DIR__.'/src', __DIR__.'/tests']);
@@ -24,6 +26,8 @@ return static function (RectorConfig $rectorConfig): void {
         RemoveUnusedPrivatePropertyRector::class,
         AttributeKeyToClassConstFetchRector::class,
         MakeCommandLazyRector::class,
+        AddArrayReturnDocTypeRector::class,
+        AddArrayParamDocTypeRector::class,
     ]);
 
     // PHP rules
@@ -32,12 +36,11 @@ return static function (RectorConfig $rectorConfig): void {
         SetList::CODE_QUALITY,
         SetList::DEAD_CODE,
         SetList::CODING_STYLE,
-        //        SetList::TYPE_DECLARATION,
-        //        SetList::TYPE_DECLARATION_STRICT,
+        SetList::TYPE_DECLARATION,
+        SetList::TYPE_DECLARATION_STRICT,
     ]);
 
     // Symfony rules
-//    $rectorConfig->symfonyContainerXml(__DIR__ . '/var/cache/dev/App_KernelDevDebugContainer.xml');
     $rectorConfig->sets([
         SymfonySetList::SYMFONY_54,
         SymfonySetList::SYMFONY_CODE_QUALITY,

@@ -37,12 +37,12 @@ class DummyEntity
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getLabel()
+    public function getLabel(): ?string
     {
         return $this->label;
     }
@@ -90,36 +90,36 @@ class DummyEntity
         return $this;
     }
 
-    public function getIntValue()
+    public function getIntValue(): ?int
     {
         return $this->int_value;
     }
 
-    public function setIntValue($int_value): self
+    public function setIntValue(?int $int_value): self
     {
         $this->int_value = $int_value;
 
         return $this;
     }
 
-    public function getDecimalValue()
+    public function getDecimalValue(): ?string
     {
         return $this->decimal_value;
     }
 
-    public function setDecimalValue($decimal_value): self
+    public function setDecimalValue(?string $decimal_value): self
     {
         $this->decimal_value = $decimal_value;
 
         return $this;
     }
 
-    public function getBoolValue()
+    public function getBoolValue(): ?bool
     {
         return $this->bool_value;
     }
 
-    public function setBoolValue($bool_value): self
+    public function setBoolValue(?bool $bool_value): self
     {
         $this->bool_value = $bool_value;
 
