@@ -2,7 +2,7 @@ name: auditor 1.x CI
 
 on:
   schedule:
-    - cron: 0 1 * * *
+    - cron: 30 0 * * *
   pull_request:
     branches:
       - 1.x
