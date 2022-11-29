@@ -9,6 +9,9 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use ReflectionClass;
 
+/**
+ * @see \DH\Auditor\Tests\Provider\Doctrine\Auditing\Annotation\AnnotationLoaderTest
+ */
 class AnnotationLoader
 {
     private EntityManagerInterface $entityManager;
