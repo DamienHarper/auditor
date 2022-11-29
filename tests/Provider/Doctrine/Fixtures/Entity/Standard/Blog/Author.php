@@ -6,46 +6,28 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="author")
- */
 #[ORM\Entity]
 #[ORM\Table(name: 'author')]
 class Author implements Stringable
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", options={"unsigned": true})
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
     #[ORM\Id]
-    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true])]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     protected ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     protected ?string $fullname = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     protected ?string $email = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity="Post", mappedBy="author", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(name="id", referencedColumnName="author_id", nullable=false)
-     */
-    #[ORM\OneToMany(targetEntity: 'Post', mappedBy: 'author', cascade: ['persist'])]
-    #[ORM\JoinColumn(name: 'id', referencedColumnName: 'author_id', nullable: true)]
-    protected \Doctrine\Common\Collections\Collection $posts;
+    #[ORM\OneToMany(targetEntity: 'Post', mappedBy: 'author', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'id', referencedColumnName: 'author_id', nullable: false)]
+    protected Collection $posts;
 
     public function __construct()
     {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Auditing\Annotation;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\Mapping\ClassMetadata;
@@ -12,14 +11,11 @@ use ReflectionClass;
 
 class AnnotationLoader
 {
-    private ?AnnotationReader $reader = null;
-
     private EntityManagerInterface $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager, bool $useAttributesOnly = false)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->reader = class_exists(AnnotationReader::class) && !$useAttributesOnly ? new AnnotationReader() : null;
     }
 
     public function load(): array
@@ -45,12 +41,9 @@ class AnnotationLoader
         $reflection = $metadata->getReflectionClass();
 
         // Check that we have an Entity annotation or attribute
-        // TODO: only rely on PHP attributes for next major release
-        $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Entity::class) : null;
+        $attributes = $reflection->getAttributes(Entity::class);
         if (\is_array($attributes) && [] !== $attributes) {
             $annotation = $attributes[0]->newInstance();
-        } elseif (null !== $this->reader) {
-            $annotation = $this->reader->getClassAnnotation($reflection, Entity::class);
         }
 
         if (null === $annotation) {
@@ -58,12 +51,9 @@ class AnnotationLoader
         }
 
         // Check that we have an Auditable annotation or attribute
-        // TODO: only rely on PHP attributes for next major release
-        $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Auditable::class) : null;
+        $attributes = $reflection->getAttributes(Auditable::class);
         if (\is_array($attributes) && [] !== $attributes) {
             $auditableAnnotation = $attributes[0]->newInstance();
-        } elseif (null !== $this->reader) {
-            $auditableAnnotation = $this->reader->getClassAnnotation($reflection, Auditable::class);
         }
 
         if (null === $auditableAnnotation) {
@@ -71,12 +61,9 @@ class AnnotationLoader
         }
 
         // Check that we have a Security annotation or attribute
-        // TODO: only rely on PHP attributes for next major release
-        $attributes = \PHP_VERSION_ID >= 80000 && method_exists($reflection, 'getAttributes') ? $reflection->getAttributes(Security::class) : null;
+        $attributes = $reflection->getAttributes(Security::class);
         if (\is_array($attributes) && [] !== $attributes) {
             $securityAnnotation = $attributes[0]->newInstance();
-        } elseif (null !== $this->reader) {
-            $securityAnnotation = $this->reader->getClassAnnotation($reflection, Security::class);
         }
 
         $roles = null === $securityAnnotation ? null : [Security::VIEW_SCOPE => $securityAnnotation->view];
@@ -97,12 +84,9 @@ class AnnotationLoader
         $properties = [];
 
         foreach ($reflection->getProperties() as $property) {
-            // TODO: only rely on PHP attributes for next major release
-            $attributes = \PHP_VERSION_ID >= 80000 && method_exists($property, 'getAttributes') ? $property->getAttributes(Ignore::class) : null;
+            $attributes = $property->getAttributes(Ignore::class);
             if (\is_array($attributes) && [] !== $attributes) {
                 $annotationProperty = $attributes[0]->newInstance();
-            } elseif (null !== $this->reader) {
-                $annotationProperty = $this->reader->getPropertyAnnotation($property, Ignore::class);
             }
 
             if (null !== $annotationProperty) {

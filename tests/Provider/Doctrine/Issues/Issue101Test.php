@@ -62,8 +62,7 @@ final class Issue101Test extends TestCase
                 __DIR__.'/../Fixtures/Issue101',
             ],
             'default',
-            null,
-            true
+            null
         );
 
         $this->provider->registerStorageService(new StorageService('default', $entityManager));

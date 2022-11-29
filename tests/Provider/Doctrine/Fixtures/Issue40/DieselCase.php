@@ -4,42 +4,27 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue40;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\HasLifecycleCallbacks
- * @ORM\Table(name="case_diesel")
- */
-#[ORM\Entity, ORM\HasLifecycleCallbacks, ORM\Table(name: 'case_diesel')]
+#[ORM\Entity]
+#[ORM\Table(name: 'case_diesel')]
+#[ORM\HasLifecycleCallbacks]
 class DieselCase
 {
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="CoreCase", cascade={"persist"})
-     * @ORM\JoinColumn(name="core_case", referencedColumnName="id")
-     */
-    #[ORM\Id, ORM\ManyToOne(targetEntity: 'CoreCase', cascade: ['persist'])]
-    #[ORM\JoinColumn(name: 'core_case', referencedColumnName: 'id')]
-    public $coreCase;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: 'CoreCase', cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'core_case')]
+    public ?CoreCase $coreCase = null;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
-    #[ORM\Column(type: 'string', length: 50)]
-    protected $name;
+    #[ORM\Column(type: Types::STRING, length: 50)]
+    protected ?string $name = null;
 
-    /**
-     * Get the value of name.
-     */
     public function getName()
     {
         return $this->name;
     }
 
-    /**
-     * Set the value of name.
-     */
     public function setName(mixed $name): void
     {
         $this->name = $name;
