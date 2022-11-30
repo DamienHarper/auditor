@@ -19,7 +19,6 @@ use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Provider\ProviderInterface;
 use DH\Auditor\Provider\Service\AuditingServiceInterface;
-use DH\Auditor\Provider\Service\StorageServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 
@@ -60,7 +59,7 @@ class DoctrineProvider extends AbstractProvider
         return \count($this->getStorageServices()) > 1;
     }
 
-    public function getAuditingServiceForEntity(string $entity): AuditingServiceInterface
+    public function getAuditingServiceForEntity(string $entity): AuditingService
     {
         foreach ($this->auditingServices as $service) {
             \assert($service instanceof AuditingService);   // helps PHPStan
@@ -77,7 +76,7 @@ class DoctrineProvider extends AbstractProvider
         throw new InvalidArgumentException(sprintf('Auditing service not found for "%s".', $entity));
     }
 
-    public function getStorageServiceForEntity(string $entity): StorageServiceInterface
+    public function getStorageServiceForEntity(string $entity): StorageService
     {
         $this->checkStorageMapper();
 
@@ -86,7 +85,10 @@ class DoctrineProvider extends AbstractProvider
 
         if (null === $storageMapper || 1 === \count($this->getStorageServices())) {
             // No mapper and only 1 storage entity manager
-            return array_values($this->getStorageServices())[0];
+            /** @var array<StorageService> $services */
+            $services = $this->getStorageServices();
+
+            return array_values($services)[0];
         }
 
         \assert(\is_callable($storageMapper));   // helps PHPStan

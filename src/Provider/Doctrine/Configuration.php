@@ -8,6 +8,8 @@ use DH\Auditor\Provider\ConfigurationInterface;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
+use DH\Auditor\Provider\Service\AuditingServiceInterface;
+use DH\Auditor\Provider\Service\StorageServiceInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -21,18 +23,27 @@ class Configuration implements ConfigurationInterface
 
     private string $tableSuffix;
 
-    private array $ignoredColumns;
+    /**
+     * @var array<string>
+     */
+    private array $ignoredColumns = [];
 
     private ?array $entities = null;
 
+    /**
+     * @var array<StorageServiceInterface>
+     */
     private array $storageServices = [];
 
+    /**
+     * @var array<AuditingServiceInterface>
+     */
     private array $auditingServices = [];
 
     private bool $isViewerEnabled;
 
     /**
-     * @var callable
+     * @var null|callable
      */
     private $storageMapper;
 
@@ -167,7 +178,7 @@ class Configuration implements ConfigurationInterface
         if (null !== $this->provider) {
             $schemaManager = new SchemaManager($this->provider);
 
-            /** @var AuditingService[] $auditingServices */
+            /** @var array<AuditingService> $auditingServices */
             $auditingServices = $this->provider->getAuditingServices();
             foreach ($auditingServices as $auditingService) {
                 $entityManager = $auditingService->getEntityManager();

@@ -16,17 +16,17 @@ class Configuration
     private string $timezone;
 
     /**
-     * @var callable
+     * @var null|callable
      */
     private $userProvider;
 
     /**
-     * @var callable
+     * @var null|callable
      */
     private $roleChecker;
 
     /**
-     * @var callable
+     * @var null|callable
      */
     private $securityProvider;
 
