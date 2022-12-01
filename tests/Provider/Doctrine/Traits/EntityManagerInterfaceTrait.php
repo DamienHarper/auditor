@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Gedmo\DoctrineExtensions;
 
 trait EntityManagerInterfaceTrait
 {
@@ -25,10 +23,6 @@ trait EntityManagerInterfaceTrait
             $paths ?? $this->fixturesPath,
             true,
         );
-
-        // TODO: decide if we keep this
-        class_exists(Annotation::class, true);
-        DoctrineExtensions::registerAnnotations();
 
         $connection = $this->getConnection($connectionName, $params);
 
