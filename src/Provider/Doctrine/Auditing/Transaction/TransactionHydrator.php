@@ -86,29 +86,27 @@ class TransactionHydrator implements TransactionHydratorInterface
             if (null !== $owner && $this->provider->isAudited($owner)) {
                 $mapping = $collection->getMapping();
 
-                if (null === $mapping) {
-                    continue;
-                }
-
-                /** @var object $entity */
-                foreach ($collection->getInsertDiff() as $entity) {
-                    if ($this->provider->isAudited($entity)) {
-                        $transaction->associate(
-                            $owner,
-                            $entity,
-                            $mapping,
-                        );
+                if (null !== $mapping) {
+                    /** @var object $entity */
+                    foreach ($collection->getInsertDiff() as $entity) {
+                        if ($this->provider->isAudited($entity)) {
+                            $transaction->associate(
+                                $owner,
+                                $entity,
+                                $mapping,
+                            );
+                        }
                     }
-                }
 
-                /** @var object $entity */
-                foreach ($collection->getDeleteDiff() as $entity) {
-                    if ($this->provider->isAudited($entity) && $collection->getOwner()) {
-                        $transaction->dissociate(
-                            $owner,
-                            $entity,
-                            $mapping,
-                        );
+                    /** @var object $entity */
+                    foreach ($collection->getDeleteDiff() as $entity) {
+                        if ($this->provider->isAudited($entity) && $collection->getOwner()) {
+                            $transaction->dissociate(
+                                $owner,
+                                $entity,
+                                $mapping,
+                            );
+                        }
                     }
                 }
             }
@@ -126,18 +124,16 @@ class TransactionHydrator implements TransactionHydratorInterface
             if (null !== $owner && $this->provider->isAudited($owner)) {
                 $mapping = $collection->getMapping();
 
-                if (null === $mapping) {
-                    continue;
-                }
-
-                /** @var object $entity */
-                foreach ($collection->toArray() as $entity) {
-                    if ($this->provider->isAudited($entity)) {
-                        $transaction->dissociate(
-                            $owner,
-                            $entity,
-                            $mapping,
-                        );
+                if (null !== $mapping) {
+                    /** @var object $entity */
+                    foreach ($collection->toArray() as $entity) {
+                        if ($this->provider->isAudited($entity)) {
+                            $transaction->dissociate(
+                                $owner,
+                                $entity,
+                                $mapping,
+                            );
+                        }
                     }
                 }
             }
