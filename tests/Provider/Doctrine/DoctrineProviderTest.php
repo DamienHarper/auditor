@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine;
 
+use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Exception\ProviderException;
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
 use DH\Auditor\Provider\Doctrine\Configuration;
@@ -82,6 +83,18 @@ final class DoctrineProviderTest extends TestCase
 
         $this->expectException(ProviderException::class);
         $provider->registerAuditingService(new AuditingService('auditingEM_1', $this->createEntityManager()));
+    }
+
+    /**
+     * @depends testRegisterAuditingEntityManager
+     */
+    public function testGetAuditingServiceForEntity(): void
+    {
+        $provider = $this->createUnregisteredDoctrineProvider();
+        $provider->registerAuditingService(new AuditingService('auditingEM', $this->createEntityManager()));
+
+        $this->expectException(InvalidArgumentException::class);
+        $provider->getAuditingServiceForEntity('My\Fake\Entity');
     }
 
     /**
@@ -191,7 +204,7 @@ final class DoctrineProviderTest extends TestCase
         $provider = $this->createUnregisteredDoctrineProvider();
         self::assertFalse($provider->isRegistered(), 'Provider is not registered.');
 
-        self::expectException(Exception::class);
+        $this->expectException(Exception::class);
         $provider->getAuditor();
 
         // registered provider

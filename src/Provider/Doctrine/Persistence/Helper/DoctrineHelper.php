@@ -138,17 +138,6 @@ final class DoctrineHelper
         return Setup::createAttributeMetadataConfiguration($paths, $isDevMode);
     }
 
-    public static function createAnnotationMetadataConfiguration(array $paths, bool $isDevMode = false): Configuration
-    {
-        if (class_exists(ORMSetup::class)) {
-            require_once self::getVendorDir().'/doctrine/orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php';
-
-            return ORMSetup::createAnnotationMetadataConfiguration($paths, $isDevMode);
-        }
-
-        return Setup::createAnnotationMetadataConfiguration($paths, $isDevMode, null, null, false);
-    }
-
     public static function getEntityManagerFromOnFlushEventArgs(OnFlushEventArgs $args): EntityManagerInterface
     {
         return method_exists($args, 'getObjectManager') ? $args->getObjectManager() : $args->getEntityManager();

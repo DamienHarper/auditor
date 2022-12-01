@@ -175,11 +175,6 @@ class DoctrineProvider extends AbstractProvider
 
         $entityOptions = $configuration->getEntities()[$class];
 
-        if (null === $entityOptions) {
-            // no option defined => $entity is audited
-            return true;
-        }
-
         if (isset($entityOptions['enabled'])) {
             return (bool) $entityOptions['enabled'];
         }
@@ -207,11 +202,6 @@ class DoctrineProvider extends AbstractProvider
 
         $class = DoctrineHelper::getRealClassName($entity);
         $entityOptions = $this->configuration->getEntities()[$class];
-
-        if (null === $entityOptions) {
-            // no option defined => $field is audited
-            return true;
-        }
 
         // are columns excluded and is field part of them?
         // yes => $field is not audited
