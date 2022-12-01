@@ -20,6 +20,4 @@ interface TransactionInterface
     public function getAssociated(): array;
 
     public function getDissociated(): array;
-
-    public function trackAuditEvent(string $type, array $data): void;
 }
