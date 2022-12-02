@@ -123,7 +123,7 @@ class Reader
         $results = [];
 
         $entities = $configuration->getEntities();
-        foreach (array_keys($entities) as $entity) {
+        foreach ($entities as $entity => $entityOptions) {
             try {
                 $audits = $this->createQuery($entity, ['transaction_hash' => $transactionHash])->execute();
                 if ([] !== $audits) {

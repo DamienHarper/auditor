@@ -49,6 +49,8 @@ class CreateSchemaListener implements EventSubscriber
                 foreach ($metadata->subClasses as $subClass) {
                     if ($this->provider->isAuditable($subClass)) {
                         $audited = true;
+
+                        break;
                     }
                 }
             }

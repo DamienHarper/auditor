@@ -108,7 +108,6 @@ class CleanAuditLogsCommand extends Command
         if ($confirm) {
             /** @var Configuration $configuration */
             $configuration = $provider->getConfiguration();
-            $entities = $configuration->getEntities();
 
             $progressBar = new ProgressBar($output, $count);
             $progressBar->setBarWidth(70);
@@ -121,7 +120,7 @@ class CleanAuditLogsCommand extends Command
             foreach ($repository as $name => $classes) {
                 foreach ($classes as $entity => $tablename) {
                     $connection = $storageServices[$name]->getEntityManager()->getConnection();
-                    $auditTable = $schemaManager->resolveAuditTableName($entities[$entity], $configuration, $connection->getDatabasePlatform());
+                    $auditTable = $schemaManager->resolveAuditTableName($entity, $configuration, $connection->getDatabasePlatform());
 
                     $queryBuilder = $connection->createQueryBuilder();
                     $queryBuilder
