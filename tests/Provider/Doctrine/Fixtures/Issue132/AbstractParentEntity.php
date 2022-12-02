@@ -8,10 +8,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table('parent_entities')
- * @ORM\InheritanceType('SINGLE_TABLE')
- * @ORM\DiscriminatorColumn('type', 'string)
- * @ORM\DiscriminatorMap(['Dummy' => DummyEntity::class])
+ * @ORM\Table("parent_entities")
+ * @ORM\InheritanceType("SINGLE_TABLE")
+ * @ORM\DiscriminatorColumn(name="type", type="string")
+ * @ORM\DiscriminatorMap({"Dummy": DummyEntity::class})
  */
 #[ORM\Entity]
 #[ORM\Table('parent_entities')]
