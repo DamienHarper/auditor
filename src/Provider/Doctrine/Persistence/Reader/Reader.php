@@ -120,7 +120,7 @@ class Reader
         $results = [];
 
         $entities = $configuration->getEntities();
-        foreach ($entities as $entity => $tablename) {
+        foreach ($entities as $entity => $entityOptions) {
             try {
                 $audits = $this->createQuery($entity, ['transaction_hash' => $transactionHash])->execute();
                 if (\count($audits) > 0) {
