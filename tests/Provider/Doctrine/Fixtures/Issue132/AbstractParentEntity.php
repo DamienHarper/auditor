@@ -25,5 +25,8 @@ abstract class AbstractParentEntity
      * @ORM\Column
      * @ORM\GeneratedValue
      */
+    #[ORM\Id]
+    #[ORM\Column]
+    #[ORM\GeneratedValue]
     private ?int $id = null;
 }
