@@ -68,7 +68,7 @@ final class CleanAuditLogsCommandTest extends TestCase
         foreach ($entities as $entity => $entityOptions) {
             $storageService = $this->provider->getStorageServiceForEntity($entity);
             $platform = $storageService->getEntityManager()->getConnection()->getDatabasePlatform();
-            $expected = 'DELETE FROM '.$schemaManager->resolveAuditTableName($entityOptions, $configuration, $platform);
+            $expected = 'DELETE FROM '.$schemaManager->resolveAuditTableName($entity, $configuration, $platform);
             self::assertStringContainsString($expected, $output);
         }
 

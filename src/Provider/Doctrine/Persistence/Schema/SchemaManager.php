@@ -115,8 +115,6 @@ class SchemaManager
         // Collect auditable entities from auditing entity managers
         $repository = $this->collectAuditableEntities();
 
-        $entities = $configuration->getEntities();
-
         // Compute and collect SQL queries
         $sqls = [];
         foreach ($repository as $name => $classes) {
@@ -130,7 +128,7 @@ class SchemaManager
             foreach ($classes as $entityFQCN => $tableName) {
                 if (!\in_array($entityFQCN, $processed, true)) {
                     /** @var string $auditTablename */
-                    $auditTablename = $this->resolveAuditTableName($entities[$entityFQCN], $configuration, $storageConnection->getDatabasePlatform());
+                    $auditTablename = $this->resolveAuditTableName($entityFQCN, $configuration, $storageConnection->getDatabasePlatform());
 
                     if ($storageSchema->hasTable($auditTablename)) {
                         // Audit table exists, let's update it if needed
@@ -168,9 +166,7 @@ class SchemaManager
 
         /** @var Configuration $configuration */
         $configuration = $this->provider->getConfiguration();
-        $entities = $configuration->getEntities();
-
-        $auditTablename = $this->resolveAuditTableName($entities[$entity], $configuration, $connection->getDatabasePlatform());
+        $auditTablename = $this->resolveAuditTableName($entity, $configuration, $connection->getDatabasePlatform());
 
         if (null !== $auditTablename && !$schema->hasTable($auditTablename)) {
             $auditTable = $schema->createTable($auditTablename);
@@ -226,9 +222,8 @@ class SchemaManager
 
         /** @var Configuration $configuration */
         $configuration = $this->provider->getConfiguration();
-        $entities = $configuration->getEntities();
 
-        $auditTablename = $this->resolveAuditTableName($entities[$entity], $configuration, $connection->getDatabasePlatform());
+        $auditTablename = $this->resolveAuditTableName($entity, $configuration, $connection->getDatabasePlatform());
         \assert(\is_string($auditTablename));
         $table = $schema->getTable($auditTablename);
 
@@ -260,35 +255,28 @@ class SchemaManager
     /**
      * Resolves audit table name, including namespace/schema.
      */
-    public function resolveAuditTableName(array $entityOptions, Configuration $configuration, AbstractPlatform $platform): ?string
+    public function resolveAuditTableName(string $entity, Configuration $configuration, AbstractPlatform $platform): ?string
     {
+        $entities = $configuration->getEntities();
+        $entityOptions = $entities[$entity];
         $tablename = $this->resolveTableName($entityOptions['table_name'], $entityOptions['audit_table_schema'], $platform);
-        \assert(\is_string($tablename));
 
-        return preg_replace(
-            sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($tablename, '#')),
-            sprintf(
-                '$1%s$2%s',
-                preg_quote($configuration->getTablePrefix(), '#'),
-                preg_quote($configuration->getTableSuffix(), '#')
-            ),
-            $tablename
-        );
+        return $this->computeAuditTablename($tablename, $configuration);
     }
 
     /**
      * Computes audit table name **without** namespace/schema.
      */
-    public function computeAuditTablename(array $entityOptions, Configuration $configuration, AbstractPlatform $platform): ?string
+    public function computeAuditTablename(string $entityTableName, Configuration $configuration): ?string
     {
         return preg_replace(
-            sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($entityOptions['table_name'], '#')),
+            sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($entityTableName, '#')),
             sprintf(
                 '$1%s$2%s',
                 preg_quote($configuration->getTablePrefix(), '#'),
                 preg_quote($configuration->getTableSuffix(), '#')
             ),
-            $entityOptions['table_name']
+            $entityTableName
         );
     }
 
