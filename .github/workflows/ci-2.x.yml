@@ -2,13 +2,13 @@ name: auditor 2.x CI
 
 on:
   schedule:
-    - cron: 0 0 * * *
+    - cron: 15 0 * * *
   pull_request:
     branches:
-      - master
+      - 2.x
   push:
     branches:
-      - master
+      - 2.x
 
 jobs:
 
