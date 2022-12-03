@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: 2.x
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -193,6 +195,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: 2.x
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
