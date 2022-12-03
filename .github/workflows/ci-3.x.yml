@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: master
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
