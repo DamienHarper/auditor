@@ -168,24 +168,21 @@ class DoctrineProvider extends AbstractProvider
         $configuration = $this->configuration;
         $class = DoctrineHelper::getRealClassName($entity);
 
+        $entities = $configuration->getEntities();
         // is $entity part of audited entities?
-        if (!\array_key_exists($class, $configuration->getEntities())) {
+        if (!\array_key_exists($class, $entities)) {
             // no => $entity is not audited
             return false;
         }
 
-        $entityOptions = $configuration->getEntities()[$class];
+        $entityOptions = $entities[$class];
 
         if (null === $entityOptions) {
             // no option defined => $entity is audited
             return true;
         }
 
-        if (isset($entityOptions['enabled'])) {
-            return (bool) $entityOptions['enabled'];
-        }
-
-        return true;
+        return $entityOptions['enabled'] ?? true;
     }
 
     /**
@@ -238,14 +235,24 @@ class DoctrineProvider extends AbstractProvider
         $this->configuration->setStorageMapper($storageMapper);
     }
 
-    public function loadAnnotations(EntityManagerInterface $entityManager, ?array $entities = null): self
+    public function loadAnnotations(EntityManagerInterface $entityManager, array $entities): self
     {
         \assert($this->configuration instanceof Configuration);   // helps PHPStan
-        $annotationLoader = new AnnotationLoader($entityManager);
-        $this->configuration->setEntities(array_merge(
-            $entities ?? $this->configuration->getEntities(),
-            $annotationLoader->load()
-        ));
+        $ormConfiguration = $entityManager->getConfiguration();
+        $metadataCache = $ormConfiguration->getMetadataCache();
+
+        if (null !== $metadataCache) {
+            // $proxyDir is used to hash entityManager
+            $item = $metadataCache->getItem('__DH_ANNOTATIONS__');
+            if (!$item->isHit() || !\is_array($value = $item->get())) {
+                $annotationLoader = new AnnotationLoader($entityManager);
+                $value = $annotationLoader->load();
+                $item->set($value);
+                $metadataCache->save($item);
+            }
+            $entities = [...$entities, ...$value];
+        }
+        $this->configuration->setEntities($entities);
 
         return $this;
     }
