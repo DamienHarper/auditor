@@ -254,7 +254,7 @@ class DoctrineProvider extends AbstractProvider
                 $item->set($value);
                 $metadataCache->save($item);
             }
-            $entities = [...$entities, ...$value];
+            $entities = array_merge($entities, $value);
         }
         $this->configuration->setEntities($entities);
 
