@@ -103,7 +103,7 @@ class TransactionHydrator implements TransactionHydratorInterface
 
                 /** @var object $entity */
                 foreach ($collection->getDeleteDiff() as $entity) {
-                    if ($this->provider->isAudited($entity) && $collection->getOwner()) {
+                    if ($this->provider->isAudited($entity)) {
                         $transaction->dissociate(
                             $owner,
                             $entity,
