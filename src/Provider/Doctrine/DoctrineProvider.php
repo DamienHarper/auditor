@@ -168,13 +168,14 @@ class DoctrineProvider extends AbstractProvider
         $configuration = $this->configuration;
         $class = DoctrineHelper::getRealClassName($entity);
 
+        $entities = $configuration->getEntities();
         // is $entity part of audited entities?
-        if (!\array_key_exists($class, $configuration->getEntities())) {
+        if (!\array_key_exists($class, $entities)) {
             // no => $entity is not audited
             return false;
         }
 
-        $entityOptions = $configuration->getEntities()[$class];
+        $entityOptions = $entities[$class];
 
         if (null === $entityOptions) {
             // no option defined => $entity is audited
@@ -238,14 +239,25 @@ class DoctrineProvider extends AbstractProvider
         $this->configuration->setStorageMapper($storageMapper);
     }
 
-    public function loadAnnotations(EntityManagerInterface $entityManager, ?array $entities = null): self
+    public function loadAnnotations(EntityManagerInterface $entityManager, array $entities): self
     {
         \assert($this->configuration instanceof Configuration);   // helps PHPStan
+        $ormConfiguration = $entityManager->getConfiguration();
+        $metadataCache = $ormConfiguration->getMetadataCache();
+
         $annotationLoader = new AnnotationLoader($entityManager);
-        $this->configuration->setEntities(array_merge(
-            $entities ?? $this->configuration->getEntities(),
-            $annotationLoader->load()
-        ));
+
+        if (null !== $metadataCache) {
+            $item = $metadataCache->getItem('__DH_ANNOTATIONS__');
+            if (!$item->isHit() || !\is_array($annotationEntities = $item->get())) {
+                $annotationEntities = $annotationLoader->load();
+                $item->set($annotationEntities);
+                $metadataCache->save($item);
+            }
+        } else {
+            $annotationEntities = $annotationLoader->load();
+        }
+        $this->configuration->setEntities(array_merge($entities, $annotationEntities));
 
         return $this;
     }
