@@ -182,7 +182,11 @@ class DoctrineProvider extends AbstractProvider
             return true;
         }
 
-        return $entityOptions['enabled'] ?? true;
+        if (isset($entityOptions['enabled'])) {
+            return (bool) $entityOptions['enabled'];
+        }
+
+        return true;
     }
 
     /**
