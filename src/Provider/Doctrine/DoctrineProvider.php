@@ -245,18 +245,19 @@ class DoctrineProvider extends AbstractProvider
         $ormConfiguration = $entityManager->getConfiguration();
         $metadataCache = $ormConfiguration->getMetadataCache();
 
+        $annotationLoader = new AnnotationLoader($entityManager);
+
         if (null !== $metadataCache) {
-            // $proxyDir is used to hash entityManager
             $item = $metadataCache->getItem('__DH_ANNOTATIONS__');
-            if (!$item->isHit() || !\is_array($value = $item->get())) {
-                $annotationLoader = new AnnotationLoader($entityManager);
-                $value = $annotationLoader->load();
-                $item->set($value);
+            if (!$item->isHit() || !\is_array($annotationEntities = $item->get())) {
+                $annotationEntities = $annotationLoader->load();
+                $item->set($annotationEntities);
                 $metadataCache->save($item);
             }
-            $entities = array_merge($entities, $value);
+        } else {
+            $annotationEntities = $annotationLoader->load();
         }
-        $this->configuration->setEntities($entities);
+        $this->configuration->setEntities(array_merge($entities, $annotationEntities));
 
         return $this;
     }
