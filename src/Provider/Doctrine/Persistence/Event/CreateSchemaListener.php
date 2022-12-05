@@ -39,6 +39,7 @@ class CreateSchemaListener implements EventSubscriber
             throw new Exception(sprintf('Inheritance type "%s" is not yet supported', $metadata->inheritanceType));
         }
 
+        $targetEntity = $metadata->name;
         // check if entity or its children are audited
         if (!$this->provider->isAuditable($metadata->name)) {
             $audited = false;
@@ -49,6 +50,7 @@ class CreateSchemaListener implements EventSubscriber
                 foreach ($metadata->subClasses as $subClass) {
                     if ($this->provider->isAuditable($subClass)) {
                         $audited = true;
+                        $targetEntity = $subClass;
 
                         break;
                     }
@@ -69,7 +71,7 @@ class CreateSchemaListener implements EventSubscriber
             && array_values($auditingServices)[0]->getEntityManager() === array_values($storageServices)[0]->getEntityManager();
 
         $updater = new SchemaManager($this->provider);
-        $updater->createAuditTable($metadata->name, $isSameEntityManager ? $eventArgs->getSchema() : null);
+        $updater->createAuditTable($targetEntity, $isSameEntityManager ? $eventArgs->getSchema() : null);
     }
 
     /**
