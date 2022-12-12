@@ -115,9 +115,9 @@ class SchemaManager
         $sqls = [];
         foreach ($repository as $name => $classes) {
             $storageConnection = $storageServices[$name]->getEntityManager()->getConnection();
-            $storageSchemaManager = $storageConnection->createSchemaManager();
+            $storageSchemaManager = DoctrineHelper::createSchemaManager($storageConnection);
 
-            $storageSchema = $storageSchemaManager->introspectSchema();
+            $storageSchema = DoctrineHelper::introspectSchema($storageSchemaManager);
             $fromSchema = clone $storageSchema;
 
             $processed = [];
