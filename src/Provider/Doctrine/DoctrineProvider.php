@@ -243,7 +243,11 @@ class DoctrineProvider extends AbstractProvider
     {
         \assert($this->configuration instanceof Configuration);   // helps PHPStan
         $ormConfiguration = $entityManager->getConfiguration();
-        $metadataCache = $ormConfiguration->getMetadataCache();
+
+        /** @since doctrine/orm:2.7.5 */
+        $metadataCache = method_exists($ormConfiguration, 'getMetadataCache')
+            ? $ormConfiguration->getMetadataCache()
+            : null;
 
         $annotationLoader = new AnnotationLoader($entityManager);
 
