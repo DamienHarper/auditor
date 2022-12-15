@@ -164,10 +164,11 @@ final class DoctrineProviderTest extends TestCase
         $provider->registerAuditingService(new AuditingService('EM2', $entityManager2));
         $provider->registerStorageService(new StorageService('EM2', $entityManager2));
 
-        self::assertNull($provider->getConfiguration()->getStorageMapper(), 'Mapping closure is not set.');
+        self::assertNull($provider->getConfiguration()->getStorageMapper(), 'StorageMapper is not set.');
 
         $provider->setStorageMapper(static fn (string $entity, array $storageServices): StorageServiceInterface => 0 === mb_strpos($entity, 'Foo') ? $storageServices['EM1'] : $storageServices['EM2']);
-        self::assertNotNull($provider->getConfiguration()->getStorageMapper(), 'Mapping closure is set.');
+        self::assertNotNull($provider->getConfiguration()->getStorageMapper(), 'StorageMapper is set.');
+        self::assertIsCallable($provider->getConfiguration()->getStorageMapper(), 'StorageMapper is a callable.');
 
         self::assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo1')->getEntityManager(), 'EM1 is used.');
         self::assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo2')->getEntityManager(), 'EM1 is used.');
@@ -176,6 +177,7 @@ final class DoctrineProviderTest extends TestCase
 
         $provider->setStorageMapper(new FakeStorageMapper());
         self::assertNotNull($provider->getConfiguration()->getStorageMapper(), 'StorageMapper is set.');
+        self::assertIsCallable($provider->getConfiguration()->getStorageMapper(), 'StorageMapper is a callable.');
 
         self::assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo1')->getEntityManager(), 'EM1 is used.');
         self::assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo2')->getEntityManager(), 'EM1 is used.');
