@@ -70,7 +70,7 @@ trait AuditTrait
             return null;
         }
 
-        if (interface_exists(UnitEnum::class) && $value instanceof UnitEnum && property_exists($value, 'value')) {
+        if (interface_exists(UnitEnum::class) && $value instanceof UnitEnum && property_exists($value, 'value')) { /** @phpstan-ignore-line */
             $value = $value->value;
         }
 

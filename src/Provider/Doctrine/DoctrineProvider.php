@@ -91,6 +91,10 @@ class DoctrineProvider extends AbstractProvider
             return array_values($services)[0];
         }
 
+        if (\is_string($storageMapper) && class_exists($storageMapper)) {
+            $storageMapper = new $storageMapper();
+        }
+
         \assert(\is_callable($storageMapper));   // helps PHPStan
 
         return $storageMapper($entity, $this->getStorageServices());
