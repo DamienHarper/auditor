@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
 use Composer\Autoload\ClassLoader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
@@ -147,7 +148,7 @@ final class DoctrineHelper
     public static function createAnnotationMetadataConfiguration(array $paths, bool $isDevMode = false): Configuration
     {
         if (class_exists(ORMSetup::class)) {
-            require_once self::getVendorDir().'/doctrine/orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php';
+            AnnotationRegistry::registerLoader('class_exists');
 
             return ORMSetup::createAnnotationMetadataConfiguration($paths, $isDevMode);
         }
