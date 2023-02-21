@@ -40,7 +40,8 @@ trait EntityManagerInterfaceTrait
 
         $em = EntityManager::create($connection, $configuration);
         $evm = $em->getEventManager();
-        foreach ($evm->getListeners() as $event => $listeners) {
+        $allListeners = method_exists($evm, 'getAllListeners') ? $evm->getAllListeners() : $evm->getListeners();
+        foreach ($allListeners as $event => $listeners) {
             foreach ($listeners as $listener) {
                 $evm->removeEventListener([$event], $listener);
             }
