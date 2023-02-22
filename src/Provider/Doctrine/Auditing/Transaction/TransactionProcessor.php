@@ -209,7 +209,7 @@ class TransactionProcessor implements TransactionProcessorInterface
         $schema = $data['schema'] ? $data['schema'].'.' : '';
         $auditTable = $schema.$configuration->getTablePrefix().$data['table'].$configuration->getTableSuffix();
         $dt = new DateTimeImmutable('now', new DateTimeZone($this->provider->getAuditor()->getConfiguration()->getTimezone()));
-        $diff = is_string($data["diff"]) ? mb_convert_encoding($data['diff'], 'UTF-8', 'UTF-8') : $data["diff"];
+        $diff = \is_string($data['diff']) ? mb_convert_encoding($data['diff'], 'UTF-8', 'UTF-8') : $data['diff'];
 
         $payload = [
             'entity' => $data['entity'],
