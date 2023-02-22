@@ -8,7 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
  * @ORM\HasLifecycleCallbacks
+ *
  * @ORM\Table(name="case_diesel")
  */
 #[ORM\Entity, ORM\HasLifecycleCallbacks, ORM\Table(name: 'case_diesel')]
@@ -16,7 +18,9 @@ class DieselCase
 {
     /**
      * @ORM\Id
+     *
      * @ORM\ManyToOne(targetEntity="CoreCase", cascade={"persist"})
+     *
      * @ORM\JoinColumn(name="core_case", referencedColumnName="id")
      */
     #[ORM\Id, ORM\ManyToOne(targetEntity: 'CoreCase', cascade: ['persist'])]

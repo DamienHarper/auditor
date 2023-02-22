@@ -8,7 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
  * @ORM\HasLifecycleCallbacks
+ *
  * @ORM\Table(name="case_core")
  */
 #[ORM\Entity, ORM\HasLifecycleCallbacks, ORM\Table(name: 'case_core')]
@@ -28,7 +30,9 @@ class CoreCase
 
     /**
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer')]

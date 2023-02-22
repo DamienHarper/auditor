@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
  * @ORM\Table(name="dummy_entity")
  */
 #[ORM\Entity, ORM\Table(name: 'dummy_entity')]
@@ -57,7 +58,9 @@ class DummyEntity
 
     /**
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     *
      * @ORM\Column(type="integer")
      */
     #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer')]

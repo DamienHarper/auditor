@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
  * @ORM\Table(name="users")
  */
 #[ORM\Entity, ORM\Table(name: 'users')]
@@ -15,7 +16,9 @@ class User
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="integer", options={"unsigned": true})
+     *
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer', options: ['unsigned' => true])]
@@ -35,6 +38,7 @@ class User
 
     /**
      * @ORM\ManyToOne(targetEntity="Locale", cascade={"persist", "remove"})
+     *
      * @ORM\JoinColumn(name="locale_id", referencedColumnName="id", nullable=true)
      */
     #[ORM\ManyToOne(targetEntity: 'Locale', cascade: ['persist', 'remove'])]

@@ -14,7 +14,9 @@ use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
  * @NamedArgumentConstructor
  *
  * @Target("CLASS")
+ *
  * @Attributes({
+ *
  *     @Attribute("enabled", required=false, type="bool"),
  * })
  */

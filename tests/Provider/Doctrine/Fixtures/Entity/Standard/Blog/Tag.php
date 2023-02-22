@@ -11,6 +11,7 @@ use Stringable;
 
 /**
  * @ORM\Entity
+ *
  * @ORM\Table(name="tag")
  */
 #[ORM\Entity]
@@ -19,7 +20,9 @@ class Tag implements Stringable
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="integer", options={"unsigned": true})
+     *
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     #[ORM\Id]

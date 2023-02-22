@@ -8,9 +8,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
  * @ORM\Table("parent_entities")
+ *
  * @ORM\InheritanceType("SINGLE_TABLE")
+ *
  * @ORM\DiscriminatorColumn(name="type", type="string")
+ *
  * @ORM\DiscriminatorMap({"Dummy": DummyEntity::class})
  */
 #[ORM\Entity]
@@ -22,7 +26,9 @@ abstract class AbstractParentEntity
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column
+     *
      * @ORM\GeneratedValue
      */
     #[ORM\Id]

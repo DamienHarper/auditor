@@ -9,7 +9,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
  * @ORM\Table(name="audited_entity")
+ *
  * @Audit\Auditable
  */
 class AuditedEntity
@@ -33,7 +35,9 @@ class AuditedEntity
 
     /**
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     *
      * @ORM\Column(type="integer")
      */
     private int $id;

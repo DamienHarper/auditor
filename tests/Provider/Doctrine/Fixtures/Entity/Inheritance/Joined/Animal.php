@@ -8,9 +8,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
  * @ORM\Table(name="animal", schema="auditor")
+ *
  * @ORM\InheritanceType("JOINED")
+ *
  * @ORM\DiscriminatorColumn(name="type", type="string")
+ *
  * @ORM\DiscriminatorMap({"cat": "Cat", "dog": "Dog"})
  */
 #[ORM\Entity, ORM\Table(name: 'animal', schema: 'auditor'), ORM\InheritanceType('JOINED')]
@@ -26,7 +30,9 @@ abstract class Animal
 
     /**
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     *
      * @ORM\Column(type="integer")
      */
     #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer')]

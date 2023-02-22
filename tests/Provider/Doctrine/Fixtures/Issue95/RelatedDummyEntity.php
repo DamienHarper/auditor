@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
  * @ORM\Table(name="related_dummy_entity")
  */
 #[ORM\Entity, ORM\Table(name: 'related_dummy_entity')]
@@ -21,6 +22,7 @@ class RelatedDummyEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="DummyEntity", cascade={"persist", "remove"}, inversedBy="children")
+     *
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true)
      */
     #[ORM\ManyToOne(targetEntity: 'DummyEntity', cascade: ['persist', 'remove'], inversedBy: 'children')]
@@ -29,7 +31,9 @@ class RelatedDummyEntity
 
     /**
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     *
      * @ORM\Column(type="integer")
      */
     #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer')]

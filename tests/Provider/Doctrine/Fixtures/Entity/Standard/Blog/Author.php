@@ -11,6 +11,7 @@ use Stringable;
 
 /**
  * @ORM\Entity
+ *
  * @ORM\Table(name="author")
  */
 #[ORM\Entity]
@@ -19,7 +20,9 @@ class Author implements Stringable
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="integer", options={"unsigned": true})
+     *
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     #[ORM\Id]
@@ -41,6 +44,7 @@ class Author implements Stringable
 
     /**
      * @ORM\OneToMany(targetEntity="Post", mappedBy="author", cascade={"persist", "remove"})
+     *
      * @ORM\JoinColumn(name="id", referencedColumnName="author_id", nullable=false)
      */
     #[ORM\OneToMany(targetEntity: 'Post', mappedBy: 'author', cascade: ['persist'])]

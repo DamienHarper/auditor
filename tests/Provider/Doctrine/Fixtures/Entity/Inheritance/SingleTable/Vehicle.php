@@ -8,9 +8,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
  * @ORM\Table(name="vehicle")
+ *
  * @ORM\InheritanceType("SINGLE_TABLE")
+ *
  * @ORM\DiscriminatorColumn(name="type", type="string")
+ *
  * @ORM\DiscriminatorMap({"vehicle": "Vehicle", "car": "Car", "bike": "Bike"})
  */
 #[ORM\Entity, ORM\Table(name: 'vehicle'), ORM\InheritanceType('SINGLE_TABLE')]
@@ -26,7 +30,9 @@ class Vehicle
 
     /**
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     *
      * @ORM\Column(type="integer")
      */
     #[ORM\Id, ORM\GeneratedValue(strategy: 'IDENTITY'), ORM\Column(type: 'integer')]

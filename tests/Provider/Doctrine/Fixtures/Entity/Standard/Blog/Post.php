@@ -13,7 +13,9 @@ use Stringable;
 
 /**
  * @ORM\Entity
+ *
  * @ORM\Table(name="post", indexes={@ORM\Index(name="fk_author_id", columns={"author_id"})})
+ *
  * @Gedmo\SoftDeleteable(fieldName="deleted_at", timeAware=false, hardDelete=false)
  */
 #[ORM\Entity]
@@ -23,7 +25,9 @@ class Post implements Stringable
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="integer", options={"unsigned": true})
+     *
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     #[ORM\Id]
@@ -45,6 +49,7 @@ class Post implements Stringable
 
     /**
      * @Gedmo\Timestampable(on="create")
+     *
      * @ORM\Column(type="datetime")
      */
     #[ORM\Column(type: 'datetime')]
@@ -64,6 +69,7 @@ class Post implements Stringable
 
     /**
      * @ORM\OneToMany(targetEntity="Comment", mappedBy="post", cascade={"persist", "remove"})
+     *
      * @ORM\JoinColumn(name="id", referencedColumnName="post_id", nullable=true)
      */
     #[ORM\OneToMany(targetEntity: 'Comment', mappedBy: 'post', cascade: ['persist', 'remove'])]
@@ -72,6 +78,7 @@ class Post implements Stringable
 
     /**
      * @ORM\ManyToOne(targetEntity="Author", inversedBy="posts", cascade={"persist", "remove"})
+     *
      * @ORM\JoinColumn(name="author_id", referencedColumnName="id", nullable=true)
      */
     #[ORM\ManyToOne(targetEntity: 'Author', inversedBy: 'posts', cascade: ['persist', 'remove'])]
@@ -80,6 +87,7 @@ class Post implements Stringable
 
     /**
      * @ORM\ManyToOne(targetEntity="Author", inversedBy="posts", cascade={"persist", "remove"})
+     *
      * @ORM\JoinColumn(name="coauthor_id", referencedColumnName="id", nullable=true)
      */
     #[ORM\ManyToOne(targetEntity: 'Author', cascade: ['persist', 'remove'])]
@@ -88,6 +96,7 @@ class Post implements Stringable
 
     /**
      * @ORM\ManyToMany(targetEntity="Tag", inversedBy="posts", cascade={"persist", "remove"})
+     *
      * @ORM\JoinTable(name="post__tag",
      *     joinColumns={@ORM\JoinColumn(name="post_id", referencedColumnName="id", nullable=false)},
      *     inverseJoinColumns={@ORM\JoinColumn(name="tag_id", referencedColumnName="id", nullable=false)}
