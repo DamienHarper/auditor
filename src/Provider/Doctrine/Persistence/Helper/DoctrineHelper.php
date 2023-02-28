@@ -148,7 +148,10 @@ final class DoctrineHelper
     public static function createAnnotationMetadataConfiguration(array $paths, bool $isDevMode = false): Configuration
     {
         if (class_exists(ORMSetup::class)) {
-            AnnotationRegistry::registerLoader('class_exists');
+            // @phpstan-ignore-next-line
+            if (method_exists(AnnotationRegistry::class, 'registerLoader')) {
+                AnnotationRegistry::registerLoader('class_exists');
+            }
 
             return ORMSetup::createAnnotationMetadataConfiguration($paths, $isDevMode);
         }
