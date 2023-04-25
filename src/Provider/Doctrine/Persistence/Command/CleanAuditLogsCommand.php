@@ -56,6 +56,9 @@ class CleanAuditLogsCommand extends Command
             ->addOption('no-confirm', null, InputOption::VALUE_NONE, 'No interaction mode')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Do not execute SQL queries.')
             ->addOption('dump-sql', null, InputOption::VALUE_NONE, 'Prints SQL related queries.')
+            ->addOption('exclude', 'x', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Entities to exclude from cleaning')
+            ->addOption('include', 'i', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Entities to include in cleaning')
+            ->addOption('date', 'd', InputOption::VALUE_OPTIONAL, 'Specify a custom date to clean audits until (must be expressed as an ISO 8601 date, e.g. 2023-04-24).')
             ->addArgument('keep', InputArgument::OPTIONAL, 'Audits retention period (must be expressed as an ISO 8601 date interval, e.g. P12M to keep the last 12 months or P7D to keep the last 7 days).', 'P12M')
         ;
     }
@@ -70,17 +73,29 @@ class CleanAuditLogsCommand extends Command
 
         $io = new SymfonyStyle($input, $output);
 
-        $keep = $input->getArgument('keep');
-        $keep = (\is_array($keep) ? $keep[0] : $keep);
+        $keep  = $input->getArgument('keep');
+        $keep  = (\is_array($keep) ? $keep[0] : $keep);
+        $date  = $input->getOption('date');
+        $until = null;
 
-        $until = $this->validateKeepArgument($keep, $io);
+        if ($date) {
+            // Use custom date if provided
+            try {
+                $until = new DateTimeImmutable($date);
+            } catch (Exception $e) {
+                $io->error(sprintf('Invalid date format provided: %s', $date));
+            }
+        } else {
+            // Fall back to default retention period
+            $until = $this->validateKeepArgument($keep, $io);
+        }
 
-        if (!$until instanceof DateTimeImmutable) {
+        if (null === $until) {
             return 0;
         }
 
         /** @var DoctrineProvider $provider */
-        $provider = $this->auditor->getProvider(DoctrineProvider::class);
+        $provider      = $this->auditor->getProvider(DoctrineProvider::class);
         $schemaManager = new SchemaManager($provider);
 
         /** @var StorageService[] $storageServices */
@@ -90,9 +105,29 @@ class CleanAuditLogsCommand extends Command
         $count = 0;
 
         // Collect auditable classes from auditing storage managers
-        $repository = $schemaManager->collectAuditableEntities();
-        foreach ($repository as $entities) {
-            $count += is_countable($entities) ? \count($entities) : 0;
+        $excludeEntities    = array_values($input->getOption('exclude') ?? []);
+        $includeEntities    = array_values($input->getOption('include') ?? []);
+        $repository         = $schemaManager->collectAuditableEntities();
+        $filteredRepository = [];
+
+        foreach ($repository as $name => $entityClasses) {
+            foreach ($entityClasses as $entityClass => $table) {
+                if (
+                    !in_array($entityClass, $excludeEntities) &&
+                    (
+                        empty($includeEntities) ||
+                        in_array($entityClass, $includeEntities)
+                    )
+                ) {
+                    $filteredRepository[$name][$entityClass] = $table;
+                }
+            }
+        }
+
+        $repository = $filteredRepository;
+
+        foreach ($repository as $name => $entities) {
+            $count += \count($entities);
         }
 
         $message = sprintf(
@@ -102,8 +137,8 @@ class CleanAuditLogsCommand extends Command
         );
 
         $confirm = $input->getOption('no-confirm') ? true : $io->confirm($message, false);
-        $dryRun = (bool) $input->getOption('dry-run');
-        $dumpSQL = (bool) $input->getOption('dump-sql');
+        $dryRun  = (bool)$input->getOption('dry-run');
+        $dumpSQL = (bool)$input->getOption('dump-sql');
 
         if ($confirm) {
             /** @var Configuration $configuration */
@@ -111,7 +146,7 @@ class CleanAuditLogsCommand extends Command
 
             $progressBar = new ProgressBar($output, $count);
             $progressBar->setBarWidth(70);
-            $progressBar->setFormat("%message%\n".$progressBar->getFormatDefinition('debug'));
+            $progressBar->setFormat("%message%\n" . $progressBar->getFormatDefinition('debug'));
 
             $progressBar->setMessage('Starting...');
             $progressBar->start();
@@ -122,6 +157,9 @@ class CleanAuditLogsCommand extends Command
                     $connection = $storageServices[$name]->getEntityManager()->getConnection();
                     $auditTable = $schemaManager->resolveAuditTableName($entity, $configuration, $connection->getDatabasePlatform());
 
+                    /**
+                     * @var QueryBuilder
+                     */
                     $queryBuilder = $connection->createQueryBuilder();
                     $queryBuilder
                         ->delete($auditTable)
@@ -130,14 +168,14 @@ class CleanAuditLogsCommand extends Command
                     ;
 
                     if ($dumpSQL) {
-                        $queries[] = str_replace(':until', "'".$until->format(self::UNTIL_DATE_FORMAT)."'", $queryBuilder->getSQL());
+                        $queries[] = str_replace(':until', "'" . $until->format(self::UNTIL_DATE_FORMAT) . "'", $queryBuilder->getSQL());
                     }
 
                     if (!$dryRun) {
                         DoctrineHelper::executeStatement($queryBuilder);
                     }
 
-                    $progressBar->setMessage(sprintf('Cleaning audit tables... (<info>%s</info>)', $auditTable));
+                    $progressBar->setMessage("Cleaning audit tables... (<info>{$auditTable}</info>)");
                     $progressBar->advance();
                 }
             }
@@ -171,8 +209,8 @@ class CleanAuditLogsCommand extends Command
     {
         try {
             $dateInterval = new DateInterval($keep);
-        } catch (Exception) {
-            $io->error(sprintf("'keep' argument must be a valid ISO 8601 date interval, '%s' given.", $keep));
+        } catch (Exception $e) {
+            $io->error(sprintf("'keep' argument must be a valid ISO 8601 date interval, '%s' given.", (string)$keep));
             $this->release();
 
             return null;
