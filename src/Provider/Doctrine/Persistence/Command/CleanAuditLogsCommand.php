@@ -137,8 +137,8 @@ class CleanAuditLogsCommand extends Command
         );
 
         $confirm = $input->getOption('no-confirm') ? true : $io->confirm($message, false);
-        $dryRun  = (bool)$input->getOption('dry-run');
-        $dumpSQL = (bool)$input->getOption('dump-sql');
+        $dryRun = (bool) $input->getOption('dry-run');
+        $dumpSQL = (bool) $input->getOption('dump-sql');
 
         if ($confirm) {
             /** @var Configuration $configuration */
@@ -146,7 +146,7 @@ class CleanAuditLogsCommand extends Command
 
             $progressBar = new ProgressBar($output, $count);
             $progressBar->setBarWidth(70);
-            $progressBar->setFormat("%message%\n" . $progressBar->getFormatDefinition('debug'));
+            $progressBar->setFormat("%message%\n".$progressBar->getFormatDefinition('debug'));
 
             $progressBar->setMessage('Starting...');
             $progressBar->start();
@@ -157,9 +157,6 @@ class CleanAuditLogsCommand extends Command
                     $connection = $storageServices[$name]->getEntityManager()->getConnection();
                     $auditTable = $schemaManager->resolveAuditTableName($entity, $configuration, $connection->getDatabasePlatform());
 
-                    /**
-                     * @var QueryBuilder
-                     */
                     $queryBuilder = $connection->createQueryBuilder();
                     $queryBuilder
                         ->delete($auditTable)
@@ -168,14 +165,14 @@ class CleanAuditLogsCommand extends Command
                     ;
 
                     if ($dumpSQL) {
-                        $queries[] = str_replace(':until', "'" . $until->format(self::UNTIL_DATE_FORMAT) . "'", $queryBuilder->getSQL());
+                        $queries[] = str_replace(':until', "'".$until->format(self::UNTIL_DATE_FORMAT)."'", $queryBuilder->getSQL());
                     }
 
                     if (!$dryRun) {
                         DoctrineHelper::executeStatement($queryBuilder);
                     }
 
-                    $progressBar->setMessage("Cleaning audit tables... (<info>{$auditTable}</info>)");
+                    $progressBar->setMessage(sprintf('Cleaning audit tables... (<info>%s</info>)', $auditTable));
                     $progressBar->advance();
                 }
             }
@@ -209,8 +206,8 @@ class CleanAuditLogsCommand extends Command
     {
         try {
             $dateInterval = new DateInterval($keep);
-        } catch (Exception $e) {
-            $io->error(sprintf("'keep' argument must be a valid ISO 8601 date interval, '%s' given.", (string)$keep));
+        } catch (Exception) {
+            $io->error(sprintf("'keep' argument must be a valid ISO 8601 date interval, '%s' given.", $keep));
             $this->release();
 
             return null;
@@ -218,4 +215,3 @@ class CleanAuditLogsCommand extends Command
 
         return (new DateTimeImmutable())->sub($dateInterval);
     }
-}
