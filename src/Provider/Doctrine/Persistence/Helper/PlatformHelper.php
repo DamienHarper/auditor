@@ -59,12 +59,11 @@ abstract class PlatformHelper
 
         $mariadb = false !== mb_stripos($version, 'mariadb');
 
-        return !($mariadb && version_compare(self::getMariaDbMysqlVersionNumber($version), '10.2.7', '<'))
+        return !($mariadb && version_compare(self::getMariaDbMysqlVersionNumber($version), '10.2.7', '<'));
         // JSON wasn't supported on MariaDB before 10.2.7
         // @see https://mariadb.com/kb/en/json-data-type/
 
         // Assume JSON is supported
-        ;
     }
 
     /**

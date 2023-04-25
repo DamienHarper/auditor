@@ -197,11 +197,11 @@ class Configuration implements ConfigurationInterface
                     $computedTableName = $schemaManager->resolveTableName($entityTableName, $namespaceName, $platform);
                     $this->entities[$entity]['table_schema'] = $namespaceName;
                     $this->entities[$entity]['table_name'] = $entityTableName;
-//                    $this->entities[$entity]['computed_table_name'] = $entityTableName;
+                    //                    $this->entities[$entity]['computed_table_name'] = $entityTableName;
                     $this->entities[$entity]['computed_table_name'] = $computedTableName;
                     $this->entities[$entity]['audit_table_schema'] = $namespaceName;
                     $this->entities[$entity]['audit_table_name'] = $schemaManager->computeAuditTablename($entityTableName, $this);
-//                    $this->entities[$entity]['computed_audit_table_name'] = $schemaManager->computeAuditTablename($this->entities[$entity], $this, $platform);
+                    //                    $this->entities[$entity]['computed_audit_table_name'] = $schemaManager->computeAuditTablename($this->entities[$entity], $this, $platform);
                     $this->entities[$entity]['computed_audit_table_name'] = $schemaManager->computeAuditTablename(
                         $computedTableName,
                         $this

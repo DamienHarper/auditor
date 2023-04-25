@@ -9,7 +9,7 @@ use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 
 trait ReaderTrait
 {
-//    use DoctrineProviderTrait;
+    //    use DoctrineProviderTrait;
 
     /**
      * Creates a Reader.
