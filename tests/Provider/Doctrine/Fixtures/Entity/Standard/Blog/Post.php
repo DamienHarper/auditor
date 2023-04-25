@@ -103,7 +103,7 @@ class Post implements Stringable
      * )
      */
     #[ORM\ManyToMany(targetEntity: 'Tag', inversedBy: 'posts', cascade: ['persist', 'remove'])]
-//    #[ORM\JoinTable(name: 'post__tag', joinColumns: [new ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id', nullable: false)], inverseJoinColumns: [new ORM\JoinColumn(name: 'tag_id', referencedColumnName: 'id', nullable: false)])]
+    //    #[ORM\JoinTable(name: 'post__tag', joinColumns: [new ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id', nullable: false)], inverseJoinColumns: [new ORM\JoinColumn(name: 'tag_id', referencedColumnName: 'id', nullable: false)])]
     protected $tags;
 
     public function __construct()
