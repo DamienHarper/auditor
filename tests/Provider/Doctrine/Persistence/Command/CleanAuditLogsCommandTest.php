@@ -111,6 +111,48 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('The command is already running in another process.', $output);
     }
 
+    public function testDateOption()
+    {
+        $command = $this->createCommand();
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            '--date' => '2023-04-26T09:00:00Z',
+        ]);
+        $command->unlock();
+
+        // the output of the command in the console
+        $output = $commandTester->getDisplay();
+        self::assertStringContainsString('clean audits created before 2023-04-26 09:00:00', $output);
+    }
+
+    public function testExcludeOption()
+    {
+        $command = $this->createCommand();
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            '--exclude' => 'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author',
+        ]);
+        $command->unlock();
+
+        // the output of the command in the console
+        $output = $commandTester->getDisplay();
+        self::assertStringContainsString('6 classes involved', $output);
+    }
+
+    public function testIncludeOption()
+    {
+        $command = $this->createCommand();
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            '--include' => 'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author',
+        ]);
+        $command->unlock();
+
+        // the output of the command in the console
+        $output = $commandTester->getDisplay();
+        self::assertStringContainsString('1 classes involved', $output);
+    }
+
     protected function createCommand(): CleanAuditLogsCommand
     {
         $command = new CleanAuditLogsCommand();
