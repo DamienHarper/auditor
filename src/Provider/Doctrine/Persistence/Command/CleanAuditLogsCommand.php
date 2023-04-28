@@ -58,7 +58,7 @@ class CleanAuditLogsCommand extends Command
             ->addOption('dump-sql', null, InputOption::VALUE_NONE, 'Prints SQL related queries.')
             ->addOption('exclude', 'x', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Entities to exclude from cleaning')
             ->addOption('include', 'i', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Entities to include in cleaning')
-            ->addOption('date', 'd', InputOption::VALUE_OPTIONAL, 'Specify a custom date to clean audits until (must be expressed as an ISO 8601 date, e.g. 2023-04-24).')
+            ->addOption('date', 'd', InputOption::VALUE_REQUIRED, 'Specify a custom date to clean audits until (must be expressed as an ISO 8601 date, e.g. 2023-04-24).')
             ->addArgument('keep', InputArgument::OPTIONAL, 'Audits retention period (must be expressed as an ISO 8601 date interval, e.g. P12M to keep the last 12 months or P7D to keep the last 7 days).', 'P12M')
         ;
     }
@@ -75,6 +75,8 @@ class CleanAuditLogsCommand extends Command
 
         $keep = $input->getArgument('keep');
         $keep = (\is_array($keep) ? $keep[0] : $keep);
+
+        /** @var string $date */
         $date = $input->getOption('date');
         $until = null;
 
@@ -154,6 +156,11 @@ class CleanAuditLogsCommand extends Command
             $progressBar->start();
 
             $queries = [];
+
+            /**
+             * @var string                $name
+             * @var array<string, string> $classes
+             */
             foreach ($repository as $name => $classes) {
                 foreach ($classes as $entity => $tablename) {
                     $connection = $storageServices[$name]->getEntityManager()->getConnection();
