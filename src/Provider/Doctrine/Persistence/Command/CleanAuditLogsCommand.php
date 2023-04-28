@@ -56,8 +56,8 @@ class CleanAuditLogsCommand extends Command
             ->addOption('no-confirm', null, InputOption::VALUE_NONE, 'No interaction mode')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Do not execute SQL queries.')
             ->addOption('dump-sql', null, InputOption::VALUE_NONE, 'Prints SQL related queries.')
-            ->addOption('exclude', 'x', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Entities to exclude from cleaning')
-            ->addOption('include', 'i', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Entities to include in cleaning')
+            ->addOption('exclude', 'x', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Entities to exclude from cleaning')
+            ->addOption('include', 'i', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Entities to include in cleaning')
             ->addOption('date', 'd', InputOption::VALUE_OPTIONAL, 'Specify a custom date to clean audits until (must be expressed as an ISO 8601 date, e.g. 2023-04-24).')
             ->addArgument('keep', InputArgument::OPTIONAL, 'Audits retention period (must be expressed as an ISO 8601 date interval, e.g. P12M to keep the last 12 months or P7D to keep the last 7 days).', 'P12M')
         ;
@@ -105,8 +105,10 @@ class CleanAuditLogsCommand extends Command
         $count = 0;
 
         // Collect auditable classes from auditing storage managers
-        $excludeEntities = array_values($input->getOption('exclude') ?? []);
-        $includeEntities = array_values($input->getOption('include') ?? []);
+        $rawExcludeValues = $input->getOption('exclude') ?? [];
+        $rawIncludeValues = $input->getOption('include') ?? [];
+        $excludeEntities = \is_array($rawExcludeValues) ? $rawExcludeValues : [$rawExcludeValues];
+        $includeEntities = \is_array($rawIncludeValues) ? $rawIncludeValues : [$rawIncludeValues];
         $repository = $schemaManager->collectAuditableEntities();
         $filteredRepository = [];
 

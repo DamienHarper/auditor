@@ -125,7 +125,7 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('clean audits created before 2023-04-26 09:00:00', $output);
     }
 
-    public function testExcludeOption()
+    public function testExcludeOptionSingleValue()
     {
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
@@ -139,7 +139,24 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('6 classes involved', $output);
     }
 
-    public function testIncludeOption()
+    public function testExcludeOptionMultipleValues()
+    {
+        $command = $this->createCommand();
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            '--exclude' => [
+                'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author',
+                'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post',
+            ],
+        ]);
+        $command->unlock();
+
+        // the output of the command in the console
+        $output = $commandTester->getDisplay();
+        self::assertStringContainsString('5 classes involved', $output);
+    }
+
+    public function testIncludeOptionSignleValue()
     {
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
@@ -151,6 +168,23 @@ final class CleanAuditLogsCommandTest extends TestCase
         // the output of the command in the console
         $output = $commandTester->getDisplay();
         self::assertStringContainsString('1 classes involved', $output);
+    }
+
+    public function testIncludeOptionMultipleValues()
+    {
+        $command = $this->createCommand();
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            '--include' => [
+                'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author',
+                'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post',
+            ],
+        ]);
+        $command->unlock();
+
+        // the output of the command in the console
+        $output = $commandTester->getDisplay();
+        self::assertStringContainsString('2 classes involved', $output);
     }
 
     protected function createCommand(): CleanAuditLogsCommand
