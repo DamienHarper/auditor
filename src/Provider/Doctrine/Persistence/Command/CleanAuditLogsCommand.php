@@ -73,9 +73,9 @@ class CleanAuditLogsCommand extends Command
 
         $io = new SymfonyStyle($input, $output);
 
-        $keep  = $input->getArgument('keep');
-        $keep  = (\is_array($keep) ? $keep[0] : $keep);
-        $date  = $input->getOption('date');
+        $keep = $input->getArgument('keep');
+        $keep = (\is_array($keep) ? $keep[0] : $keep);
+        $date = $input->getOption('date');
         $until = null;
 
         if ($date) {
@@ -95,7 +95,7 @@ class CleanAuditLogsCommand extends Command
         }
 
         /** @var DoctrineProvider $provider */
-        $provider      = $this->auditor->getProvider(DoctrineProvider::class);
+        $provider = $this->auditor->getProvider(DoctrineProvider::class);
         $schemaManager = new SchemaManager($provider);
 
         /** @var StorageService[] $storageServices */
@@ -105,18 +105,18 @@ class CleanAuditLogsCommand extends Command
         $count = 0;
 
         // Collect auditable classes from auditing storage managers
-        $excludeEntities    = array_values($input->getOption('exclude') ?? []);
-        $includeEntities    = array_values($input->getOption('include') ?? []);
-        $repository         = $schemaManager->collectAuditableEntities();
+        $excludeEntities = array_values($input->getOption('exclude') ?? []);
+        $includeEntities = array_values($input->getOption('include') ?? []);
+        $repository = $schemaManager->collectAuditableEntities();
         $filteredRepository = [];
 
         foreach ($repository as $name => $entityClasses) {
             foreach ($entityClasses as $entityClass => $table) {
                 if (
-                    !in_array($entityClass, $excludeEntities) &&
-                    (
-                        empty($includeEntities) ||
-                        in_array($entityClass, $includeEntities)
+                    !\in_array($entityClass, $excludeEntities, true)
+                    && (
+                        empty($includeEntities)
+                        || \in_array($entityClass, $includeEntities, true)
                     )
                 ) {
                     $filteredRepository[$name][$entityClass] = $table;
