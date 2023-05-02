@@ -25,7 +25,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.2
           extensions: composer:v2
 
       - name: Install PHP-CS-Fixer
@@ -73,6 +73,7 @@ jobs:
         php:
           - '8.0'
           - '8.1'
+          - '8.2'
         symfony:
           - '5.*'
           - '6.*'
@@ -84,7 +85,7 @@ jobs:
 
     steps:
       - name: Shutdown Ubuntu MySQL (SUDO)
-        run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+        run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please do not remove it
 
       - name: Checkout
         uses: actions/checkout@v3
