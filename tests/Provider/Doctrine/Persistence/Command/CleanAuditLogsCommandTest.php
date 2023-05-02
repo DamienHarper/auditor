@@ -189,9 +189,12 @@ final class CleanAuditLogsCommandTest extends TestCase
 
     protected function createCommand(): CleanAuditLogsCommand
     {
+        dump($this->getName());
+        dump('before: ', $this->lock);
         $command = new CleanAuditLogsCommand();
         $command->setAuditor($this->provider->getAuditor());
-        $command->unlock();
+        //        $command->unlock();
+        dump('after: ', $this->lock);
 
         return $command;
     }
