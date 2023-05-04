@@ -105,6 +105,8 @@ final class CleanAuditLogsCommandTest extends TestCase
         // the output of the command in the console
         $output = $commandTester->getDisplay();
         self::assertStringContainsString('The command is already running in another process.', $output);
+
+        $this->release();
     }
 
     public function testDateOption()

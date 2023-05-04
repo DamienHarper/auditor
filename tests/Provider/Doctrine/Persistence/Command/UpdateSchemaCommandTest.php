@@ -134,6 +134,8 @@ final class UpdateSchemaCommandTest extends TestCase
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
         self::assertStringContainsString('The command is already running in another process.', $output);
+
+        $this->release();
     }
 
     protected function createCommand(): UpdateSchemaCommand
