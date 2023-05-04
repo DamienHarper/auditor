@@ -13,7 +13,7 @@ on:
 jobs:
   tests:
     name: Tests PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, ${{ matrix.db }}
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     services:
       mysql:
@@ -110,7 +110,7 @@ jobs:
 
   tests-symfony-next:
     name: Tests PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, ${{ matrix.db }}
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     services:
       mysql:
