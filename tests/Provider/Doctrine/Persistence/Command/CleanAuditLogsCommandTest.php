@@ -39,7 +39,6 @@ final class CleanAuditLogsCommandTest extends TestCase
             '--no-confirm' => true,
             'keep' => $keep,
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -60,7 +59,6 @@ final class CleanAuditLogsCommandTest extends TestCase
             '--no-confirm' => true,
             '--dump-sql' => true,
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -85,7 +83,6 @@ final class CleanAuditLogsCommandTest extends TestCase
         $commandTester->execute([
             '--no-confirm' => true,
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -104,11 +101,12 @@ final class CleanAuditLogsCommandTest extends TestCase
         $commandTester->execute([
             '--no-confirm' => true,
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
         self::assertStringContainsString('The command is already running in another process.', $output);
+
+        $this->release();
     }
 
     public function testDateOption()
@@ -118,7 +116,6 @@ final class CleanAuditLogsCommandTest extends TestCase
         $commandTester->execute([
             '--date' => '2023-04-26T09:00:00Z',
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -132,7 +129,6 @@ final class CleanAuditLogsCommandTest extends TestCase
         $commandTester->execute([
             '--exclude' => 'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author',
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -149,7 +145,6 @@ final class CleanAuditLogsCommandTest extends TestCase
                 'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post',
             ],
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -163,7 +158,6 @@ final class CleanAuditLogsCommandTest extends TestCase
         $commandTester->execute([
             '--include' => 'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author',
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -180,7 +174,6 @@ final class CleanAuditLogsCommandTest extends TestCase
                 'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post',
             ],
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -191,7 +184,6 @@ final class CleanAuditLogsCommandTest extends TestCase
     {
         $command = new CleanAuditLogsCommand();
         $command->setAuditor($this->provider->getAuditor());
-        $command->unlock();
 
         return $command;
     }
