@@ -39,7 +39,6 @@ final class CleanAuditLogsCommandTest extends TestCase
             '--no-confirm' => true,
             'keep' => $keep,
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -60,7 +59,6 @@ final class CleanAuditLogsCommandTest extends TestCase
             '--no-confirm' => true,
             '--dump-sql' => true,
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -85,7 +83,6 @@ final class CleanAuditLogsCommandTest extends TestCase
         $commandTester->execute([
             '--no-confirm' => true,
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -104,7 +101,6 @@ final class CleanAuditLogsCommandTest extends TestCase
         $commandTester->execute([
             '--no-confirm' => true,
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -118,7 +114,6 @@ final class CleanAuditLogsCommandTest extends TestCase
         $commandTester->execute([
             '--date' => '2023-04-26T09:00:00Z',
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -132,7 +127,6 @@ final class CleanAuditLogsCommandTest extends TestCase
         $commandTester->execute([
             '--exclude' => 'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author',
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -149,7 +143,6 @@ final class CleanAuditLogsCommandTest extends TestCase
                 'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post',
             ],
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -163,7 +156,6 @@ final class CleanAuditLogsCommandTest extends TestCase
         $commandTester->execute([
             '--include' => 'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author',
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -180,7 +172,6 @@ final class CleanAuditLogsCommandTest extends TestCase
                 'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post',
             ],
         ]);
-        $command->unlock();
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -189,12 +180,8 @@ final class CleanAuditLogsCommandTest extends TestCase
 
     protected function createCommand(): CleanAuditLogsCommand
     {
-        dump($this->getName());
-        dump('before: ', $this->lock);
         $command = new CleanAuditLogsCommand();
         $command->setAuditor($this->provider->getAuditor());
-        //        $command->unlock();
-        dump('after: ', $this->lock);
 
         return $command;
     }

@@ -36,11 +36,6 @@ class CleanAuditLogsCommand extends Command
 
     private Auditor $auditor;
 
-    public function unlock(): void
-    {
-        $this->release();
-    }
-
     public function setAuditor(Auditor $auditor): self
     {
         $this->auditor = $auditor;
