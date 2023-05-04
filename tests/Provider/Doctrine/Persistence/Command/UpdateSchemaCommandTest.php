@@ -49,8 +49,6 @@ final class UpdateSchemaCommandTest extends TestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute([]);
 
-        $command->unlock();
-
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
         self::assertStringContainsString('[CAUTION] This operation should not be executed in a production environment!', $output);
@@ -67,8 +65,6 @@ final class UpdateSchemaCommandTest extends TestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute(['--dump-sql' => true]);
 
-        $command->unlock();
-
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
         self::assertStringContainsString('The following SQL statements will be executed:', $output);
@@ -82,8 +78,6 @@ final class UpdateSchemaCommandTest extends TestCase
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute(['--force' => true]);
-
-        $command->unlock();
 
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
@@ -102,7 +96,6 @@ final class UpdateSchemaCommandTest extends TestCase
             '--force' => true,
             '--dump-sql' => true,
         ]);
-        $command->unlock();
 
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
@@ -122,8 +115,6 @@ final class UpdateSchemaCommandTest extends TestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute(['--force' => true]);
 
-        $command->unlock();
-
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
         self::assertStringContainsString('[OK] Nothing to update.', $output);
@@ -140,8 +131,6 @@ final class UpdateSchemaCommandTest extends TestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute([]);
 
-        $command->unlock();
-
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
         self::assertStringContainsString('The command is already running in another process.', $output);
@@ -151,7 +140,6 @@ final class UpdateSchemaCommandTest extends TestCase
     {
         $command = new UpdateSchemaCommand();
         $command->setAuditor($this->provider->getAuditor());
-        $command->unlock();
 
         return $command;
     }

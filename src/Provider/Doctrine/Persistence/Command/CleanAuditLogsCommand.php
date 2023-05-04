@@ -63,7 +63,7 @@ class CleanAuditLogsCommand extends Command
         if (!$this->lock()) {
             $output->writeln('The command is already running in another process.');
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         $io = new SymfonyStyle($input, $output);
@@ -88,7 +88,7 @@ class CleanAuditLogsCommand extends Command
         }
 
         if (null === $until) {
-            return 0;
+            return Command::SUCCESS;
         }
 
         /** @var DoctrineProvider $provider */
@@ -203,7 +203,7 @@ class CleanAuditLogsCommand extends Command
         // automatically when the execution of the command ends
         $this->release();
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function validateKeepArgument(string $keep, SymfonyStyle $io): ?DateTimeImmutable

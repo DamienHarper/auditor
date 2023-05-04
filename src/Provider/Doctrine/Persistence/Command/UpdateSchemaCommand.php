@@ -24,11 +24,6 @@ class UpdateSchemaCommand extends Command
 
     private Auditor $auditor;
 
-    public function unlock(): void
-    {
-        $this->release();
-    }
-
     public function setAuditor(Auditor $auditor): self
     {
         $this->auditor = $auditor;
@@ -51,7 +46,7 @@ class UpdateSchemaCommand extends Command
         if (!$this->lock()) {
             $output->writeln('The command is already running in another process.');
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         $io = new SymfonyStyle($input, $output);
@@ -74,7 +69,7 @@ class UpdateSchemaCommand extends Command
             $io->success('Nothing to update.');
             $this->release();
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         if ($dumpSql) {
@@ -115,7 +110,7 @@ class UpdateSchemaCommand extends Command
         if ($dumpSql || $force) {
             $this->release();
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         $io->caution('This operation should not be executed in a production environment!');
@@ -132,6 +127,6 @@ class UpdateSchemaCommand extends Command
 
         $this->release();
 
-        return 1;
+        return Command::FAILURE;
     }
 }
