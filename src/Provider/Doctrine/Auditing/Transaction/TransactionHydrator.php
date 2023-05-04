@@ -86,7 +86,7 @@ class TransactionHydrator implements TransactionHydratorInterface
             if (null !== $owner && $this->provider->isAudited($owner)) {
                 $mapping = $collection->getMapping();
 
-                if (null === $mapping) {
+                if (!\is_array($mapping)) {
                     continue;
                 }
 
@@ -126,7 +126,7 @@ class TransactionHydrator implements TransactionHydratorInterface
             if (null !== $owner && $this->provider->isAudited($owner)) {
                 $mapping = $collection->getMapping();
 
-                if (null === $mapping) {
+                if (!\is_array($mapping)) {
                     continue;
                 }
 
