@@ -1,12 +1,12 @@
-includes:
-    - tools/phpstan/vendor/phpstan/phpstan-doctrine/extension.neon
-    - tools/phpstan/vendor/phpstan/phpstan-doctrine/rules.neon
-
 parameters:
     level: max
     inferPrivatePropertyTypeFromConstructor: true
     checkMissingIterableValueType: false
     checkGenericClassInNonGenericObjectType: false
+    type_coverage:
+        return_type: 100
+        param_type: 100
+        property_type: 100
 
     excludePaths:
         - 'src/Event/AuditEvent.php'

@@ -107,8 +107,8 @@ class Reader
             ->setAllowedTypes('page', ['null', 'int'])
             ->setAllowedTypes('page_size', ['null', 'int'])
             ->setAllowedTypes('strict', ['null', 'bool'])
-            ->setAllowedValues('page', static fn ($value): bool => null === $value || $value >= 1)
-            ->setAllowedValues('page_size', static fn ($value): bool => null === $value || $value >= 1)
+            ->setAllowedValues('page', static fn (?int $value): bool => null === $value || $value >= 1)
+            ->setAllowedValues('page_size', static fn (?int $value): bool => null === $value || $value >= 1)
         ;
     }
 

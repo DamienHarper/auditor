@@ -8,15 +8,9 @@ class SimpleFilter implements FilterInterface
 {
     protected string $name;
 
-    /**
-     * @var mixed
-     */
-    protected $value;
+    protected mixed $value;
 
-    /**
-     * @param array|string $value
-     */
-    public function __construct(string $name, $value)
+    public function __construct(string $name, mixed $value)
     {
         $this->name = $name;
         $this->value = $value;

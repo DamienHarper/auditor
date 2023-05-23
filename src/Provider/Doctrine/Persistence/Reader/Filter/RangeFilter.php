@@ -10,15 +10,9 @@ class RangeFilter implements FilterInterface
 {
     protected string $name;
 
-    /**
-     * @var mixed
-     */
-    protected $minValue;
+    protected mixed $minValue;
 
-    /**
-     * @var mixed
-     */
-    protected $maxValue;
+    protected mixed $maxValue;
 
     /**
      * @throws InvalidArgumentException
