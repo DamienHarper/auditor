@@ -21,9 +21,6 @@ class LoggerChain implements SQLLogger
         $this->loggers[] = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function startQuery($sql, ?array $params = null, ?array $types = null): void
     {
         foreach ($this->loggers as $logger) {
@@ -31,9 +28,6 @@ class LoggerChain implements SQLLogger
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function stopQuery(): void
     {
         foreach ($this->loggers as $logger) {

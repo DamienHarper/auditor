@@ -71,9 +71,6 @@ class DoctrineSubscriber implements EventSubscriber
         $entityManager->getConnection()->getConfiguration()->setSQLLogger($loggerChain);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSubscribedEvents(): array
     {
         return [Events::onFlush];
