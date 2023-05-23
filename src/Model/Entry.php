@@ -21,10 +21,7 @@ class Entry
 
     protected string $diffs;
 
-    /**
-     * @var null|int|string
-     */
-    protected $blame_id;
+    protected int|null|string $blame_id = null;
 
     protected ?string $blame_user = null;
 
@@ -78,10 +75,8 @@ class Entry
 
     /**
      * Get the value of blame_id.
-     *
-     * @return null|int|string
      */
-    public function getUserId()
+    public function getUserId(): int|null|string
     {
         return $this->blame_id;
     }
