@@ -43,9 +43,6 @@ class DoctrineSubscriber implements EventSubscriber
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSubscribedEvents(): array
     {
         return [Events::onFlush];

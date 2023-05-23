@@ -23,9 +23,6 @@ final class DHDriver extends AbstractDriverMiddleware
         $this->driver = $driver;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function connect(array $params): DHConnection
     {
         return new DHConnection(

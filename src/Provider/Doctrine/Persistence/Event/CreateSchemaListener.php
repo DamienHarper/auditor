@@ -74,9 +74,6 @@ class CreateSchemaListener implements EventSubscriber
         $updater->createAuditTable($targetEntity, $isSameEntityManager ? $eventArgs->getSchema() : null);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSubscribedEvents(): array
     {
         return [
