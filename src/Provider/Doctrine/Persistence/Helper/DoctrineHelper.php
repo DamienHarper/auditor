@@ -10,11 +10,8 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\ORMSetup;
-use Doctrine\ORM\Tools\Setup;
 use InvalidArgumentException;
 use ReflectionClass;
 
@@ -69,6 +66,11 @@ final class DoctrineHelper
         return \constant(Types::class.'::'.$type);
     }
 
+    /**
+     * TODO: remove this method when we drop support of doctrine/dbal 2.13.x.
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
     public static function createSchemaManager(Connection $connection): AbstractSchemaManager
     {
         return method_exists($connection, 'createSchemaManager')
@@ -76,14 +78,21 @@ final class DoctrineHelper
             : $connection->getSchemaManager(); // @phpstan-ignore-line
     }
 
+    /**
+     * TODO: remove this method when we drop support of doctrine/dbal 2.13.x.
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
     public static function introspectSchema(AbstractSchemaManager $schemaManager): Schema
     {
         return method_exists($schemaManager, 'introspectSchema')
             ? $schemaManager->introspectSchema()
-            : $schemaManager->createSchema();
+            : $schemaManager->createSchema(); // @phpstan-ignore-line
     }
 
     /**
+     * TODO: remove this method when we drop support of doctrine/dbal 2.13.x.
+     *
      * @return array<string>
      *
      * @throws \Doctrine\DBAL\Exception
@@ -99,16 +108,7 @@ final class DoctrineHelper
             );
         }
 
-        return $fromSchema->getMigrateToSql($toSchema, $platform);
-    }
-
-    public static function createAttributeMetadataConfiguration(array $paths, bool $isDevMode = false): Configuration
-    {
-        if (class_exists(ORMSetup::class)) {
-            return ORMSetup::createAttributeMetadataConfiguration($paths, $isDevMode);
-        }
-
-        return Setup::createAttributeMetadataConfiguration($paths, $isDevMode);
+        return $fromSchema->getMigrateToSql($toSchema, $platform); // @phpstan-ignore-line
     }
 
     public static function getEntityManagerFromOnFlushEventArgs(OnFlushEventArgs $args): EntityManagerInterface

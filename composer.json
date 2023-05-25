@@ -13,7 +13,7 @@
   "require": {
     "php": ">=8.0",
     "ext-json": "*",
-    "doctrine/dbal": ">=2.13.1",
+    "doctrine/dbal": "^2.13.1|^3.2",
     "doctrine/orm": "^2.13",
     "symfony/cache": "^5.4|^6.0",
     "symfony/event-dispatcher": "^5.4|^6.0",
