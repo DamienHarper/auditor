@@ -108,12 +108,13 @@ class Query
                 ->select('COUNT(id)')
             ;
 
+            /** @var false|int $result */
             $result = $queryBuilder->executeQuery()->fetchOne();
         } catch (Exception) {
             $result = false;
         }
 
-        return false === $result ? 0 : (int) $result;
+        return (int) $result;
     }
 
     public function addFilter(FilterInterface $filter): self
