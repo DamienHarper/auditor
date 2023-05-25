@@ -6,12 +6,9 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
 use Composer\Autoload\ClassLoader;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
@@ -72,35 +69,11 @@ final class DoctrineHelper
         return \constant(Types::class.'::'.$type);
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
-    public static function executeStatement(QueryBuilder|Statement $statement): void
-    {
-        if (method_exists($statement, 'executeStatement')) {
-            $statement->executeStatement();
-        } else {
-            $statement->execute();
-        }
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
-    public static function executeQuery(QueryBuilder|Statement $statement): int|Result|string
-    {
-        if (method_exists($statement, 'executeQuery')) {
-            return $statement->executeQuery();
-        }
-
-        return $statement->execute();
-    }
-
     public static function createSchemaManager(Connection $connection): AbstractSchemaManager
     {
         return method_exists($connection, 'createSchemaManager')
             ? $connection->createSchemaManager()
-            : $connection->getSchemaManager();
+            : $connection->getSchemaManager(); // @phpstan-ignore-line
     }
 
     public static function introspectSchema(AbstractSchemaManager $schemaManager): Schema

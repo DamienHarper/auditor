@@ -281,7 +281,7 @@ final class SchemaManagerTest extends TestCase
         $sqls = DoctrineHelper::getMigrateToSql($entityManager->getConnection(), $fromSchema, $toSchema);
         foreach ($sqls as $sql) {
             $statement = $entityManager->getConnection()->prepare($sql);
-            DoctrineHelper::executeStatement($statement);
+            $statement->executeStatement();
         }
     }
 

@@ -84,7 +84,7 @@ class Query
     public function execute(): array
     {
         $queryBuilder = $this->buildQueryBuilder();
-        $statement = method_exists($queryBuilder, 'executeQuery') ? $queryBuilder->executeQuery() : $queryBuilder->execute();
+        $statement = $queryBuilder->executeQuery();
 
         $result = [];
         \assert($statement instanceof Result);
@@ -108,19 +108,7 @@ class Query
                 ->select('COUNT(id)')
             ;
 
-            if (method_exists($queryBuilder, 'executeQuery')) {
-                // doctrine/dbal v3.x
-                $result = $queryBuilder
-                    ->executeQuery()
-                    ->fetchOne()
-                ;
-            } else {
-                // doctrine/dbal v2.13.x
-                $result = $queryBuilder // @phpstan-ignore-line
-                    ->execute()
-                    ->fetchColumn(0)
-                ;
-            }
+            $result = $queryBuilder->executeQuery()->fetchOne();
         } catch (Exception) {
             $result = false;
         }
