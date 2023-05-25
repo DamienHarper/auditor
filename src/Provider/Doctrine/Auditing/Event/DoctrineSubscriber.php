@@ -7,7 +7,6 @@ namespace DH\Auditor\Provider\Doctrine\Auditing\Event;
 use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
@@ -29,8 +28,9 @@ class DoctrineSubscriber implements EventSubscriber
      */
     public function onFlush(OnFlushEventArgs $args): void
     {
-        $entityManager = DoctrineHelper::getEntityManagerFromOnFlushEventArgs($args);
+        $entityManager = $args->getObjectManager();
         $transaction = new Transaction($entityManager);
+
         // Populate transaction
         $this->transactionManager->populate($transaction);
 

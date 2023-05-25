@@ -4,16 +4,12 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
-use Composer\Autoload\ClassLoader;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Event\OnFlushEventArgs;
 use InvalidArgumentException;
-use ReflectionClass;
 
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Helper\DoctrineHelperTest
@@ -109,19 +105,5 @@ final class DoctrineHelper
         }
 
         return $fromSchema->getMigrateToSql($toSchema, $platform); // @phpstan-ignore-line
-    }
-
-    public static function getEntityManagerFromOnFlushEventArgs(OnFlushEventArgs $args): EntityManagerInterface
-    {
-        return method_exists($args, 'getObjectManager') ? $args->getObjectManager() : $args->getEntityManager();
-    }
-
-    public static function getVendorDir(): string
-    {
-        $reflection = new ReflectionClass(ClassLoader::class);
-        $filename = $reflection->getFileName();
-        \assert(\is_string($filename));
-
-        return \dirname($filename, 2);
     }
 }
