@@ -219,6 +219,10 @@ class Query
 
     private function mergeSimpleFilters(array $filters): SimpleFilter
     {
+        if ([] === $filters) {
+            throw new InvalidArgumentException('$filters cannot be empty.');
+        }
+
         $merged = [];
         $name = null;
 
@@ -239,7 +243,7 @@ class Query
 
     private function buildWhere(QueryBuilder $queryBuilder): QueryBuilder
     {
-        foreach ($this->filters as $name => $rawFilters) {
+        foreach ($this->filters as $rawFilters) {
             if (0 === (is_countable($rawFilters) ? \count($rawFilters) : 0)) {
                 continue;
             }
@@ -266,7 +270,8 @@ class Query
 
                     foreach ($data['params'] as $name => $value) {
                         if (\is_array($value)) {
-                            $queryBuilder->setParameter($name, $value, Connection::PARAM_STR_ARRAY);
+                            // TODO: replace Connection::PARAM_STR_ARRAY with ArrayParameterType::STRING when dropping support of doctrine/dbal < 3.6
+                            $queryBuilder->setParameter($name, $value, Connection::PARAM_STR_ARRAY); // @phpstan-ignore-line
                         } else {
                             $queryBuilder->setParameter($name, $value);
                         }
