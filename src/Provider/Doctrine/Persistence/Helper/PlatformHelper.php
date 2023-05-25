@@ -41,10 +41,10 @@ abstract class PlatformHelper
 
     public static function getServerVersion(Connection $connection): ?string
     {
-        $wrappedConnection = $connection->getWrappedConnection();
+        $nativeConnection = $connection->getNativeConnection();
 
-        if ($wrappedConnection instanceof ServerInfoAwareConnection) {
-            return $wrappedConnection->getServerVersion();
+        if ($nativeConnection instanceof ServerInfoAwareConnection) {
+            return $nativeConnection->getServerVersion();
         }
 
         return null;

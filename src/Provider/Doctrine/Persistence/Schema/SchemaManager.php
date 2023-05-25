@@ -44,7 +44,7 @@ class SchemaManager
             $connection = $storageServices[$name]->getEntityManager()->getConnection();
             foreach ($queries as $index => $sql) {
                 $statement = $connection->prepare($sql);
-                DoctrineHelper::executeStatement($statement);
+                $statement->executeStatement();
 
                 if (null !== $callback) {
                     $callback([

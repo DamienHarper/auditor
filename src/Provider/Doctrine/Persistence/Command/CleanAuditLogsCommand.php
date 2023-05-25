@@ -9,7 +9,6 @@ use DateTimeImmutable;
 use DH\Auditor\Auditor;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use Exception;
@@ -173,7 +172,7 @@ class CleanAuditLogsCommand extends Command
                     }
 
                     if (!$dryRun) {
-                        DoctrineHelper::executeStatement($queryBuilder);
+                        $queryBuilder->executeStatement();
                     }
 
                     $progressBar->setMessage(sprintf('Cleaning audit tables... (<info>%s</info>)', $auditTable));

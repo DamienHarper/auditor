@@ -4,22 +4,12 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
-use Composer\Autoload\ClassLoader;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\ORMSetup;
-use Doctrine\ORM\Tools\Setup;
 use InvalidArgumentException;
-use ReflectionClass;
 
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Helper\DoctrineHelperTest
@@ -73,44 +63,32 @@ final class DoctrineHelper
     }
 
     /**
+     * TODO: remove this method when we drop support of doctrine/dbal 2.13.x.
+     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public static function executeStatement(QueryBuilder|Statement $statement): void
-    {
-        if (method_exists($statement, 'executeStatement')) {
-            $statement->executeStatement();
-        } else {
-            $statement->execute();
-        }
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
-    public static function executeQuery(QueryBuilder|Statement $statement): int|Result|string
-    {
-        if (method_exists($statement, 'executeQuery')) {
-            return $statement->executeQuery();
-        }
-
-        return $statement->execute();
-    }
-
     public static function createSchemaManager(Connection $connection): AbstractSchemaManager
     {
         return method_exists($connection, 'createSchemaManager')
             ? $connection->createSchemaManager()
-            : $connection->getSchemaManager();
+            : $connection->getSchemaManager(); // @phpstan-ignore-line
     }
 
+    /**
+     * TODO: remove this method when we drop support of doctrine/dbal 2.13.x.
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
     public static function introspectSchema(AbstractSchemaManager $schemaManager): Schema
     {
         return method_exists($schemaManager, 'introspectSchema')
             ? $schemaManager->introspectSchema()
-            : $schemaManager->createSchema();
+            : $schemaManager->createSchema(); // @phpstan-ignore-line
     }
 
     /**
+     * TODO: remove this method when we drop support of doctrine/dbal 2.13.x.
+     *
      * @return array<string>
      *
      * @throws \Doctrine\DBAL\Exception
@@ -126,29 +104,6 @@ final class DoctrineHelper
             );
         }
 
-        return $fromSchema->getMigrateToSql($toSchema, $platform);
-    }
-
-    public static function createAttributeMetadataConfiguration(array $paths, bool $isDevMode = false): Configuration
-    {
-        if (class_exists(ORMSetup::class)) {
-            return ORMSetup::createAttributeMetadataConfiguration($paths, $isDevMode);
-        }
-
-        return Setup::createAttributeMetadataConfiguration($paths, $isDevMode);
-    }
-
-    public static function getEntityManagerFromOnFlushEventArgs(OnFlushEventArgs $args): EntityManagerInterface
-    {
-        return method_exists($args, 'getObjectManager') ? $args->getObjectManager() : $args->getEntityManager();
-    }
-
-    public static function getVendorDir(): string
-    {
-        $reflection = new ReflectionClass(ClassLoader::class);
-        $filename = $reflection->getFileName();
-        \assert(\is_string($filename));
-
-        return \dirname($filename, 2);
+        return $fromSchema->getMigrateToSql($toSchema, $platform); // @phpstan-ignore-line
     }
 }

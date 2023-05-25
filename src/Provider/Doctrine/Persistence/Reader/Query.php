@@ -84,7 +84,7 @@ class Query
     public function execute(): array
     {
         $queryBuilder = $this->buildQueryBuilder();
-        $statement = method_exists($queryBuilder, 'executeQuery') ? $queryBuilder->executeQuery() : $queryBuilder->execute();
+        $statement = $queryBuilder->executeQuery();
 
         $result = [];
         \assert($statement instanceof Result);
@@ -108,24 +108,13 @@ class Query
                 ->select('COUNT(id)')
             ;
 
-            if (method_exists($queryBuilder, 'executeQuery')) {
-                // doctrine/dbal v3.x
-                $result = $queryBuilder
-                    ->executeQuery()
-                    ->fetchOne()
-                ;
-            } else {
-                // doctrine/dbal v2.13.x
-                $result = $queryBuilder // @phpstan-ignore-line
-                    ->execute()
-                    ->fetchColumn(0)
-                ;
-            }
+            /** @var false|int $result */
+            $result = $queryBuilder->executeQuery()->fetchOne();
         } catch (Exception) {
             $result = false;
         }
 
-        return false === $result ? 0 : (int) $result;
+        return (int) $result;
     }
 
     public function addFilter(FilterInterface $filter): self
@@ -230,6 +219,10 @@ class Query
 
     private function mergeSimpleFilters(array $filters): SimpleFilter
     {
+        if ([] === $filters) {
+            throw new InvalidArgumentException('$filters cannot be empty.');
+        }
+
         $merged = [];
         $name = null;
 
@@ -250,7 +243,7 @@ class Query
 
     private function buildWhere(QueryBuilder $queryBuilder): QueryBuilder
     {
-        foreach ($this->filters as $name => $rawFilters) {
+        foreach ($this->filters as $rawFilters) {
             if (0 === (is_countable($rawFilters) ? \count($rawFilters) : 0)) {
                 continue;
             }
@@ -277,7 +270,8 @@ class Query
 
                     foreach ($data['params'] as $name => $value) {
                         if (\is_array($value)) {
-                            $queryBuilder->setParameter($name, $value, Connection::PARAM_STR_ARRAY);
+                            // TODO: replace Connection::PARAM_STR_ARRAY with ArrayParameterType::STRING when dropping support of doctrine/dbal < 3.6
+                            $queryBuilder->setParameter($name, $value, Connection::PARAM_STR_ARRAY); // @phpstan-ignore-line
                         } else {
                             $queryBuilder->setParameter($name, $value);
                         }

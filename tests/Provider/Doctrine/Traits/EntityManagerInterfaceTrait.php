@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
+use Doctrine\ORM\ORMSetup;
 
 trait EntityManagerInterfaceTrait
 {
@@ -20,10 +20,7 @@ trait EntityManagerInterfaceTrait
 
     private function createEntityManager(?array $paths = null, string $connectionName = 'default', ?array $params = null): EntityManagerInterface
     {
-        $configuration = DoctrineHelper::createAttributeMetadataConfiguration(
-            $paths ?? $this->fixturesPath,
-            true,
-        );
+        $configuration = ORMSetup::createAttributeMetadataConfiguration($paths ?? $this->fixturesPath, true);
         $configuration->setNamingStrategy(new UnderscoreNamingStrategy(CASE_LOWER));
 
         $connection = $this->getConnection($connectionName, $params);

@@ -76,7 +76,7 @@ trait AuditTrait
 
         $platform = $entityManager->getConnection()->getDatabasePlatform();
 
-        switch ($type->getName()) {
+        switch (array_search($type::class, Type::getTypesMap(), true)) {
             case DoctrineHelper::getDoctrineType('BIGINT'):
                 $convertedValue = (string) $value;  // @phpstan-ignore-line
 

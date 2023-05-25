@@ -67,7 +67,7 @@ trait SchemaSetupTrait
         $sqls = DoctrineHelper::getMigrateToSql($storageConnection, $fromSchema, $toSchema);
         foreach ($sqls as $sql) {
             $statement = $storageConnection->prepare($sql);
-            DoctrineHelper::executeStatement($statement);
+            $statement->executeStatement();
         }
 
         try {
@@ -136,7 +136,7 @@ trait SchemaSetupTrait
         $sqls = DoctrineHelper::getMigrateToSql($storageConnection, $fromSchema, $schema);
         foreach ($sqls as $sql) {
             $statement = $storageConnection->prepare($sql);
-            DoctrineHelper::executeStatement($statement);
+            $statement->executeStatement();
         }
 
         try {
