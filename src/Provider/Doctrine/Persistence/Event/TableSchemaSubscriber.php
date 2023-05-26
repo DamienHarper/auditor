@@ -10,7 +10,7 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 
-class TableSchemaSubscriber implements EventSubscriber
+final class TableSchemaSubscriber implements EventSubscriber
 {
     private DoctrineProvider $provider;
 

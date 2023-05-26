@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Auditing\Transaction\TransactionProcessorTest
  */
-class TransactionProcessor implements TransactionProcessorInterface
+final class TransactionProcessor implements TransactionProcessorInterface
 {
     use AuditTrait;
 

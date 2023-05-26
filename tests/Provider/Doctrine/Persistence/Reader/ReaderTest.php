@@ -469,7 +469,7 @@ final class ReaderTest extends TestCase
         self::assertCount(2, $audits[Post::class], 'Reader::getAllAuditsByTransactionHash() is ok.');
     }
 
-    protected function explain(Entry $entry, string $class, bool $verbose = true): string
+    private function explain(Entry $entry, string $class, bool $verbose = true): string
     {
         $diff = $entry->getDiffs() ?? [];
 

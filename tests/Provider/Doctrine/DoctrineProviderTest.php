@@ -569,7 +569,7 @@ final class DoctrineProviderTest extends TestCase
     }
 }
 
-class FakeStorageMapper
+final class FakeStorageMapper
 {
     public function __invoke(string $entity, array $storageServices): StorageServiceInterface
     {
@@ -577,7 +577,7 @@ class FakeStorageMapper
     }
 }
 
-class FakeUserProvider implements UserProviderInterface
+final class FakeUserProvider implements UserProviderInterface
 {
     public function __invoke(): ?UserInterface
     {
@@ -585,7 +585,7 @@ class FakeUserProvider implements UserProviderInterface
     }
 }
 
-class FakeSecurityProvider implements SecurityProviderInterface
+final class FakeSecurityProvider implements SecurityProviderInterface
 {
     public function __invoke(): array
     {
@@ -593,7 +593,7 @@ class FakeSecurityProvider implements SecurityProviderInterface
     }
 }
 
-class FakeRoleChecker implements RoleCheckerInterface
+final class FakeRoleChecker implements RoleCheckerInterface
 {
     public function __invoke(string $entity, string $scope): bool
     {

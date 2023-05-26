@@ -17,7 +17,7 @@ use Exception;
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Event\CreateSchemaListenerTest
  */
-class CreateSchemaListener implements EventSubscriber
+final class CreateSchemaListener implements EventSubscriber
 {
     private DoctrineProvider $provider;
 

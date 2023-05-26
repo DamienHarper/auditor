@@ -23,7 +23,7 @@ use Doctrine\ORM\EntityManagerInterface;
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema\SchemaManagerTest
  */
-class SchemaManager
+final class SchemaManager
 {
     private DoctrineProvider $provider;
 

@@ -25,6 +25,11 @@ final class CreateSchemaListenerTest extends TestCase
 {
     use DefaultSchemaSetupTrait;
 
+    /**
+     * @var array<class-string<\DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal>>
+     */
+    private const CLASSES = [Dog::class, Cat::class];
+
     public function testCorrectSchemaStandard(): void
     {
         $tableNames = $this->getTables();
@@ -53,12 +58,11 @@ final class CreateSchemaListenerTest extends TestCase
     {
         $configuration = $this->provider->getConfiguration();
         $entities = $configuration->getEntities();
-        $classes = [Dog::class, Cat::class];
         $tableNames = $this->getTables();
 
         self::assertNotContains(Animal::class, $entities);
 
-        foreach ($classes as $entity) {
+        foreach (self::CLASSES as $entity) {
             self::assertContains($entities[$entity]['computed_table_name'], $tableNames);
             self::assertContains($entities[$entity]['computed_audit_table_name'], $tableNames);
         }

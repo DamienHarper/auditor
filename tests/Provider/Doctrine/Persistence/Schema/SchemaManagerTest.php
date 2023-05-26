@@ -39,6 +39,84 @@ final class SchemaManagerTest extends TestCase
 {
     use DefaultSchemaSetupTrait;
     use ReflectionTrait;
+    // new/alternate structure
+    /**
+     * @var array<string, array<string, array<string, int|true>|array<string, null|bool>|array<string, null|false|int>|array<string, null|true>|array<string, true>|string>>
+     */
+    private const ALTERNATE_COLUMNS = [
+        'id' => [
+            'type' => Types::INTEGER,
+            'options' => [
+                'autoincrement' => true,
+                'unsigned' => true,
+            ],
+        ],
+        'type' => [
+            'type' => Types::STRING,
+            'options' => [
+                'notnull' => true,
+                'length' => 10,
+            ],
+        ],
+        'object_id' => [
+            'type' => Types::STRING,
+            'options' => [
+                'notnull' => true,
+                'length' => 50,
+            ],
+        ],
+        'discriminator' => [
+            'type' => Types::STRING,
+            'options' => [
+                'default' => null,
+                'notnull' => false,
+            ],
+        ],
+        'diffs' => [
+            'type' => Types::JSON,
+            'options' => [
+                'default' => null,
+                'notnull' => false,
+            ],
+        ],
+        'blame_id' => [
+            'type' => Types::STRING,
+            'options' => [
+                'default' => null,
+                'notnull' => false,
+                'unsigned' => true,
+            ],
+        ],
+        'blame_user' => [
+            'type' => Types::STRING,
+            'options' => [
+                'default' => null,
+                'notnull' => false,
+                'length' => 100,
+            ],
+        ],
+        'created_at' => [
+            'type' => Types::DATETIME_IMMUTABLE,
+            'options' => [
+                'notnull' => true,
+            ],
+        ],
+        'locale' => [
+            'type' => Types::STRING,
+            'options' => [
+                'default' => null,
+                'notnull' => false,
+                'length' => 5,
+            ],
+        ],
+        'version' => [
+            'type' => Types::INTEGER,
+            'options' => [
+                'default' => null,
+                'notnull' => true,
+            ],
+        ],
+    ];
 
     public function testStorageServicesSetup(): void
     {
@@ -124,82 +202,6 @@ final class SchemaManagerTest extends TestCase
         $toSchema = $updater->createAuditTable(Author::class);
         $this->migrate($fromSchema, $toSchema, $entityManager);
 
-        // new/alternate structure
-        $alternateColumns = [
-            'id' => [
-                'type' => Types::INTEGER,
-                'options' => [
-                    'autoincrement' => true,
-                    'unsigned' => true,
-                ],
-            ],
-            'type' => [
-                'type' => Types::STRING,
-                'options' => [
-                    'notnull' => true,
-                    'length' => 10,
-                ],
-            ],
-            'object_id' => [
-                'type' => Types::STRING,
-                'options' => [
-                    'notnull' => true,
-                    'length' => 50,
-                ],
-            ],
-            'discriminator' => [
-                'type' => Types::STRING,
-                'options' => [
-                    'default' => null,
-                    'notnull' => false,
-                ],
-            ],
-            'diffs' => [
-                'type' => Types::JSON,
-                'options' => [
-                    'default' => null,
-                    'notnull' => false,
-                ],
-            ],
-            'blame_id' => [
-                'type' => Types::STRING,
-                'options' => [
-                    'default' => null,
-                    'notnull' => false,
-                    'unsigned' => true,
-                ],
-            ],
-            'blame_user' => [
-                'type' => Types::STRING,
-                'options' => [
-                    'default' => null,
-                    'notnull' => false,
-                    'length' => 100,
-                ],
-            ],
-            'created_at' => [
-                'type' => Types::DATETIME_IMMUTABLE,
-                'options' => [
-                    'notnull' => true,
-                ],
-            ],
-            'locale' => [
-                'type' => Types::STRING,
-                'options' => [
-                    'default' => null,
-                    'notnull' => false,
-                    'length' => 5,
-                ],
-            ],
-            'version' => [
-                'type' => Types::INTEGER,
-                'options' => [
-                    'default' => null,
-                    'notnull' => true,
-                ],
-            ],
-        ];
-
         $hash = md5('author_audit');
         $alternateIndices = [
             'id' => [
@@ -230,7 +232,7 @@ final class SchemaManagerTest extends TestCase
         $columns = $schemaManager->listTableColumns($authorAuditTable->getName());
 
         $reflectedMethod = $this->reflectMethod($updater, 'processColumns');
-        $reflectedMethod->invokeArgs($updater, [$table, $columns, $alternateColumns, $entityManager->getConnection()]);
+        $reflectedMethod->invokeArgs($updater, [$table, $columns, self::ALTERNATE_COLUMNS, $entityManager->getConnection()]);
 
         $reflectedMethod = $this->reflectMethod($updater, 'processIndices');
         $reflectedMethod->invokeArgs($updater, [$table, $alternateIndices, $entityManager->getConnection()]);
@@ -240,7 +242,7 @@ final class SchemaManagerTest extends TestCase
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
 
         // check expected alternate columns
-        foreach (array_keys($alternateColumns) as $name) {
+        foreach (array_keys(self::ALTERNATE_COLUMNS) as $name) {
             self::assertTrue($authorAuditTable->hasColumn($name), 'audit table has a column named "'.$name.'".');
         }
 

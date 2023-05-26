@@ -29,20 +29,23 @@ final class CleanAuditLogsCommandTest extends TestCase
     use LockableTrait;
     use SchemaSetupTrait;
 
+    /**
+     * @var string
+     */
+    private const KEEP = 'WRONG';
+
     public function testExecuteFailsWithKeepWrongFormat(): void
     {
-        $keep = 'WRONG';
-
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             '--no-confirm' => true,
-            'keep' => $keep,
+            'keep' => self::KEEP,
         ]);
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString(sprintf("[ERROR] 'keep' argument must be a valid ISO 8601 date interval, '%s' given.", $keep), $output);
+        self::assertStringContainsString(sprintf("[ERROR] 'keep' argument must be a valid ISO 8601 date interval, '%s' given.", self::KEEP), $output);
     }
 
     public function testDumpSQL(): void
@@ -180,7 +183,7 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('2 classes involved', $output);
     }
 
-    protected function createCommand(): CleanAuditLogsCommand
+    private function createCommand(): CleanAuditLogsCommand
     {
         $command = new CleanAuditLogsCommand();
         $command->setAuditor($this->provider->getAuditor());

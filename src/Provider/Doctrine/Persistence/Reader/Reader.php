@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader\ReaderTest
  */
-class Reader
+final class Reader
 {
     /**
      * @var int

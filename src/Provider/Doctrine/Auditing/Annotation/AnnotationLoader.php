@@ -12,7 +12,7 @@ use ReflectionClass;
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Auditing\Annotation\AnnotationLoaderTest
  */
-class AnnotationLoader
+final class AnnotationLoader
 {
     private EntityManagerInterface $entityManager;
 

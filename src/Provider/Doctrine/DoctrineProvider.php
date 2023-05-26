@@ -25,8 +25,24 @@ use Exception;
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\DoctrineProviderTest
  */
-class DoctrineProvider extends AbstractProvider
+final class DoctrineProvider extends AbstractProvider
 {
+    /**
+     * @var array<string, string>
+     */
+    private const FIELDS = [
+        'type' => ':type',
+        'object_id' => ':object_id',
+        'discriminator' => ':discriminator',
+        'transaction_hash' => ':transaction_hash',
+        'diffs' => ':diffs',
+        'blame_id' => ':blame_id',
+        'blame_user' => ':blame_user',
+        'blame_user_fqdn' => ':blame_user_fqdn',
+        'blame_user_firewall' => ':blame_user_firewall',
+        'ip' => ':ip',
+        'created_at' => ':created_at',
+    ];
     private TransactionManager $transactionManager;
 
     public function __construct(ConfigurationInterface $configuration)
@@ -107,25 +123,11 @@ class DoctrineProvider extends AbstractProvider
         $entity = $payload['entity'];
         unset($payload['table'], $payload['entity']);
 
-        $fields = [
-            'type' => ':type',
-            'object_id' => ':object_id',
-            'discriminator' => ':discriminator',
-            'transaction_hash' => ':transaction_hash',
-            'diffs' => ':diffs',
-            'blame_id' => ':blame_id',
-            'blame_user' => ':blame_user',
-            'blame_user_fqdn' => ':blame_user_fqdn',
-            'blame_user_firewall' => ':blame_user_firewall',
-            'ip' => ':ip',
-            'created_at' => ':created_at',
-        ];
-
         $query = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
             $auditTable,
-            implode(', ', array_keys($fields)),
-            implode(', ', array_values($fields))
+            implode(', ', array_keys(self::FIELDS)),
+            implode(', ', array_values(self::FIELDS))
         );
 
         /** @var StorageService $storageService */

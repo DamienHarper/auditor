@@ -138,7 +138,7 @@ final class UpdateSchemaCommandTest extends TestCase
         $this->release();
     }
 
-    protected function createCommand(): UpdateSchemaCommand
+    private function createCommand(): UpdateSchemaCommand
     {
         $command = new UpdateSchemaCommand();
         $command->setAuditor($this->provider->getAuditor());

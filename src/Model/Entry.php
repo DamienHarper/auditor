@@ -7,31 +7,31 @@ namespace DH\Auditor\Model;
 /**
  * @see \DH\Auditor\Tests\Model\EntryTest
  */
-class Entry
+final class Entry
 {
-    protected int $id;
+    private int $id;
 
-    protected string $type;
+    private string $type;
 
-    protected string $object_id;
+    private string $object_id;
 
-    protected ?string $discriminator = null;
+    private ?string $discriminator = null;
 
-    protected ?string $transaction_hash = null;
+    private ?string $transaction_hash = null;
 
-    protected string $diffs;
+    private string $diffs;
 
-    protected int|null|string $blame_id = null;
+    private int|null|string $blame_id = null;
 
-    protected ?string $blame_user = null;
+    private ?string $blame_user = null;
 
-    protected ?string $blame_user_fqdn = null;
+    private ?string $blame_user_fqdn = null;
 
-    protected ?string $blame_user_firewall = null;
+    private ?string $blame_user_firewall = null;
 
-    protected ?string $ip = null;
+    private ?string $ip = null;
 
-    protected string $created_at;
+    private string $created_at;
 
     /**
      * Get the value of id.

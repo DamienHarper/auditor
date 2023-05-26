@@ -6,6 +6,6 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Exception;
 
 use Exception;
 
-class UpdateException extends Exception
+final class UpdateException extends Exception
 {
 }

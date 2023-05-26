@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * @see \DH\Auditor\Tests\AuditorTest
  */
-class Auditor
+final class Auditor
 {
     private Configuration $configuration;
 

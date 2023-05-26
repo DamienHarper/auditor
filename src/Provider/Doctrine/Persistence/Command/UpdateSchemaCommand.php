@@ -18,7 +18,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Command\UpdateSchemaCommandTest
  */
-class UpdateSchemaCommand extends Command
+final class UpdateSchemaCommand extends Command
 {
     use LockableTrait;
 

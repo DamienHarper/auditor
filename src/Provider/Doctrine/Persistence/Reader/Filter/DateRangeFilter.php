@@ -7,13 +7,13 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter;
 use DateTimeInterface;
 use DH\Auditor\Exception\InvalidArgumentException;
 
-class DateRangeFilter implements FilterInterface
+final class DateRangeFilter implements FilterInterface
 {
-    protected string $name;
+    private string $name;
 
-    protected ?DateTimeInterface $minValue;
+    private ?DateTimeInterface $minValue;
 
-    protected ?DateTimeInterface $maxValue;
+    private ?DateTimeInterface $maxValue;
 
     public function __construct(string $name, ?DateTimeInterface $minValue, ?DateTimeInterface $maxValue = null)
     {
