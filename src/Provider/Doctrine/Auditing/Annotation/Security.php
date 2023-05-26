@@ -19,7 +19,7 @@ final class Security
      * @var array<string>
      */
     #[Required]
-    public array $view;
+    public array $view = [];
 
     public function __construct(array $view)
     {

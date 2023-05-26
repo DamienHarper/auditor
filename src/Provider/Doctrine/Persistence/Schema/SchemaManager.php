@@ -64,7 +64,7 @@ class SchemaManager
     {
         $metadataDriver = $entityManager->getConfiguration()->getMetadataDriverImpl();
         $entities = [];
-        if (null !== $metadataDriver) {
+        if ($metadataDriver instanceof \Doctrine\Persistence\Mapping\Driver\MappingDriver) {
             $entities = $metadataDriver->getAllClassNames();
         }
 
@@ -159,7 +159,7 @@ class SchemaManager
         $storageService = $this->provider->getStorageServiceForEntity($entity);
         $connection = $storageService->getEntityManager()->getConnection();
 
-        if (null === $schema) {
+        if (!$schema instanceof \Doctrine\DBAL\Schema\Schema) {
             $schemaManager = DoctrineHelper::createSchemaManager($connection);
             $schema = DoctrineHelper::introspectSchema($schemaManager);
         }
@@ -216,7 +216,7 @@ class SchemaManager
         $connection = $storageService->getEntityManager()->getConnection();
 
         $schemaManager = DoctrineHelper::createSchemaManager($connection);
-        if (null === $schema) {
+        if (!$schema instanceof \Doctrine\DBAL\Schema\Schema) {
             $schema = DoctrineHelper::introspectSchema($schemaManager);
         }
 

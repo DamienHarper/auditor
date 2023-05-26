@@ -162,7 +162,7 @@ class DoctrineProvider extends AbstractProvider
      */
     public function isAudited(object|string $entity): bool
     {
-        \assert(null !== $this->auditor);
+        \assert($this->auditor instanceof \DH\Auditor\Auditor);
         if (!$this->auditor->getConfiguration()->isEnabled()) {
             return false;
         }
@@ -238,7 +238,7 @@ class DoctrineProvider extends AbstractProvider
 
         $annotationLoader = new AnnotationLoader($entityManager);
 
-        if (null !== $metadataCache) {
+        if ($metadataCache instanceof \Psr\Cache\CacheItemPoolInterface) {
             $item = $metadataCache->getItem('__DH_ANNOTATIONS__');
             if (!$item->isHit() || !\is_array($annotationEntities = $item->get())) {
                 $annotationEntities = $annotationLoader->load();
@@ -248,6 +248,7 @@ class DoctrineProvider extends AbstractProvider
         } else {
             $annotationEntities = $annotationLoader->load();
         }
+
         $this->configuration->setEntities(array_merge($entities, $annotationEntities));
 
         return $this;

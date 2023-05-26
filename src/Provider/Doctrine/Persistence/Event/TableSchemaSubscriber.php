@@ -28,7 +28,7 @@ class TableSchemaSubscriber implements EventSubscriber
 
             \assert($storageService instanceof StorageService);
             $platform = $storageService->getEntityManager()->getConnection()->getDatabasePlatform();
-            if (null !== $platform && !$platform->supportsSchemas()) {
+            if ($platform instanceof \Doctrine\DBAL\Platforms\AbstractPlatform && !$platform->supportsSchemas()) {
                 $classMetadata->setPrimaryTable([
                     'name' => $schemaManager->resolveTableName($classMetadata->getTableName(), $classMetadata->getSchemaName() ?? '', $platform),
                     'schema' => '',

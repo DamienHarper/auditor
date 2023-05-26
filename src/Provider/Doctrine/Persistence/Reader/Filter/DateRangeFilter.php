@@ -17,7 +17,7 @@ class DateRangeFilter implements FilterInterface
 
     public function __construct(string $name, ?DateTimeInterface $minValue, ?DateTimeInterface $maxValue = null)
     {
-        if (null !== $minValue && null !== $maxValue && $minValue > $maxValue) {
+        if ($minValue instanceof DateTimeInterface && $maxValue instanceof DateTimeInterface && $minValue > $maxValue) {
             throw new InvalidArgumentException('Max bound has to be later than min bound.');
         }
 
@@ -44,12 +44,12 @@ class DateRangeFilter implements FilterInterface
         $sqls = [];
         $params = [];
 
-        if (null !== $this->minValue) {
+        if ($this->minValue instanceof DateTimeInterface) {
             $sqls[] = sprintf('%s >= :min_%s', $this->name, $this->name);
             $params['min_'.$this->name] = $this->minValue->format('Y-m-d H:i:s');
         }
 
-        if (null !== $this->maxValue) {
+        if ($this->maxValue instanceof DateTimeInterface) {
             $sqls[] = sprintf('%s <= :max_%s', $this->name, $this->name);
             $params['max_'.$this->name] = $this->maxValue->format('Y-m-d H:i:s');
         }

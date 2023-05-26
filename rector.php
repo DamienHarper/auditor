@@ -14,6 +14,7 @@ use Rector\Symfony\Set\SymfonySetList;
 use Rector\Transform\Rector\Attribute\AttributeKeyToClassConstFetchRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddArrayParamDocTypeRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddArrayReturnDocTypeRector;
+use Rector\Privatization\Rector\Property\ChangeReadOnlyPropertyWithDefaultValueToConstantRector;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([__DIR__.'/src', __DIR__.'/tests']);
@@ -28,6 +29,7 @@ return static function (RectorConfig $rectorConfig): void {
         MakeCommandLazyRector::class,
         AddArrayReturnDocTypeRector::class,
         AddArrayParamDocTypeRector::class,
+        ChangeReadOnlyPropertyWithDefaultValueToConstantRector::class,
     ]);
 
     // PHP rules
@@ -46,7 +48,6 @@ return static function (RectorConfig $rectorConfig): void {
         SymfonySetList::SYMFONY_CODE_QUALITY,
         SymfonySetList::SYMFONY_CONSTRUCTOR_INJECTION,
         SymfonySetList::ANNOTATIONS_TO_ATTRIBUTES,
-        SymfonySetList::SYMFONY_STRICT,
     ]);
 
     // Doctrine rules

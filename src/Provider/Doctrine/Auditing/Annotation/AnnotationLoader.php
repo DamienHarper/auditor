@@ -49,7 +49,7 @@ class AnnotationLoader
             $annotation = $attributes[0]->newInstance();
         }
 
-        if (null === $annotation) {
+        if (!$annotation instanceof \Doctrine\ORM\Mapping\Entity) {
             return null;
         }
 
@@ -59,7 +59,7 @@ class AnnotationLoader
             $auditableAnnotation = $attributes[0]->newInstance();
         }
 
-        if (null === $auditableAnnotation) {
+        if (!$auditableAnnotation instanceof \DH\Auditor\Provider\Doctrine\Auditing\Annotation\Auditable) {
             return null;
         }
 
@@ -69,7 +69,7 @@ class AnnotationLoader
             $securityAnnotation = $attributes[0]->newInstance();
         }
 
-        $roles = null === $securityAnnotation ? null : [Security::VIEW_SCOPE => $securityAnnotation->view];
+        $roles = $securityAnnotation instanceof \DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security ? [Security::VIEW_SCOPE => $securityAnnotation->view] : null;
 
         // Are there any Ignore annotation or attribute?
         $ignoredColumns = $this->getAllProperties($reflection);
@@ -92,7 +92,7 @@ class AnnotationLoader
                 $annotationProperty = $attributes[0]->newInstance();
             }
 
-            if (null !== $annotationProperty) {
+            if ($annotationProperty instanceof \DH\Auditor\Provider\Doctrine\Auditing\Annotation\Ignore) {
                 $properties[] = $property->getName();
             }
         }

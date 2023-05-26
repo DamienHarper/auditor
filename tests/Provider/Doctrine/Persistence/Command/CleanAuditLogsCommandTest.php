@@ -63,7 +63,7 @@ final class CleanAuditLogsCommandTest extends TestCase
         // the output of the command in the console
         $output = $commandTester->getDisplay();
 
-        foreach ($entities as $entity => $entityOptions) {
+        foreach (array_keys($entities) as $entity) {
             $storageService = $this->provider->getStorageServiceForEntity($entity);
             $platform = $storageService->getEntityManager()->getConnection()->getDatabasePlatform();
             $expected = 'DELETE FROM '.$schemaManager->resolveAuditTableName($entity, $configuration, $platform);
@@ -109,7 +109,7 @@ final class CleanAuditLogsCommandTest extends TestCase
         $this->release();
     }
 
-    public function testDateOption()
+    public function testDateOption(): void
     {
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
@@ -122,12 +122,12 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('clean audits created before 2023-04-26 09:00:00', $output);
     }
 
-    public function testExcludeOptionSingleValue()
+    public function testExcludeOptionSingleValue(): void
     {
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute([
-            '--exclude' => 'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author',
+            '--exclude' => \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author::class,
         ]);
 
         // the output of the command in the console
@@ -135,14 +135,14 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('6 classes involved', $output);
     }
 
-    public function testExcludeOptionMultipleValues()
+    public function testExcludeOptionMultipleValues(): void
     {
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             '--exclude' => [
-                'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author',
-                'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post',
+                \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author::class,
+                \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post::class,
             ],
         ]);
 
@@ -151,12 +151,12 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('5 classes involved', $output);
     }
 
-    public function testIncludeOptionSignleValue()
+    public function testIncludeOptionSignleValue(): void
     {
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute([
-            '--include' => 'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author',
+            '--include' => \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author::class,
         ]);
 
         // the output of the command in the console
@@ -164,14 +164,14 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('1 classes involved', $output);
     }
 
-    public function testIncludeOptionMultipleValues()
+    public function testIncludeOptionMultipleValues(): void
     {
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             '--include' => [
-                'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author',
-                'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post',
+                \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author::class,
+                \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post::class,
             ],
         ]);
 

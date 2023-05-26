@@ -173,7 +173,8 @@ class Configuration implements ConfigurationInterface
         if ($this->initialized && null !== $this->entities) {
             return $this->entities;
         }
-        if (null !== $this->provider) {
+
+        if ($this->provider instanceof \DH\Auditor\Provider\Doctrine\DoctrineProvider) {
             $schemaManager = new SchemaManager($this->provider);
 
             /** @var array<AuditingService> $auditingServices */
@@ -189,7 +190,7 @@ class Configuration implements ConfigurationInterface
                 }
 
                 \assert(null !== $this->entities);
-                foreach ($this->entities as $entity => $config) {
+                foreach (array_keys($this->entities) as $entity) {
                     $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
                     $entityTableName = $meta->getTableName();
                     $namespaceName = $meta->getSchemaName() ?? '';
@@ -208,6 +209,7 @@ class Configuration implements ConfigurationInterface
                     );
                 }
             }
+
             $this->initialized = true;
         }
 
