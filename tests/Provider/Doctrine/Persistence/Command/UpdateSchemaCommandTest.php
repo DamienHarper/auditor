@@ -24,6 +24,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  *
  * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class UpdateSchemaCommandTest extends TestCase
 {
     use LockableTrait;
@@ -56,9 +57,7 @@ final class UpdateSchemaCommandTest extends TestCase
         self::assertStringContainsString(' queries to update the database.', $output);
     }
 
-    /**
-     * @depends testExecute
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testExecute')]
     public function testExecuteDumpSQL(): void
     {
         $command = $this->createCommand();
@@ -70,9 +69,7 @@ final class UpdateSchemaCommandTest extends TestCase
         self::assertStringContainsString('The following SQL statements will be executed:', $output);
     }
 
-    /**
-     * @depends testExecute
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testExecute')]
     public function testExecuteForce(): void
     {
         $command = $this->createCommand();
@@ -85,9 +82,7 @@ final class UpdateSchemaCommandTest extends TestCase
         self::assertStringContainsString('[OK] Database schema updated successfully!', $output);
     }
 
-    /**
-     * @depends testExecute
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testExecute')]
     public function testExecuteForceDumpSQL(): void
     {
         $command = $this->createCommand();
@@ -104,9 +99,7 @@ final class UpdateSchemaCommandTest extends TestCase
         self::assertStringContainsString('[OK] Database schema updated successfully!', $output);
     }
 
-    /**
-     * @depends testExecute
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testExecute')]
     public function testExecuteNothingToUpdate(): void
     {
         $this->provider->getConfiguration()->setEntities([]);
@@ -120,9 +113,7 @@ final class UpdateSchemaCommandTest extends TestCase
         self::assertStringContainsString('[OK] Nothing to update.', $output);
     }
 
-    /**
-     * @depends testExecute
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testExecute')]
     public function testExecuteFailsWhileLocked(): void
     {
         $this->lock('audit:schema:update');

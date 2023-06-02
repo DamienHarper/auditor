@@ -35,6 +35,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class SchemaManagerTest extends TestCase
 {
     use DefaultSchemaSetupTrait;
@@ -180,9 +181,7 @@ final class SchemaManagerTest extends TestCase
         }
     }
 
-    /**
-     * @depends testCreateAuditTable
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testCreateAuditTable')]
     public function testUpdateAuditTable(): void
     {
         $updater = new SchemaManager($this->provider);

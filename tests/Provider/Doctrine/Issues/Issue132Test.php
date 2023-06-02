@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class Issue132Test extends TestCase
 {
     use DefaultSchemaSetupTrait;

@@ -43,6 +43,7 @@ final class DoctrineProvider extends AbstractProvider
         'ip' => ':ip',
         'created_at' => ':created_at',
     ];
+
     private TransactionManager $transactionManager;
 
     public function __construct(ConfigurationInterface $configuration)

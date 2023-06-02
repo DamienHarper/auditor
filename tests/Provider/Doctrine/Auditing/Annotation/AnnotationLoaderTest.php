@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class AnnotationLoaderTest extends TestCase
 {
     use EntityManagerInterfaceTrait;

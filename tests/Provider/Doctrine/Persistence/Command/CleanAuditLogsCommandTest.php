@@ -24,6 +24,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  *
  * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class CleanAuditLogsCommandTest extends TestCase
 {
     use LockableTrait;
@@ -76,9 +77,7 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('[OK] Success', $output);
     }
 
-    /**
-     * @depends testDumpSQL
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testDumpSQL')]
     public function testExecute(): void
     {
         $command = $this->createCommand();
@@ -92,9 +91,7 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('[OK] Success', $output);
     }
 
-    /**
-     * @depends testExecute
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testExecute')]
     public function testExecuteFailsWhileLocked(): void
     {
         $this->lock('audit:clean');

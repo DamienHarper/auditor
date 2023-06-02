@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class DoctrineHelperTest extends TestCase
 {
     public function testRegisterStorageServiceAgainstNoStorageProvider(): void

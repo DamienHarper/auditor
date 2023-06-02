@@ -18,6 +18,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class Issue98Test extends TestCase
 {
     use ReaderTrait;

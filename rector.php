@@ -56,6 +56,7 @@ return static function (RectorConfig $rectorConfig): void {
         DoctrineSetList::DOCTRINE_DBAL_30,
         DoctrineSetList::DOCTRINE_ORM_29,
         DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
+        DoctrineSetList::GEDMO_ANNOTATIONS_TO_ATTRIBUTES,
     ]);
 
     // PHPUnit rules
@@ -63,5 +64,7 @@ return static function (RectorConfig $rectorConfig): void {
         PHPUnitSetList::PHPUNIT_91,
         PHPUnitSetList::PHPUNIT_CODE_QUALITY,
         PHPUnitSetList::PHPUNIT_YIELD_DATA_PROVIDER,
+        PHPUnitSetList::PHPUNIT_EXCEPTION,
+        PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES,
     ]);
 };

@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class ConfigurationTest extends TestCase
 {
     use ProviderConfigurationTrait;

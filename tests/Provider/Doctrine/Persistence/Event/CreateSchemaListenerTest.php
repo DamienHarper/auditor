@@ -21,6 +21,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class CreateSchemaListenerTest extends TestCase
 {
     use DefaultSchemaSetupTrait;
@@ -38,9 +39,7 @@ final class CreateSchemaListenerTest extends TestCase
         self::assertContains('author_audit', $tableNames);
     }
 
-    /**
-     * @depends testCorrectSchemaStandard
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testCorrectSchemaStandard')]
     public function testCorrectSchemaForSingleTableInheritance(): void
     {
         $tableNames = $this->getTables();
@@ -51,9 +50,7 @@ final class CreateSchemaListenerTest extends TestCase
         self::assertContains('vehicle_audit', $tableNames);
     }
 
-    /**
-     * @depends testCorrectSchemaForSingleTableInheritance
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testCorrectSchemaForSingleTableInheritance')]
     public function testCorrectSchemaForJoinedTableInheritance(): void
     {
         $configuration = $this->provider->getConfiguration();

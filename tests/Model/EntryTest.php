@@ -13,6 +13,7 @@ use ReflectionClass;
  *
  * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class EntryTest extends TestCase
 {
     /**

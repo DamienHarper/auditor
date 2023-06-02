@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class Issue112Test extends TestCase
 {
     use AuditTrait;
