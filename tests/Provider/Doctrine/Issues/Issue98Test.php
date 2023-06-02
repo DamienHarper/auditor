@@ -15,8 +15,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
- *
- * @small
  */
 #[\PHPUnit\Framework\Attributes\Small]
 final class Issue98Test extends TestCase

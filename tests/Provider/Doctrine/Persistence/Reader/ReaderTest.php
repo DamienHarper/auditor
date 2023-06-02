@@ -24,8 +24,6 @@ use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException as Opti
 
 /**
  * @internal
- *
- * @small
  */
 #[\PHPUnit\Framework\Attributes\Small]
 final class ReaderTest extends TestCase

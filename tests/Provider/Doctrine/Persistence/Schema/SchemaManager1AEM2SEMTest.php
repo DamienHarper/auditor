@@ -21,8 +21,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
- *
- * @small
  */
 #[\PHPUnit\Framework\Attributes\Small]
 final class SchemaManager1AEM2SEMTest extends TestCase

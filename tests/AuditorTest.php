@@ -17,8 +17,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * @internal
- *
- * @small
  */
 #[\PHPUnit\Framework\Attributes\Small]
 final class AuditorTest extends TestCase

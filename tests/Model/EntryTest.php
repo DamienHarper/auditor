@@ -10,8 +10,6 @@ use ReflectionClass;
 
 /**
  * @internal
- *
- * @small
  */
 #[\PHPUnit\Framework\Attributes\Small]
 final class EntryTest extends TestCase

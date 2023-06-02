@@ -21,8 +21,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * @internal
- *
- * @small
  */
 #[\PHPUnit\Framework\Attributes\Small]
 final class CleanAuditLogsCommandTest extends TestCase

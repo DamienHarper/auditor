@@ -9,8 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
- *
- * @small
  */
 #[\PHPUnit\Framework\Attributes\Small]
 final class DoctrineHelperTest extends TestCase
