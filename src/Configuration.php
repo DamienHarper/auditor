@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @see \DH\Auditor\Tests\ConfigurationTest
  */
-class Configuration
+final class Configuration
 {
     private bool $enabled;
 

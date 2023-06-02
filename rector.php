@@ -14,6 +14,7 @@ use Rector\Symfony\Set\SymfonySetList;
 use Rector\Transform\Rector\Attribute\AttributeKeyToClassConstFetchRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddArrayParamDocTypeRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddArrayReturnDocTypeRector;
+use Rector\Privatization\Rector\Property\ChangeReadOnlyPropertyWithDefaultValueToConstantRector;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([__DIR__.'/src', __DIR__.'/tests']);
@@ -28,6 +29,7 @@ return static function (RectorConfig $rectorConfig): void {
         MakeCommandLazyRector::class,
         AddArrayReturnDocTypeRector::class,
         AddArrayParamDocTypeRector::class,
+        ChangeReadOnlyPropertyWithDefaultValueToConstantRector::class,
     ]);
 
     // PHP rules
@@ -37,7 +39,7 @@ return static function (RectorConfig $rectorConfig): void {
         SetList::DEAD_CODE,
         SetList::CODING_STYLE,
         SetList::TYPE_DECLARATION,
-        SetList::TYPE_DECLARATION_STRICT,
+        SetList::PRIVATIZATION,
     ]);
 
     // Symfony rules
@@ -46,7 +48,6 @@ return static function (RectorConfig $rectorConfig): void {
         SymfonySetList::SYMFONY_CODE_QUALITY,
         SymfonySetList::SYMFONY_CONSTRUCTOR_INJECTION,
         SymfonySetList::ANNOTATIONS_TO_ATTRIBUTES,
-        SymfonySetList::SYMFONY_STRICT,
     ]);
 
     // Doctrine rules
@@ -55,6 +56,7 @@ return static function (RectorConfig $rectorConfig): void {
         DoctrineSetList::DOCTRINE_DBAL_30,
         DoctrineSetList::DOCTRINE_ORM_29,
         DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
+        DoctrineSetList::GEDMO_ANNOTATIONS_TO_ATTRIBUTES,
     ]);
 
     // PHPUnit rules
@@ -62,5 +64,7 @@ return static function (RectorConfig $rectorConfig): void {
         PHPUnitSetList::PHPUNIT_91,
         PHPUnitSetList::PHPUNIT_CODE_QUALITY,
         PHPUnitSetList::PHPUNIT_YIELD_DATA_PROVIDER,
+        PHPUnitSetList::PHPUNIT_EXCEPTION,
+        PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES,
     ]);
 };

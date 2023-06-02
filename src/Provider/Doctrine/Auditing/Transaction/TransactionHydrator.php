@@ -11,7 +11,7 @@ use DH\Auditor\Transaction\TransactionHydratorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
 
-class TransactionHydrator implements TransactionHydratorInterface
+final class TransactionHydrator implements TransactionHydratorInterface
 {
     use AuditTrait;
 

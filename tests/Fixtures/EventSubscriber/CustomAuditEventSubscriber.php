@@ -8,7 +8,7 @@ use DH\Auditor\Auditor;
 use DH\Auditor\Event\LifecycleEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CustomAuditEventSubscriber implements EventSubscriberInterface
+final class CustomAuditEventSubscriber implements EventSubscriberInterface
 {
     private Auditor $auditor;
 

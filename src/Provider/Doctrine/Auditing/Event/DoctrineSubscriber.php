@@ -11,7 +11,7 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
 
-class DoctrineSubscriber implements EventSubscriber
+final class DoctrineSubscriber implements EventSubscriber
 {
     private TransactionManager $transactionManager;
 

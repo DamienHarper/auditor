@@ -21,28 +21,30 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * @internal
- *
- * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class CleanAuditLogsCommandTest extends TestCase
 {
     use LockableTrait;
     use SchemaSetupTrait;
 
+    /**
+     * @var string
+     */
+    private const KEEP = 'WRONG';
+
     public function testExecuteFailsWithKeepWrongFormat(): void
     {
-        $keep = 'WRONG';
-
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             '--no-confirm' => true,
-            'keep' => $keep,
+            'keep' => self::KEEP,
         ]);
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString(sprintf("[ERROR] 'keep' argument must be a valid ISO 8601 date interval, '%s' given.", $keep), $output);
+        self::assertStringContainsString(sprintf("[ERROR] 'keep' argument must be a valid ISO 8601 date interval, '%s' given.", self::KEEP), $output);
     }
 
     public function testDumpSQL(): void
@@ -63,7 +65,7 @@ final class CleanAuditLogsCommandTest extends TestCase
         // the output of the command in the console
         $output = $commandTester->getDisplay();
 
-        foreach ($entities as $entity => $entityOptions) {
+        foreach (array_keys($entities) as $entity) {
             $storageService = $this->provider->getStorageServiceForEntity($entity);
             $platform = $storageService->getEntityManager()->getConnection()->getDatabasePlatform();
             $expected = 'DELETE FROM '.$schemaManager->resolveAuditTableName($entity, $configuration, $platform);
@@ -73,9 +75,7 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('[OK] Success', $output);
     }
 
-    /**
-     * @depends testDumpSQL
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testDumpSQL')]
     public function testExecute(): void
     {
         $command = $this->createCommand();
@@ -89,9 +89,7 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('[OK] Success', $output);
     }
 
-    /**
-     * @depends testExecute
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testExecute')]
     public function testExecuteFailsWhileLocked(): void
     {
         $this->lock('audit:clean');
@@ -109,7 +107,7 @@ final class CleanAuditLogsCommandTest extends TestCase
         $this->release();
     }
 
-    public function testDateOption()
+    public function testDateOption(): void
     {
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
@@ -122,12 +120,12 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('clean audits created before 2023-04-26 09:00:00', $output);
     }
 
-    public function testExcludeOptionSingleValue()
+    public function testExcludeOptionSingleValue(): void
     {
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute([
-            '--exclude' => 'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author',
+            '--exclude' => \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author::class,
         ]);
 
         // the output of the command in the console
@@ -135,14 +133,14 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('6 classes involved', $output);
     }
 
-    public function testExcludeOptionMultipleValues()
+    public function testExcludeOptionMultipleValues(): void
     {
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             '--exclude' => [
-                'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author',
-                'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post',
+                \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author::class,
+                \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post::class,
             ],
         ]);
 
@@ -151,12 +149,12 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('5 classes involved', $output);
     }
 
-    public function testIncludeOptionSignleValue()
+    public function testIncludeOptionSignleValue(): void
     {
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute([
-            '--include' => 'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author',
+            '--include' => \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author::class,
         ]);
 
         // the output of the command in the console
@@ -164,14 +162,14 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('1 classes involved', $output);
     }
 
-    public function testIncludeOptionMultipleValues()
+    public function testIncludeOptionMultipleValues(): void
     {
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             '--include' => [
-                'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author',
-                'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post',
+                \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author::class,
+                \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post::class,
             ],
         ]);
 
@@ -180,7 +178,7 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('2 classes involved', $output);
     }
 
-    protected function createCommand(): CleanAuditLogsCommand
+    private function createCommand(): CleanAuditLogsCommand
     {
         $command = new CleanAuditLogsCommand();
         $command->setAuditor($this->provider->getAuditor());

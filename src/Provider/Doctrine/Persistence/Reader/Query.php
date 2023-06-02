@@ -19,7 +19,7 @@ use Exception;
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader\QueryTest
  */
-class Query
+final class Query
 {
     /**
      * @var string

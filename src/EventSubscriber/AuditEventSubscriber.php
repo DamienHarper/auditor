@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * @see \DH\Auditor\Tests\EventSubscriber\AuditEventSubscriberTest
  */
-class AuditEventSubscriber implements EventSubscriberInterface
+final class AuditEventSubscriber implements EventSubscriberInterface
 {
     private Auditor $auditor;
 

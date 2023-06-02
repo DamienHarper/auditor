@@ -8,7 +8,7 @@ use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\Provider\AbstractProvider;
 use DH\Auditor\Provider\ConfigurationInterface;
 
-class StorageNoAuditProvider extends AbstractProvider
+final class StorageNoAuditProvider extends AbstractProvider
 {
     public function getConfiguration(): ConfigurationInterface
     {

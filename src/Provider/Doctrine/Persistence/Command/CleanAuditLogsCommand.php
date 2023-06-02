@@ -24,7 +24,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Command\CleanAuditLogsCommandTest
  */
-class CleanAuditLogsCommand extends Command
+final class CleanAuditLogsCommand extends Command
 {
     use LockableTrait;
 
@@ -70,15 +70,15 @@ class CleanAuditLogsCommand extends Command
         $keep = $input->getArgument('keep');
         $keep = (\is_array($keep) ? $keep[0] : $keep);
 
-        /** @var string $date */
+        /** @var ?string $date */
         $date = $input->getOption('date');
         $until = null;
 
-        if ($date) {
+        if (null !== $date) {
             // Use custom date if provided
             try {
                 $until = new DateTimeImmutable($date);
-            } catch (Exception $e) {
+            } catch (Exception) {
                 $io->error(sprintf('Invalid date format provided: %s', $date));
             }
         } else {
@@ -86,7 +86,7 @@ class CleanAuditLogsCommand extends Command
             $until = $this->validateKeepArgument($keep, $io);
         }
 
-        if (null === $until) {
+        if (!$until instanceof DateTimeImmutable) {
             return Command::SUCCESS;
         }
 
@@ -113,7 +113,7 @@ class CleanAuditLogsCommand extends Command
                 if (
                     !\in_array($entityClass, $excludeEntities, true)
                     && (
-                        empty($includeEntities)
+                        [] === $includeEntities
                         || \in_array($entityClass, $includeEntities, true)
                     )
                 ) {
@@ -124,7 +124,7 @@ class CleanAuditLogsCommand extends Command
 
         $repository = $filteredRepository;
 
-        foreach ($repository as $name => $entities) {
+        foreach ($repository as $entities) {
             $count += \count($entities);
         }
 
@@ -156,7 +156,7 @@ class CleanAuditLogsCommand extends Command
              * @var array<string, string> $classes
              */
             foreach ($repository as $name => $classes) {
-                foreach ($classes as $entity => $tablename) {
+                foreach (array_keys($classes) as $entity) {
                     $connection = $storageServices[$name]->getEntityManager()->getConnection();
                     $auditTable = $schemaManager->resolveAuditTableName($entity, $configuration, $connection->getDatabasePlatform());
 

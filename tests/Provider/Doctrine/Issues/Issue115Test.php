@@ -18,10 +18,9 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  *
- * @small
- *
  * @requires PHP >= 8.1
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class Issue115Test extends TestCase
 {
     use DefaultSchemaSetupTrait;

@@ -10,29 +10,31 @@ use ReflectionClass;
 
 /**
  * @internal
- *
- * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class EntryTest extends TestCase
 {
+    /**
+     * @var array<string, int|string>
+     */
+    private const ATTRIBUTES = [
+        'id' => 1,
+        'type' => 'type',
+        'object_id' => '1',
+        'diffs' => '{}',
+        'blame_id' => 1,
+        'blame_user' => 'John Doe',
+        'blame_user_fqdn' => 'Acme\User',
+        'blame_user_firewall' => 'main',
+        'ip' => '1.2.3.4',
+        'created_at' => 'now',
+    ];
+
     public function testAccessors(): void
     {
         $entry = new Entry();
         $reflectionClass = new ReflectionClass(Entry::class);
-
-        $attributes = [
-            'id' => 1,
-            'type' => 'type',
-            'object_id' => '1',
-            'diffs' => '{}',
-            'blame_id' => 1,
-            'blame_user' => 'John Doe',
-            'blame_user_fqdn' => 'Acme\User',
-            'blame_user_firewall' => 'main',
-            'ip' => '1.2.3.4',
-            'created_at' => 'now',
-        ];
-        foreach ($attributes as $name => $value) {
+        foreach (self::ATTRIBUTES as $name => $value) {
             $attribute = $reflectionClass->getProperty($name);
             $attribute->setAccessible(true);
             $attribute->setValue($entry, $value);

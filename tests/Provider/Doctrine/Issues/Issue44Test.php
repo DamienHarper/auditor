@@ -12,9 +12,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
- *
- * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class Issue44Test extends TestCase
 {
     use ReaderTrait;

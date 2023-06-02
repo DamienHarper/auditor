@@ -10,7 +10,7 @@ use DH\Auditor\Transaction\TransactionHydratorInterface;
 use DH\Auditor\Transaction\TransactionManagerInterface;
 use DH\Auditor\Transaction\TransactionProcessorInterface;
 
-class TransactionManager implements TransactionManagerInterface
+final class TransactionManager implements TransactionManagerInterface
 {
     private TransactionProcessorInterface $processor;
 

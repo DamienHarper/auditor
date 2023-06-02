@@ -21,9 +21,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
- *
- * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class SchemaManager1AEM2SEMTest extends TestCase
 {
     use BlogSchemaSetupTrait;
@@ -50,9 +49,7 @@ final class SchemaManager1AEM2SEMTest extends TestCase
         self::assertSame($animalStorageService, $vehicleStorageService, 'Animal and Vehicle use the same storage entity manager.');
     }
 
-    /**
-     * @depends testStorageServicesSetup
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testStorageServicesSetup')]
     public function testSchemaSetup(): void
     {
         $storageServices = $this->provider->getStorageServices();

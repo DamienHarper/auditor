@@ -39,7 +39,7 @@ abstract class AbstractProvider implements ProviderInterface
 
     public function getAuditor(): Auditor
     {
-        if (null === $this->auditor) {
+        if (!$this->auditor instanceof \DH\Auditor\Auditor) {
             throw new ProviderException('This provider has not been registered.');
         }
 
@@ -48,7 +48,7 @@ abstract class AbstractProvider implements ProviderInterface
 
     public function isRegistered(): bool
     {
-        return null !== $this->auditor;
+        return $this->auditor instanceof \DH\Auditor\Auditor;
     }
 
     public function registerStorageService(StorageServiceInterface $service): ProviderInterface

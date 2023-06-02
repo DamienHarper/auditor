@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace DH\Auditor\User;
 
-class User implements UserInterface
+final class User implements UserInterface
 {
-    protected ?string $id;
+    private ?string $id;
 
-    protected ?string $username;
+    private ?string $username;
 
     /**
      * User constructor.

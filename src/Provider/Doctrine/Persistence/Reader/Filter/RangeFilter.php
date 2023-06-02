@@ -6,13 +6,13 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter;
 
 use DH\Auditor\Exception\InvalidArgumentException;
 
-class RangeFilter implements FilterInterface
+final class RangeFilter implements FilterInterface
 {
-    protected string $name;
+    private string $name;
 
-    protected mixed $minValue;
+    private mixed $minValue;
 
-    protected mixed $maxValue;
+    private mixed $maxValue;
 
     /**
      * @throws InvalidArgumentException

@@ -21,7 +21,7 @@ trait ConnectionTrait
 
     private function getConnection(string $name = 'default', ?array $params = null): Connection
     {
-        if (!isset(self::$connections[$name]) || null === self::$connections[$name]) {
+        if (!isset(self::$connections[$name]) || !self::$connections[$name] instanceof \Doctrine\DBAL\Connection) {
             self::$connections[$name] = $this->createConnection($params);
         }
 

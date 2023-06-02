@@ -32,7 +32,6 @@ return (new PhpCsFixer\Config())
         'nullable_type_declaration_for_default_null_value' => true,
         'ordered_interfaces' => true,
         'ordered_traits' => true,
-        'php_unit_size_class' => true,
         'php_unit_test_class_requires_covers' => false,
         'phpdoc_types' => true,
         'phpdoc_to_param_type' => true,

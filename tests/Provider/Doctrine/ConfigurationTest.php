@@ -14,12 +14,19 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
- *
- * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class ConfigurationTest extends TestCase
 {
     use ProviderConfigurationTrait;
+
+    /**
+     * @var string[]
+     */
+    private const IGNORED = [
+        'created_at',
+        'updated_at',
+    ];
 
     public function testGetProvider(): void
     {
@@ -86,16 +93,11 @@ final class ConfigurationTest extends TestCase
 
     public function testGloballyIgnoredColumns(): void
     {
-        $ignored = [
-            'created_at',
-            'updated_at',
-        ];
-
         $configuration = $this->createProviderConfiguration([
-            'ignored_columns' => $ignored,
+            'ignored_columns' => self::IGNORED,
         ]);
 
-        self::assertSame($ignored, $configuration->getIgnoredColumns(), '"ignored_columns" are honored.');
+        self::assertSame(self::IGNORED, $configuration->getIgnoredColumns(), '"ignored_columns" are honored.');
     }
 
     public function testGetEntities(): void

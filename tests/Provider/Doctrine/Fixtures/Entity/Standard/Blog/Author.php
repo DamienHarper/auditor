@@ -36,7 +36,7 @@ class Author implements Stringable
 
     public function __toString(): string
     {
-        return $this->getFullname() ?? self::class.'#'.$this->getId();
+        return $this->fullname ?? self::class.'#'.$this->id;
     }
 
     public function __sleep()

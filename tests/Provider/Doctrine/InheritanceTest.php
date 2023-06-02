@@ -18,9 +18,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
- *
- * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class InheritanceTest extends TestCase
 {
     use ReaderTrait;

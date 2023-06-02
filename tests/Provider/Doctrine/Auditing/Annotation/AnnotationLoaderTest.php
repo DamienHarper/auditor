@@ -10,9 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
- *
- * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class AnnotationLoaderTest extends TestCase
 {
     use EntityManagerInterfaceTrait;

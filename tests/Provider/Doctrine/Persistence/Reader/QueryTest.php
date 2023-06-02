@@ -16,9 +16,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
- *
- * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class QueryTest extends TestCase
 {
     use ConnectionTrait;
@@ -34,9 +33,7 @@ final class QueryTest extends TestCase
         }
     }
 
-    /**
-     * @depends testNoFiltersByDefault
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testNoFiltersByDefault')]
     public function testAddSimpleFilter(): void
     {
         $query = new Query('author_audit', $this->createConnection());
@@ -62,9 +59,7 @@ final class QueryTest extends TestCase
         self::assertSame([$filter1, $filter2, $filter3], $filters[Query::TRANSACTION_HASH], 'Second filter is added.');
     }
 
-    /**
-     * @depends testAddSimpleFilter
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testAddSimpleFilter')]
     public function testAddUnexpectedFilter(): void
     {
         $query = new Query('author_audit', $this->createConnection());
@@ -74,9 +69,7 @@ final class QueryTest extends TestCase
         $query->addFilter(new SimpleFilter('unknown_filter', '123abc'));
     }
 
-    /**
-     * @depends testAddUnexpectedFilter
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testAddUnexpectedFilter')]
     public function testAddRangeFilter(): void
     {
         // only min bound
@@ -104,9 +97,7 @@ final class QueryTest extends TestCase
         self::assertSame([$filter], $filters[Query::OBJECT_ID], 'Range filter with both bound is added.');
     }
 
-    /**
-     * @depends testAddUnexpectedFilter
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testAddUnexpectedFilter')]
     public function testAddDateRangeFilter(): void
     {
         $min = new DateTimeImmutable('-1 day');
@@ -144,9 +135,7 @@ final class QueryTest extends TestCase
         self::assertSame([], $query->getOrderBy(), 'No ORDER BY by default.');
     }
 
-    /**
-     * @depends testNoOrderByByDefault
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testNoOrderByByDefault')]
     public function testAddOrderBy(): void
     {
         $query = new Query('author_audit', $this->createConnection());
@@ -170,9 +159,7 @@ final class QueryTest extends TestCase
         self::assertSame($expected, $orderBy, 'Second ORDER BY is added.');
     }
 
-    /**
-     * @depends testAddOrderBy
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testAddOrderBy')]
     public function testAddUnexpectedOrderBy(): void
     {
         $query = new Query('author_audit', $this->createConnection());
@@ -189,9 +176,7 @@ final class QueryTest extends TestCase
         self::assertSame([0, 0], $query->getLimit(), 'No LIMIT by default.');
     }
 
-    /**
-     * @depends testNoLimitNoOffsetByDefault
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testNoLimitNoOffsetByDefault')]
     public function testLimitWithoutOffset(): void
     {
         $query = new Query('author_audit', $this->createConnection());
@@ -200,9 +185,7 @@ final class QueryTest extends TestCase
         self::assertSame([10, 0], $query->getLimit(), 'LIMIT without offset is OK.');
     }
 
-    /**
-     * @depends testNoLimitNoOffsetByDefault
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testNoLimitNoOffsetByDefault')]
     public function testWithLimitAndOffset(): void
     {
         $query = new Query('author_audit', $this->createConnection());
@@ -211,9 +194,7 @@ final class QueryTest extends TestCase
         self::assertSame([10, 50], $query->getLimit(), 'LIMIT with offset is OK.');
     }
 
-    /**
-     * @depends testNoLimitNoOffsetByDefault
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testNoLimitNoOffsetByDefault')]
     public function testLimitNegativeLimit(): void
     {
         $query = new Query('author_audit', $this->createConnection());
@@ -222,9 +203,7 @@ final class QueryTest extends TestCase
         $query->limit(-1, 50);
     }
 
-    /**
-     * @depends testNoLimitNoOffsetByDefault
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testNoLimitNoOffsetByDefault')]
     public function testLimitNegativeOffset(): void
     {
         $query = new Query('author_audit', $this->createConnection());
@@ -233,10 +212,8 @@ final class QueryTest extends TestCase
         $query->limit(0, -50);
     }
 
-    /**
-     * @depends testAddSimpleFilter
-     * @depends testAddOrderBy
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testAddSimpleFilter')]
+    #[\PHPUnit\Framework\Attributes\Depends('testAddOrderBy')]
     public function testBuildQueryBuilderDefault(): void
     {
         $query = new Query('author_audit', $this->createConnection());
@@ -250,9 +227,7 @@ final class QueryTest extends TestCase
         self::assertSame($expectedParameters, $queryBuilder->getParameters(), 'No parameters if no filters.');
     }
 
-    /**
-     * @depends testBuildQueryBuilderDefault
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testBuildQueryBuilderDefault')]
     public function testBuildQueryBuilderSimpleFilter(): void
     {
         $query = new Query('author_audit', $this->createConnection());
@@ -289,9 +264,7 @@ final class QueryTest extends TestCase
         self::assertSame($expectedParameters, $queryBuilder->getParameters(), 'Parameters OK with 3 filters.');
     }
 
-    /**
-     * @depends testBuildQueryBuilderDefault
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testBuildQueryBuilderDefault')]
     public function testBuildQueryBuilderOrderBy(): void
     {
         $query = new Query('author_audit', $this->createConnection());
@@ -310,9 +283,7 @@ final class QueryTest extends TestCase
         self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with 2 ORDER BY.');
     }
 
-    /**
-     * @depends testBuildQueryBuilderDefault
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testBuildQueryBuilderDefault')]
     public function testBuildQueryBuilderLimit(): void
     {
         $query = new Query('author_audit', $this->createConnection());
@@ -331,9 +302,7 @@ final class QueryTest extends TestCase
         self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with LIMIT.');
     }
 
-    /**
-     * @depends testBuildQueryBuilderDefault
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testBuildQueryBuilderDefault')]
     public function testBuildQueryBuilderRangeFilter(): void
     {
         // test SQL query with a range filter, min bound only
@@ -364,9 +333,7 @@ final class QueryTest extends TestCase
         self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with max bound only.');
     }
 
-    /**
-     * @depends testBuildQueryBuilderDefault
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testBuildQueryBuilderDefault')]
     public function testBuildQueryBuilderDateRangeFilter(): void
     {
         $min = new DateTimeImmutable('-1 day');

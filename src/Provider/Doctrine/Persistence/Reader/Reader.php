@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader\ReaderTest
  */
-class Reader
+final class Reader
 {
     /**
      * @var int
@@ -123,7 +123,7 @@ class Reader
         $results = [];
 
         $entities = $configuration->getEntities();
-        foreach ($entities as $entity => $entityOptions) {
+        foreach (array_keys($entities) as $entity) {
             try {
                 $audits = $this->createQuery($entity, ['transaction_hash' => $transactionHash])->execute();
                 if ([] !== $audits) {

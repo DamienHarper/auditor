@@ -7,7 +7,7 @@ namespace DH\Auditor\Provider\Doctrine\Model;
 use DH\Auditor\Model\Transaction as BaseTransaction;
 use Doctrine\ORM\EntityManagerInterface;
 
-class Transaction extends BaseTransaction
+final class Transaction extends BaseTransaction
 {
     private EntityManagerInterface $entityManager;
 

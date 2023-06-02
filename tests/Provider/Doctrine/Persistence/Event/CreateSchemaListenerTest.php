@@ -18,12 +18,16 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
- *
- * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class CreateSchemaListenerTest extends TestCase
 {
     use DefaultSchemaSetupTrait;
+
+    /**
+     * @var array<class-string<\DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal>>
+     */
+    private const CLASSES = [Dog::class, Cat::class];
 
     public function testCorrectSchemaStandard(): void
     {
@@ -33,9 +37,7 @@ final class CreateSchemaListenerTest extends TestCase
         self::assertContains('author_audit', $tableNames);
     }
 
-    /**
-     * @depends testCorrectSchemaStandard
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testCorrectSchemaStandard')]
     public function testCorrectSchemaForSingleTableInheritance(): void
     {
         $tableNames = $this->getTables();
@@ -46,19 +48,16 @@ final class CreateSchemaListenerTest extends TestCase
         self::assertContains('vehicle_audit', $tableNames);
     }
 
-    /**
-     * @depends testCorrectSchemaForSingleTableInheritance
-     */
+    #[\PHPUnit\Framework\Attributes\Depends('testCorrectSchemaForSingleTableInheritance')]
     public function testCorrectSchemaForJoinedTableInheritance(): void
     {
         $configuration = $this->provider->getConfiguration();
         $entities = $configuration->getEntities();
-        $classes = [Dog::class, Cat::class];
         $tableNames = $this->getTables();
 
         self::assertNotContains(Animal::class, $entities);
 
-        foreach ($classes as $entity) {
+        foreach (self::CLASSES as $entity) {
             self::assertContains($entities[$entity]['computed_table_name'], $tableNames);
             self::assertContains($entities[$entity]['computed_audit_table_name'], $tableNames);
         }

@@ -19,9 +19,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
- *
- * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class TransactionProcessorTest extends TestCase
 {
     use DefaultSchemaSetupTrait;

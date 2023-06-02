@@ -12,33 +12,35 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
- *
- * @small
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class LifecycleEventTest extends TestCase
 {
     use AuditorTrait;
 
+    /**
+     * @var array<string, class-string<\DH\Auditor\EventSubscriber\AuditEventSubscriber>|string>
+     */
+    private const PAYLOAD = [
+        'entity' => AuditEventSubscriber::class,
+        'table' => '',
+        'type' => '',
+        'object_id' => '',
+        'discriminator' => '',
+        'transaction_hash' => '',
+        'diffs' => '',
+        'blame_id' => '',
+        'blame_user' => '',
+        'blame_user_fqdn' => '',
+        'blame_user_firewall' => '',
+        'ip' => '',
+        'created_at' => '',
+    ];
+
     public function testLifecycleEvent(): void
     {
-        $payload = [
-            'entity' => AuditEventSubscriber::class,
-            'table' => '',
-            'type' => '',
-            'object_id' => '',
-            'discriminator' => '',
-            'transaction_hash' => '',
-            'diffs' => '',
-            'blame_id' => '',
-            'blame_user' => '',
-            'blame_user_fqdn' => '',
-            'blame_user_firewall' => '',
-            'ip' => '',
-            'created_at' => '',
-        ];
-
-        $event = new LifecycleEvent($payload);
-        self::assertSame($payload, $event->getPayload());
+        $event = new LifecycleEvent(self::PAYLOAD);
+        self::assertSame(self::PAYLOAD, $event->getPayload());
     }
 
     public function testLifecycleEventWithInvalidPayload(): void

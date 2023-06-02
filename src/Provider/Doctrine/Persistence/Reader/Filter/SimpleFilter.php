@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter;
 
-class SimpleFilter implements FilterInterface
+final class SimpleFilter implements FilterInterface
 {
-    protected string $name;
+    private string $name;
 
-    protected mixed $value;
+    private mixed $value;
 
     public function __construct(string $name, mixed $value)
     {
