@@ -13,7 +13,7 @@ use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
 use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
-use DH\Auditor\Provider\Doctrine\Persistence\Event\TableSchemaSubscriber;
+use DH\Auditor\Provider\Doctrine\Persistence\Event\TableSchemaListener;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
@@ -66,7 +66,7 @@ final class DoctrineProvider extends AbstractProvider
         $evm = $entityManager->getEventManager();
 
         // Register subscribers
-        $evm->addEventListener([Events::loadClassMetadata], new TableSchemaSubscriber($this));
+        $evm->addEventListener([Events::loadClassMetadata], new TableSchemaListener($this));
         $evm->addEventListener([ToolEvents::postGenerateSchemaTable], new CreateSchemaListener($this));
         $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager));
 

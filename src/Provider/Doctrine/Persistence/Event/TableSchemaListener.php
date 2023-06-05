@@ -9,7 +9,7 @@ use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 
-final class TableSchemaSubscriber
+final class TableSchemaListener
 {
     private DoctrineProvider $provider;
 
