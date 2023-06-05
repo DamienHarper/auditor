@@ -20,6 +20,8 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Provider\ProviderInterface;
 use DH\Auditor\Provider\Service\AuditingServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Events;
+use Doctrine\ORM\Tools\ToolEvents;
 use Exception;
 
 /**
@@ -64,8 +66,8 @@ final class DoctrineProvider extends AbstractProvider
         $evm = $entityManager->getEventManager();
 
         // Register subscribers
-        $evm->addEventSubscriber(new TableSchemaSubscriber($this));
-        $evm->addEventSubscriber(new CreateSchemaListener($this));
+        $evm->addEventListener([Events::loadClassMetadata], new TableSchemaSubscriber($this));
+        $evm->addEventListener([ToolEvents::postGenerateSchemaTable], new CreateSchemaListener($this));
         $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager));
 
         return $this;
