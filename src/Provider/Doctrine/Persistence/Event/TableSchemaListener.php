@@ -7,10 +7,9 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Event;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
-use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 
-final class TableSchemaSubscriber implements EventSubscriber
+final class TableSchemaListener
 {
     private DoctrineProvider $provider;
 
@@ -35,13 +34,5 @@ final class TableSchemaSubscriber implements EventSubscriber
                 ]);
             }
         }
-    }
-
-    /**
-     * @return array<string>
-     */
-    public function getSubscribedEvents(): array
-    {
-        return ['loadClassMetadata'];
     }
 }
