@@ -43,25 +43,6 @@ final class Configuration
         $this->roleChecker = $config['role_checker'];
     }
 
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        // https://symfony.com/doc/current/components/options_resolver.html
-        $resolver
-            ->setDefaults([
-                'enabled' => true,
-                'timezone' => 'UTC',
-                'role_checker' => null,
-                'user_provider' => null,
-                'security_provider' => null,
-            ])
-            ->setAllowedTypes('enabled', 'bool')
-            ->setAllowedTypes('timezone', 'string')
-            ->setAllowedTypes('role_checker', ['null', 'string', 'callable'])
-            ->setAllowedTypes('user_provider', ['null', 'string', 'callable'])
-            ->setAllowedTypes('security_provider', ['null', 'string', 'callable'])
-        ;
-    }
-
     /**
      * enabled auditing.
      */
@@ -132,5 +113,24 @@ final class Configuration
     public function getRoleChecker(): ?callable
     {
         return $this->roleChecker;
+    }
+
+    private function configureOptions(OptionsResolver $resolver): void
+    {
+        // https://symfony.com/doc/current/components/options_resolver.html
+        $resolver
+            ->setDefaults([
+                'enabled' => true,
+                'timezone' => 'UTC',
+                'role_checker' => null,
+                'user_provider' => null,
+                'security_provider' => null,
+            ])
+            ->setAllowedTypes('enabled', 'bool')
+            ->setAllowedTypes('timezone', 'string')
+            ->setAllowedTypes('role_checker', ['null', 'string', 'callable'])
+            ->setAllowedTypes('user_provider', ['null', 'string', 'callable'])
+            ->setAllowedTypes('security_provider', ['null', 'string', 'callable'])
+        ;
     }
 }

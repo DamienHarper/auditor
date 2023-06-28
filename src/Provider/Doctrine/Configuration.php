@@ -66,31 +66,6 @@ final class Configuration implements ConfigurationInterface
         $this->storageMapper = $config['storage_mapper'];
     }
 
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        // https://symfony.com/doc/current/components/options_resolver.html
-        $resolver
-            ->setDefaults([
-                'table_prefix' => '',
-                'table_suffix' => '_audit',
-                'ignored_columns' => [],
-                'entities' => [],
-                'storage_services' => [],
-                'auditing_services' => [],
-                'viewer' => true,
-                'storage_mapper' => null,
-            ])
-            ->setAllowedTypes('table_prefix', 'string')
-            ->setAllowedTypes('table_suffix', 'string')
-            ->setAllowedTypes('ignored_columns', 'array')
-            ->setAllowedTypes('entities', 'array')
-            ->setAllowedTypes('storage_services', 'array')
-            ->setAllowedTypes('auditing_services', 'array')
-            ->setAllowedTypes('viewer', 'bool')
-            ->setAllowedTypes('storage_mapper', ['null', 'string', 'callable'])
-        ;
-    }
-
     /**
      * Set the value of entities.
      *
@@ -272,5 +247,30 @@ final class Configuration implements ConfigurationInterface
     {
         $this->provider = $provider;
         $this->initialized = false;
+    }
+
+    private function configureOptions(OptionsResolver $resolver): void
+    {
+        // https://symfony.com/doc/current/components/options_resolver.html
+        $resolver
+            ->setDefaults([
+                'table_prefix' => '',
+                'table_suffix' => '_audit',
+                'ignored_columns' => [],
+                'entities' => [],
+                'storage_services' => [],
+                'auditing_services' => [],
+                'viewer' => true,
+                'storage_mapper' => null,
+            ])
+            ->setAllowedTypes('table_prefix', 'string')
+            ->setAllowedTypes('table_suffix', 'string')
+            ->setAllowedTypes('ignored_columns', 'array')
+            ->setAllowedTypes('entities', 'array')
+            ->setAllowedTypes('storage_services', 'array')
+            ->setAllowedTypes('auditing_services', 'array')
+            ->setAllowedTypes('viewer', 'bool')
+            ->setAllowedTypes('storage_mapper', ['null', 'string', 'callable'])
+        ;
     }
 }
