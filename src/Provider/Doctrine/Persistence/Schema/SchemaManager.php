@@ -174,7 +174,7 @@ final class SchemaManager
             // Add columns to audit table
             $isJsonSupported = PlatformHelper::isJsonSupported($connection);
             foreach (SchemaHelper::getAuditTableColumns() as $columnName => $struct) {
-                if (Types::JSON === $struct['type'] && $isJsonSupported) {
+                if (Types::JSON === $struct['type'] && !$isJsonSupported) {
                     $type = Types::TEXT;
                 } else {
                     $type = $struct['type'];
@@ -290,7 +290,7 @@ final class SchemaManager
                 // column is part of expected columns
                 $table->dropColumn($column->getName());
 
-                if (Types::JSON === $expectedColumns[$column->getName()]['type'] && $isJsonSupported) {
+                if (Types::JSON === $expectedColumns[$column->getName()]['type'] && !$isJsonSupported) {
                     $type = Types::TEXT;
                 } else {
                     $type = $expectedColumns[$column->getName()]['type'];
