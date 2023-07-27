@@ -25,7 +25,7 @@ final class QueryTest extends TestCase
 
     public function testNoFiltersByDefault(): void
     {
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
 
         $filters = $query->getFilters();
         foreach ($filters as $values) {
@@ -36,7 +36,7 @@ final class QueryTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Depends('testNoFiltersByDefault')]
     public function testAddSimpleFilter(): void
     {
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $filter1 = new SimpleFilter(Query::TRANSACTION_HASH, '123abc');
         $query->addFilter($filter1);
 
@@ -62,7 +62,7 @@ final class QueryTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Depends('testAddSimpleFilter')]
     public function testAddUnexpectedFilter(): void
     {
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
 
         $this->expectException(InvalidArgumentException::class);
 
@@ -73,7 +73,7 @@ final class QueryTest extends TestCase
     public function testAddRangeFilter(): void
     {
         // only min bound
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $filter = new RangeFilter(Query::OBJECT_ID, 1);
         $query->addFilter($filter);
 
@@ -81,7 +81,7 @@ final class QueryTest extends TestCase
         self::assertSame([$filter], $filters[Query::OBJECT_ID], 'Range filter with min bound only is added.');
 
         // only max bound
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $filter = new RangeFilter(Query::OBJECT_ID, null, 1);
         $query->addFilter($filter);
 
@@ -89,7 +89,7 @@ final class QueryTest extends TestCase
         self::assertSame([$filter], $filters[Query::OBJECT_ID], 'Range filter with max bound only is added.');
 
         // min and max bound
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $filter = new RangeFilter(Query::OBJECT_ID, 5, 15);
         $query->addFilter($filter);
 
@@ -104,7 +104,7 @@ final class QueryTest extends TestCase
         $max = new DateTimeImmutable('+1 day');
 
         // only min bound
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $filter = new DateRangeFilter(Query::CREATED_AT, $min);
         $query->addFilter($filter);
 
@@ -112,7 +112,7 @@ final class QueryTest extends TestCase
         self::assertSame([$filter], $filters[Query::CREATED_AT], 'Date range filter with min bound only is added.');
 
         // only max bound
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $filter = new DateRangeFilter(Query::CREATED_AT, null, $max);
         $query->addFilter($filter);
 
@@ -120,7 +120,7 @@ final class QueryTest extends TestCase
         self::assertSame([$filter], $filters[Query::CREATED_AT], 'Date range filter with max bound only is added.');
 
         // min and max bound
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $filter = new DateRangeFilter(Query::CREATED_AT, $min, $max);
         $query->addFilter($filter);
 
@@ -130,7 +130,7 @@ final class QueryTest extends TestCase
 
     public function testNoOrderByByDefault(): void
     {
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
 
         self::assertSame([], $query->getOrderBy(), 'No ORDER BY by default.');
     }
@@ -138,7 +138,7 @@ final class QueryTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Depends('testNoOrderByByDefault')]
     public function testAddOrderBy(): void
     {
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $query->addOrderBy(Query::TRANSACTION_HASH, 'ASC');
 
         $orderBy = $query->getOrderBy();
@@ -162,7 +162,7 @@ final class QueryTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Depends('testAddOrderBy')]
     public function testAddUnexpectedOrderBy(): void
     {
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
 
         $this->expectException(InvalidArgumentException::class);
 
@@ -171,7 +171,7 @@ final class QueryTest extends TestCase
 
     public function testNoLimitNoOffsetByDefault(): void
     {
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
 
         self::assertSame([0, 0], $query->getLimit(), 'No LIMIT by default.');
     }
@@ -179,7 +179,7 @@ final class QueryTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Depends('testNoLimitNoOffsetByDefault')]
     public function testLimitWithoutOffset(): void
     {
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $query->limit(10);
 
         self::assertSame([10, 0], $query->getLimit(), 'LIMIT without offset is OK.');
@@ -188,7 +188,7 @@ final class QueryTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Depends('testNoLimitNoOffsetByDefault')]
     public function testWithLimitAndOffset(): void
     {
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $query->limit(10, 50);
 
         self::assertSame([10, 50], $query->getLimit(), 'LIMIT with offset is OK.');
@@ -197,7 +197,7 @@ final class QueryTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Depends('testNoLimitNoOffsetByDefault')]
     public function testLimitNegativeLimit(): void
     {
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
 
         $this->expectException(InvalidArgumentException::class);
         $query->limit(-1, 50);
@@ -206,7 +206,7 @@ final class QueryTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Depends('testNoLimitNoOffsetByDefault')]
     public function testLimitNegativeOffset(): void
     {
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
 
         $this->expectException(InvalidArgumentException::class);
         $query->limit(0, -50);
@@ -216,7 +216,7 @@ final class QueryTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Depends('testAddOrderBy')]
     public function testBuildQueryBuilderDefault(): void
     {
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $reflectedMethod = $this->reflectMethod($query, 'buildQueryBuilder');
         $queryBuilder = $reflectedMethod->invokeArgs($query, []);
 
@@ -230,7 +230,7 @@ final class QueryTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Depends('testBuildQueryBuilderDefault')]
     public function testBuildQueryBuilderSimpleFilter(): void
     {
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $reflectedMethod = $this->reflectMethod($query, 'buildQueryBuilder');
 
         // test SQL query with 1 filter
@@ -267,7 +267,7 @@ final class QueryTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Depends('testBuildQueryBuilderDefault')]
     public function testBuildQueryBuilderOrderBy(): void
     {
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $reflectedMethod = $this->reflectMethod($query, 'buildQueryBuilder');
 
         // test SQL query with 1 ORDER BY
@@ -286,7 +286,7 @@ final class QueryTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Depends('testBuildQueryBuilderDefault')]
     public function testBuildQueryBuilderLimit(): void
     {
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $reflectedMethod = $this->reflectMethod($query, 'buildQueryBuilder');
 
         // test SQL query with LIMIT
@@ -306,7 +306,7 @@ final class QueryTest extends TestCase
     public function testBuildQueryBuilderRangeFilter(): void
     {
         // test SQL query with a range filter, min bound only
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $reflectedMethod = $this->reflectMethod($query, 'buildQueryBuilder');
 
         $expectedQuery = 'SELECT * FROM author_audit at WHERE object_id >= :min_object_id';
@@ -315,7 +315,7 @@ final class QueryTest extends TestCase
         self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with min bound only.');
 
         // test SQL query with a range filter, max bound only
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $reflectedMethod = $this->reflectMethod($query, 'buildQueryBuilder');
 
         $expectedQuery = 'SELECT * FROM author_audit at WHERE object_id <= :max_object_id';
@@ -324,7 +324,7 @@ final class QueryTest extends TestCase
         self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with max bound only.');
 
         // test SQL query with a range filter with both bounds
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $reflectedMethod = $this->reflectMethod($query, 'buildQueryBuilder');
 
         $expectedQuery = 'SELECT * FROM author_audit at WHERE object_id >= :min_object_id AND object_id <= :max_object_id';
@@ -340,7 +340,7 @@ final class QueryTest extends TestCase
         $max = new DateTimeImmutable('+1 day');
 
         // test SQL query with a date range filter, min bound only
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $reflectedMethod = $this->reflectMethod($query, 'buildQueryBuilder');
 
         $expectedQuery = 'SELECT * FROM author_audit at WHERE object_id >= :min_object_id';
@@ -349,7 +349,7 @@ final class QueryTest extends TestCase
         self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with min bound only.');
 
         // test SQL query with a date range filter, max bound only
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $reflectedMethod = $this->reflectMethod($query, 'buildQueryBuilder');
 
         $expectedQuery = 'SELECT * FROM author_audit at WHERE object_id <= :max_object_id';
@@ -358,7 +358,7 @@ final class QueryTest extends TestCase
         self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with max bound only.');
 
         // test SQL query with a date range filter with both bounds
-        $query = new Query('author_audit', $this->createConnection());
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $reflectedMethod = $this->reflectMethod($query, 'buildQueryBuilder');
 
         $expectedQuery = 'SELECT * FROM author_audit at WHERE object_id >= :min_object_id AND object_id <= :max_object_id';

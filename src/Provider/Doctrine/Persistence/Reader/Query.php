@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Model\Entry;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
@@ -68,10 +70,13 @@ final class Query
 
     private int $limit = 0;
 
-    public function __construct(string $table, Connection $connection)
+    private DateTimeZone $timezone;
+
+    public function __construct(string $table, Connection $connection, string $timezone)
     {
         $this->connection = $connection;
         $this->table = $table;
+        $this->timezone = new DateTimeZone($timezone);
 
         foreach ($this->getSupportedFilters() as $filterType) {
             $this->filters[$filterType] = [];
@@ -89,6 +94,7 @@ final class Query
         $result = [];
         \assert($statement instanceof Result);
         foreach ($statement->fetchAllAssociative() as $row) {
+            $row['created_at'] = new DateTimeImmutable($row['created_at'], $this->timezone);
             $result[] = Entry::fromArray($row);
         }
 
