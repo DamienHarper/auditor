@@ -13,13 +13,9 @@ use PHPUnit\Framework\TestCase;
 #[\PHPUnit\Framework\Attributes\Small]
 final class TransactionTest extends TestCase
 {
-    protected function setUp(): void
-    {
-    }
+    protected function setUp(): void {}
 
-    protected function tearDown(): void
-    {
-    }
+    protected function tearDown(): void {}
 
     public function testGetTransactionHash(): void
     {

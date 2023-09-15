@@ -6,6 +6,4 @@ namespace DH\Auditor\Exception;
 
 use Exception;
 
-final class InvalidArgumentException extends Exception
-{
-}
+final class InvalidArgumentException extends Exception {}

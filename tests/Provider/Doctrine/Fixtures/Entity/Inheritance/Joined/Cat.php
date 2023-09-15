@@ -8,6 +8,4 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'cat', schema: 'auditor')]
-class Cat extends Animal
-{
-}
+class Cat extends Animal {}

@@ -9,6 +9,4 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[Audit\Auditable]
-class ChildEntity extends ParentEntity
-{
-}
+class ChildEntity extends ParentEntity {}

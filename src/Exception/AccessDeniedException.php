@@ -6,6 +6,4 @@ namespace DH\Auditor\Exception;
 
 use Exception;
 
-final class AccessDeniedException extends Exception
-{
-}
+final class AccessDeniedException extends Exception {}
