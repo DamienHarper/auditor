@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Model;
 
+use DateTimeImmutable;
 use DH\Auditor\Model\Entry;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -14,27 +15,24 @@ use ReflectionClass;
 #[\PHPUnit\Framework\Attributes\Small]
 final class EntryTest extends TestCase
 {
-    /**
-     * @var array<string, int|string>
-     */
-    private const ATTRIBUTES = [
-        'id' => 1,
-        'type' => 'type',
-        'object_id' => '1',
-        'diffs' => '{}',
-        'blame_id' => 1,
-        'blame_user' => 'John Doe',
-        'blame_user_fqdn' => 'Acme\User',
-        'blame_user_firewall' => 'main',
-        'ip' => '1.2.3.4',
-        'created_at' => 'now',
-    ];
-
     public function testAccessors(): void
     {
+        $attributes = [
+            'id' => 1,
+            'type' => 'type',
+            'object_id' => '1',
+            'diffs' => '{}',
+            'blame_id' => 1,
+            'blame_user' => 'John Doe',
+            'blame_user_fqdn' => 'Acme\User',
+            'blame_user_firewall' => 'main',
+            'ip' => '1.2.3.4',
+            'created_at' => new DateTimeImmutable(),
+        ];
+
         $entry = new Entry();
         $reflectionClass = new ReflectionClass(Entry::class);
-        foreach (self::ATTRIBUTES as $name => $value) {
+        foreach ($attributes as $name => $value) {
             $attribute = $reflectionClass->getProperty($name);
             $attribute->setAccessible(true);
             $attribute->setValue($entry, $value);
@@ -50,7 +48,7 @@ final class EntryTest extends TestCase
         self::assertSame('Acme\User', $entry->getUserFqdn(), 'Entry::getUserFqdn() is ok.');
         self::assertSame('main', $entry->getUserFirewall(), 'Entry::getUserFirewall() is ok.');
         self::assertSame('1.2.3.4', $entry->getIp(), 'Entry::getIp() is ok.');
-        self::assertSame('now', $entry->getCreatedAt(), 'Entry::getCreatedAt() is ok.');
+        self::assertSame($attributes['created_at'], $entry->getCreatedAt(), 'Entry::getCreatedAt() is ok.');
     }
 
     public function testUndefinedUser(): void

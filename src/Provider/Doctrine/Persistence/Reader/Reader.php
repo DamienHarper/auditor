@@ -50,10 +50,10 @@ final class Reader
         $this->configureOptions($resolver);
         $config = $resolver->resolve($options);
 
-        /** @var StorageService $storageService */
-        $storageService = $this->provider->getStorageServiceForEntity($entity);
+        $connection = $this->provider->getStorageServiceForEntity($entity)->getEntityManager()->getConnection();
+        $timezone   = $this->provider->getAuditor()->getConfiguration()->getTimezone();
 
-        $query = new Query($this->getEntityAuditTableName($entity), $storageService->getEntityManager()->getConnection());
+        $query = new Query($this->getEntityAuditTableName($entity), $connection, $timezone);
         $query
             ->addOrderBy(Query::CREATED_AT, 'DESC')
             ->addOrderBy(Query::ID, 'DESC')
