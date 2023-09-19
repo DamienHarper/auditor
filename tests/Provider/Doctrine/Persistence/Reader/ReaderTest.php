@@ -96,7 +96,7 @@ final class ReaderTest extends TestCase
         self::assertIsString($audits[0]->getUserFqdn());
         self::assertSame('main', $audits[0]->getUserFirewall());
         self::assertIsString($audits[0]->getIp());
-        self::assertMatchesRegularExpression('#\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}#', $audits[0]->getCreatedAt());
+        self::assertInstanceOf(DateTimeImmutable::class, $audits[0]->getCreatedAt());
 
         $expected = [
             'Inserted DH\\Auditor\\Tests\\Provider\\Doctrine\\Fixtures\\Entity\\Standard\\Blog\\Author#3: [email: luke.skywalker@gmail.com, fullname: Luke Skywalker]',
