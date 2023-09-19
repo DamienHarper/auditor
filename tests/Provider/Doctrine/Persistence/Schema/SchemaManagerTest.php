@@ -38,6 +38,7 @@ final class SchemaManagerTest extends TestCase
 {
     use DefaultSchemaSetupTrait;
     use ReflectionTrait;
+
     // new/alternate structure
     /**
      * @var array<string, array<string, array<string, int|true>|array<string, null|bool>|array<string, null|false|int>|array<string, null|true>|array<string, true>|string>>

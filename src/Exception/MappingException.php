@@ -6,6 +6,4 @@ namespace DH\Auditor\Exception;
 
 use Exception;
 
-final class MappingException extends Exception
-{
-}
+final class MappingException extends Exception {}

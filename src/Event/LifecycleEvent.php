@@ -7,6 +7,4 @@ namespace DH\Auditor\Event;
 /**
  * @see \DH\Auditor\Tests\Event\LifecycleEventTest
  */
-final class LifecycleEvent extends AuditEvent
-{
-}
+final class LifecycleEvent extends AuditEvent {}

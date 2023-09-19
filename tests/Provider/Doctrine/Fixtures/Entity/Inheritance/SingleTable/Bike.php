@@ -7,6 +7,4 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleT
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class Bike extends Vehicle
-{
-}
+class Bike extends Vehicle {}
