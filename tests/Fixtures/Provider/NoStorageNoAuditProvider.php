@@ -10,13 +10,9 @@ use DH\Auditor\Provider\ConfigurationInterface;
 
 final class NoStorageNoAuditProvider extends AbstractProvider
 {
-    public function getConfiguration(): ConfigurationInterface
-    {
-    }
+    public function getConfiguration(): ConfigurationInterface {}
 
-    public function persist(LifecycleEvent $event): void
-    {
-    }
+    public function persist(LifecycleEvent $event): void {}
 
     public function supportsStorage(): bool
     {
@@ -28,11 +24,7 @@ final class NoStorageNoAuditProvider extends AbstractProvider
         return false;
     }
 
-    public function getStorageServices(): array
-    {
-    }
+    public function getStorageServices(): array {}
 
-    public function getAuditingServices(): array
-    {
-    }
+    public function getAuditingServices(): array {}
 }

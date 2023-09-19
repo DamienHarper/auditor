@@ -7,6 +7,4 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue132;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class DummyEntity extends AbstractParentEntity
-{
-}
+class DummyEntity extends AbstractParentEntity {}
