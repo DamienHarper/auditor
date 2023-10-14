@@ -13,7 +13,7 @@ use DH\Auditor\Event\Dto\UpdateEventDto;
 /**
  * @see \DH\Auditor\Tests\Model\TransactionTest
  */
-final class Transaction implements TransactionInterface
+class Transaction implements TransactionInterface
 {
     /**
      * @var string
