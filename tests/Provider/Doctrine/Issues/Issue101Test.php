@@ -25,8 +25,6 @@ final class Issue101Test extends TestCase
             self::markTestSkipped('PHP > 8.0 is required.');
         }
 
-        parent::setUp();
-
         // provider with 1 em for both storage and auditing
         $this->createAndInitDoctrineProvider();
 
