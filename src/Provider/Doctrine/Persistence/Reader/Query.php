@@ -94,6 +94,7 @@ final class Query
         $result = [];
         \assert($statement instanceof Result);
         foreach ($statement->fetchAllAssociative() as $row) {
+            // @var array{created_at: string} $row
             $row['created_at'] = new DateTimeImmutable($row['created_at'], $this->timezone);
             $result[] = Entry::fromArray($row);
         }
