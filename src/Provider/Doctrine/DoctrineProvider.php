@@ -33,17 +33,17 @@ final class DoctrineProvider extends AbstractProvider
      * @var array<string, string>
      */
     private const FIELDS = [
-        'type' => ':type',
-        'object_id' => ':object_id',
-        'discriminator' => ':discriminator',
-        'transaction_hash' => ':transaction_hash',
-        'diffs' => ':diffs',
-        'blame_id' => ':blame_id',
-        'blame_user' => ':blame_user',
-        'blame_user_fqdn' => ':blame_user_fqdn',
-        'blame_user_firewall' => ':blame_user_firewall',
-        'ip' => ':ip',
-        'created_at' => ':created_at',
+        'type' => '?',
+        'object_id' => '?',
+        'discriminator' => '?',
+        'transaction_hash' => '?',
+        'diffs' => '?',
+        'blame_id' => '?',
+        'blame_user' => '?',
+        'blame_user_fqdn' => '?',
+        'blame_user_firewall' => '?',
+        'ip' => '?',
+        'created_at' => '?',
     ];
 
     private TransactionManager $transactionManager;
@@ -126,10 +126,11 @@ final class DoctrineProvider extends AbstractProvider
         $entity = $payload['entity'];
         unset($payload['table'], $payload['entity']);
 
+        $keys = array_keys(self::FIELDS);
         $query = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
             $auditTable,
-            implode(', ', array_keys(self::FIELDS)),
+            implode(', ', $keys),
             implode(', ', array_values(self::FIELDS))
         );
 
@@ -138,7 +139,7 @@ final class DoctrineProvider extends AbstractProvider
         $statement = $storageService->getEntityManager()->getConnection()->prepare($query);
 
         foreach ($payload as $key => $value) {
-            $statement->bindValue($key, $value);
+            $statement->bindValue(array_search($key, keys) + 1, $value);
         }
 
         $statement->executeStatement();
