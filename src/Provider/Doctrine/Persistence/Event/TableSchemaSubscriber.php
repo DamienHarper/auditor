@@ -22,7 +22,7 @@ class TableSchemaSubscriber implements EventSubscriber
     public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs): void
     {
         $classMetadata = $eventArgs->getClassMetadata();
-        if (!$classMetadata->isInheritanceTypeSingleTable() || $classMetadata->getName() === $classMetadata->rootEntityName) {
+        if (!$classMetadata->isEmbeddedClass && (!$classMetadata->isInheritanceTypeSingleTable() || $classMetadata->getName() === $classMetadata->rootEntityName)) {
             $schemaManager = new SchemaManager($this->provider);
             $storageService = $this->provider->getStorageServiceForEntity($classMetadata->getName());
 
