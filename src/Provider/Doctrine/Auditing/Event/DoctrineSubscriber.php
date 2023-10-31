@@ -17,6 +17,9 @@ use Doctrine\ORM\Events;
 
 class DoctrineSubscriber implements EventSubscriber
 {
+    /** @var Transaction[] */
+    private array $transactions = [];
+
     private TransactionManager $transactionManager;
 
     private ?SQLLogger $loggerBackup = null;
@@ -35,7 +38,11 @@ class DoctrineSubscriber implements EventSubscriber
     public function onFlush(OnFlushEventArgs $args): void
     {
         $entityManager = DoctrineHelper::getEntityManagerFromOnFlushEventArgs($args);
-        $transaction = new Transaction($entityManager);
+        $entityManagerId = spl_object_id($entityManager);
+
+        // cached transaction model, if it holds same EM no need to create a new one
+        $transaction = ($this->transactions[$entityManagerId] ??= new Transaction($entityManager));
+
         // Populate transaction
         $this->transactionManager->populate($transaction);
 
@@ -48,27 +55,34 @@ class DoctrineSubscriber implements EventSubscriber
 
             return;
         }
-        trigger_deprecation('damienharper/auditor', '2.2', 'SQLLogger is deprecated. Use DHMiddleware instead');
-        // extend the SQL logger
-        $this->loggerBackup = $entityManager->getConnection()->getConfiguration()->getSQLLogger();
-        $auditLogger = new Logger(function () use ($entityManager, $transaction): void {
-            // flushes pending data
-            $entityManager->getConnection()->getConfiguration()->setSQLLogger($this->loggerBackup);
-            $this->transactionManager->process($transaction);
-            $transaction->reset();
-        });
 
-        // Initialize a new LoggerChain with the new AuditLogger + the existing SQLLoggers.
-        $loggerChain = new LoggerChain();
-        if ($this->loggerBackup instanceof LoggerChain) {
-            foreach ($this->loggerBackup->getLoggers() as $logger) {
-                $loggerChain->addLogger($logger);
-            }
-        } elseif ($this->loggerBackup instanceof SQLLogger) {
-            $loggerChain->addLogger($this->loggerBackup);
+        trigger_deprecation('damienharper/auditor', '2.2', 'SQLLogger is deprecated. Use DHMiddleware instead');
+
+        // extend the SQL logger
+        $currentLogger = $entityManager->getConnection()->getConfiguration()->getSQLLogger();
+
+        // current logger is not a LoggerChain, wrap it
+        if (!$currentLogger instanceof LoggerChain) {
+            // backup current logger
+            $this->loggerBackup = $currentLogger;
+
+            // create a new LoggerChain with the new AuditLogger
+            $auditLogger = new Logger(function () use ($entityManager, $transaction): void {
+                // reset logger
+                $entityManager->getConnection()->getConfiguration()->setSQLLogger($this->loggerBackup);
+
+                // flushes pending data
+                $this->transactionManager->process($transaction);
+                $transaction->reset();
+            });
+
+            // Initialize a new LoggerChain with the new AuditLogger + the existing SQLLoggers.
+            $loggerChain = new LoggerChain();
+            $loggerChain->addLogger($currentLogger);
+            $loggerChain->addLogger($auditLogger);
+
+            $entityManager->getConnection()->getConfiguration()->setSQLLogger($loggerChain);
         }
-        $loggerChain->addLogger($auditLogger);
-        $entityManager->getConnection()->getConfiguration()->setSQLLogger($loggerChain);
     }
 
     public function getSubscribedEvents(): array
