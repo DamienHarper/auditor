@@ -3,7 +3,6 @@
 namespace DH\Auditor\Tests\Provider\Doctrine\Event;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\LoggerChain;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
@@ -11,12 +10,11 @@ use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Logging\SQLLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
 
 class DoctrineSubscriberTest extends TestCase
 {
-    public function testMemoryUsage(): void
+    public function testIssue185(): void
     {
         $transactionManager = $this->createMock(TransactionManager::class);
         $objectManager = $this->createMock(EntityManagerInterface::class);
