@@ -60,13 +60,9 @@ class DoctrineSubscriber implements EventSubscriber
 
         // extend the SQL logger
         $currentLogger = $entityManager->getConnection()->getConfiguration()->getSQLLogger();
-
-        // current logger is not a LoggerChain, wrap it
         if (!$currentLogger instanceof LoggerChain) {
-            // backup current logger
             $this->loggerBackup = $currentLogger;
 
-            // create a new LoggerChain with the new AuditLogger
             $auditLogger = new Logger(function () use ($entityManager, $transaction): void {
                 // reset logger
                 $entityManager->getConnection()->getConfiguration()->setSQLLogger($this->loggerBackup);
@@ -78,7 +74,9 @@ class DoctrineSubscriber implements EventSubscriber
 
             // Initialize a new LoggerChain with the new AuditLogger + the existing SQLLoggers.
             $loggerChain = new LoggerChain();
-            $loggerChain->addLogger($currentLogger);
+            if ($currentLogger !== null) {
+                $loggerChain->addLogger($currentLogger);
+            }
             $loggerChain->addLogger($auditLogger);
 
             $entityManager->getConnection()->getConfiguration()->setSQLLogger($loggerChain);
