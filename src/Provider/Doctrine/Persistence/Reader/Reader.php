@@ -21,9 +21,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 final class Reader
 {
-    /**
-     * @var int
-     */
     public const PAGE_SIZE = 50;
 
     private DoctrineProvider $provider;
@@ -53,7 +50,12 @@ final class Reader
         $connection = $this->provider->getStorageServiceForEntity($entity)->getEntityManager()->getConnection();
         $timezone   = $this->provider->getAuditor()->getConfiguration()->getTimezone();
 
-        $query = new Query($this->getEntityAuditTableName($entity), $connection, $timezone);
+        $query = new Query(
+            $this->getEntityAuditTableName($entity),
+            $connection,
+            $this->provider->getConfiguration(),
+            $timezone,
+        );
         $query
             ->addOrderBy(Query::CREATED_AT, 'DESC')
             ->addOrderBy(Query::ID, 'DESC')
@@ -84,6 +86,12 @@ final class Reader
             && ORMMetadata::INHERITANCE_TYPE_SINGLE_TABLE === $metadata->inheritanceType
         ) {
             $query->addFilter(new SimpleFilter(Query::DISCRIMINATOR, $entity));
+        }
+
+        foreach ($this->provider->getConfiguration()->getExtraIndices() as $indexedField => $extraIndexConfig) {
+            if (null !== $config[$indexedField]) {
+                $query->addFilter(new SimpleFilter($indexedField, $config[$indexedField]));
+            }
         }
 
         return $query;
@@ -195,6 +203,11 @@ final class Reader
             ->setAllowedValues('page', static fn (?int $value): bool => null === $value || $value >= 1)
             ->setAllowedValues('page_size', static fn (?int $value): bool => null === $value || $value >= 1)
         ;
+
+        foreach ($this->provider->getConfiguration()->getExtraIndices() as $indexedField => $extraIndexConfig) {
+            $resolver->setDefault($indexedField, null);
+            $resolver->setAllowedTypes($indexedField, ['null', 'int', 'string', 'array']);
+        }
     }
 
     /**

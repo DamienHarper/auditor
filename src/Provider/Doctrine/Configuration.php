@@ -6,6 +6,7 @@ namespace DH\Auditor\Provider\Doctrine;
 
 use DH\Auditor\Provider\ConfigurationInterface;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -21,12 +22,13 @@ final class Configuration implements ConfigurationInterface
 
     private string $tableSuffix;
 
-    /**
-     * @var array<string>
-     */
-    private array $ignoredColumns = [];
+    private array $ignoredColumns;
 
     private ?array $entities = null;
+
+    private array $extraFields = [];
+
+    private array $extraIndices = [];
 
     private array $storageServices = [];
 
@@ -57,6 +59,20 @@ final class Configuration implements ConfigurationInterface
             // use entity names as array keys for easier lookup
             foreach ($config['entities'] as $auditedEntity => $entityOptions) {
                 $this->entities[$auditedEntity] = $entityOptions;
+            }
+        }
+
+        if (isset($config['extra_fields']) && !empty($config['extra_fields'])) {
+            // use field names as array keys for easier lookup
+            foreach ($config['extra_fields'] as $fieldName => $fieldOptions) {
+                $this->extraFields[$fieldName] = $fieldOptions;
+            }
+        }
+
+        if (isset($config['extra_indices']) && !empty($config['extra_indices'])) {
+            // use index names as array keys for easier lookup
+            foreach ($config['extra_indices'] as $indexName => $indexOptions) {
+                $this->extraIndices[$indexName] = $indexOptions;
             }
         }
 
@@ -191,6 +207,65 @@ final class Configuration implements ConfigurationInterface
         return $this->entities ?? [];
     }
 
+    public function getExtraFields(): array
+    {
+        return $this->extraFields;
+    }
+
+    public function getAllFields(): array
+    {
+        return array_merge(
+            SchemaHelper::getAuditTableColumns(),
+            $this->extraFields
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $extraFields
+     */
+    public function setExtraFields(array $extraFields): self
+    {
+        $this->extraFields = $extraFields;
+
+        return $this;
+    }
+
+    public function getExtraIndices(): array
+    {
+        return $this->extraIndices;
+    }
+
+    public function prepareExtraIndices(string $tablename): array
+    {
+        $indices = [];
+        foreach ($this->extraIndices as $extraIndexField => $extraIndexOptions) {
+            $indices[$extraIndexField] = [
+                'type' => $extraIndexOptions['type'] ?? 'index',
+                'name' => sprintf('%s_%s_idx', $extraIndexOptions['name_prefix'] ?? $extraIndexField, md5($tablename)),
+            ];
+        }
+
+        return $indices;
+    }
+
+    public function getAllIndices(string $tablename): array
+    {
+        return array_merge(
+            SchemaHelper::getAuditTableIndices($tablename),
+            $this->prepareExtraIndices($tablename)
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $extraIndices
+     */
+    public function setExtraIndices(array $extraIndices): self
+    {
+        $this->extraIndices = $extraIndices;
+
+        return $this;
+    }
+
     /**
      * Enables auditing for a specific entity.
      *
@@ -258,6 +333,8 @@ final class Configuration implements ConfigurationInterface
                 'table_suffix' => '_audit',
                 'ignored_columns' => [],
                 'entities' => [],
+                'extra_fields' => [],
+                'extra_indices' => [],
                 'storage_services' => [],
                 'auditing_services' => [],
                 'viewer' => true,
@@ -267,6 +344,8 @@ final class Configuration implements ConfigurationInterface
             ->setAllowedTypes('table_suffix', 'string')
             ->setAllowedTypes('ignored_columns', 'array')
             ->setAllowedTypes('entities', 'array')
+            ->setAllowedTypes('extra_fields', 'array')
+            ->setAllowedTypes('extra_indices', 'array')
             ->setAllowedTypes('storage_services', 'array')
             ->setAllowedTypes('auditing_services', 'array')
             ->setAllowedTypes('viewer', 'bool')
