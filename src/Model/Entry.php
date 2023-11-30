@@ -23,6 +23,8 @@ final class Entry
 
     private string $diffs;
 
+    private array $extra_fields = [];
+
     private int|null|string $blame_id = null;
 
     private ?string $blame_user = null;
@@ -41,6 +43,28 @@ final class Entry
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function setExtraField($key, $value = null): void
+    {
+        if ($key === (array)$key) {
+            $this->extra_fields = $key;
+        } else {
+            $this->extra_fields[$key] = $value;
+        }
+    }
+
+    public function getExtraField($key = ''): mixed
+    {
+        if ('' === $key) {
+            return $this->extra_fields;
+        }
+
+        if (isset($this->extra_fields[$key])) {
+            return $this->extra_fields[$key];
+        }
+
+        return null;
     }
 
     /**
@@ -137,6 +161,8 @@ final class Entry
         foreach ($row as $key => $value) {
             if (property_exists($entry, $key)) {
                 $entry->{$key} = 'id' === $key ? (int) $value : $value;
+            } else {
+                $entry->extra_fields[$key] = $value;
             }
         }
 

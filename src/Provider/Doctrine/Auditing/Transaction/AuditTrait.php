@@ -10,6 +10,7 @@ use DH\Auditor\User\UserInterface;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Throwable;
 use UnitEnum;
 
@@ -123,6 +124,28 @@ trait AuditTrait
         }
 
         return $convertedValue;
+    }
+
+    /**
+     * Returns the extra fields if set.
+     */
+    private function extraFields(object $entity): array
+    {
+        $configuration = $this->provider->getConfiguration();
+        $extraFieldProperties = array_keys($configuration->getExtraFields());
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+
+        $extraFields = [];
+
+        foreach ($extraFieldProperties as $extraField) {
+            if (!$propertyAccessor->isReadable($entity, $extraField)) {
+                continue;
+            }
+
+            $extraFields[$extraField] = $propertyAccessor->getValue($entity, $extraField);
+        }
+
+        return $extraFields;
     }
 
     /**
