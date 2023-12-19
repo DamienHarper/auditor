@@ -5,5 +5,10 @@
         "phpstan/phpstan-deprecation-rules": "^1.0",
         "phpstan/phpstan-doctrine": "^1.0",
         "phpstan/phpstan-strict-rules": "^1.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
     }
 }

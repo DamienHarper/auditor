@@ -134,8 +134,6 @@ class Post implements Stringable
 
     /**
      * Get the value of id.
-     *
-     * @return int
      */
     public function getId(): ?int
     {
@@ -154,8 +152,6 @@ class Post implements Stringable
 
     /**
      * Get the value of title.
-     *
-     * @return string
      */
     public function getTitle(): ?string
     {
@@ -174,8 +170,6 @@ class Post implements Stringable
 
     /**
      * Get the value of body.
-     *
-     * @return string
      */
     public function getBody(): ?string
     {
@@ -232,8 +226,6 @@ class Post implements Stringable
 
     /**
      * Get the value of author_id.
-     *
-     * @return int
      */
     public function getAuthorId(): ?int
     {
