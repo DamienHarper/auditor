@@ -139,7 +139,7 @@ final class DoctrineProvider extends AbstractProvider
         $statement = $storageService->getEntityManager()->getConnection()->prepare($query);
 
         foreach ($payload as $key => $value) {
-            $statement->bindValue(array_search($key, $keys) + 1, $value);
+            $statement->bindValue(array_search($key, $keys, true) + 1, $value);
         }
 
         $statement->executeStatement();
