@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DH\Auditor\Tests\Provider\Doctrine\Event;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
@@ -12,7 +14,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use PHPUnit\Framework\TestCase;
 
-class DoctrineSubscriberTest extends TestCase
+/**
+ * @internal
+ *
+ * @small
+ */
+final class DoctrineSubscriberTest extends TestCase
 {
     public function testIssue185(): void
     {
@@ -23,24 +30,23 @@ class DoctrineSubscriberTest extends TestCase
 
         $objectManager
             ->method('getConnection')
-            ->willReturn($connection = $this->createMock(Connection::class));
+            ->willReturn($connection = $this->createMock(Connection::class))
+        ;
 
         $connection
             ->method('getDriver')
-            ->willReturn($driver = $this->createMock(Driver::class));
+            ->willReturn($driver = $this->createMock(Driver::class))
+        ;
 
         $connection
             ->method('getConfiguration')
-            ->willReturn($configuration = new Configuration());
+            ->willReturn($configuration = new Configuration())
+        ;
 
-        $configuration->setSQLLogger(new class implements SQLLogger {
-            public function startQuery($sql, ?array $params = null, ?array $types = null)
-            {
-            }
+        $configuration->setSQLLogger(new class() implements SQLLogger {
+            public function startQuery($sql, ?array $params = null, ?array $types = null): void {}
 
-            public function stopQuery()
-            {
-            }
+            public function stopQuery(): void {}
         });
 
         $target = new DoctrineSubscriber($transactionManager);

@@ -74,7 +74,7 @@ class DoctrineSubscriber implements EventSubscriber
 
             // Initialize a new LoggerChain with the new AuditLogger + the existing SQLLoggers.
             $loggerChain = new LoggerChain();
-            if ($currentLogger !== null) {
+            if (null !== $currentLogger) {
                 $loggerChain->addLogger($currentLogger);
             }
             $loggerChain->addLogger($auditLogger);
