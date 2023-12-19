@@ -12,7 +12,6 @@ use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
-use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMMetadata;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -51,7 +50,7 @@ final class Reader
         $config = $resolver->resolve($options);
 
         $connection = $this->provider->getStorageServiceForEntity($entity)->getEntityManager()->getConnection();
-        $timezone   = $this->provider->getAuditor()->getConfiguration()->getTimezone();
+        $timezone = $this->provider->getAuditor()->getConfiguration()->getTimezone();
 
         $query = new Query($this->getEntityAuditTableName($entity), $connection, $timezone);
         $query
