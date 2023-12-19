@@ -154,9 +154,7 @@ trait SchemaSetupTrait
         // No audited entities configured
     }
 
-    private function setupEntities(): void
-    {
-    }
+    private function setupEntities(): void {}
 
     /**
      * @param array<StorageServiceInterface> $storageServices

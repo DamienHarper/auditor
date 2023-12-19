@@ -69,8 +69,6 @@ class Tag implements Stringable
 
     /**
      * Get the value of id.
-     *
-     * @return int
      */
     public function getId(): ?int
     {
@@ -89,8 +87,6 @@ class Tag implements Stringable
 
     /**
      * Get the value of title.
-     *
-     * @return string
      */
     public function getTitle(): ?string
     {

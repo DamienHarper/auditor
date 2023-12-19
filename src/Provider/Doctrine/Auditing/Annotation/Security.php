@@ -11,9 +11,7 @@ use Doctrine\Common\Annotations\Annotation\Required;
 
 /**
  * @Annotation
- *
  * @NamedArgumentConstructor
- *
  * @Target("CLASS")
  *
  * @Attributes({

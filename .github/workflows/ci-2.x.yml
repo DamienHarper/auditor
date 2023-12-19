@@ -23,7 +23,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.3
           extensions: composer:v2
 
       - name: Install PHP-CS-Fixer
@@ -32,6 +32,8 @@ jobs:
       - name: Run PHP-CS-Fixer
         run: |
           sed -i "s/'phpdoc_to_return_type' => true/'phpdoc_to_return_type' => false/g" .php-cs-fixer.php
+          sed -i "s/'phpdoc_to_param_type' => true/'phpdoc_to_param_type' => false/g" .php-cs-fixer.php
+          sed -i "s/'phpdoc_to_property_type' => true/'phpdoc_to_property_type' => false/g" .php-cs-fixer.php
           composer cs-check
 
       - name: Validate composer
@@ -74,6 +76,8 @@ jobs:
           - '7.4'
           - '8.0'
           - '8.1'
+          - '8.2'
+          - '8.3'
         symfony:
           - '4.4.*'
           - '5.*'
@@ -179,6 +183,8 @@ jobs:
         php:
           - '8.0'
           - '8.1'
+          - '8.2'
+          - '8.3'
         symfony:
           - '6.*'
         db:

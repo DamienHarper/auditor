@@ -106,8 +106,6 @@ class Entry
 
     /**
      * Get the value of ip.
-     *
-     * @return string
      */
     public function getIp(): ?string
     {
@@ -124,8 +122,6 @@ class Entry
 
     /**
      * Get diff values.
-     *
-     * @return array
      */
     public function getDiffs(bool $includeMedadata = false): ?array
     {

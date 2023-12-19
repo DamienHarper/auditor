@@ -30,7 +30,5 @@ class Logger implements SQLLogger
         }
     }
 
-    public function stopQuery(): void
-    {
-    }
+    public function stopQuery(): void {}
 }

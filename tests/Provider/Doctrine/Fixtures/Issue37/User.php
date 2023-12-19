@@ -95,8 +95,6 @@ class User
 
     /**
      * Get the value of locale_id.
-     *
-     * @return string
      */
     public function getLocaleId(): ?string
     {

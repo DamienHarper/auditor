@@ -67,9 +67,7 @@ class Comment
     #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id', nullable: true)]
     protected $post;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function __sleep()
     {
@@ -88,8 +86,6 @@ class Comment
 
     /**
      * Get the value of id.
-     *
-     * @return int
      */
     public function getId(): ?int
     {
@@ -108,8 +104,6 @@ class Comment
 
     /**
      * Get the value of body.
-     *
-     * @return string
      */
     public function getBody(): ?string
     {
@@ -128,8 +122,6 @@ class Comment
 
     /**
      * Get the value of author.
-     *
-     * @return string
      */
     public function getAuthor(): ?string
     {
@@ -166,8 +158,6 @@ class Comment
 
     /**
      * Get the value of post_id.
-     *
-     * @return int
      */
     public function getPostId(): ?int
     {
