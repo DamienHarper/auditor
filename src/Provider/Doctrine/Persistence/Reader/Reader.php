@@ -106,7 +106,7 @@ final class Reader
                     $results[$entity] = $audits;
                 }
             } catch (AccessDeniedException) {
-                // acces denied
+                // access denied
             }
         }
 
