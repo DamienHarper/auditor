@@ -20,7 +20,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: 2.x
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -92,7 +92,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: 2.x
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -130,8 +130,7 @@ jobs:
         run: composer install --no-progress --ansi --working-dir=tools/phpstan
 
       - name: Run PHPStan
-#        run: composer phpstan
-        run: tools/phpstan/vendor/bin/phpstan --ansi analyse src --debug
+        run: composer phpstan
 
       - name: Run tests
         run: |
@@ -196,7 +195,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: 2.x
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
