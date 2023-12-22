@@ -69,13 +69,12 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.0'
-          - '8.1'
           - '8.2'
           - '8.3'
         symfony:
           - '5.*'
           - '6.*'
+          - '7.*'
         db:
           - 'sqlite'
           - 'mysql'
@@ -120,6 +119,10 @@ jobs:
       - name: Update project dependencies (6.*)
         if: matrix.symfony == '6.*'
         run: SYMFONY_REQUIRE="^6.0" composer update --no-progress --ansi --prefer-stable
+
+      - name: Update project dependencies (7.*)
+        if: matrix.symfony == '7.*'
+        run: SYMFONY_REQUIRE="^7.0" composer update --no-progress --ansi --prefer-stable
 
       - name: Install PHPStan
         run: composer install --no-progress --ansi --working-dir=tools/phpstan
