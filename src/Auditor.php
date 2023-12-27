@@ -12,7 +12,7 @@ use ReflectionException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @see \DH\Auditor\Tests\AuditorTest
+ * @see Tests\AuditorTest
  */
 class Auditor
 {
