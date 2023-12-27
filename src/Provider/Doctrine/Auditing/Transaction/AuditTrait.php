@@ -18,9 +18,9 @@ trait AuditTrait
     /**
      * Returns the primary key value of an entity.
      *
-     * @throws \DH\Auditor\Exception\MappingException
+     * @throws MappingException
      * @throws \Doctrine\DBAL\Exception
-     * @throws \Doctrine\ORM\Mapping\MappingException
+     * @throws ORMMappingException
      */
     private function id(EntityManagerInterface $entityManager, object $entity): mixed
     {
@@ -128,10 +128,10 @@ trait AuditTrait
     /**
      * Computes a usable diff.
      *
-     * @throws \DH\Auditor\Exception\MappingException
+     * @throws MappingException
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\DBAL\Types\ConversionException
-     * @throws \Doctrine\ORM\Mapping\MappingException
+     * @throws ORMMappingException
      */
     private function diff(EntityManagerInterface $entityManager, object $entity, array $changeset): array
     {
@@ -181,9 +181,9 @@ trait AuditTrait
     /**
      * Returns an array describing an entity.
      *
-     * @throws \DH\Auditor\Exception\MappingException
+     * @throws MappingException
      * @throws \Doctrine\DBAL\Exception
-     * @throws \Doctrine\ORM\Mapping\MappingException
+     * @throws ORMMappingException
      */
     private function summarize(EntityManagerInterface $entityManager, ?object $entity = null, array $extra = []): ?array
     {

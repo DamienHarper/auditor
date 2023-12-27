@@ -125,7 +125,7 @@ final class CleanAuditLogsCommandTest extends TestCase
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute([
-            '--exclude' => \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author::class,
+            '--exclude' => Author::class,
         ]);
 
         // the output of the command in the console
@@ -139,8 +139,8 @@ final class CleanAuditLogsCommandTest extends TestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             '--exclude' => [
-                \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author::class,
-                \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post::class,
+                Author::class,
+                Post::class,
             ],
         ]);
 
@@ -154,7 +154,7 @@ final class CleanAuditLogsCommandTest extends TestCase
         $command = $this->createCommand();
         $commandTester = new CommandTester($command);
         $commandTester->execute([
-            '--include' => \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author::class,
+            '--include' => Author::class,
         ]);
 
         // the output of the command in the console
@@ -168,8 +168,8 @@ final class CleanAuditLogsCommandTest extends TestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             '--include' => [
-                \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author::class,
-                \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post::class,
+                Author::class,
+                Post::class,
             ],
         ]);
 

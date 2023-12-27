@@ -7,7 +7,7 @@ namespace DH\Auditor;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @see \DH\Auditor\Tests\ConfigurationTest
+ * @see Tests\ConfigurationTest
  */
 final class Configuration
 {
