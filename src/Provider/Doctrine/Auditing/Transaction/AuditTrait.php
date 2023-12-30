@@ -20,7 +20,7 @@ trait AuditTrait
      * Returns the primary key value of an entity.
      *
      * @throws MappingException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws ORMMappingException
      */
     private function id(EntityManagerInterface $entityManager, object $entity): mixed
