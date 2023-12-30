@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace DH\Auditor\Model;
 
 use DateTimeImmutable;
+use DH\Auditor\Tests\Model\EntryTest;
 
 /**
- * @see \DH\Auditor\Tests\Model\EntryTest
+ * @see EntryTest
  */
 final class Entry
 {

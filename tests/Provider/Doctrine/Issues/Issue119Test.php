@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Issues;
 
+use DH\Auditor\Model\Entry;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionProcessor;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
@@ -35,7 +36,7 @@ final class Issue119Test extends TestCase
         $audits = $reader->createQuery(DummyEntity::class)->execute();
         self::assertCount(1, $audits, 'results count ok.');
 
-        /** @var \DH\Auditor\Model\Entry $audit */
+        /** @var Entry $audit */
         $audit = $audits[0];
         $diffs = $audit->getDiffs()['json_array'];
         self::assertSame([

@@ -11,6 +11,7 @@ use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
+use DH\Auditor\Tests\Provider\Doctrine\Persistence\Command\CleanAuditLogsCommandTest;
 use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
@@ -22,7 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Command\CleanAuditLogsCommandTest
+ * @see CleanAuditLogsCommandTest
  */
 final class CleanAuditLogsCommand extends Command
 {

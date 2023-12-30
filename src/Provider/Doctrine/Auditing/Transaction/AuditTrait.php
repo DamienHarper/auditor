@@ -7,6 +7,7 @@ namespace DH\Auditor\Provider\Doctrine\Auditing\Transaction;
 use DH\Auditor\Exception\MappingException;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\User\UserInterface;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
@@ -61,7 +62,7 @@ trait AuditTrait
     /**
      * Type converts the input value and returns it.
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws \Doctrine\DBAL\Types\ConversionException
      */
     private function value(EntityManagerInterface $entityManager, Type $type, mixed $value): mixed
@@ -129,7 +130,7 @@ trait AuditTrait
      * Computes a usable diff.
      *
      * @throws MappingException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws \Doctrine\DBAL\Types\ConversionException
      * @throws ORMMappingException
      */
@@ -182,7 +183,7 @@ trait AuditTrait
      * Returns an array describing an entity.
      *
      * @throws MappingException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws ORMMappingException
      */
     private function summarize(EntityManagerInterface $entityManager, ?object $entity = null, array $extra = []): ?array

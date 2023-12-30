@@ -7,6 +7,7 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Issues;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\AuditTrait;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue112\DummyEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
+use Doctrine\ORM\Mapping\MappingException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,7 +20,7 @@ final class Issue112Test extends TestCase
     use DefaultSchemaSetupTrait;
 
     /**
-     * @throws \Doctrine\ORM\Mapping\MappingException
+     * @throws MappingException
      * @throws \Doctrine\DBAL\Exception
      * @throws \DH\Auditor\Exception\MappingException
      */

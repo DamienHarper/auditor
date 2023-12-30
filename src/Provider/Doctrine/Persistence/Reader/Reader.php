@@ -12,11 +12,12 @@ use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
+use DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader\ReaderTest;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMMetadata;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader\ReaderTest
+ * @see ReaderTest
  */
 final class Reader
 {

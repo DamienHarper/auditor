@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Auditing\Annotation;
 
+use DH\Auditor\Tests\Provider\Doctrine\Auditing\Annotation\AnnotationLoaderTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use ReflectionClass;
 
 /**
- * @see \DH\Auditor\Tests\Provider\Doctrine\Auditing\Annotation\AnnotationLoaderTest
+ * @see AnnotationLoaderTest
  */
 final class AnnotationLoader
 {

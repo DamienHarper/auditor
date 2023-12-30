@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
+use DH\Auditor\Tests\Provider\Doctrine\Persistence\Helper\DoctrineHelperTest;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
@@ -12,7 +14,7 @@ use Doctrine\DBAL\Types\Types;
 use InvalidArgumentException;
 
 /**
- * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Helper\DoctrineHelperTest
+ * @see DoctrineHelperTest
  *
  * @internal
  */
@@ -65,7 +67,7 @@ final class DoctrineHelper
     /**
      * TODO: remove this method when we drop support of doctrine/dbal 2.13.x.
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public static function createSchemaManager(Connection $connection): AbstractSchemaManager
     {
@@ -77,7 +79,7 @@ final class DoctrineHelper
     /**
      * TODO: remove this method when we drop support of doctrine/dbal 2.13.x.
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public static function introspectSchema(AbstractSchemaManager $schemaManager): Schema
     {
@@ -91,7 +93,7 @@ final class DoctrineHelper
      *
      * @return array<string>
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public static function getMigrateToSql(Connection $connection, Schema $fromSchema, Schema $toSchema): array
     {

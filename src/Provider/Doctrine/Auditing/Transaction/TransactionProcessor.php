@@ -12,12 +12,13 @@ use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
+use DH\Auditor\Tests\Provider\Doctrine\Auditing\Transaction\TransactionProcessorTest;
 use DH\Auditor\Transaction\TransactionProcessorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 /**
- * @see \DH\Auditor\Tests\Provider\Doctrine\Auditing\Transaction\TransactionProcessorTest
+ * @see TransactionProcessorTest
  */
 final class TransactionProcessor implements TransactionProcessorInterface
 {

@@ -19,13 +19,14 @@ use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Provider\ProviderInterface;
 use DH\Auditor\Provider\Service\AuditingServiceInterface;
+use DH\Auditor\Tests\Provider\Doctrine\DoctrineProviderTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ToolEvents;
 use Exception;
 
 /**
- * @see \DH\Auditor\Tests\Provider\Doctrine\DoctrineProviderTest
+ * @see DoctrineProviderTest
  */
 final class DoctrineProvider extends AbstractProvider
 {

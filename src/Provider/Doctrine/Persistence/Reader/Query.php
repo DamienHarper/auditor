@@ -13,13 +13,14 @@ use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\DateRangeFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\FilterInterface;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\RangeFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
+use DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader\QueryTest;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Exception;
 
 /**
- * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader\QueryTest
+ * @see QueryTest
  */
 final class Query
 {
