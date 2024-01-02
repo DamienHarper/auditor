@@ -6,11 +6,12 @@ namespace DH\Auditor\EventSubscriber;
 
 use DH\Auditor\Auditor;
 use DH\Auditor\Event\LifecycleEvent;
+use DH\Auditor\Tests\EventSubscriber\AuditEventSubscriberTest;
 use Exception;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * @see \DH\Auditor\Tests\EventSubscriber\AuditEventSubscriberTest
+ * @see AuditEventSubscriberTest
  */
 class AuditEventSubscriber implements EventSubscriberInterface
 {

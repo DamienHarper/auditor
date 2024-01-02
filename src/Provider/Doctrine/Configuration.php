@@ -8,10 +8,11 @@ use DH\Auditor\Provider\ConfigurationInterface;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
+use DH\Auditor\Tests\Provider\Doctrine\ConfigurationTest;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @see \DH\Auditor\Tests\Provider\Doctrine\ConfigurationTest
+ * @see ConfigurationTest
  */
 class Configuration implements ConfigurationInterface
 {

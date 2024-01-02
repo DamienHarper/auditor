@@ -12,6 +12,7 @@ use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
+use DH\Auditor\Tests\Provider\Doctrine\Persistence\Command\CleanAuditLogsCommandTest;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Exception;
 use Symfony\Component\Console\Command\Command;
@@ -24,7 +25,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Command\CleanAuditLogsCommandTest
+ * @see CleanAuditLogsCommandTest
  */
 class CleanAuditLogsCommand extends Command
 {

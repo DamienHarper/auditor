@@ -9,9 +9,10 @@ use DH\Auditor\Event\Dto\DissociateEventDto;
 use DH\Auditor\Event\Dto\InsertEventDto;
 use DH\Auditor\Event\Dto\RemoveEventDto;
 use DH\Auditor\Event\Dto\UpdateEventDto;
+use DH\Auditor\Tests\Model\TransactionTest;
 
 /**
- * @see \DH\Auditor\Tests\Model\TransactionTest
+ * @see TransactionTest
  */
 class Transaction implements TransactionInterface
 {

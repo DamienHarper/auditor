@@ -11,7 +11,9 @@ use DH\Auditor\Provider\Doctrine\Persistence\Helper\PlatformHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
+use DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema\SchemaManagerTest;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
@@ -20,7 +22,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema\SchemaManagerTest
+ * @see SchemaManagerTest
  */
 class SchemaManager
 {
@@ -145,7 +147,7 @@ class SchemaManager
     /**
      * Creates an audit table.
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function createAuditTable(string $entity, ?Schema $schema = null): Schema
     {
@@ -199,7 +201,7 @@ class SchemaManager
      * Ensures an audit table's structure is valid.
      *
      * @throws SchemaException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function updateAuditTable(string $entity, ?Schema $schema = null): Schema
     {

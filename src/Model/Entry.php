@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Model;
 
+use DH\Auditor\Tests\Model\EntryTest;
+
 /**
- * @see \DH\Auditor\Tests\Model\EntryTest
+ * @see EntryTest
  */
 class Entry
 {

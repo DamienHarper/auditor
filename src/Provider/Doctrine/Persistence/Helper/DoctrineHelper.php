@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
 use Composer\Autoload\ClassLoader;
+use DH\Auditor\Tests\Provider\Doctrine\Persistence\Helper\DoctrineHelperTest;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -23,7 +24,7 @@ use InvalidArgumentException;
 use ReflectionClass;
 
 /**
- * @see \DH\Auditor\Tests\Provider\Doctrine\Persistence\Helper\DoctrineHelperTest
+ * @see DoctrineHelperTest
  *
  * @internal
  */

@@ -20,11 +20,12 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Provider\ProviderInterface;
 use DH\Auditor\Provider\Service\AuditingServiceInterface;
 use DH\Auditor\Provider\Service\StorageServiceInterface;
+use DH\Auditor\Tests\Provider\Doctrine\DoctrineProviderTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 
 /**
- * @see \DH\Auditor\Tests\Provider\Doctrine\DoctrineProviderTest
+ * @see DoctrineProviderTest
  */
 class DoctrineProvider extends AbstractProvider
 {
