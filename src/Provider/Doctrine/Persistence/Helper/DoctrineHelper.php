@@ -8,6 +8,7 @@ use Composer\Autoload\ClassLoader;
 use DH\Auditor\Tests\Provider\Doctrine\Persistence\Helper\DoctrineHelperTest;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -34,8 +35,6 @@ final class DoctrineHelper
      * Gets the real class name of a class name that could be a proxy.
      *
      * @param object|string $subject
-     *
-     * @return string
      *
      * credits
      * https://github.com/api-platform/core/blob/master/src/Util/ClassInfoTrait.php
@@ -77,7 +76,7 @@ final class DoctrineHelper
     /**
      * @param QueryBuilder|Statement $statement
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public static function executeStatement($statement): void
     {
@@ -93,7 +92,7 @@ final class DoctrineHelper
      *
      * @return int|Result|string
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public static function executeQuery($statement)
     {
@@ -121,7 +120,7 @@ final class DoctrineHelper
     /**
      * @return array<string>
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public static function getMigrateToSql(Connection $connection, Schema $fromSchema, Schema $toSchema): array
     {
