@@ -8,6 +8,7 @@ use DH\Auditor\Exception\MappingException;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\User\UserInterface;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
@@ -63,7 +64,7 @@ trait AuditTrait
      * Type converts the input value and returns it.
      *
      * @throws Exception
-     * @throws \Doctrine\DBAL\Types\ConversionException
+     * @throws ConversionException
      */
     private function value(EntityManagerInterface $entityManager, Type $type, mixed $value): mixed
     {
@@ -131,7 +132,7 @@ trait AuditTrait
      *
      * @throws MappingException
      * @throws Exception
-     * @throws \Doctrine\DBAL\Types\ConversionException
+     * @throws ConversionException
      * @throws ORMMappingException
      */
     private function diff(EntityManagerInterface $entityManager, object $entity, array $changeset): array

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine;
 
+use DH\Auditor\Auditor;
 use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Exception\ProviderException;
@@ -24,6 +25,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ToolEvents;
 use Exception;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * @see DoctrineProviderTest
@@ -169,7 +171,7 @@ final class DoctrineProvider extends AbstractProvider
      */
     public function isAudited(object|string $entity): bool
     {
-        \assert($this->auditor instanceof \DH\Auditor\Auditor);
+        \assert($this->auditor instanceof Auditor);
         if (!$this->auditor->getConfiguration()->isEnabled()) {
             return false;
         }
@@ -245,7 +247,7 @@ final class DoctrineProvider extends AbstractProvider
 
         $annotationLoader = new AnnotationLoader($entityManager);
 
-        if ($metadataCache instanceof \Psr\Cache\CacheItemPoolInterface) {
+        if ($metadataCache instanceof CacheItemPoolInterface) {
             $item = $metadataCache->getItem('__DH_ANNOTATIONS__');
             if (!$item->isHit() || !\is_array($annotationEntities = $item->get())) {
                 $annotationEntities = $annotationLoader->load();

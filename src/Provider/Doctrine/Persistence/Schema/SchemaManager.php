@@ -21,6 +21,7 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 
 /**
  * @see SchemaManagerTest
@@ -66,7 +67,7 @@ final class SchemaManager
     {
         $metadataDriver = $entityManager->getConfiguration()->getMetadataDriverImpl();
         $entities = [];
-        if ($metadataDriver instanceof \Doctrine\Persistence\Mapping\Driver\MappingDriver) {
+        if ($metadataDriver instanceof MappingDriver) {
             $entities = $metadataDriver->getAllClassNames();
         }
 
@@ -161,7 +162,7 @@ final class SchemaManager
         $storageService = $this->provider->getStorageServiceForEntity($entity);
         $connection = $storageService->getEntityManager()->getConnection();
 
-        if (!$schema instanceof \Doctrine\DBAL\Schema\Schema) {
+        if (!$schema instanceof Schema) {
             $schemaManager = DoctrineHelper::createSchemaManager($connection);
             $schema = DoctrineHelper::introspectSchema($schemaManager);
         }
@@ -218,7 +219,7 @@ final class SchemaManager
         $connection = $storageService->getEntityManager()->getConnection();
 
         $schemaManager = DoctrineHelper::createSchemaManager($connection);
-        if (!$schema instanceof \Doctrine\DBAL\Schema\Schema) {
+        if (!$schema instanceof Schema) {
             $schema = DoctrineHelper::introspectSchema($schemaManager);
         }
 

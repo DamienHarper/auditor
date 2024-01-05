@@ -150,7 +150,7 @@ final class Configuration implements ConfigurationInterface
             return $this->entities;
         }
 
-        if ($this->provider instanceof \DH\Auditor\Provider\Doctrine\DoctrineProvider) {
+        if ($this->provider instanceof DoctrineProvider) {
             $schemaManager = new SchemaManager($this->provider);
 
             /** @var array<AuditingService> $auditingServices */

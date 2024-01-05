@@ -22,11 +22,6 @@ final class DoctrineHelper
 {
     /**
      * Gets the real class name of a class name that could be a proxy.
-     *
-     * @param object|string $subject
-     *
-     * credits
-     * https://github.com/api-platform/core/blob/master/src/Util/ClassInfoTrait.php
      */
     public static function getRealClassName(object|string $subject): string
     {

@@ -7,6 +7,7 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Event;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 
 final class TableSchemaListener
@@ -27,7 +28,7 @@ final class TableSchemaListener
 
             \assert($storageService instanceof StorageService);
             $platform = $storageService->getEntityManager()->getConnection()->getDatabasePlatform();
-            if ($platform instanceof \Doctrine\DBAL\Platforms\AbstractPlatform && !$platform->supportsSchemas()) {
+            if ($platform instanceof AbstractPlatform && !$platform->supportsSchemas()) {
                 $classMetadata->setPrimaryTable([
                     'name' => $schemaManager->resolveTableName($classMetadata->getTableName(), $classMetadata->getSchemaName() ?? '', $platform),
                     'schema' => '',

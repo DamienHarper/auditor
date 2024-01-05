@@ -27,7 +27,7 @@ class RelatedDummyEntity implements Stringable
     public function __construct(?DummyEntity $parent, string $label)
     {
         $this->parent = $parent;
-        if ($parent instanceof \DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue95\DummyEntity) {
+        if ($parent instanceof DummyEntity) {
             $parent->addChild($this);
         }
 
