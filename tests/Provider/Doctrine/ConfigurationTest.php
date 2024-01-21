@@ -10,12 +10,13 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation\AuditedEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ProviderConfigurationTrait;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class ConfigurationTest extends TestCase
 {
     use ProviderConfigurationTrait;

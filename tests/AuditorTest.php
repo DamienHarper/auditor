@@ -12,13 +12,15 @@ use DH\Auditor\Tests\Fixtures\Provider\NoStorageNoAuditProvider;
 use DH\Auditor\Tests\Fixtures\Provider\StorageAndAuditProvider;
 use DH\Auditor\Tests\Fixtures\Provider\StorageNoAuditProvider;
 use DH\Auditor\Tests\Traits\AuditorTrait;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class AuditorTest extends TestCase
 {
     use AuditorTrait;
@@ -38,7 +40,7 @@ final class AuditorTest extends TestCase
         self::assertCount(0, $auditor->getProviders(), 'Auditor::$providers is an empty array by default.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testGetProviders')]
+    #[Depends('testGetProviders')]
     public function testRegisterProvider(): void
     {
         $auditor = $this->createAuditor();
@@ -54,7 +56,7 @@ final class AuditorTest extends TestCase
         self::assertSame($auditor, $provider->getAuditor(), 'Provider is properly registered.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testRegisterProvider')]
+    #[Depends('testRegisterProvider')]
     public function testHasProvider(): void
     {
         $auditor = $this->createAuditor();
@@ -66,7 +68,7 @@ final class AuditorTest extends TestCase
         self::assertFalse($auditor->hasProvider('UNKNOWN_PROVIDER'));
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testRegisterProvider')]
+    #[Depends('testRegisterProvider')]
     public function testRegisterNoStorageNoAuditProvider(): void
     {
         $auditor = $this->createAuditor();
@@ -76,7 +78,7 @@ final class AuditorTest extends TestCase
         $auditor->registerProvider($provider);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testRegisterProvider')]
+    #[Depends('testRegisterProvider')]
     public function testGetProvider(): void
     {
         $auditor = $this->createAuditor();
@@ -90,7 +92,7 @@ final class AuditorTest extends TestCase
         $auditor->getProvider('UNKNOWN_PROVIDER');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testRegisterProvider')]
+    #[Depends('testRegisterProvider')]
     public function testIsStorageEnabled(): void
     {
         $auditor = $this->createAuditor();
@@ -107,7 +109,7 @@ final class AuditorTest extends TestCase
         $auditor->isStorageEnabled($provider3);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testIsStorageEnabled')]
+    #[Depends('testIsStorageEnabled')]
     public function testDisableStorage(): void
     {
         $auditor = $this->createAuditor();
@@ -127,7 +129,7 @@ final class AuditorTest extends TestCase
         $auditor->disableStorage($provider3);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testIsStorageEnabled')]
+    #[Depends('testIsStorageEnabled')]
     public function testDisableStorageWhenOnlyOneIsEnabled(): void
     {
         $auditor = $this->createAuditor();
@@ -139,7 +141,7 @@ final class AuditorTest extends TestCase
         $auditor->disableStorage($provider);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testDisableStorage')]
+    #[Depends('testDisableStorage')]
     public function testEnableStorage(): void
     {
         $auditor = $this->createAuditor();
@@ -159,7 +161,7 @@ final class AuditorTest extends TestCase
         $auditor->enableStorage($provider3);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testRegisterProvider')]
+    #[Depends('testRegisterProvider')]
     public function testIsAuditingEnabled(): void
     {
         $auditor = $this->createAuditor();
@@ -176,7 +178,7 @@ final class AuditorTest extends TestCase
         $auditor->isAuditingEnabled($provider3);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testIsStorageEnabled')]
+    #[Depends('testIsStorageEnabled')]
     public function testDisableAuditing(): void
     {
         $auditor = $this->createAuditor();
@@ -196,7 +198,7 @@ final class AuditorTest extends TestCase
         $auditor->disableAuditing($provider3);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testIsStorageEnabled')]
+    #[Depends('testIsStorageEnabled')]
     public function testDisableAuditingWhenOnlyOneIsEnabled(): void
     {
         $auditor = $this->createAuditor();
@@ -208,7 +210,7 @@ final class AuditorTest extends TestCase
         $auditor->disableAuditing($provider);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testDisableStorage')]
+    #[Depends('testDisableStorage')]
     public function testEnableAuditing(): void
     {
         $auditor = $this->createAuditor();

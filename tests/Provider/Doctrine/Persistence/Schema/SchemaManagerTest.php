@@ -28,12 +28,14 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class SchemaManagerTest extends TestCase
 {
     use DefaultSchemaSetupTrait;
@@ -180,7 +182,7 @@ final class SchemaManagerTest extends TestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testCreateAuditTable')]
+    #[Depends('testCreateAuditTable')]
     public function testUpdateAuditTable(): void
     {
         $updater = new SchemaManager($this->provider);

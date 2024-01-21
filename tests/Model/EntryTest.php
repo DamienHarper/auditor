@@ -6,13 +6,14 @@ namespace DH\Auditor\Tests\Model;
 
 use DateTimeImmutable;
 use DH\Auditor\Model\Entry;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class EntryTest extends TestCase
 {
     public function testAccessors(): void

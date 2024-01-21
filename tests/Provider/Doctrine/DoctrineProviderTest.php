@@ -26,12 +26,14 @@ use DH\Auditor\User\User;
 use DH\Auditor\User\UserInterface;
 use DH\Auditor\User\UserProviderInterface;
 use Exception;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class DoctrineProviderTest extends TestCase
 {
     use DoctrineProviderTrait;
@@ -84,7 +86,7 @@ final class DoctrineProviderTest extends TestCase
         $provider->registerAuditingService(new AuditingService('auditingEM_1', $this->createEntityManager()));
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testRegisterAuditingEntityManager')]
+    #[Depends('testRegisterAuditingEntityManager')]
     public function testGetAuditingServiceForEntity(): void
     {
         $provider = $this->createUnregisteredDoctrineProvider();
@@ -94,8 +96,8 @@ final class DoctrineProviderTest extends TestCase
         $provider->getAuditingServiceForEntity('My\Fake\Entity');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testRegisterAuditingEntityManager')]
-    #[\PHPUnit\Framework\Attributes\Depends('testRegisterStorageEntityManager')]
+    #[Depends('testRegisterAuditingEntityManager')]
+    #[Depends('testRegisterStorageEntityManager')]
     public function testRegisterEntityManager(): void
     {
         $provider = $this->createUnregisteredDoctrineProvider();
@@ -243,7 +245,7 @@ final class DoctrineProviderTest extends TestCase
         self::assertFalse($provider->isAuditable(Comment::class), 'Entity "'.Comment::class.'" is not auditable.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testIsAudited')]
+    #[Depends('testIsAudited')]
     public function testIsAuditedHonorsEnabledFlag(): void
     {
         $entities = [
@@ -273,7 +275,7 @@ final class DoctrineProviderTest extends TestCase
         self::assertFalse($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is not audited.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testIsAudited')]
+    #[Depends('testIsAudited')]
     public function testIsAuditedWhenAuditIsEnabled(): void
     {
         $entities = [
@@ -305,7 +307,7 @@ final class DoctrineProviderTest extends TestCase
         self::assertFalse($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is not audited.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testIsAudited')]
+    #[Depends('testIsAudited')]
     public function testIsAuditedWhenAuditIsDisabled(): void
     {
         $entities = [
@@ -326,7 +328,7 @@ final class DoctrineProviderTest extends TestCase
         self::assertFalse($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is not audited.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testIsAudited')]
+    #[Depends('testIsAudited')]
     public function testIsAuditedFieldAuditsAnyFieldByDefault(): void
     {
         $entities = [
@@ -344,7 +346,7 @@ final class DoctrineProviderTest extends TestCase
         self::assertTrue($provider->isAuditedField(Post::class, 'updated_at'), 'Every field is audited.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testIsAuditedFieldAuditsAnyFieldByDefault')]
+    #[Depends('testIsAuditedFieldAuditsAnyFieldByDefault')]
     public function testIsAuditedFieldHonorsLocallyIgnoredColumns(): void
     {
         $entities = [
@@ -367,7 +369,7 @@ final class DoctrineProviderTest extends TestCase
         self::assertFalse($provider->isAuditedField(Post::class, 'updated_at'), 'Field "'.Post::class.'::$updated_at" is not audited.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testIsAuditedFieldHonorsLocallyIgnoredColumns')]
+    #[Depends('testIsAuditedFieldHonorsLocallyIgnoredColumns')]
     public function testIsAuditedFieldHonorsGloballyIgnoredColumns(): void
     {
         $entities = [
@@ -389,7 +391,7 @@ final class DoctrineProviderTest extends TestCase
         self::assertFalse($provider->isAuditedField(Post::class, 'updated_at'), 'Field "'.Post::class.'::$updated_at" is not audited.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testIsAuditedFieldHonorsLocallyIgnoredColumns')]
+    #[Depends('testIsAuditedFieldHonorsLocallyIgnoredColumns')]
     public function testIsAuditedFieldReturnsFalseIfEntityIsNotAudited(): void
     {
         $entities = [
@@ -436,7 +438,7 @@ final class DoctrineProviderTest extends TestCase
         self::assertFalse($provider->isAuditedField(AuditedEntityWithAttribute::class, 'ignoredPrivateField'), 'Field "'.AuditedEntityWithAttribute::class.'::$ignoredPrivateField" is ignored.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testIsAuditedHonorsEnabledFlag')]
+    #[Depends('testIsAuditedHonorsEnabledFlag')]
     public function testEnableAuditFor(): void
     {
         $entities = [
@@ -457,7 +459,7 @@ final class DoctrineProviderTest extends TestCase
         self::assertTrue($provider->isAudited(Post::class), 'entity "'.Post::class.'" is audited.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testIsAuditedHonorsEnabledFlag')]
+    #[Depends('testIsAuditedHonorsEnabledFlag')]
     public function testDisableAuditFor(): void
     {
         $entities = [

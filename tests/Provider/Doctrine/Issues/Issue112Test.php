@@ -9,12 +9,13 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue112\DummyEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Mapping\MappingException;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class Issue112Test extends TestCase
 {
     use AuditTrait;

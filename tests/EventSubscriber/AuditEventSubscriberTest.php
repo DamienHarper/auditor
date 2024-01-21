@@ -8,12 +8,13 @@ use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\EventSubscriber\AuditEventSubscriber;
 use DH\Auditor\Tests\Fixtures\EventSubscriber\CustomAuditEventSubscriber;
 use DH\Auditor\Tests\Traits\AuditorTrait;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class AuditEventSubscriberTest extends TestCase
 {
     use AuditorTrait;

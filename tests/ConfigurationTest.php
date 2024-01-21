@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests;
 
 use DH\Auditor\Tests\Traits\AuditorConfigurationTrait;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class ConfigurationTest extends TestCase
 {
     use AuditorConfigurationTrait;

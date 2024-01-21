@@ -13,12 +13,13 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue33\Shop;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue33\ShopOfferPrice;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class Issue33Test extends TestCase
 {
     use ReaderTrait;

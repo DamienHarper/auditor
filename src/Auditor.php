@@ -33,7 +33,7 @@ final class Auditor
      */
     private array $auditProviders = [];
 
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
+    private EventDispatcherInterface $dispatcher;
 
     /**
      * @throws ReflectionException

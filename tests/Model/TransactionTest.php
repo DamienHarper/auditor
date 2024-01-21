@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Model;
 
 use DH\Auditor\Model\Transaction;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class TransactionTest extends TestCase
 {
     protected function setUp(): void {}

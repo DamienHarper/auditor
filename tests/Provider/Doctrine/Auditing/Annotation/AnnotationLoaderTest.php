@@ -6,12 +6,13 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Auditing\Annotation;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\EntityManagerInterfaceTrait;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class AnnotationLoaderTest extends TestCase
 {
     use EntityManagerInterfaceTrait;

@@ -14,12 +14,14 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\C
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Vehicle;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class CreateSchemaListenerTest extends TestCase
 {
     use DefaultSchemaSetupTrait;
@@ -37,7 +39,7 @@ final class CreateSchemaListenerTest extends TestCase
         self::assertContains('author_audit', $tableNames);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testCorrectSchemaStandard')]
+    #[Depends('testCorrectSchemaStandard')]
     public function testCorrectSchemaForSingleTableInheritance(): void
     {
         $tableNames = $this->getTables();
@@ -48,7 +50,7 @@ final class CreateSchemaListenerTest extends TestCase
         self::assertContains('vehicle_audit', $tableNames);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testCorrectSchemaForSingleTableInheritance')]
+    #[Depends('testCorrectSchemaForSingleTableInheritance')]
     public function testCorrectSchemaForJoinedTableInheritance(): void
     {
         $configuration = $this->provider->getConfiguration();

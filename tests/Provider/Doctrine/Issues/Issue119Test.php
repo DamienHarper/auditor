@@ -10,12 +10,13 @@ use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\DummyEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class Issue119Test extends TestCase
 {
     use DefaultSchemaSetupTrait;

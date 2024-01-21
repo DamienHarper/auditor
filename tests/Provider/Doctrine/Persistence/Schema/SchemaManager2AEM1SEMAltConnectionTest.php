@@ -17,12 +17,14 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\BlogSchemaSetupTrait;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class SchemaManager2AEM1SEMAltConnectionTest extends TestCase
 {
     use BlogSchemaSetupTrait;
@@ -49,7 +51,7 @@ final class SchemaManager2AEM1SEMAltConnectionTest extends TestCase
         self::assertSame($animalStorageService, $vehicleStorageService, 'Animal and Vehicle use the same storage entity manager.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testStorageServicesSetup')]
+    #[Depends('testStorageServicesSetup')]
     public function testSchemaSetup(): void
     {
         $storageServices = $this->provider->getStorageServices();

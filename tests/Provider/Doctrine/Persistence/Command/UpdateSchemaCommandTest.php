@@ -15,6 +15,8 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -22,7 +24,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class UpdateSchemaCommandTest extends TestCase
 {
     use LockableTrait;
@@ -55,7 +57,7 @@ final class UpdateSchemaCommandTest extends TestCase
         self::assertStringContainsString(' queries to update the database.', $output);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testExecute')]
+    #[Depends('testExecute')]
     public function testExecuteDumpSQL(): void
     {
         $command = $this->createCommand();
@@ -67,7 +69,7 @@ final class UpdateSchemaCommandTest extends TestCase
         self::assertStringContainsString('The following SQL statements will be executed:', $output);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testExecute')]
+    #[Depends('testExecute')]
     public function testExecuteForce(): void
     {
         $command = $this->createCommand();
@@ -80,7 +82,7 @@ final class UpdateSchemaCommandTest extends TestCase
         self::assertStringContainsString('[OK] Database schema updated successfully!', $output);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testExecute')]
+    #[Depends('testExecute')]
     public function testExecuteForceDumpSQL(): void
     {
         $command = $this->createCommand();
@@ -97,7 +99,7 @@ final class UpdateSchemaCommandTest extends TestCase
         self::assertStringContainsString('[OK] Database schema updated successfully!', $output);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testExecute')]
+    #[Depends('testExecute')]
     public function testExecuteNothingToUpdate(): void
     {
         $this->provider->getConfiguration()->setEntities([]);
@@ -111,7 +113,7 @@ final class UpdateSchemaCommandTest extends TestCase
         self::assertStringContainsString('[OK] Nothing to update.', $output);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testExecute')]
+    #[Depends('testExecute')]
     public function testExecuteFailsWhileLocked(): void
     {
         $this->lock('audit:schema:update');

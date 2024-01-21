@@ -14,6 +14,7 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue115\DummyEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue115\DummyEnum;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @requires PHP >= 8.1
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class Issue115Test extends TestCase
 {
     use DefaultSchemaSetupTrait;

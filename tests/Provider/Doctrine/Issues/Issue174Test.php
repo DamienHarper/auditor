@@ -7,12 +7,13 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Issues;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 /**
  * @internal
  */

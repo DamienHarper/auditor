@@ -15,6 +15,8 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -22,7 +24,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class CleanAuditLogsCommandTest extends TestCase
 {
     use LockableTrait;
@@ -75,7 +77,7 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('[OK] Success', $output);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testDumpSQL')]
+    #[Depends('testDumpSQL')]
     public function testExecute(): void
     {
         $command = $this->createCommand();
@@ -89,7 +91,7 @@ final class CleanAuditLogsCommandTest extends TestCase
         self::assertStringContainsString('[OK] Success', $output);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testExecute')]
+    #[Depends('testExecute')]
     public function testExecuteFailsWhileLocked(): void
     {
         $this->lock('audit:clean');

@@ -19,13 +19,15 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\BlogSchemaSetupTrait;
 use DH\Auditor\Tests\Traits\ReflectionTrait;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException as OptionsResolverInvalidArgumentException;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class ReaderTest extends TestCase
 {
     use BlogSchemaSetupTrait;
@@ -65,7 +67,7 @@ final class ReaderTest extends TestCase
         self::assertSame('comment', $reader->getEntityTableName(Comment::class), 'tablename is ok.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testGetEntityTableName')]
+    #[Depends('testGetEntityTableName')]
     public function testGetEntityTableAuditName(): void
     {
         $entities = [
@@ -191,7 +193,7 @@ final class ReaderTest extends TestCase
         $reader->createQuery(Author::class, ['page_size' => -1])->execute();
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testGetAudits')]
+    #[Depends('testGetAudits')]
     public function testGetAuditsPager(): void
     {
         $reader = $this->createReader();
@@ -220,7 +222,7 @@ final class ReaderTest extends TestCase
         self::assertCount(4, $audits);
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testGetAudits')]
+    #[Depends('testGetAudits')]
     public function testGetAuditsByDate(): void
     {
         $reader = $this->createReader();
@@ -271,7 +273,7 @@ final class ReaderTest extends TestCase
         ;
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testGetAudits')]
+    #[Depends('testGetAudits')]
     public function testGetAuditsCount(): void
     {
         $reader = $this->createReader();
@@ -280,7 +282,7 @@ final class ReaderTest extends TestCase
         self::assertSame(7, $count, 'count is ok.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testGetAudits')]
+    #[Depends('testGetAudits')]
     public function testGetAuditsHonorsId(): void
     {
         $reader = $this->createReader();
@@ -302,7 +304,7 @@ final class ReaderTest extends TestCase
         self::assertSame([], $audits, 'no result when id is invalid.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testGetAudits')]
+    #[Depends('testGetAudits')]
     public function testGetAuditsHonorsPageSize(): void
     {
         $reader = $this->createReader();
@@ -329,7 +331,7 @@ final class ReaderTest extends TestCase
         $reader->createQuery(Author::class, ['page' => 1, 'page_size' => -1])->execute();
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testGetAudits')]
+    #[Depends('testGetAudits')]
     public function testGetAuditsHonorsFilter(): void
     {
         $reader = $this->createReader();
@@ -355,7 +357,7 @@ final class ReaderTest extends TestCase
         self::assertCount(0, $audits, 'result count is ok.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testGetAudits')]
+    #[Depends('testGetAudits')]
     public function testGetAuditByTransactionHash(): void
     {
         $reader = $this->createReader();
@@ -399,7 +401,7 @@ final class ReaderTest extends TestCase
         self::assertCount(2, $audits, 'result count is ok.');
     }
 
-    #[\PHPUnit\Framework\Attributes\Depends('testGetAuditByTransactionHash')]
+    #[Depends('testGetAuditByTransactionHash')]
     public function testGetAllAuditsByTransactionHash(): void
     {
         $reader = $this->createReader();

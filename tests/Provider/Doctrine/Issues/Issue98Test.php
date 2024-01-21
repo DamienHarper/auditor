@@ -11,12 +11,13 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue98\Issue98;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\Small]
+#[Small]
 final class Issue98Test extends TestCase
 {
     use ReaderTrait;
