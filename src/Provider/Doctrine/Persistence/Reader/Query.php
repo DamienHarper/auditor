@@ -109,11 +109,10 @@ final class Query
 
         try {
             $queryBuilder
-                ->resetQueryPart('select')
-                ->resetQueryPart('orderBy')
+                ->add('select', 'COUNT(id)', false)
+                ->resetOrderBy()
                 ->setMaxResults(null)
                 ->setFirstResult(0)
-                ->select('COUNT(id)')
             ;
 
             /** @var false|int $result */
