@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Auditing\Event;
 
+use Closure;
 use DH\Auditor\Provider\Doctrine\Auditing\Logger\Logger;
 use DH\Auditor\Provider\Doctrine\Auditing\Logger\LoggerChain;
 use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
@@ -11,9 +12,12 @@ use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use Doctrine\Common\EventSubscriber;
+use Doctrine\DBAL\Driver;
+use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Doctrine\DBAL\Logging\SQLLogger;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
+use ReflectionClass;
 
 class DoctrineSubscriber implements EventSubscriber
 {
@@ -47,6 +51,11 @@ class DoctrineSubscriber implements EventSubscriber
         $this->transactionManager->populate($transaction);
 
         $driver = $entityManager->getConnection()->getDriver();
+
+        if (!$driver instanceof DHDriver) {
+            $driver = $this->getWrappedDriver($driver);
+        }
+
         if ($driver instanceof DHDriver) {
             $driver->addDHFlusher(function () use ($transaction): void {
                 $this->transactionManager->process($transaction);
@@ -86,5 +95,40 @@ class DoctrineSubscriber implements EventSubscriber
     public function getSubscribedEvents(): array
     {
         return [Events::onFlush];
+    }
+
+    /**
+     * @internal this method is used to retrieve the wrapped driver from the given driver
+     */
+    public function getWrappedDriver(Driver $driver)
+    {
+        $that = $this;
+
+        // if the driver is already a DHDriver, return it
+        if ($driver instanceof DHDriver) {
+            return $driver;
+        }
+
+        // if the driver is an instance of AbstractDriverMiddleware, return the wrapped driver
+        if ($driver instanceof AbstractDriverMiddleware) {
+            return Closure::bind(function () use ($that) {
+                // @var AbstractDriverMiddleware $this
+                return $that->getWrappedDriver($this->wrappedDriver);
+            }, $driver, AbstractDriverMiddleware::class)();
+        }
+
+        return Closure::bind(function () use ($that) {
+            /** @var Driver $this */
+            $properties = (new ReflectionClass($this))->getProperties();
+            foreach ($properties as $property) {
+                $property->setAccessible(true);
+                $value = $property->getValue($this);
+                if ($value instanceof Driver) {
+                    return $that->getWrappedDriver($value);
+                }
+            }
+
+            return null;
+        }, $driver, Driver::class)() ?? $driver;
     }
 }
