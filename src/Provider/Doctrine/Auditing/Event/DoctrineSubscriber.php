@@ -99,6 +99,7 @@ class DoctrineSubscriber implements EventSubscriber
 
     /**
      * @internal this method is used to retrieve the wrapped driver from the given driver
+     *
      * @return Closure|Driver
      */
     public function getWrappedDriver(Driver $driver)
