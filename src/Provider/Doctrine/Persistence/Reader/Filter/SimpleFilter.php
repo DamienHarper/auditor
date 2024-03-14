@@ -9,12 +9,12 @@ class SimpleFilter implements FilterInterface
     protected string $name;
 
     /**
-     * @var array|string
+     * @var array|string|int
      */
     protected $value;
 
     /**
-     * @param array|string $value
+     * @param array|string|int $value
      */
     public function __construct(string $name, $value)
     {
@@ -28,7 +28,7 @@ class SimpleFilter implements FilterInterface
     }
 
     /**
-     * @return array|string
+     * @return array|string|int
      */
     public function getValue()
     {
