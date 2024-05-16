@@ -72,11 +72,4 @@ final class CreateSchemaListener
         $updater = new SchemaManager($this->provider);
         $updater->createAuditTable($targetEntity, $isSameEntityManager ? $eventArgs->getSchema() : null);
     }
-
-    public function getSubscribedEvents(): array
-    {
-        return [
-            ToolEvents::postGenerateSchemaTable,
-        ];
-    }
 }
