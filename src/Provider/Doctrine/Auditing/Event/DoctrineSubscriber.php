@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace DH\Auditor\Provider\Doctrine\Auditing\Event;
 
 use Closure;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Logger;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\LoggerChain;
 use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
-use Doctrine\DBAL\Logging\SQLLogger;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
 use ReflectionClass;
@@ -68,10 +65,8 @@ final class DoctrineSubscriber implements EventSubscriber
 
     /**
      * @internal this method is used to retrieve the wrapped driver from the given driver
-     *
-     * @return Closure|Driver
      */
-    public function getWrappedDriver(Driver $driver)
+    public function getWrappedDriver(Driver $driver): Closure|Driver
     {
         $that = $this;
 
@@ -98,8 +93,6 @@ final class DoctrineSubscriber implements EventSubscriber
                     return $that->getWrappedDriver($value);
                 }
             }
-
-            return null;
         }, $driver, Driver::class)() ?? $driver;
     }
 }
