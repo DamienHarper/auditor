@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware;
 
+use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 
 /**
@@ -13,12 +14,6 @@ final class DHDriver extends AbstractDriverMiddleware
 {
     /** @var array<callable> */
     private array $flusherList = [];
-
-    public function __construct(DriverInterface $driver)
-    {
-        parent::__construct($driver);
-        $this->driver = $driver;
-    }
 
     public function connect(array $params): DHConnection
     {
