@@ -9,6 +9,7 @@ use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Persistence\Event\CreateSchemaListenerTest;
+use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
 use Exception;
@@ -71,5 +72,12 @@ final class CreateSchemaListener
 
         $updater = new SchemaManager($this->provider);
         $updater->createAuditTable($targetEntity, $isSameEntityManager ? $eventArgs->getSchema() : null);
+    }
+
+    public function getSubscribedEvents(): array
+    {
+        return [
+            ToolEvents::postGenerateSchemaTable,
+        ];
     }
 }

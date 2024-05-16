@@ -21,6 +21,7 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Provider\ProviderInterface;
 use DH\Auditor\Provider\Service\AuditingServiceInterface;
 use DH\Auditor\Tests\Provider\Doctrine\DoctrineProviderTest;
+use DH\Auditor\Provider\Service\StorageServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ToolEvents;
@@ -117,6 +118,10 @@ final class DoctrineProvider extends AbstractProvider
             $storageMapper = new $storageMapper();
         }
 
+        if (\is_string($storageMapper) && class_exists($storageMapper)) {
+            $storageMapper = new $storageMapper();
+        }
+
         \assert(\is_callable($storageMapper));   // helps PHPStan
 
         return $storageMapper($entity, $this->getStorageServices());
@@ -180,6 +185,7 @@ final class DoctrineProvider extends AbstractProvider
         $configuration = $this->configuration;
         $class = DoctrineHelper::getRealClassName($entity);
 
+        $entities = $configuration->getEntities();
         // is $entity part of audited entities?
         $entities = $configuration->getEntities();
         if (!\array_key_exists($class, $entities)) {
@@ -188,6 +194,11 @@ final class DoctrineProvider extends AbstractProvider
         }
 
         $entityOptions = $entities[$class];
+
+        if (null === $entityOptions) {
+            // no option defined => $entity is audited
+            return true;
+        }
 
         if (isset($entityOptions['enabled'])) {
             return (bool) $entityOptions['enabled'];
