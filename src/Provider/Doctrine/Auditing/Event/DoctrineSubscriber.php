@@ -93,6 +93,6 @@ final class DoctrineSubscriber implements EventSubscriber
                     return $that->getWrappedDriver($value);
                 }
             }
-        }, $driver, Driver::class)() ?? $driver;
+        }, $driver, Driver::class)();
     }
 }

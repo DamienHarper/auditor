@@ -8,8 +8,8 @@ parameters:
         param_type: 100
         property_type: 100
 
-    excludePaths:
-        - 'src/Event/AuditEvent.php'
+    paths:
+        - src
 
     ignoreErrors:
         # false positives
