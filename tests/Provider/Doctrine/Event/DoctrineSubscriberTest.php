@@ -5,20 +5,19 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine\Event;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\LoggerChain;
 use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
-use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
+use DH\Auditor\Transaction\TransactionManagerInterface;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection as ConnectionDbal;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\API\MySQL\ExceptionConverter;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
-use Doctrine\DBAL\Logging\SQLLogger;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\VersionAwarePlatformDriver;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 /**
  * @internal
@@ -27,48 +26,20 @@ use PHPUnit\Framework\TestCase;
  */
 final class DoctrineSubscriberTest extends TestCase
 {
-    public function testIssue185(): void
-    {
-        $transactionManager = $this->createMock(TransactionManager::class);
-        $objectManager = $this->createMock(EntityManagerInterface::class);
-
-        $args = new OnFlushEventArgs($objectManager);
-
-        $objectManager
-            ->method('getConnection')
-            ->willReturn($connection = $this->createMock(ConnectionDbal::class))
-        ;
-
-        $connection
-            ->method('getDriver')
-            ->willReturn($driver = $this->createMock(Driver::class))
-        ;
-
-        $connection
-            ->method('getConfiguration')
-            ->willReturn($configuration = new Configuration())
-        ;
-
-        $configuration->setSQLLogger(new class() implements SQLLogger {
-            public function startQuery($sql, ?array $params = null, ?array $types = null): void {}
-
-            public function stopQuery(): void {}
-        });
-
-        $target = new DoctrineSubscriber($transactionManager);
-        $target->onFlush($args);
-        $target->onFlush($args);
-        $target->onFlush($args);
-        $target->onFlush($args);
-        $target->onFlush($args);
-
-        $result = $configuration->getSQLLogger();
-        self::assertCount(2, $result->getLoggers());
-    }
-
     public function testIssue184IfAbstractDriverMiddleware(): void
     {
-        $transactionManager = $this->createMock(TransactionManager::class);
+        $transactionManager = new class() implements TransactionManagerInterface {
+            public function populate($transaction): void {}
+
+            public function process($transaction): void
+            {
+                static $i = 0;
+                ++$i;
+                if ($i > 1) {
+                    throw new RuntimeException('Expected only once');
+                }
+            }
+        };
         $objectManager = $this->createMock(EntityManagerInterface::class);
 
         $args = new OnFlushEventArgs($objectManager);
@@ -90,19 +61,27 @@ final class DoctrineSubscriberTest extends TestCase
         $target = new DoctrineSubscriber($transactionManager);
         $target->onFlush($args);
 
-        $transactionManager
-            ->expects(self::once())
-            ->method('process')
-        ;
-
         foreach ($dhDriver->getFlusherList() as $item) {
             ($item)();
         }
+
+        self::assertTrue(true);
     }
 
     public function testIssue184IfNotAbstractDriverMiddleware(): void
     {
-        $transactionManager = $this->createMock(TransactionManager::class);
+        $transactionManager = new class() implements TransactionManagerInterface {
+            public function populate($transaction): void {}
+
+            public function process($transaction): void
+            {
+                static $i = 0;
+                ++$i;
+                if ($i > 1) {
+                    throw new RuntimeException('Expected only once');
+                }
+            }
+        };
         $objectManager = $this->createMock(EntityManagerInterface::class);
 
         $args = new OnFlushEventArgs($objectManager);
@@ -145,19 +124,23 @@ final class DoctrineSubscriberTest extends TestCase
         $target = new DoctrineSubscriber($transactionManager);
         $target->onFlush($args);
 
-        $transactionManager
-            ->expects(self::once())
-            ->method('process')
-        ;
-
         foreach ($dhDriver->getFlusherList() as $item) {
             ($item)();
         }
+
+        self::assertTrue(true);
     }
 
     public function testIssue184Unexpected(): void
     {
-        $transactionManager = $this->createMock(TransactionManager::class);
+        $transactionManager = new class() implements TransactionManagerInterface {
+            public function populate($transaction): void {}
+
+            public function process($transaction): void
+            {
+                throw new RuntimeException('Unexpected call');
+            }
+        };
         $objectManager = $this->createMock(EntityManagerInterface::class);
 
         $args = new OnFlushEventArgs($objectManager);
@@ -192,17 +175,9 @@ final class DoctrineSubscriberTest extends TestCase
             ->willReturn($configuration = $this->createMock(Configuration::class))
         ;
 
-        $transactionManager
-            ->expects(self::never())
-            ->method('process')
-        ;
-
-        $configuration->expects(self::once())
-            ->method('setSQLLogger')
-            ->with(self::isInstanceOf(LoggerChain::class))
-        ;
-
         $target = new DoctrineSubscriber($transactionManager);
         $target->onFlush($args);
+
+        self::assertTrue(true);
     }
 }

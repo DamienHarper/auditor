@@ -6,8 +6,8 @@ namespace DH\Auditor\Provider\Doctrine\Auditing\Event;
 
 use Closure;
 use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
-use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
+use DH\Auditor\Transaction\TransactionManagerInterface;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
@@ -20,12 +20,7 @@ final class DoctrineSubscriber implements EventSubscriber
     /** @var Transaction[] */
     private array $transactions = [];
 
-    private TransactionManager $transactionManager;
-
-    public function __construct(TransactionManager $transactionManager)
-    {
-        $this->transactionManager = $transactionManager;
-    }
+    public function __construct(private readonly TransactionManagerInterface $transactionManager) {}
 
     /**
      * It is called inside EntityManager#flush() after the changes to all the managed entities
@@ -83,7 +78,7 @@ final class DoctrineSubscriber implements EventSubscriber
             }, $driver, AbstractDriverMiddleware::class)();
         }
 
-        return Closure::bind(function () use ($that) {
+        return Closure::bind(function () use ($that): Closure|Driver|null {
             /** @var Driver $this */
             $properties = (new ReflectionClass($this))->getProperties();
             foreach ($properties as $property) {
@@ -93,6 +88,8 @@ final class DoctrineSubscriber implements EventSubscriber
                     return $that->getWrappedDriver($value);
                 }
             }
-        }, $driver, Driver::class)();
+
+            return null;
+        }, $driver, Driver::class)() ?: $driver;
     }
 }
