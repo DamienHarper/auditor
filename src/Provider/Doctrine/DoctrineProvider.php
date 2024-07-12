@@ -117,10 +117,6 @@ final class DoctrineProvider extends AbstractProvider
             $storageMapper = new $storageMapper();
         }
 
-        if (\is_string($storageMapper) && class_exists($storageMapper)) {
-            $storageMapper = new $storageMapper();
-        }
-
         \assert(\is_callable($storageMapper));   // helps PHPStan
 
         return $storageMapper($entity, $this->getStorageServices());
@@ -184,7 +180,6 @@ final class DoctrineProvider extends AbstractProvider
         $configuration = $this->configuration;
         $class = DoctrineHelper::getRealClassName($entity);
 
-        $entities = $configuration->getEntities();
         // is $entity part of audited entities?
         $entities = $configuration->getEntities();
         if (!\array_key_exists($class, $entities)) {
@@ -193,11 +188,6 @@ final class DoctrineProvider extends AbstractProvider
         }
 
         $entityOptions = $entities[$class];
-
-        if (null === $entityOptions) {
-            // no option defined => $entity is audited
-            return true;
-        }
 
         if (isset($entityOptions['enabled'])) {
             return (bool) $entityOptions['enabled'];

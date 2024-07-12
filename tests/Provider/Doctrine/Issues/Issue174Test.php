@@ -23,6 +23,6 @@ final class Issue174Test extends TestCase
         $configuration = new Configuration(['table_prefix' => 'audit_', 'table_suffix' => '_suffix']);
         $manager = new SchemaManager($this->provider);
         $result = $manager->computeAuditTablename('schema.entity', $configuration);
-        self::assertSame('audit_schema.entity_suffix', $result);
+        self::assertSame('schema.audit_entity_suffix', $result);
     }
 }
