@@ -84,10 +84,10 @@ final class AnnotationLoader
 
     private function getAllProperties(ReflectionClass $reflection): array
     {
-        $annotationProperty = null;
         $properties = [];
 
         foreach ($reflection->getProperties() as $property) {
+            $annotationProperty = null;
             $attributes = $property->getAttributes(Ignore::class);
             if (\is_array($attributes) && [] !== $attributes) {
                 $annotationProperty = $attributes[0]->newInstance();

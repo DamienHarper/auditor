@@ -1,8 +1,7 @@
 parameters:
     level: max
     inferPrivatePropertyTypeFromConstructor: true
-    checkMissingIterableValueType: false
-    checkGenericClassInNonGenericObjectType: false
+
     type_coverage:
         return_type: 100
         param_type: 100
@@ -12,6 +11,8 @@ parameters:
         - src
 
     ignoreErrors:
+        - identifier: missingType.iterableValue
+        - identifier: missingType.generics
         # false positives
         - '~Dead catch - Throwable is never thrown in the try block~'
         - '~Parameter \#1 \$className of method Doctrine\\ORM\\EntityManagerInterface\:\:getClassMetadata\(\) expects class-string<object>, string given\.~'

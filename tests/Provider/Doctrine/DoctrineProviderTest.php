@@ -436,6 +436,7 @@ final class DoctrineProviderTest extends TestCase
         self::assertFalse($provider->isAuditedField(AuditedEntityWithAttribute::class, 'ignoredField'), 'Field "'.AuditedEntityWithAttribute::class.'::$ignoredField" is ignored.');
         self::assertFalse($provider->isAuditedField(AuditedEntityWithAttribute::class, 'ignoredProtectedField'), 'Field "'.AuditedEntityWithAttribute::class.'::$ignoredProtectedField" is ignored.');
         self::assertFalse($provider->isAuditedField(AuditedEntityWithAttribute::class, 'ignoredPrivateField'), 'Field "'.AuditedEntityWithAttribute::class.'::$ignoredPrivateField" is ignored.');
+        self::assertTrue($provider->isAuditedField(AuditedEntityWithAttribute::class, 'id'), 'Field "'.AuditedEntityWithAttribute::class.'::$id" is audited.');
     }
 
     #[Depends('testIsAuditedHonorsEnabledFlag')]
