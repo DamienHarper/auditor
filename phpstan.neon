@@ -7,6 +7,9 @@ parameters:
         param_type: 100
         property_type: 100
 
+    paths:
+        - src
+
     ignoreErrors:
         - identifier: missingType.iterableValue
         - identifier: missingType.generics

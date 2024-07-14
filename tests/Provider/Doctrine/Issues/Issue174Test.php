@@ -14,9 +14,6 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-/**
- * @internal
- */
 final class Issue174Test extends TestCase
 {
     use DefaultSchemaSetupTrait;
