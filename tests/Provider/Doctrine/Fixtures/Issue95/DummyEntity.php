@@ -8,15 +8,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Stringable;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'dummy_entity')]
-class DummyEntity implements Stringable
+class DummyEntity implements \Stringable
 {
-    #[ORM\Column(type: Types::STRING, length: 50)]
-    protected string $label;
-
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: Types::INTEGER)]
@@ -25,9 +21,9 @@ class DummyEntity implements Stringable
     #[ORM\OneToMany(targetEntity: 'RelatedDummyEntity', mappedBy: 'parent')]
     private Collection $children;
 
-    public function __construct(string $label)
+    public function __construct(#[ORM\Column(type: Types::STRING, length: 50)]
+        protected string $label)
     {
-        $this->label = $label;
         $this->children = new ArrayCollection();
     }
 

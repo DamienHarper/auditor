@@ -9,6 +9,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue112\DummyEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Mapping\MappingException;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -16,6 +17,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversNothing]
 final class Issue112Test extends TestCase
 {
     use AuditTrait;
@@ -33,6 +35,6 @@ final class Issue112Test extends TestCase
         $entity->setPrimaryKey(2);
 
         $data = $this->summarize($entityManager, $entity);
-        self::assertSame('primaryKey', $data['pkName']);
+        $this->assertSame('primaryKey', $data['pkName']);
     }
 }

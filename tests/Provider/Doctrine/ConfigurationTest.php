@@ -10,6 +10,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation\AuditedEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ProviderConfigurationTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -17,6 +18,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversNothing]
 final class ConfigurationTest extends TestCase
 {
     use ProviderConfigurationTrait;
@@ -33,21 +35,21 @@ final class ConfigurationTest extends TestCase
     {
         $configuration = $this->createProviderConfiguration();
 
-        self::assertNull($configuration->getProvider(), 'provider is null by default.');
+        $this->assertNull($configuration->getProvider(), 'provider is null by default.');
     }
 
     public function testDefaultTablePrefix(): void
     {
         $configuration = $this->createProviderConfiguration();
 
-        self::assertSame('', $configuration->getTablePrefix(), '"table_prefix" is empty by default.');
+        $this->assertSame('', $configuration->getTablePrefix(), '"table_prefix" is empty by default.');
     }
 
     public function testDefaultTableSuffix(): void
     {
         $configuration = $this->createProviderConfiguration();
 
-        self::assertSame('_audit', $configuration->getTableSuffix(), '"table_suffix" is "_audit" by default.');
+        $this->assertSame('_audit', $configuration->getTableSuffix(), '"table_suffix" is "_audit" by default.');
     }
 
     public function testCustomTablePrefix(): void
@@ -56,7 +58,7 @@ final class ConfigurationTest extends TestCase
             'table_prefix' => 'audit_',
         ]);
 
-        self::assertSame('audit_', $configuration->getTablePrefix(), 'Custom "table_prefix" is "audit_".');
+        $this->assertSame('audit_', $configuration->getTablePrefix(), 'Custom "table_prefix" is "audit_".');
     }
 
     public function testCustomTableSuffix(): void
@@ -65,14 +67,14 @@ final class ConfigurationTest extends TestCase
             'table_suffix' => '_audit_log',
         ]);
 
-        self::assertSame('_audit_log', $configuration->getTableSuffix(), 'Custom "table_suffix" is "_audit_log".');
+        $this->assertSame('_audit_log', $configuration->getTableSuffix(), 'Custom "table_suffix" is "_audit_log".');
     }
 
     public function testIsViewerEnabledByDefault(): void
     {
         $configuration = $this->createProviderConfiguration();
 
-        self::assertTrue($configuration->isViewerEnabled(), 'Viewer is enabled by default.');
+        $this->assertTrue($configuration->isViewerEnabled(), 'Viewer is enabled by default.');
     }
 
     public function testDisableViewer(): void
@@ -80,7 +82,7 @@ final class ConfigurationTest extends TestCase
         $configuration = $this->createProviderConfiguration();
         $configuration->disableViewer();
 
-        self::assertFalse($configuration->isViewerEnabled(), 'Viewer is disabled.');
+        $this->assertFalse($configuration->isViewerEnabled(), 'Viewer is disabled.');
     }
 
     public function testEnableViewer(): void
@@ -89,7 +91,7 @@ final class ConfigurationTest extends TestCase
         $configuration->disableViewer();
         $configuration->enableViewer();
 
-        self::assertTrue($configuration->isViewerEnabled(), 'Viewer is enabled.');
+        $this->assertTrue($configuration->isViewerEnabled(), 'Viewer is enabled.');
     }
 
     public function testGloballyIgnoredColumns(): void
@@ -98,7 +100,7 @@ final class ConfigurationTest extends TestCase
             'ignored_columns' => self::IGNORED,
         ]);
 
-        self::assertSame(self::IGNORED, $configuration->getIgnoredColumns(), '"ignored_columns" are honored.');
+        $this->assertSame(self::IGNORED, $configuration->getIgnoredColumns(), '"ignored_columns" are honored.');
     }
 
     public function testGetEntities(): void
@@ -124,6 +126,6 @@ final class ConfigurationTest extends TestCase
             'entities' => $entities,
         ]);
 
-        self::assertSame($entities, $configuration->getEntities(), 'AuditConfiguration::getEntities() returns configured entities list.');
+        $this->assertSame($entities, $configuration->getEntities(), 'AuditConfiguration::getEntities() returns configured entities list.');
     }
 }

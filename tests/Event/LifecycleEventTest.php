@@ -8,6 +8,7 @@ use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\EventSubscriber\AuditEventSubscriber;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Tests\Traits\AuditorTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversNothing]
 final class LifecycleEventTest extends TestCase
 {
     use AuditorTrait;
@@ -41,7 +43,7 @@ final class LifecycleEventTest extends TestCase
     public function testLifecycleEvent(): void
     {
         $event = new LifecycleEvent(self::PAYLOAD);
-        self::assertSame(self::PAYLOAD, $event->getPayload());
+        $this->assertSame(self::PAYLOAD, $event->getPayload());
     }
 
     public function testLifecycleEventWithInvalidPayload(): void
@@ -72,7 +74,7 @@ final class LifecycleEventTest extends TestCase
 
         $payload['entity'] = 'new entity';
         $event->setPayload($payload);
-        self::assertSame($payload, $event->getPayload());
+        $this->assertSame($payload, $event->getPayload());
     }
 
     public function testSetInvalidPayload(): void

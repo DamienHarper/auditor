@@ -11,7 +11,6 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
-use InvalidArgumentException;
 
 /**
  * @see DoctrineHelperTest
@@ -51,7 +50,7 @@ final class DoctrineHelper
     public static function getDoctrineType(string $type): string
     {
         if (!\defined(Types::class.'::'.$type)) {
-            throw new InvalidArgumentException(\sprintf('Undefined Doctrine type "%s"', $type));
+            throw new \InvalidArgumentException(\sprintf('Undefined Doctrine type "%s"', $type));
         }
 
         \assert(\is_string(\constant(Types::class.'::'.$type)));

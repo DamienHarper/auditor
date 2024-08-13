@@ -15,6 +15,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -25,6 +26,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  * @internal
  */
 #[Small]
+#[CoversNothing]
 final class UpdateSchemaCommandTest extends TestCase
 {
     use LockableTrait;
@@ -52,9 +54,9 @@ final class UpdateSchemaCommandTest extends TestCase
 
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('[CAUTION] This operation should not be executed in a production environment!', $output);
-        self::assertStringContainsString('The Schema-Tool would execute ', $output);
-        self::assertStringContainsString(' queries to update the database.', $output);
+        $this->assertStringContainsString('[CAUTION] This operation should not be executed in a production environment!', $output);
+        $this->assertStringContainsString('The Schema-Tool would execute ', $output);
+        $this->assertStringContainsString(' queries to update the database.', $output);
     }
 
     #[Depends('testExecute')]
@@ -66,7 +68,7 @@ final class UpdateSchemaCommandTest extends TestCase
 
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('The following SQL statements will be executed:', $output);
+        $this->assertStringContainsString('The following SQL statements will be executed:', $output);
     }
 
     #[Depends('testExecute')]
@@ -78,8 +80,8 @@ final class UpdateSchemaCommandTest extends TestCase
 
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('Updating database schema...', $output);
-        self::assertStringContainsString('[OK] Database schema updated successfully!', $output);
+        $this->assertStringContainsString('Updating database schema...', $output);
+        $this->assertStringContainsString('[OK] Database schema updated successfully!', $output);
     }
 
     #[Depends('testExecute')]
@@ -94,9 +96,9 @@ final class UpdateSchemaCommandTest extends TestCase
 
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('The following SQL statements will be executed:', $output);
-        self::assertStringContainsString('Updating database schema...', $output);
-        self::assertStringContainsString('[OK] Database schema updated successfully!', $output);
+        $this->assertStringContainsString('The following SQL statements will be executed:', $output);
+        $this->assertStringContainsString('Updating database schema...', $output);
+        $this->assertStringContainsString('[OK] Database schema updated successfully!', $output);
     }
 
     #[Depends('testExecute')]
@@ -110,7 +112,7 @@ final class UpdateSchemaCommandTest extends TestCase
 
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('[OK] Nothing to update.', $output);
+        $this->assertStringContainsString('[OK] Nothing to update.', $output);
     }
 
     #[Depends('testExecute')]
@@ -124,7 +126,7 @@ final class UpdateSchemaCommandTest extends TestCase
 
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('The command is already running in another process.', $output);
+        $this->assertStringContainsString('The command is already running in another process.', $output);
 
         $this->release();
     }

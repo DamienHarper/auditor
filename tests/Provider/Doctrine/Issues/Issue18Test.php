@@ -11,6 +11,7 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue18\DataObject;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -18,6 +19,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversNothing]
 final class Issue18Test extends TestCase
 {
     use ReaderTrait;
@@ -42,12 +44,12 @@ final class Issue18Test extends TestCase
         $this->flushAll($storageServices);
 
         $audits = $reader->createQuery(DataObject::class)->execute();
-        self::assertCount(2, $audits, 'results count ok.');
-        self::assertSame(Transaction::UPDATE, $audits[0]->getType(), 'Transaction::UPDATE operation.');
-        self::assertSame(Transaction::INSERT, $audits[1]->getType(), 'Transaction::INSERT operation.');
+        $this->assertCount(2, $audits, 'results count ok.');
+        $this->assertSame(Transaction::UPDATE, $audits[0]->getType(), 'Transaction::UPDATE operation.');
+        $this->assertSame(Transaction::INSERT, $audits[1]->getType(), 'Transaction::INSERT operation.');
 
-        self::assertIsArray($audits[0]->getDiffs(), 'Valid diffs');
-        self::assertIsArray($audits[1]->getDiffs(), 'Valid diffs');
+        $this->assertIsArray($audits[0]->getDiffs(), 'Valid diffs');
+        $this->assertIsArray($audits[1]->getDiffs(), 'Valid diffs');
     }
 
     private function createAndInitDoctrineProvider(): void

@@ -11,6 +11,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue37\Locale;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue37\User;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -18,6 +19,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversNothing]
 final class Issue37Test extends TestCase
 {
     use ReaderTrait;
@@ -49,9 +51,9 @@ final class Issue37Test extends TestCase
         $this->flushAll($storageServices);
 
         $audits = $reader->createQuery(Locale::class)->execute();
-        self::assertCount(2, $audits, 'results count ok.');
-        self::assertSame('en_US', $audits[0]->getObjectId(), 'Entry::object_id is a string.');
-        self::assertSame('fr_FR', $audits[1]->getObjectId(), 'Entry::object_id is a string.');
+        $this->assertCount(2, $audits, 'results count ok.');
+        $this->assertSame('en_US', $audits[0]->getObjectId(), 'Entry::object_id is a string.');
+        $this->assertSame('fr_FR', $audits[1]->getObjectId(), 'Entry::object_id is a string.');
 
         $user1 = new User();
         $user1
@@ -70,7 +72,7 @@ final class Issue37Test extends TestCase
         $this->flushAll($storageServices);
 
         $audits = $reader->createQuery(User::class)->execute();
-        self::assertCount(2, $audits, 'results count ok.');
+        $this->assertCount(2, $audits, 'results count ok.');
     }
 
     private function createAndInitDoctrineProvider(): void

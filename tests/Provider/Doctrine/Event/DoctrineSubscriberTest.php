@@ -16,14 +16,15 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\VersionAwarePlatformDriver;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 /**
  * @internal
- *
- * @small
  */
+#[Small]
+#[CoversNothing]
 final class DoctrineSubscriberTest extends TestCase
 {
     public function testIssue184IfAbstractDriverMiddleware(): void
@@ -36,7 +37,7 @@ final class DoctrineSubscriberTest extends TestCase
                 static $i = 0;
                 ++$i;
                 if ($i > 1) {
-                    throw new RuntimeException('Expected only once');
+                    throw new \RuntimeException('Expected only once');
                 }
             }
         };
@@ -65,7 +66,7 @@ final class DoctrineSubscriberTest extends TestCase
             ($item)();
         }
 
-        self::assertTrue(true);
+        $this->assertTrue(true);
     }
 
     public function testIssue184IfNotAbstractDriverMiddleware(): void
@@ -78,7 +79,7 @@ final class DoctrineSubscriberTest extends TestCase
                 static $i = 0;
                 ++$i;
                 if ($i > 1) {
-                    throw new RuntimeException('Expected only once');
+                    throw new \RuntimeException('Expected only once');
                 }
             }
         };
@@ -89,14 +90,6 @@ final class DoctrineSubscriberTest extends TestCase
         $nativeDriver = $this->createMock(Driver::class);
         $dhDriver = new DHDriver($nativeDriver);
         $driver = new class($dhDriver) implements VersionAwarePlatformDriver {
-            /** @noinspection PhpPropertyOnlyWrittenInspection */
-            private Driver $wrappedDriver;
-
-            public function __construct(Driver $wrappedDriver)
-            {
-                $this->wrappedDriver = $wrappedDriver;
-            }
-
             public function connect(array $params): void {}
 
             public function getDatabasePlatform(): void {}
@@ -128,7 +121,7 @@ final class DoctrineSubscriberTest extends TestCase
             ($item)();
         }
 
-        self::assertTrue(true);
+        $this->assertTrue(true);
     }
 
     public function testIssue184Unexpected(): void
@@ -138,7 +131,7 @@ final class DoctrineSubscriberTest extends TestCase
 
             public function process($transaction): void
             {
-                throw new RuntimeException('Unexpected call');
+                throw new \RuntimeException('Unexpected call');
             }
         };
         $objectManager = $this->createMock(EntityManagerInterface::class);
@@ -178,6 +171,6 @@ final class DoctrineSubscriberTest extends TestCase
         $target = new DoctrineSubscriber($transactionManager);
         $target->onFlush($args);
 
-        self::assertTrue(true);
+        $this->assertTrue(true);
     }
 }

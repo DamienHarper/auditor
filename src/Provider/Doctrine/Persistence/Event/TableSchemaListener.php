@@ -12,9 +12,7 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 
 final readonly class TableSchemaListener
 {
-    public function __construct(private DoctrineProvider $provider)
-    {
-    }
+    public function __construct(private DoctrineProvider $provider) {}
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs): void
     {

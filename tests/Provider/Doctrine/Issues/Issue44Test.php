@@ -8,6 +8,7 @@ use DH\Auditor\Model\Transaction;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\DummyEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversNothing]
 final class Issue44Test extends TestCase
 {
     use ReaderTrait;
@@ -35,8 +37,8 @@ final class Issue44Test extends TestCase
         $em->commit();
 
         $audits = $reader->createQuery(DummyEntity::class)->execute();
-        self::assertCount(1, $audits, 'results count ok.');
-        self::assertSame(Transaction::INSERT, $audits[0]->getType(), 'Reader::INSERT operation.');
+        $this->assertCount(1, $audits, 'results count ok.');
+        $this->assertSame(Transaction::INSERT, $audits[0]->getType(), 'Reader::INSERT operation.');
     }
 
     private function configureEntities(): void

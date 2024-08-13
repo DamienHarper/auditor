@@ -7,7 +7,6 @@ namespace DH\Auditor\EventSubscriber;
 use DH\Auditor\Auditor;
 use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\Tests\EventSubscriber\AuditEventSubscriberTest;
-use Exception;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -15,9 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 final readonly class AuditEventSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private Auditor $auditor)
-    {
-    }
+    public function __construct(private Auditor $auditor) {}
 
     public static function getSubscribedEvents(): array
     {
@@ -34,7 +31,7 @@ final readonly class AuditEventSubscriber implements EventSubscriberInterface
             if ($provider->supportsStorage()) {
                 try {
                     $provider->persist($event);
-                } catch (Exception) {
+                } catch (\Exception) {
                     // do nothing to ensure other providers are called
                 }
             }

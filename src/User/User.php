@@ -9,9 +9,7 @@ final readonly class User implements UserInterface
     /**
      * User constructor.
      */
-    public function __construct(private ?string $id = null, private ?string $username = null)
-    {
-    }
+    public function __construct(private ?string $id = null, private ?string $username = null) {}
 
     public function getIdentifier(): ?string
     {

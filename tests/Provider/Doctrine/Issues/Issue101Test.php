@@ -9,6 +9,7 @@ use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue101\ChildEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -16,16 +17,13 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversNothing]
 final class Issue101Test extends TestCase
 {
     use SchemaSetupTrait;
 
     protected function setUp(): void
     {
-        if (\PHP_VERSION_ID < 80000) {
-            self::markTestSkipped('PHP > 8.0 is required.');
-        }
-
         parent::setUp();
 
         // provider with 1 em for both storage and auditing
@@ -44,11 +42,11 @@ final class Issue101Test extends TestCase
 
     public function testIssue101(): void
     {
-        self::assertTrue($this->provider->isAudited(ChildEntity::class), '"'.ChildEntity::class.'" is audited.');
-        self::assertTrue($this->provider->isAuditedField(ChildEntity::class, 'auditedField'), 'Field "'.ChildEntity::class.'::$auditedField" is audited.');
-        self::assertFalse($this->provider->isAuditedField(ChildEntity::class, 'ignoredField'), 'Field "'.ChildEntity::class.'::$ignoredField" is ignored.');
-        self::assertFalse($this->provider->isAuditedField(ChildEntity::class, 'ignoredProtectedField'), 'Field "'.ChildEntity::class.'::$ignoredProtectedField" is ignored.');
-        self::assertFalse($this->provider->isAuditedField(ChildEntity::class, 'ignoredPrivateField'), 'Field "'.ChildEntity::class.'::$ignoredPrivateField" is ignored.');
+        $this->assertTrue($this->provider->isAudited(ChildEntity::class), '"'.ChildEntity::class.'" is audited.');
+        $this->assertTrue($this->provider->isAuditedField(ChildEntity::class, 'auditedField'), 'Field "'.ChildEntity::class.'::$auditedField" is audited.');
+        $this->assertFalse($this->provider->isAuditedField(ChildEntity::class, 'ignoredField'), 'Field "'.ChildEntity::class.'::$ignoredField" is ignored.');
+        $this->assertFalse($this->provider->isAuditedField(ChildEntity::class, 'ignoredProtectedField'), 'Field "'.ChildEntity::class.'::$ignoredProtectedField" is ignored.');
+        $this->assertFalse($this->provider->isAuditedField(ChildEntity::class, 'ignoredPrivateField'), 'Field "'.ChildEntity::class.'::$ignoredPrivateField" is ignored.');
     }
 
     private function createAndInitDoctrineProvider(): void

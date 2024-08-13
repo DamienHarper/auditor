@@ -12,8 +12,6 @@ use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
-use Throwable;
-use UnitEnum;
 
 trait AuditTrait
 {
@@ -72,7 +70,7 @@ trait AuditTrait
             return null;
         }
 
-        if (interface_exists(UnitEnum::class) && $value instanceof UnitEnum && property_exists($value, 'value')) { /** @phpstan-ignore-line */
+        if (interface_exists(\UnitEnum::class) && $value instanceof \UnitEnum && property_exists($value, 'value')) { /** @phpstan-ignore-line */
             $value = $value->value;
         }
 
@@ -102,7 +100,6 @@ trait AuditTrait
             case 'uuid_binary':
             case 'uuid_binary_ordered_time':
             case 'uuid':
-
             case DoctrineHelper::getDoctrineType('BLOB'):
             case DoctrineHelper::getDoctrineType('BINARY'):
                 if (\is_resource($value)) {
@@ -199,7 +196,7 @@ trait AuditTrait
         if (method_exists($entity, '__toString')) {
             try {
                 $label = (string) $entity;
-            } catch (Throwable) {
+            } catch (\Throwable) {
                 $label = DoctrineHelper::getRealClassName($entity).(null === $pkValue ? '' : '#'.$pkValue);
             }
         } else {

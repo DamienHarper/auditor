@@ -8,6 +8,7 @@ use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\EventSubscriber\AuditEventSubscriber;
 use DH\Auditor\Tests\Fixtures\EventSubscriber\CustomAuditEventSubscriber;
 use DH\Auditor\Tests\Traits\AuditorTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversNothing]
 final class AuditEventSubscriberTest extends TestCase
 {
     use AuditorTrait;
@@ -44,7 +46,7 @@ final class AuditEventSubscriberTest extends TestCase
 
         $dispatcher->dispatch(new LifecycleEvent($payload));
 
-        self::assertArrayHasKey(LifecycleEvent::class, AuditEventSubscriber::getSubscribedEvents());
+        $this->assertArrayHasKey(LifecycleEvent::class, AuditEventSubscriber::getSubscribedEvents());
     }
 
     public function testCustomAuditEventSubscriber(): void
@@ -76,6 +78,6 @@ final class AuditEventSubscriberTest extends TestCase
 
         $dispatcher->dispatch(new LifecycleEvent($payload));
 
-        self::assertArrayHasKey(LifecycleEvent::class, CustomAuditEventSubscriber::getSubscribedEvents());
+        $this->assertArrayHasKey(LifecycleEvent::class, CustomAuditEventSubscriber::getSubscribedEvents());
     }
 }

@@ -8,16 +8,13 @@ use DH\Auditor\Tests\Provider\Doctrine\Auditing\Annotation\AnnotationLoaderTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\Mapping\ClassMetadata;
-use ReflectionClass;
 
 /**
  * @see AnnotationLoaderTest
  */
 final readonly class AnnotationLoader
 {
-    public function __construct(private EntityManagerInterface $entityManager)
-    {
-    }
+    public function __construct(private EntityManagerInterface $entityManager) {}
 
     public function load(): array
     {
@@ -79,7 +76,7 @@ final readonly class AnnotationLoader
         ];
     }
 
-    private function getAllProperties(ReflectionClass $reflection): array
+    private function getAllProperties(\ReflectionClass $reflection): array
     {
         $properties = [];
 

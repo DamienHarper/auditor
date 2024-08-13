@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Model;
 
-use DateTimeImmutable;
 use DH\Auditor\Tests\Model\EntryTest;
 
 /**
@@ -34,7 +33,7 @@ final class Entry
 
     private ?string $ip = null;
 
-    private readonly DateTimeImmutable $created_at;
+    private readonly \DateTimeImmutable $created_at;
 
     /**
      * Get the value of id.
@@ -113,7 +112,7 @@ final class Entry
     /**
      * Get the value of created_at.
      */
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->created_at;
     }

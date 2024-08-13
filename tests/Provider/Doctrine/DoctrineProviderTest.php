@@ -25,7 +25,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Traits\DoctrineProviderTrait;
 use DH\Auditor\User\User;
 use DH\Auditor\User\UserInterface;
 use DH\Auditor\User\UserProviderInterface;
-use Exception;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -34,6 +34,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversNothing]
 final class DoctrineProviderTest extends TestCase
 {
     use DoctrineProviderTrait;
@@ -58,13 +59,13 @@ final class DoctrineProviderTest extends TestCase
     {
         $provider = $this->createUnregisteredDoctrineProvider();
 
-        self::assertCount(0, $provider->getStorageServices(), 'There is no storage entity manager registered.');
+        $this->assertCount(0, $provider->getStorageServices(), 'There is no storage entity manager registered.');
 
         $provider->registerStorageService(new StorageService('storageEM_1', $this->createEntityManager()));
-        self::assertCount(1, $provider->getStorageServices(), 'There is 1 storage entity manager registered.');
+        $this->assertCount(1, $provider->getStorageServices(), 'There is 1 storage entity manager registered.');
 
         $provider->registerStorageService(new StorageService('storageEM_2', $this->createEntityManager()));
-        self::assertCount(2, $provider->getStorageServices(), 'There are 2 storage entity managers registered.');
+        $this->assertCount(2, $provider->getStorageServices(), 'There are 2 storage entity managers registered.');
 
         $this->expectException(ProviderException::class);
         $provider->registerStorageService(new StorageService('storageEM_1', $this->createEntityManager()));
@@ -74,13 +75,13 @@ final class DoctrineProviderTest extends TestCase
     {
         $provider = $this->createUnregisteredDoctrineProvider();
 
-        self::assertCount(0, $provider->getAuditingServices(), 'There is no auditing entity manager registered.');
+        $this->assertCount(0, $provider->getAuditingServices(), 'There is no auditing entity manager registered.');
 
         $provider->registerAuditingService(new AuditingService('auditingEM_1', $this->createEntityManager()));
-        self::assertCount(1, $provider->getAuditingServices(), 'There is 1 auditing entity manager registered.');
+        $this->assertCount(1, $provider->getAuditingServices(), 'There is 1 auditing entity manager registered.');
 
         $provider->registerAuditingService(new AuditingService('auditingEM_2', $this->createEntityManager()));
-        self::assertCount(2, $provider->getAuditingServices(), 'There are 2 auditing entity managers registered.');
+        $this->assertCount(2, $provider->getAuditingServices(), 'There are 2 auditing entity managers registered.');
 
         $this->expectException(ProviderException::class);
         $provider->registerAuditingService(new AuditingService('auditingEM_1', $this->createEntityManager()));
@@ -102,50 +103,50 @@ final class DoctrineProviderTest extends TestCase
     {
         $provider = $this->createUnregisteredDoctrineProvider();
 
-        self::assertCount(0, $provider->getAuditingServices(), 'There is no auditing entity manager registered.');
-        self::assertCount(0, $provider->getStorageServices(), 'There is no storage entity manager registered.');
+        $this->assertCount(0, $provider->getAuditingServices(), 'There is no auditing entity manager registered.');
+        $this->assertCount(0, $provider->getStorageServices(), 'There is no storage entity manager registered.');
 
         $provider->registerAuditingService(new AuditingService('auditingEM', $this->createEntityManager([
             __DIR__.'/../../../src/Provider/Doctrine/Auditing/Annotation',
             __DIR__.'/Fixtures/Entity/Standard/Blog',
         ])));
 
-        self::assertCount(1, $provider->getAuditingServices(), 'There is 1 auditing entity manager registered.');
-        self::assertCount(0, $provider->getStorageServices(), 'There is no storage entity manager registered.');
+        $this->assertCount(1, $provider->getAuditingServices(), 'There is 1 auditing entity manager registered.');
+        $this->assertCount(0, $provider->getStorageServices(), 'There is no storage entity manager registered.');
 
         $provider->registerStorageService(new StorageService('storageEM', $this->createEntityManager([
             __DIR__.'/../../../src/Provider/Doctrine/Auditing/Annotation',
             __DIR__.'/Fixtures/Entity/Standard/Blog',
         ])));
 
-        self::assertCount(1, $provider->getAuditingServices(), 'There is 1 auditing entity manager registered.');
-        self::assertCount(1, $provider->getStorageServices(), 'There is 1 storage entity manager registered.');
+        $this->assertCount(1, $provider->getAuditingServices(), 'There is 1 auditing entity manager registered.');
+        $this->assertCount(1, $provider->getStorageServices(), 'There is 1 storage entity manager registered.');
 
         $entityManager = $this->createEntityManager();
         $provider->registerAuditingService(new AuditingService('default', $entityManager));
         $provider->registerStorageService(new StorageService('default', $entityManager));
 
-        self::assertCount(2, $provider->getAuditingServices(), 'There are 2 auditing entity managers registered.');
-        self::assertCount(2, $provider->getStorageServices(), 'There are 2 storage entity managers registered.');
+        $this->assertCount(2, $provider->getAuditingServices(), 'There are 2 auditing entity managers registered.');
+        $this->assertCount(2, $provider->getStorageServices(), 'There are 2 storage entity managers registered.');
     }
 
     public function testIsStorageMapperRequired(): void
     {
         $provider = $this->createUnregisteredDoctrineProvider();
 
-        self::assertFalse($provider->isStorageMapperRequired(), 'Mapper is not required since there is strictly less than 2 storage entity manager.');
+        $this->assertFalse($provider->isStorageMapperRequired(), 'Mapper is not required since there is strictly less than 2 storage entity manager.');
 
         $entityManager = $this->createEntityManager();
         $provider->registerAuditingService(new AuditingService('EM1', $entityManager));
         $provider->registerStorageService(new StorageService('EM1', $entityManager));
 
-        self::assertFalse($provider->isStorageMapperRequired(), 'Mapper is not required since there is strictly less than 2 storage entity manager.');
+        $this->assertFalse($provider->isStorageMapperRequired(), 'Mapper is not required since there is strictly less than 2 storage entity manager.');
 
         $entityManager = $this->createEntityManager();
         $provider->registerAuditingService(new AuditingService('EM2', $entityManager));
         $provider->registerStorageService(new StorageService('EM2', $entityManager));
 
-        self::assertTrue($provider->isStorageMapperRequired(), 'Mapper is required since there is more than 2 storage entity managers.');
+        $this->assertTrue($provider->isStorageMapperRequired(), 'Mapper is required since there is more than 2 storage entity managers.');
     }
 
     public function testSetStorageMapper(): void
@@ -161,25 +162,25 @@ final class DoctrineProviderTest extends TestCase
         $provider->registerAuditingService(new AuditingService('EM2', $entityManager2));
         $provider->registerStorageService(new StorageService('EM2', $entityManager2));
 
-        self::assertNull($provider->getConfiguration()->getStorageMapper(), 'StorageMapper is not set.');
+        $this->assertNull($provider->getConfiguration()->getStorageMapper(), 'StorageMapper is not set.');
 
         $provider->setStorageMapper(static fn (string $entity, array $storageServices): StorageServiceInterface => 0 === mb_strpos($entity, 'Foo') ? $storageServices['EM1'] : $storageServices['EM2']);
-        self::assertNotNull($provider->getConfiguration()->getStorageMapper(), 'StorageMapper is set.');
-        self::assertIsCallable($provider->getConfiguration()->getStorageMapper(), 'StorageMapper is a callable.');
+        $this->assertNotNull($provider->getConfiguration()->getStorageMapper(), 'StorageMapper is set.');
+        $this->assertIsCallable($provider->getConfiguration()->getStorageMapper(), 'StorageMapper is a callable.');
 
-        self::assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo1')->getEntityManager(), 'EM1 is used.');
-        self::assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo2')->getEntityManager(), 'EM1 is used.');
-        self::assertSame($entityManager2, $provider->getStorageServiceForEntity('Bar1')->getEntityManager(), 'EM2 is used.');
-        self::assertSame($entityManager2, $provider->getStorageServiceForEntity('Bar2')->getEntityManager(), 'EM2 is used.');
+        $this->assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo1')->getEntityManager(), 'EM1 is used.');
+        $this->assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo2')->getEntityManager(), 'EM1 is used.');
+        $this->assertSame($entityManager2, $provider->getStorageServiceForEntity('Bar1')->getEntityManager(), 'EM2 is used.');
+        $this->assertSame($entityManager2, $provider->getStorageServiceForEntity('Bar2')->getEntityManager(), 'EM2 is used.');
 
         $provider->setStorageMapper(new FakeStorageMapper());
-        self::assertNotNull($provider->getConfiguration()->getStorageMapper(), 'StorageMapper is set.');
-        self::assertIsCallable($provider->getConfiguration()->getStorageMapper(), 'StorageMapper is a callable.');
+        $this->assertNotNull($provider->getConfiguration()->getStorageMapper(), 'StorageMapper is set.');
+        $this->assertIsCallable($provider->getConfiguration()->getStorageMapper(), 'StorageMapper is a callable.');
 
-        self::assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo1')->getEntityManager(), 'EM1 is used.');
-        self::assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo2')->getEntityManager(), 'EM1 is used.');
-        self::assertSame($entityManager2, $provider->getStorageServiceForEntity('Bar1')->getEntityManager(), 'EM2 is used.');
-        self::assertSame($entityManager2, $provider->getStorageServiceForEntity('Bar2')->getEntityManager(), 'EM2 is used.');
+        $this->assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo1')->getEntityManager(), 'EM1 is used.');
+        $this->assertSame($entityManager1, $provider->getStorageServiceForEntity('Foo2')->getEntityManager(), 'EM1 is used.');
+        $this->assertSame($entityManager2, $provider->getStorageServiceForEntity('Bar1')->getEntityManager(), 'EM2 is used.');
+        $this->assertSame($entityManager2, $provider->getStorageServiceForEntity('Bar2')->getEntityManager(), 'EM2 is used.');
     }
 
     public function testCheckStorageMapperThrowsExceptionWhenNoMapperDefined(): void
@@ -201,14 +202,14 @@ final class DoctrineProviderTest extends TestCase
     {
         // unregistered provider
         $provider = $this->createUnregisteredDoctrineProvider();
-        self::assertFalse($provider->isRegistered(), 'Provider is not registered.');
+        $this->assertFalse($provider->isRegistered(), 'Provider is not registered.');
 
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
         $provider->getAuditor();
 
         // registered provider
         $provider = $this->createDoctrineProvider();
-        self::assertTrue($provider->isRegistered(), 'Provider is registered.');
+        $this->assertTrue($provider->isRegistered(), 'Provider is registered.');
     }
 
     public function testIsAudited(): void
@@ -222,8 +223,8 @@ final class DoctrineProviderTest extends TestCase
         ]);
         $provider = $this->createDoctrineProvider($configuration);
 
-        self::assertTrue($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is audited.');
-        self::assertFalse($provider->isAudited(Comment::class), 'Entity "'.Comment::class.'" is not audited.');
+        $this->assertTrue($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is audited.');
+        $this->assertFalse($provider->isAudited(Comment::class), 'Entity "'.Comment::class.'" is not audited.');
     }
 
     public function testIsAuditable(): void
@@ -239,10 +240,10 @@ final class DoctrineProviderTest extends TestCase
         ]);
         $provider = $this->createDoctrineProvider($configuration);
 
-        self::assertFalse($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is not audited.');
-        self::assertTrue($provider->isAuditable(Post::class), 'Entity "'.Post::class.'" is auditable.');
-        self::assertFalse($provider->isAudited(Comment::class), 'Entity "'.Comment::class.'" is not audited.');
-        self::assertFalse($provider->isAuditable(Comment::class), 'Entity "'.Comment::class.'" is not auditable.');
+        $this->assertFalse($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is not audited.');
+        $this->assertTrue($provider->isAuditable(Post::class), 'Entity "'.Post::class.'" is auditable.');
+        $this->assertFalse($provider->isAudited(Comment::class), 'Entity "'.Comment::class.'" is not audited.');
+        $this->assertFalse($provider->isAuditable(Comment::class), 'Entity "'.Comment::class.'" is not auditable.');
     }
 
     #[Depends('testIsAudited')]
@@ -259,7 +260,7 @@ final class DoctrineProviderTest extends TestCase
         ]);
         $provider = $this->createDoctrineProvider($configuration);
 
-        self::assertTrue($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is audited.');
+        $this->assertTrue($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is audited.');
 
         $entities = [
             Post::class => [
@@ -272,7 +273,7 @@ final class DoctrineProviderTest extends TestCase
         ]);
         $provider = $this->createDoctrineProvider($configuration);
 
-        self::assertFalse($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is not audited.');
+        $this->assertFalse($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is not audited.');
     }
 
     #[Depends('testIsAudited')]
@@ -290,7 +291,7 @@ final class DoctrineProviderTest extends TestCase
         $provider = $this->createDoctrineProvider($configuration);
         $provider->getAuditor()->getConfiguration()->enable();
 
-        self::assertTrue($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is audited.');
+        $this->assertTrue($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is audited.');
 
         $entities = [
             Post::class => [
@@ -304,7 +305,7 @@ final class DoctrineProviderTest extends TestCase
         $provider = $this->createDoctrineProvider($configuration);
         $provider->getAuditor()->getConfiguration()->enable();
 
-        self::assertFalse($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is not audited.');
+        $this->assertFalse($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is not audited.');
     }
 
     #[Depends('testIsAudited')]
@@ -321,11 +322,11 @@ final class DoctrineProviderTest extends TestCase
         ]);
         $provider = $this->createDoctrineProvider($configuration);
 
-        self::assertTrue($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is audited.');
+        $this->assertTrue($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is audited.');
 
         $provider->getAuditor()->getConfiguration()->disable();
 
-        self::assertFalse($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is not audited.');
+        $this->assertFalse($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is not audited.');
     }
 
     #[Depends('testIsAudited')]
@@ -340,10 +341,10 @@ final class DoctrineProviderTest extends TestCase
         ]);
         $provider = $this->createDoctrineProvider($configuration);
 
-        self::assertTrue($provider->isAuditedField(Post::class, 'id'), 'Every field is audited.');
-        self::assertTrue($provider->isAuditedField(Post::class, 'title'), 'Every field is audited.');
-        self::assertTrue($provider->isAuditedField(Post::class, 'created_at'), 'Every field is audited.');
-        self::assertTrue($provider->isAuditedField(Post::class, 'updated_at'), 'Every field is audited.');
+        $this->assertTrue($provider->isAuditedField(Post::class, 'id'), 'Every field is audited.');
+        $this->assertTrue($provider->isAuditedField(Post::class, 'title'), 'Every field is audited.');
+        $this->assertTrue($provider->isAuditedField(Post::class, 'created_at'), 'Every field is audited.');
+        $this->assertTrue($provider->isAuditedField(Post::class, 'updated_at'), 'Every field is audited.');
     }
 
     #[Depends('testIsAuditedFieldAuditsAnyFieldByDefault')]
@@ -363,10 +364,10 @@ final class DoctrineProviderTest extends TestCase
         ]);
         $provider = $this->createDoctrineProvider($configuration);
 
-        self::assertTrue($provider->isAuditedField(Post::class, 'id'), 'Field "'.Post::class.'::$id" is audited.');
-        self::assertTrue($provider->isAuditedField(Post::class, 'title'), 'Field "'.Post::class.'::$title" is audited.');
-        self::assertFalse($provider->isAuditedField(Post::class, 'created_at'), 'Field "'.Post::class.'::$created_at" is not audited.');
-        self::assertFalse($provider->isAuditedField(Post::class, 'updated_at'), 'Field "'.Post::class.'::$updated_at" is not audited.');
+        $this->assertTrue($provider->isAuditedField(Post::class, 'id'), 'Field "'.Post::class.'::$id" is audited.');
+        $this->assertTrue($provider->isAuditedField(Post::class, 'title'), 'Field "'.Post::class.'::$title" is audited.');
+        $this->assertFalse($provider->isAuditedField(Post::class, 'created_at'), 'Field "'.Post::class.'::$created_at" is not audited.');
+        $this->assertFalse($provider->isAuditedField(Post::class, 'updated_at'), 'Field "'.Post::class.'::$updated_at" is not audited.');
     }
 
     #[Depends('testIsAuditedFieldHonorsLocallyIgnoredColumns')]
@@ -385,10 +386,10 @@ final class DoctrineProviderTest extends TestCase
         ]);
         $provider = $this->createDoctrineProvider($configuration);
 
-        self::assertTrue($provider->isAuditedField(Post::class, 'id'), 'Field "'.Post::class.'::$id" is audited.');
-        self::assertTrue($provider->isAuditedField(Post::class, 'title'), 'Field "'.Post::class.'::$title" is audited.');
-        self::assertFalse($provider->isAuditedField(Post::class, 'created_at'), 'Field "'.Post::class.'::$created_at" is not audited.');
-        self::assertFalse($provider->isAuditedField(Post::class, 'updated_at'), 'Field "'.Post::class.'::$updated_at" is not audited.');
+        $this->assertTrue($provider->isAuditedField(Post::class, 'id'), 'Field "'.Post::class.'::$id" is audited.');
+        $this->assertTrue($provider->isAuditedField(Post::class, 'title'), 'Field "'.Post::class.'::$title" is audited.');
+        $this->assertFalse($provider->isAuditedField(Post::class, 'created_at'), 'Field "'.Post::class.'::$created_at" is not audited.');
+        $this->assertFalse($provider->isAuditedField(Post::class, 'updated_at'), 'Field "'.Post::class.'::$updated_at" is not audited.');
     }
 
     #[Depends('testIsAuditedFieldHonorsLocallyIgnoredColumns')]
@@ -407,7 +408,7 @@ final class DoctrineProviderTest extends TestCase
         ]);
         $provider = $this->createDoctrineProvider($configuration);
 
-        self::assertFalse($provider->isAuditedField(Comment::class, 'id'), 'Field "'.Comment::class.'::$id" is audited but "'.Comment::class.'" entity is not.');
+        $this->assertFalse($provider->isAuditedField(Comment::class, 'id'), 'Field "'.Comment::class.'::$id" is audited but "'.Comment::class.'" entity is not.');
     }
 
     public function testLoadEntitiesWithAttributesOnly(): void
@@ -422,7 +423,7 @@ final class DoctrineProviderTest extends TestCase
         );
         $annotationLoader = new AnnotationLoader($entityManager);
         $loaded = $annotationLoader->load();
-        self::assertCount(2, $loaded);
+        $this->assertCount(2, $loaded);
 
         $auditor = $this->createAuditor();
         $provider = new DoctrineProvider($this->createProviderConfiguration(['entities' => $loaded]));
@@ -431,12 +432,12 @@ final class DoctrineProviderTest extends TestCase
 
         $auditor->registerProvider($provider);
 
-        self::assertTrue($provider->isAudited(AuditedEntityWithAttribute::class), '"'.AuditedEntityWithAttribute::class.'" is audited.');
-        self::assertTrue($provider->isAuditedField(AuditedEntityWithAttribute::class, 'auditedField'), 'Field "'.AuditedEntityWithAttribute::class.'::$auditedField" is audited.');
-        self::assertFalse($provider->isAuditedField(AuditedEntityWithAttribute::class, 'ignoredField'), 'Field "'.AuditedEntityWithAttribute::class.'::$ignoredField" is ignored.');
-        self::assertFalse($provider->isAuditedField(AuditedEntityWithAttribute::class, 'ignoredProtectedField'), 'Field "'.AuditedEntityWithAttribute::class.'::$ignoredProtectedField" is ignored.');
-        self::assertFalse($provider->isAuditedField(AuditedEntityWithAttribute::class, 'ignoredPrivateField'), 'Field "'.AuditedEntityWithAttribute::class.'::$ignoredPrivateField" is ignored.');
-        self::assertTrue($provider->isAuditedField(AuditedEntityWithAttribute::class, 'id'), 'Field "'.AuditedEntityWithAttribute::class.'::$id" is audited.');
+        $this->assertTrue($provider->isAudited(AuditedEntityWithAttribute::class), '"'.AuditedEntityWithAttribute::class.'" is audited.');
+        $this->assertTrue($provider->isAuditedField(AuditedEntityWithAttribute::class, 'auditedField'), 'Field "'.AuditedEntityWithAttribute::class.'::$auditedField" is audited.');
+        $this->assertFalse($provider->isAuditedField(AuditedEntityWithAttribute::class, 'ignoredField'), 'Field "'.AuditedEntityWithAttribute::class.'::$ignoredField" is ignored.');
+        $this->assertFalse($provider->isAuditedField(AuditedEntityWithAttribute::class, 'ignoredProtectedField'), 'Field "'.AuditedEntityWithAttribute::class.'::$ignoredProtectedField" is ignored.');
+        $this->assertFalse($provider->isAuditedField(AuditedEntityWithAttribute::class, 'ignoredPrivateField'), 'Field "'.AuditedEntityWithAttribute::class.'::$ignoredPrivateField" is ignored.');
+        $this->assertTrue($provider->isAuditedField(AuditedEntityWithAttribute::class, 'id'), 'Field "'.AuditedEntityWithAttribute::class.'::$id" is audited.');
     }
 
     #[Depends('testIsAuditedHonorsEnabledFlag')]
@@ -453,11 +454,11 @@ final class DoctrineProviderTest extends TestCase
         ]);
         $provider = $this->createDoctrineProvider($configuration);
 
-        self::assertFalse($provider->isAudited(Post::class), 'entity "'.Post::class.'" is not audited.');
+        $this->assertFalse($provider->isAudited(Post::class), 'entity "'.Post::class.'" is not audited.');
 
         $configuration->enableAuditFor(Post::class);
 
-        self::assertTrue($provider->isAudited(Post::class), 'entity "'.Post::class.'" is audited.');
+        $this->assertTrue($provider->isAudited(Post::class), 'entity "'.Post::class.'" is audited.');
     }
 
     #[Depends('testIsAuditedHonorsEnabledFlag')]
@@ -474,11 +475,11 @@ final class DoctrineProviderTest extends TestCase
         ]);
         $provider = $this->createDoctrineProvider($configuration);
 
-        self::assertTrue($provider->isAudited(Post::class), 'entity "'.Post::class.'" is audited.');
+        $this->assertTrue($provider->isAudited(Post::class), 'entity "'.Post::class.'" is audited.');
 
         $configuration->disableAuditFor(Post::class);
 
-        self::assertFalse($provider->isAudited(Post::class), 'entity "'.Post::class.'" is not audited.');
+        $this->assertFalse($provider->isAudited(Post::class), 'entity "'.Post::class.'" is not audited.');
     }
 
     public function testSetEntities(): void
@@ -496,14 +497,14 @@ final class DoctrineProviderTest extends TestCase
         $configuration->setEntities($entities);
         $entities2 = $configuration->getEntities();
 
-        self::assertNotSame($entities2, $entities1, 'Configuration::setEntities() replaces previously configured entities.');
+        $this->assertNotSame($entities2, $entities1, 'Configuration::setEntities() replaces previously configured entities.');
     }
 
     public function testGetConfiguration(): void
     {
         $provider = $this->createDoctrineProvider();
 
-        self::assertInstanceOf(Configuration::class, $provider->getConfiguration(), 'Configuration is reachable.');
+        $this->assertInstanceOf(Configuration::class, $provider->getConfiguration(), 'Configuration is reachable.');
     }
 
     public function testSetUserProvider(): void
@@ -514,10 +515,10 @@ final class DoctrineProviderTest extends TestCase
         $provider->getAuditor()->getConfiguration()->setUserProvider(new FakeUserProvider());
         $after = $provider->getAuditor()->getConfiguration()->getUserProvider();
 
-        self::assertIsCallable($after, 'UserProvider is a callable.');
-        self::assertNotSame($before, $after, 'UserProvider has changed.');
+        $this->assertIsCallable($after, 'UserProvider is a callable.');
+        $this->assertNotSame($before, $after, 'UserProvider has changed.');
 
-        self::assertInstanceOf(User::class, $after(), 'UserProvider returns a User instance.');
+        $this->assertInstanceOf(User::class, $after(), 'UserProvider returns a User instance.');
     }
 
     public function testSetSecurityProvider(): void
@@ -528,10 +529,10 @@ final class DoctrineProviderTest extends TestCase
         $provider->getAuditor()->getConfiguration()->setSecurityProvider(new FakeSecurityProvider());
         $after = $provider->getAuditor()->getConfiguration()->getSecurityProvider();
 
-        self::assertIsCallable($after, 'SecurityProvider is a callable.');
-        self::assertNotSame($before, $after, 'SecurityProvider has changed.');
+        $this->assertIsCallable($after, 'SecurityProvider is a callable.');
+        $this->assertNotSame($before, $after, 'SecurityProvider has changed.');
 
-        self::assertIsArray($after(), 'SecurityProvider returns an array.');
+        $this->assertIsArray($after(), 'SecurityProvider returns an array.');
     }
 
     public function testSetRoleChecker(): void
@@ -542,10 +543,10 @@ final class DoctrineProviderTest extends TestCase
         $provider->getAuditor()->getConfiguration()->setRoleChecker(new FakeRoleChecker());
         $after = $provider->getAuditor()->getConfiguration()->getRoleChecker();
 
-        self::assertIsCallable($after, 'RoleChecker is a callable.');
-        self::assertNotSame($before, $after, 'RoleChecker has changed.');
+        $this->assertIsCallable($after, 'RoleChecker is a callable.');
+        $this->assertNotSame($before, $after, 'RoleChecker has changed.');
 
-        self::assertIsBool($after('', ''), 'RoleChecker returns a bool.');
+        $this->assertIsBool($after('', ''), 'RoleChecker returns a bool.');
     }
 }
 

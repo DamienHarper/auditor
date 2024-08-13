@@ -8,7 +8,6 @@ use DH\Auditor\EventSubscriber\AuditEventSubscriber;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Exception\ProviderException;
 use DH\Auditor\Provider\ProviderInterface;
-use ReflectionException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -32,7 +31,7 @@ final class Auditor
     private array $auditProviders = [];
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function __construct(private readonly Configuration $configuration, private readonly EventDispatcherInterface $dispatcher)
     {

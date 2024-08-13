@@ -4,19 +4,11 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Fixtures\EventSubscriber;
 
-use DH\Auditor\Auditor;
 use DH\Auditor\Event\LifecycleEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class CustomAuditEventSubscriber implements EventSubscriberInterface
 {
-    private Auditor $auditor;
-
-    public function __construct(Auditor $auditor)
-    {
-        $this->auditor = $auditor;
-    }
-
     public static function getSubscribedEvents(): array
     {
         return [

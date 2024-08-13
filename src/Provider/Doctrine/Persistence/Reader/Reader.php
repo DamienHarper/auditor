@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
 
-use ArrayIterator;
 use DH\Auditor\Exception\AccessDeniedException;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
@@ -29,9 +28,7 @@ final readonly class Reader
     /**
      * Reader constructor.
      */
-    public function __construct(private DoctrineProvider $provider)
-    {
-    }
+    public function __construct(private DoctrineProvider $provider) {}
 
     public function getProvider(): DoctrineProvider
     {
@@ -112,7 +109,7 @@ final readonly class Reader
     }
 
     /**
-     * @return array{results: ArrayIterator<int|string, \DH\Auditor\Model\Entry>, currentPage: int, hasPreviousPage: bool, hasNextPage: bool, previousPage: null|int, nextPage: null|int, numPages: int, haveToPaginate: bool, numResults: int, pageSize: int}
+     * @return array{results: \ArrayIterator<int|string, \DH\Auditor\Model\Entry>, currentPage: int, hasPreviousPage: bool, hasNextPage: bool, previousPage: null|int, nextPage: null|int, numPages: int, haveToPaginate: bool, numResults: int, pageSize: int}
      */
     public function paginate(Query $query, int $page = 1, int $pageSize = self::PAGE_SIZE): array
     {
@@ -122,7 +119,7 @@ final readonly class Reader
         $hasNextPage = ($currentPage * $pageSize) < $numResults;
 
         return [
-            'results' => new ArrayIterator($query->execute()),
+            'results' => new \ArrayIterator($query->execute()),
             'currentPage' => $currentPage,
             'hasPreviousPage' => $hasPreviousPage,
             'hasNextPage' => $hasNextPage,

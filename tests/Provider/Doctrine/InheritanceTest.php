@@ -14,6 +14,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\C
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\SingleTable\Vehicle;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -21,6 +22,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversNothing]
 final class InheritanceTest extends TestCase
 {
     use ReaderTrait;
@@ -67,22 +69,22 @@ final class InheritanceTest extends TestCase
         $this->flushAll($storageServices);
 
         $audits = $reader->createQuery(Vehicle::class)->execute();
-        self::assertCount(1, $audits, 'results count ok.');
+        $this->assertCount(1, $audits, 'results count ok.');
 
         $audits = $reader->createQuery(Vehicle::class, ['strict' => false])->execute();
-        self::assertCount(3, $audits, 'results count ok.');
+        $this->assertCount(3, $audits, 'results count ok.');
 
         $audits = $reader->createQuery(Car::class)->execute();
-        self::assertCount(1, $audits, 'results count ok.');
+        $this->assertCount(1, $audits, 'results count ok.');
 
         $audits = $reader->createQuery(Bike::class)->execute();
-        self::assertCount(1, $audits, 'results count ok.');
+        $this->assertCount(1, $audits, 'results count ok.');
 
         $audits = $reader->createQuery(Cat::class)->execute();
-        self::assertCount(1, $audits, 'results count ok.');
+        $this->assertCount(1, $audits, 'results count ok.');
 
         $audits = $reader->createQuery(Dog::class)->execute();
-        self::assertCount(1, $audits, 'results count ok.');
+        $this->assertCount(1, $audits, 'results count ok.');
 
         $car->setLabel('Taycan');
         $storageServices[Car::class]->getEntityManager()->persist($car);
@@ -93,16 +95,16 @@ final class InheritanceTest extends TestCase
         $this->flushAll($storageServices);
 
         $audits = $reader->createQuery(Vehicle::class)->execute();
-        self::assertCount(1, $audits, 'results count ok.');
+        $this->assertCount(1, $audits, 'results count ok.');
 
         $audits = $reader->createQuery(Car::class)->execute();
-        self::assertCount(2, $audits, 'results count ok.');
+        $this->assertCount(2, $audits, 'results count ok.');
 
         $audits = $reader->createQuery(Dog::class)->execute();
-        self::assertCount(1, $audits, 'results count ok.');
+        $this->assertCount(1, $audits, 'results count ok.');
 
         $audits = $reader->createQuery(Cat::class)->execute();
-        self::assertCount(2, $audits, 'results count ok.');
+        $this->assertCount(2, $audits, 'results count ok.');
     }
 
     private function createAndInitDoctrineProvider(): void

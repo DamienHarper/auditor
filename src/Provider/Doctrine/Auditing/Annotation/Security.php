@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Auditing\Annotation;
 
-use Attribute;
 use Symfony\Contracts\Service\Attribute\Required;
 
-#[Attribute(Attribute::TARGET_CLASS)]
+#[\Attribute(\Attribute::TARGET_CLASS)]
 final class Security
 {
     /**
@@ -21,7 +20,5 @@ final class Security
          */
         #[Required]
         public array $view
-    )
-    {
-    }
+    ) {}
 }

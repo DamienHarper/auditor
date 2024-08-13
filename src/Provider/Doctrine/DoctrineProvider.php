@@ -24,7 +24,6 @@ use DH\Auditor\Tests\Provider\Doctrine\DoctrineProviderTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ToolEvents;
-use Exception;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -91,7 +90,7 @@ final class DoctrineProvider extends AbstractProvider
                 $service->getEntityManager()->getClassMetadata($entity)->getTableName();
 
                 return $service;
-            } catch (Exception) {
+            } catch (\Exception) {
             }
         }
 

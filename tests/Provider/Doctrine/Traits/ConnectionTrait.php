@@ -10,7 +10,6 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use Throwable;
 
 trait ConnectionTrait
 {
@@ -106,7 +105,7 @@ trait ConnectionTrait
     {
         try {
             $schemaManager->dropDatabase($dbname);
-        } catch (Throwable) {
+        } catch (\Throwable) {
             // do nothing
         }
 

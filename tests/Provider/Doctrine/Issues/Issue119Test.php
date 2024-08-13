@@ -10,6 +10,7 @@ use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\DummyEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -17,6 +18,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversNothing]
 final class Issue119Test extends TestCase
 {
     use DefaultSchemaSetupTrait;
@@ -35,12 +37,12 @@ final class Issue119Test extends TestCase
         ]);
         $processor->process($transaction);
         $audits = $reader->createQuery(DummyEntity::class)->execute();
-        self::assertCount(1, $audits, 'results count ok.');
+        $this->assertCount(1, $audits, 'results count ok.');
 
         /** @var Entry $audit */
         $audit = $audits[0];
         $diffs = $audit->getDiffs()['json_array'];
-        self::assertSame([
+        $this->assertSame([
             'example' => '例',
         ], $diffs['new']);
     }

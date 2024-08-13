@@ -11,6 +11,7 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue98\Issue98;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -18,6 +19,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversNothing]
 final class Issue98Test extends TestCase
 {
     use ReaderTrait;
@@ -35,8 +37,8 @@ final class Issue98Test extends TestCase
         $em->flush();
 
         $audits = $reader->createQuery(Issue98::class)->execute();
-        self::assertCount(1, $audits, 'results count ok.');
-        self::assertSame(Transaction::INSERT, $audits[0]->getType(), 'Reader::INSERT operation.');
+        $this->assertCount(1, $audits, 'results count ok.');
+        $this->assertSame(Transaction::INSERT, $audits[0]->getType(), 'Reader::INSERT operation.');
     }
 
     private function createAndInitDoctrineProvider(): void

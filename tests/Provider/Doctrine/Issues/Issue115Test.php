@@ -14,6 +14,7 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue115\DummyEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue115\DummyEnum;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -23,6 +24,7 @@ use PHPUnit\Framework\TestCase;
  * @requires PHP >= 8.1
  */
 #[Small]
+#[CoversNothing]
 final class Issue115Test extends TestCase
 {
     use DefaultSchemaSetupTrait;
@@ -46,13 +48,13 @@ final class Issue115Test extends TestCase
         $processor->process($transaction);
 
         $audits = $reader->createQuery(DummyEntity::class)->execute();
-        self::assertCount(1, $audits, 'results count ok.');
+        $this->assertCount(1, $audits, 'results count ok.');
 
         /** @var Entry $audit */
         $audit = $audits[0];
         $diffs = $audit->getDiffs()['id'];
-        self::assertSame('a', $diffs['old']);
-        self::assertSame('b', $diffs['new']);
+        $this->assertSame('a', $diffs['old']);
+        $this->assertSame('b', $diffs['new']);
     }
 
     private function configureEntities(): void

@@ -12,6 +12,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -19,6 +20,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversNothing]
 final class Issue132Test extends TestCase
 {
     use DefaultSchemaSetupTrait;
@@ -27,7 +29,7 @@ final class Issue132Test extends TestCase
     {
         $manager = new SchemaManager($this->provider);
         $schema = $manager->createAuditTable(DummyEntity::class);
-        self::assertThat('parent_entities_audit', self::callback(static function (string $tableName) use ($schema): bool {
+        $this->assertThat('parent_entities_audit', self::callback(static function (string $tableName) use ($schema): bool {
             foreach ($schema->getTables() as $table) {
                 if ($table->getName() === $tableName) {
                     return true;
@@ -50,7 +52,7 @@ final class Issue132Test extends TestCase
 
         $manager = new SchemaManager($this->provider);
         $auditTableName = $manager->computeAuditTablename($tableName, $this->provider->getConfiguration());
-        self::assertTrue($schema->hasTable($auditTableName));
+        $this->assertTrue($schema->hasTable($auditTableName));
     }
 
     private function configureEntities(): void

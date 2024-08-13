@@ -17,6 +17,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\BlogSchemaSetupTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -25,6 +26,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversNothing]
 final class SchemaManager2AEM1SEMAltConnectionTest extends TestCase
 {
     use BlogSchemaSetupTrait;
@@ -36,19 +38,19 @@ final class SchemaManager2AEM1SEMAltConnectionTest extends TestCase
         $commentStorageService = $this->provider->getStorageServiceForEntity(Comment::class);
         $tagStorageService = $this->provider->getStorageServiceForEntity(Tag::class);
 
-        self::assertSame($authorStorageService, $postStorageService, 'Author and Post use the same storage entity manager.');
-        self::assertSame($authorStorageService, $commentStorageService, 'Author and Comment use the same storage entity manager.');
-        self::assertSame($authorStorageService, $tagStorageService, 'Author and Tag use the same storage entity manager.');
+        $this->assertSame($authorStorageService, $postStorageService, 'Author and Post use the same storage entity manager.');
+        $this->assertSame($authorStorageService, $commentStorageService, 'Author and Comment use the same storage entity manager.');
+        $this->assertSame($authorStorageService, $tagStorageService, 'Author and Tag use the same storage entity manager.');
 
         $animalStorageService = $this->provider->getStorageServiceForEntity(Animal::class);
         $catStorageService = $this->provider->getStorageServiceForEntity(Cat::class);
         $dogStorageService = $this->provider->getStorageServiceForEntity(Dog::class);
         $vehicleStorageService = $this->provider->getStorageServiceForEntity(Vehicle::class);
 
-        self::assertSame($authorStorageService, $animalStorageService, 'Author and Animal use the same storage entity manager.');
-        self::assertSame($animalStorageService, $catStorageService, 'Animal and Cat use the same storage entity manager.');
-        self::assertSame($animalStorageService, $dogStorageService, 'Animal and Dog use the same storage entity manager.');
-        self::assertSame($animalStorageService, $vehicleStorageService, 'Animal and Vehicle use the same storage entity manager.');
+        $this->assertSame($authorStorageService, $animalStorageService, 'Author and Animal use the same storage entity manager.');
+        $this->assertSame($animalStorageService, $catStorageService, 'Animal and Cat use the same storage entity manager.');
+        $this->assertSame($animalStorageService, $dogStorageService, 'Animal and Dog use the same storage entity manager.');
+        $this->assertSame($animalStorageService, $vehicleStorageService, 'Animal and Vehicle use the same storage entity manager.');
     }
 
     #[Depends('testStorageServicesSetup')]
@@ -83,7 +85,7 @@ final class SchemaManager2AEM1SEMAltConnectionTest extends TestCase
             );
             sort($tables);
 
-            self::assertSame($expected[$name], $tables, 'Schema of "'.$name.'" is correct.');
+            $this->assertSame($expected[$name], $tables, 'Schema of "'.$name.'" is correct.');
         }
     }
 

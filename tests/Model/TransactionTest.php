@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Model;
 
 use DH\Auditor\Model\Transaction;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -12,6 +13,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversNothing]
 final class TransactionTest extends TestCase
 {
     protected function setUp(): void {}
@@ -23,8 +25,8 @@ final class TransactionTest extends TestCase
         $transaction = new Transaction();
 
         $transaction_hash = $transaction->getTransactionHash();
-        self::assertNotNull($transaction_hash, 'transaction_hash is not null');
-        self::assertIsString($transaction_hash, 'transaction_hash is a string');
-        self::assertSame(40, mb_strlen($transaction_hash), 'transaction_hash is a string of 40 characters');
+        $this->assertNotNull($transaction_hash, 'transaction_hash is not null');
+        $this->assertIsString($transaction_hash, 'transaction_hash is a string');
+        $this->assertSame(40, mb_strlen($transaction_hash), 'transaction_hash is a string of 40 characters');
     }
 }
