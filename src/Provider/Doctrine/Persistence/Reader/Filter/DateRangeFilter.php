@@ -7,21 +7,17 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter;
 use DateTimeInterface;
 use DH\Auditor\Exception\InvalidArgumentException;
 
-final class DateRangeFilter implements FilterInterface
+final readonly class DateRangeFilter implements FilterInterface
 {
-    private string $name;
-
     private ?DateTimeInterface $minValue;
 
     private ?DateTimeInterface $maxValue;
 
-    public function __construct(string $name, ?DateTimeInterface $minValue, ?DateTimeInterface $maxValue = null)
+    public function __construct(private string $name, ?DateTimeInterface $minValue, ?DateTimeInterface $maxValue = null)
     {
         if ($minValue instanceof DateTimeInterface && $maxValue instanceof DateTimeInterface && $minValue > $maxValue) {
             throw new InvalidArgumentException('Max bound has to be later than min bound.');
         }
-
-        $this->name = $name;
         $this->minValue = $minValue;
         $this->maxValue = $maxValue;
     }

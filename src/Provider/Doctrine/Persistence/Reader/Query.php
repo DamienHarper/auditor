@@ -63,20 +63,14 @@ final class Query
 
     private array $orderBy = [];
 
-    private Connection $connection;
-
-    private string $table;
-
     private int $offset = 0;
 
     private int $limit = 0;
 
-    private DateTimeZone $timezone;
+    private readonly DateTimeZone $timezone;
 
-    public function __construct(string $table, Connection $connection, string $timezone)
+    public function __construct(private readonly string $table, private readonly Connection $connection, string $timezone)
     {
-        $this->connection = $connection;
-        $this->table = $table;
         $this->timezone = new DateTimeZone($timezone);
 
         foreach ($this->getSupportedFilters() as $filterType) {

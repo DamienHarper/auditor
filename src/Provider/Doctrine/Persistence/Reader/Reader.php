@@ -19,21 +19,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @see ReaderTest
  */
-final class Reader
+final readonly class Reader
 {
     /**
      * @var int
      */
     public const PAGE_SIZE = 50;
 
-    private DoctrineProvider $provider;
-
     /**
      * Reader constructor.
      */
-    public function __construct(DoctrineProvider $provider)
+    public function __construct(private DoctrineProvider $provider)
     {
-        $this->provider = $provider;
     }
 
     public function getProvider(): DoctrineProvider
@@ -120,7 +117,7 @@ final class Reader
     public function paginate(Query $query, int $page = 1, int $pageSize = self::PAGE_SIZE): array
     {
         $numResults = $query->count();
-        $currentPage = $page < 1 ? 1 : $page;
+        $currentPage = max(1, $page);
         $hasPreviousPage = $currentPage > 1;
         $hasNextPage = ($currentPage * $pageSize) < $numResults;
 

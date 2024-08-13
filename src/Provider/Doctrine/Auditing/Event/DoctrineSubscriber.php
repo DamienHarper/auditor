@@ -72,10 +72,9 @@ final class DoctrineSubscriber implements EventSubscriber
 
         // if the driver is an instance of AbstractDriverMiddleware, return the wrapped driver
         if ($driver instanceof AbstractDriverMiddleware) {
-            return Closure::bind(function () use ($that) {
+            return Closure::bind(fn(): \Closure|\Doctrine\DBAL\Driver =>
                 // @var AbstractDriverMiddleware $this
-                return $that->getWrappedDriver($this->wrappedDriver);
-            }, $driver, AbstractDriverMiddleware::class)();
+                $that->getWrappedDriver($this->wrappedDriver), $driver, AbstractDriverMiddleware::class)();
         }
 
         return Closure::bind(function () use ($that): Closure|Driver|null {

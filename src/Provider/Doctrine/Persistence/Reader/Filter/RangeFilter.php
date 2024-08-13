@@ -8,8 +8,6 @@ use DH\Auditor\Exception\InvalidArgumentException;
 
 final class RangeFilter implements FilterInterface
 {
-    private string $name;
-
     private mixed $minValue;
 
     private mixed $maxValue;
@@ -17,13 +15,11 @@ final class RangeFilter implements FilterInterface
     /**
      * @throws InvalidArgumentException
      */
-    public function __construct(string $name, mixed $minValue, mixed $maxValue = null)
+    public function __construct(private readonly string $name, mixed $minValue, mixed $maxValue = null)
     {
         if (null === $minValue && null === $maxValue) {
             throw new InvalidArgumentException('You must provide at least one of the two range bounds.');
         }
-
-        $this->name = $name;
         $this->minValue = $minValue;
         $this->maxValue = $maxValue;
     }

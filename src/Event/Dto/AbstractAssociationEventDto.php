@@ -6,16 +6,9 @@ namespace DH\Auditor\Event\Dto;
 
 abstract class AbstractAssociationEventDto extends AbstractEventDto
 {
-    private object $target;
-
-    private array $mapping;
-
-    public function __construct(object $source, object $target, array $mapping)
+    public function __construct(object $source, private readonly object $target, private readonly array $mapping)
     {
         parent::__construct($source);
-
-        $this->target = $target;
-        $this->mapping = $mapping;
     }
 
     public function getTarget(): object

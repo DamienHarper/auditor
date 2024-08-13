@@ -13,13 +13,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * @see AuditEventSubscriberTest
  */
-final class AuditEventSubscriber implements EventSubscriberInterface
+final readonly class AuditEventSubscriber implements EventSubscriberInterface
 {
-    private Auditor $auditor;
-
-    public function __construct(Auditor $auditor)
+    public function __construct(private Auditor $auditor)
     {
-        $this->auditor = $auditor;
     }
 
     public static function getSubscribedEvents(): array

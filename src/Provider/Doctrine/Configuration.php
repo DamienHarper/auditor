@@ -18,9 +18,9 @@ final class Configuration implements ConfigurationInterface
 {
     private ?DoctrineProvider $provider = null;
 
-    private string $tablePrefix;
+    private readonly string $tablePrefix;
 
-    private string $tableSuffix;
+    private readonly string $tableSuffix;
 
     /**
      * @var array<string>
@@ -28,10 +28,6 @@ final class Configuration implements ConfigurationInterface
     private array $ignoredColumns = [];
 
     private ?array $entities = null;
-
-    private array $storageServices = [];
-
-    private array $auditingServices = [];
 
     private bool $isViewerEnabled;
 
@@ -60,9 +56,6 @@ final class Configuration implements ConfigurationInterface
                 $this->entities[$auditedEntity] = $entityOptions;
             }
         }
-
-        $this->storageServices = $config['storage_services'];
-        $this->auditingServices = $config['auditing_services'];
         $this->isViewerEnabled = $config['viewer'];
         $this->storageMapper = $config['storage_mapper'];
     }

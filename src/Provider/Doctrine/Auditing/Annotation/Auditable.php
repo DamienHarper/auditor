@@ -9,10 +9,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_CLASS)]
 final class Auditable
 {
-    public bool $enabled = true;
-
-    public function __construct(bool $enabled = true)
+    public function __construct(public bool $enabled = true)
     {
-        $this->enabled = $enabled;
     }
 }

@@ -13,13 +13,10 @@ use ReflectionClass;
 /**
  * @see AnnotationLoaderTest
  */
-final class AnnotationLoader
+final readonly class AnnotationLoader
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(private EntityManagerInterface $entityManager)
     {
-        $this->entityManager = $entityManager;
     }
 
     public function load(): array
@@ -99,7 +96,7 @@ final class AnnotationLoader
         }
 
         if (false !== $reflection->getParentClass()) {
-            $properties = array_unique(array_merge($this->getAllProperties($reflection->getParentClass()), $properties));
+            return array_unique(array_merge($this->getAllProperties($reflection->getParentClass()), $properties));
         }
 
         return $properties;

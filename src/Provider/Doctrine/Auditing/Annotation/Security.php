@@ -15,14 +15,13 @@ final class Security
      */
     public const VIEW_SCOPE = 'view';
 
-    /**
-     * @var array<string>
-     */
-    #[Required]
-    public array $view = [];
-
-    public function __construct(array $view)
+    public function __construct(
+        /**
+         * @var array<string>
+         */
+        #[Required]
+        public array $view
+    )
     {
-        $this->view = $view;
     }
 }

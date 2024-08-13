@@ -49,7 +49,7 @@ final class DoctrineProvider extends AbstractProvider
         'created_at' => '?',
     ];
 
-    private TransactionManager $transactionManager;
+    private readonly TransactionManager $transactionManager;
 
     public function __construct(ConfigurationInterface $configuration)
     {

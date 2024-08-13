@@ -16,13 +16,10 @@ use Exception;
 /**
  * @see CreateSchemaListenerTest
  */
-final class CreateSchemaListener
+final readonly class CreateSchemaListener
 {
-    private DoctrineProvider $provider;
-
-    public function __construct(DoctrineProvider $provider)
+    public function __construct(private DoctrineProvider $provider)
     {
-        $this->provider = $provider;
     }
 
     public function postGenerateSchemaTable(GenerateSchemaTableEventArgs $eventArgs): void
