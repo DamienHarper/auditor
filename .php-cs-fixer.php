@@ -1,50 +1,49 @@
 <?php
-
 declare(strict_types=1);
+
 use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
-
-$finder = (new Finder())
-    ->in(__DIR__.'/src')
-    ->in(__DIR__.'/tests')
-    ->append([__FILE__])
-;
+use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
 
 return (new Config())
+    ->setParallelConfig(ParallelConfigFactory::detect()) // @TODO 4.0 no need to call this manually :poop:
     ->setRiskyAllowed(true)
     ->setRules([
+        '@PHP82Migration' => true,
+        '@Symfony' => true,
+        '@Symfony:risky' => true,
+        '@DoctrineAnnotation' => true,
         '@PhpCsFixer' => true,
         '@PhpCsFixer:risky' => true,
-        '@DoctrineAnnotation' => true,
-        '@PHPUnit84Migration:risky' => true,
-        'date_time_immutable' => true,
-        'final_public_method_for_abstract_class' => false,
+        '@PHPUnit100Migration:risky' => true,
+//        'date_time_immutable' => true,
         'general_phpdoc_annotation_remove' => [
             'annotations' => [
+                'expectedDeprecation',
                 'expectedException',
                 'expectedExceptionMessage',
                 'expectedExceptionMessageRegExp',
             ],
         ],
-        'global_namespace_import' => true,
-        'linebreak_after_opening_tag' => true,
-        'list_syntax' => ['syntax' => 'short'],
-        'mb_str_functions' => true,
-        'method_chaining_indentation' => true,
-        'nullable_type_declaration_for_default_null_value' => true,
         'ordered_interfaces' => true,
         'ordered_traits' => true,
-        'php_unit_test_class_requires_covers' => false,
-        'phpdoc_types' => true,
         'phpdoc_to_param_type' => true,
         'phpdoc_to_property_type' => true,
         'phpdoc_to_return_type' => true,
         'regular_callable_call' => true,
-        'self_static_accessor' => true,
         'simplified_if_return' => true,
-        'simplified_null_return' => true,
-        'static_lambda' => true,
         'get_class_to_class_keyword' => true,
+        'mb_str_functions' => true,
+        'modernize_strpos' => true,
+        'no_useless_concat_operator' => false, // TODO switch back on when the `src/Console/Application.php` no longer needs the concat
+        'numeric_literal_separator' => true,
+        'string_implicit_backslashes' => true, // https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/pull/7786
     ])
-    ->setFinder($finder)
-;
+    ->setFinder(
+        (new Finder())
+            ->ignoreDotFiles(false)
+            ->ignoreVCSIgnored(true)
+            ->in(__DIR__.'/src')
+            ->in(__DIR__.'/tests')
+    )
+    ;
