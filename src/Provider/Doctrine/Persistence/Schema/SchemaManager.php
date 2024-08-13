@@ -264,8 +264,8 @@ class SchemaManager
     public function computeAuditTablename(string $entityTableName, Configuration $configuration): ?string
     {
         return preg_replace(
-            sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($entityTableName, '#')),
-            sprintf(
+            \sprintf('#^([^\.]+\.)?(%s)$#', preg_quote($entityTableName, '#')),
+            \sprintf(
                 '$1%s$2%s',
                 preg_quote($configuration->getTablePrefix(), '#'),
                 preg_quote($configuration->getTableSuffix(), '#')

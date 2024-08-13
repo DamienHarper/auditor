@@ -71,7 +71,7 @@ class Auditor
     public function getProvider(string $name): ProviderInterface
     {
         if (!$this->hasProvider($name)) {
-            throw new InvalidArgumentException(sprintf('Unknown provider "%s"', $name));
+            throw new InvalidArgumentException(\sprintf('Unknown provider "%s"', $name));
         }
 
         return $this->providers[$name];
@@ -88,7 +88,7 @@ class Auditor
     public function registerProvider(ProviderInterface $provider): self
     {
         if (!$provider->supportsStorage() && !$provider->supportsAuditing()) {
-            throw new ProviderException(sprintf('Provider "%s" does not support storage and auditing.', \get_class($provider)));
+            throw new ProviderException(\sprintf('Provider "%s" does not support storage and auditing.', \get_class($provider)));
         }
 
         $this->providers[\get_class($provider)] = $provider;
@@ -111,7 +111,7 @@ class Auditor
     public function enableStorage(ProviderInterface $provider): self
     {
         if (!$provider->supportsStorage()) {
-            throw new ProviderException(sprintf('Provider "%s" does not support storage.', \get_class($provider)));
+            throw new ProviderException(\sprintf('Provider "%s" does not support storage.', \get_class($provider)));
         }
 
         $this->storageProviders[\get_class($provider)] = $provider;
@@ -125,7 +125,7 @@ class Auditor
     public function disableStorage(ProviderInterface $provider): self
     {
         if (!$provider->supportsStorage()) {
-            throw new ProviderException(sprintf('Provider "%s" does not support storage.', \get_class($provider)));
+            throw new ProviderException(\sprintf('Provider "%s" does not support storage.', \get_class($provider)));
         }
 
         if (1 === \count($this->storageProviders)) {
@@ -144,7 +144,7 @@ class Auditor
     {
         $key = \get_class($provider);
         if (!$this->hasProvider($key)) {
-            throw new InvalidArgumentException(sprintf('Unknown provider "%s"', $key));
+            throw new InvalidArgumentException(\sprintf('Unknown provider "%s"', $key));
         }
 
         return \array_key_exists($key, $this->storageProviders);
@@ -156,7 +156,7 @@ class Auditor
     public function enableAuditing(ProviderInterface $provider): self
     {
         if (!$provider->supportsAuditing()) {
-            throw new ProviderException(sprintf('Provider "%s" does not support audit hooks.', \get_class($provider)));
+            throw new ProviderException(\sprintf('Provider "%s" does not support audit hooks.', \get_class($provider)));
         }
 
         $this->auditProviders[\get_class($provider)] = $provider;
@@ -170,7 +170,7 @@ class Auditor
     public function disableAuditing(ProviderInterface $provider): self
     {
         if (!$provider->supportsAuditing()) {
-            throw new ProviderException(sprintf('Provider "%s" does not support audit hooks.', \get_class($provider)));
+            throw new ProviderException(\sprintf('Provider "%s" does not support audit hooks.', \get_class($provider)));
         }
 
         if (1 === \count($this->auditProviders)) {
@@ -189,7 +189,7 @@ class Auditor
     {
         $key = \get_class($provider);
         if (!$this->hasProvider($key)) {
-            throw new InvalidArgumentException(sprintf('Unknown provider "%s"', $key));
+            throw new InvalidArgumentException(\sprintf('Unknown provider "%s"', $key));
         }
 
         return \array_key_exists($key, $this->auditProviders);

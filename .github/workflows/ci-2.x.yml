@@ -30,11 +30,7 @@ jobs:
         run: composer install --no-progress --ansi --working-dir=tools/php-cs-fixer
 
       - name: Run PHP-CS-Fixer
-        run: |
-          sed -i "s/'phpdoc_to_return_type' => true/'phpdoc_to_return_type' => false/g" .php-cs-fixer.php
-          sed -i "s/'phpdoc_to_param_type' => true/'phpdoc_to_param_type' => false/g" .php-cs-fixer.php
-          sed -i "s/'phpdoc_to_property_type' => true/'phpdoc_to_property_type' => false/g" .php-cs-fixer.php
-          composer cs-check
+        run: composer cs-check
 
       - name: Validate composer
         run: composer validate --strict --no-check-lock

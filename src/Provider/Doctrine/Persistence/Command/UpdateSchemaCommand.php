@@ -84,7 +84,7 @@ class UpdateSchemaCommand extends Command
 
             foreach ($sqls as $name => $queries) {
                 foreach ($queries as $index => $sql) {
-                    $io->text(sprintf('    %s;', $sql));
+                    $io->text(\sprintf('    %s;', $sql));
                 }
             }
         }
@@ -108,7 +108,7 @@ class UpdateSchemaCommand extends Command
 
             $pluralization = (1 === $count) ? 'query was' : 'queries were';
 
-            $io->text(sprintf('    <info>%s</info> %s executed', $count, $pluralization));
+            $io->text(\sprintf('    <info>%s</info> %s executed', $count, $pluralization));
             $io->success('Database schema updated successfully!');
         }
 
@@ -121,12 +121,12 @@ class UpdateSchemaCommand extends Command
         $io->caution('This operation should not be executed in a production environment!');
         $io->text(
             [
-                sprintf('The Schema-Tool would execute <info>"%s"</info> queries to update the database.', $count),
+                \sprintf('The Schema-Tool would execute <info>"%s"</info> queries to update the database.', $count),
                 '',
                 'Please run the operation by passing one - or both - of the following options:',
                 '',
-                sprintf('    <info>%s --force</info> to execute the command', $this->getName()),
-                sprintf('    <info>%s --dump-sql</info> to dump the SQL statements to the screen', $this->getName()),
+                \sprintf('    <info>%s --force</info> to execute the command', $this->getName()),
+                \sprintf('    <info>%s --dump-sql</info> to dump the SQL statements to the screen', $this->getName()),
             ]
         );
 

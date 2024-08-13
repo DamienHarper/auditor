@@ -93,7 +93,7 @@ class CleanAuditLogsCommand extends Command
             $count += \count($entities);
         }
 
-        $message = sprintf(
+        $message = \sprintf(
             "You are about to clean audits created before <comment>%s</comment>: %d classes involved.\n Do you want to proceed?",
             $until->format(self::UNTIL_DATE_FORMAT),
             $count
@@ -173,7 +173,7 @@ class CleanAuditLogsCommand extends Command
         try {
             $dateInterval = new DateInterval($keep);
         } catch (Exception $e) {
-            $io->error(sprintf("'keep' argument must be a valid ISO 8601 date interval, '%s' given.", (string) $keep));
+            $io->error(\sprintf("'keep' argument must be a valid ISO 8601 date interval, '%s' given.", (string) $keep));
             $this->release();
 
             return null;

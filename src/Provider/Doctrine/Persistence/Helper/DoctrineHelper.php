@@ -65,7 +65,7 @@ final class DoctrineHelper
     public static function getDoctrineType(string $type): string
     {
         if (!\defined(Types::class.'::'.$type)) {
-            throw new InvalidArgumentException(sprintf('Undefined Doctrine type "%s"', $type));
+            throw new InvalidArgumentException(\sprintf('Undefined Doctrine type "%s"', $type));
         }
 
         \assert(\is_string(\constant(Types::class.'::'.$type)));
