@@ -20,6 +20,7 @@ final class RangeFilter implements FilterInterface
         if (null === $minValue && null === $maxValue) {
             throw new InvalidArgumentException('You must provide at least one of the two range bounds.');
         }
+
         $this->minValue = $minValue;
         $this->maxValue = $maxValue;
     }

@@ -56,6 +56,7 @@ final class Configuration implements ConfigurationInterface
                 $this->entities[$auditedEntity] = $entityOptions;
             }
         }
+
         $this->isViewerEnabled = $config['viewer'];
         $this->storageMapper = $config['storage_mapper'];
     }

@@ -18,6 +18,7 @@ final readonly class DateRangeFilter implements FilterInterface
         if ($minValue instanceof DateTimeInterface && $maxValue instanceof DateTimeInterface && $minValue > $maxValue) {
             throw new InvalidArgumentException('Max bound has to be later than min bound.');
         }
+
         $this->minValue = $minValue;
         $this->maxValue = $maxValue;
     }
