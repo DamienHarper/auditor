@@ -80,7 +80,7 @@ final class CleanAuditLogsCommand extends Command
             try {
                 $until = new DateTimeImmutable($date);
             } catch (Exception) {
-                $io->error(sprintf('Invalid date format provided: %s', $date));
+                $io->error(\sprintf('Invalid date format provided: %s', $date));
             }
         } else {
             // Fall back to default retention period
@@ -129,7 +129,7 @@ final class CleanAuditLogsCommand extends Command
             $count += \count($entities);
         }
 
-        $message = sprintf(
+        $message = \sprintf(
             "You are about to clean audits created before <comment>%s</comment>: %d classes involved.\n Do you want to proceed?",
             $until->format(self::UNTIL_DATE_FORMAT),
             $count
@@ -176,7 +176,7 @@ final class CleanAuditLogsCommand extends Command
                         $queryBuilder->executeStatement();
                     }
 
-                    $progressBar->setMessage(sprintf('Cleaning audit tables... (<info>%s</info>)', $auditTable));
+                    $progressBar->setMessage(\sprintf('Cleaning audit tables... (<info>%s</info>)', $auditTable));
                     $progressBar->advance();
                 }
             }
@@ -211,7 +211,7 @@ final class CleanAuditLogsCommand extends Command
         try {
             $dateInterval = new DateInterval($keep);
         } catch (Exception) {
-            $io->error(sprintf("'keep' argument must be a valid ISO 8601 date interval, '%s' given.", $keep));
+            $io->error(\sprintf("'keep' argument must be a valid ISO 8601 date interval, '%s' given.", $keep));
             $this->release();
 
             return null;

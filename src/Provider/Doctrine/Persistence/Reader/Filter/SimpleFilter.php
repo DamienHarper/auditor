@@ -30,13 +30,13 @@ final class SimpleFilter implements FilterInterface
     {
         if (\is_array($this->value) && 1 < \count($this->value)) {
             return [
-                'sql' => sprintf('%s IN (:%s)', $this->name, $this->name),
+                'sql' => \sprintf('%s IN (:%s)', $this->name, $this->name),
                 'params' => [$this->name => $this->value],
             ];
         }
 
         return [
-            'sql' => sprintf('%s = :%s', $this->name, $this->name),
+            'sql' => \sprintf('%s = :%s', $this->name, $this->name),
             'params' => [$this->name => (\is_array($this->value) ? $this->value[0] : $this->value)],
         ];
     }

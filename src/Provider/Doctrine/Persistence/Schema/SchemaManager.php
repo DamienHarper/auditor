@@ -198,7 +198,7 @@ final class SchemaManager
                         PlatformHelper::isIndexLengthLimited($columnName, $connection) ? ['lengths' => [191]] : []
                     );
                 } else {
-                    throw new InvalidArgumentException(sprintf("Missing key 'name' for column '%s'", $columnName));
+                    throw new InvalidArgumentException(\sprintf("Missing key 'name' for column '%s'", $columnName));
                 }
             }
         }
@@ -274,7 +274,7 @@ final class SchemaManager
     {
         return preg_replace(
             '#^([^.]+\.)?(.+)$#',
-            sprintf(
+            \sprintf(
                 '$1%s$2%s',
                 preg_quote($configuration->getTablePrefix(), '#'),
                 preg_quote($configuration->getTableSuffix(), '#')

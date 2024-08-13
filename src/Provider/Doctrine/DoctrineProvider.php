@@ -95,7 +95,7 @@ final class DoctrineProvider extends AbstractProvider
             }
         }
 
-        throw new InvalidArgumentException(sprintf('Auditing service not found for "%s".', $entity));
+        throw new InvalidArgumentException(\sprintf('Auditing service not found for "%s".', $entity));
     }
 
     public function getStorageServiceForEntity(string $entity): StorageService
@@ -130,7 +130,7 @@ final class DoctrineProvider extends AbstractProvider
         unset($payload['table'], $payload['entity']);
 
         $keys = array_keys(self::FIELDS);
-        $query = sprintf(
+        $query = \sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
             $auditTable,
             implode(', ', $keys),

@@ -315,7 +315,7 @@ final class Query
     private function checkFilter(string $filter): void
     {
         if (!\in_array($filter, $this->getSupportedFilters(), true)) {
-            throw new InvalidArgumentException(sprintf('Unsupported "%s" filter, allowed filters: %s.', $filter, implode(', ', $this->getSupportedFilters())));
+            throw new InvalidArgumentException(\sprintf('Unsupported "%s" filter, allowed filters: %s.', $filter, implode(', ', $this->getSupportedFilters())));
         }
     }
 }

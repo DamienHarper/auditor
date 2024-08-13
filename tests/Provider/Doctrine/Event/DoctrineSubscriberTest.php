@@ -28,7 +28,7 @@ final class DoctrineSubscriberTest extends TestCase
 {
     public function testIssue184IfAbstractDriverMiddleware(): void
     {
-        $transactionManager = new class() implements TransactionManagerInterface {
+        $transactionManager = new class implements TransactionManagerInterface {
             public function populate($transaction): void {}
 
             public function process($transaction): void
@@ -70,7 +70,7 @@ final class DoctrineSubscriberTest extends TestCase
 
     public function testIssue184IfNotAbstractDriverMiddleware(): void
     {
-        $transactionManager = new class() implements TransactionManagerInterface {
+        $transactionManager = new class implements TransactionManagerInterface {
             public function populate($transaction): void {}
 
             public function process($transaction): void
@@ -133,7 +133,7 @@ final class DoctrineSubscriberTest extends TestCase
 
     public function testIssue184Unexpected(): void
     {
-        $transactionManager = new class() implements TransactionManagerInterface {
+        $transactionManager = new class implements TransactionManagerInterface {
             public function populate($transaction): void {}
 
             public function process($transaction): void
@@ -145,7 +145,7 @@ final class DoctrineSubscriberTest extends TestCase
 
         $args = new OnFlushEventArgs($objectManager);
 
-        $driver = new class() implements VersionAwarePlatformDriver {
+        $driver = new class implements VersionAwarePlatformDriver {
             public function connect(array $params): void {}
 
             public function getDatabasePlatform(): void {}

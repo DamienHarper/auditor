@@ -52,12 +52,12 @@ final class RangeFilter implements FilterInterface
         $params = [];
 
         if (null !== $this->minValue) {
-            $sqls[] = sprintf('%s >= :min_%s', $this->name, $this->name);
+            $sqls[] = \sprintf('%s >= :min_%s', $this->name, $this->name);
             $params['min_'.$this->name] = $this->minValue;
         }
 
         if (null !== $this->maxValue) {
-            $sqls[] = sprintf('%s <= :max_%s', $this->name, $this->name);
+            $sqls[] = \sprintf('%s <= :max_%s', $this->name, $this->name);
             $params['max_'.$this->name] = $this->maxValue;
         }
 

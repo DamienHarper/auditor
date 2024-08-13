@@ -45,12 +45,12 @@ final class DateRangeFilter implements FilterInterface
         $params = [];
 
         if ($this->minValue instanceof DateTimeInterface) {
-            $sqls[] = sprintf('%s >= :min_%s', $this->name, $this->name);
+            $sqls[] = \sprintf('%s >= :min_%s', $this->name, $this->name);
             $params['min_'.$this->name] = $this->minValue->format('Y-m-d H:i:s');
         }
 
         if ($this->maxValue instanceof DateTimeInterface) {
-            $sqls[] = sprintf('%s <= :max_%s', $this->name, $this->name);
+            $sqls[] = \sprintf('%s <= :max_%s', $this->name, $this->name);
             $params['max_'.$this->name] = $this->maxValue->format('Y-m-d H:i:s');
         }
 

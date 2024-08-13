@@ -165,7 +165,7 @@ final class Reader
             $schema = $entityManager->getClassMetadata($entity)->getSchemaName().'.';
         }
 
-        return sprintf(
+        return \sprintf(
             '%s%s%s%s',
             $schema,
             $configuration->getTablePrefix(),

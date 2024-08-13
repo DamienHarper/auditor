@@ -58,7 +58,7 @@ abstract class AbstractProvider implements ProviderInterface
         }
 
         if (\array_key_exists($service->getName(), $this->storageServices)) {
-            throw new ProviderException(sprintf('A storage service named "%s" is already registered.', $service->getName()));
+            throw new ProviderException(\sprintf('A storage service named "%s" is already registered.', $service->getName()));
         }
 
         $this->storageServices[$service->getName()] = $service;
@@ -81,7 +81,7 @@ abstract class AbstractProvider implements ProviderInterface
         }
 
         if (\array_key_exists($service->getName(), $this->auditingServices)) {
-            throw new ProviderException(sprintf('An auditing service named "%s" is already registered.', $service->getName()));
+            throw new ProviderException(\sprintf('An auditing service named "%s" is already registered.', $service->getName()));
         }
 
         $this->auditingServices[$service->getName()] = $service;

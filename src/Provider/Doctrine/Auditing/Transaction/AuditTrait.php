@@ -31,7 +31,7 @@ trait AuditTrait
         try {
             $pk = $meta->getSingleIdentifierFieldName();
         } catch (ORMMappingException) {
-            throw new MappingException(sprintf('Composite primary keys are not supported (%s).', $entity::class));
+            throw new MappingException(\sprintf('Composite primary keys are not supported (%s).', $entity::class));
         }
 
         if (isset($meta->fieldMappings[$pk])) {

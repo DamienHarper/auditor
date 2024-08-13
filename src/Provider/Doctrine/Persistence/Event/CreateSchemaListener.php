@@ -35,7 +35,7 @@ final class CreateSchemaListener
             ClassMetadataInfo::INHERITANCE_TYPE_JOINED,
             ClassMetadataInfo::INHERITANCE_TYPE_SINGLE_TABLE,
         ], true)) {
-            throw new Exception(sprintf('Inheritance type "%s" is not yet supported', $metadata->inheritanceType));
+            throw new Exception(\sprintf('Inheritance type "%s" is not yet supported', $metadata->inheritanceType));
         }
 
         $targetEntity = $metadata->name;
