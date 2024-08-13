@@ -11,17 +11,17 @@ use DH\Auditor\Tests\Model\EntryTest;
  */
 final class Entry
 {
-    private readonly int $id;
+    private int $id = 0;
 
-    private readonly string $type;
+    private string $type = '';
 
-    private readonly string $object_id;
+    private string $object_id = '';
 
     private ?string $discriminator = null;
 
     private ?string $transaction_hash = null;
 
-    private readonly string $diffs;
+    private string $diffs = '{}';
 
     private null|int|string $blame_id = null;
 
@@ -33,7 +33,7 @@ final class Entry
 
     private ?string $ip = null;
 
-    private readonly \DateTimeImmutable $created_at;
+    private ?\DateTimeImmutable $created_at = null;
 
     /**
      * Get the value of id.
@@ -112,7 +112,7 @@ final class Entry
     /**
      * Get the value of created_at.
      */
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->created_at;
     }

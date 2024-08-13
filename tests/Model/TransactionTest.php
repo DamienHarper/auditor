@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Model;
 
 use DH\Auditor\Model\Transaction;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversNothing]
+#[CoversClass(Transaction::class)]
 final class TransactionTest extends TestCase
 {
     protected function setUp(): void {}

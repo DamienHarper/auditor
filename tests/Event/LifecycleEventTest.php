@@ -8,7 +8,7 @@ use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\EventSubscriber\AuditEventSubscriber;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Tests\Traits\AuditorTrait;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversNothing]
+#[CoversClass(LifecycleEvent::class)]
 final class LifecycleEventTest extends TestCase
 {
     use AuditorTrait;

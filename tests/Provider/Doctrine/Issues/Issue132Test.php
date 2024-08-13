@@ -12,7 +12,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversNothing]
+#[CoversClass(DummyEntity::class)]
 final class Issue132Test extends TestCase
 {
     use DefaultSchemaSetupTrait;

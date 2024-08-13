@@ -11,7 +11,7 @@ use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Query;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ConnectionTrait;
 use DH\Auditor\Tests\Traits\ReflectionTrait;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversNothing]
+#[CoversClass(Query::class)]
 final class QueryTest extends TestCase
 {
     use ConnectionTrait;

@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
+use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation\AuditableButUnauditedEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation\AuditedEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ProviderConfigurationTrait;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +19,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversNothing]
+#[CoversClass(Configuration::class)]
 final class ConfigurationTest extends TestCase
 {
     use ProviderConfigurationTrait;

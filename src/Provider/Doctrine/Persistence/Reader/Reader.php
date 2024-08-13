@@ -22,6 +22,8 @@ final readonly class Reader
 {
     /**
      * @var int
+     *
+     * @phpstan-ignore-next-line
      */
     public const PAGE_SIZE = 50;
 

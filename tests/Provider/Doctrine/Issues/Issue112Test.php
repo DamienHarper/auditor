@@ -9,7 +9,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue112\DummyEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Mapping\MappingException;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversNothing]
+#[CoversClass(DummyEntity::class)]
 final class Issue112Test extends TestCase
 {
     use AuditTrait;

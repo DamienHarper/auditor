@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Helper;
 
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversNothing]
+#[CoversClass(DoctrineHelper::class)]
 final class DoctrineHelperTest extends TestCase
 {
     public function testRegisterStorageServiceAgainstNoStorageProvider(): void

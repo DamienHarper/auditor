@@ -28,6 +28,8 @@ final class CleanAuditLogsCommand extends Command
 
     /**
      * @var string
+     *
+     * @phpstan-ignore-next-line
      */
     private const UNTIL_DATE_FORMAT = 'Y-m-d H:i:s';
 

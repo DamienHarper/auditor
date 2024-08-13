@@ -12,7 +12,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue40\CoreCase;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue40\DieselCase;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversNothing]
+#[CoversClass(CoreCase::class)]
 final class Issue40Test extends TestCase
 {
     use ReaderTrait;

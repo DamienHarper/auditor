@@ -10,6 +10,7 @@ use DH\Auditor\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\DateRangeFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Query;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
@@ -18,7 +19,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\BlogSchemaSetupTrait;
 use DH\Auditor\Tests\Traits\ReflectionTrait;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -28,7 +29,7 @@ use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException as Opti
  * @internal
  */
 #[Small]
-#[CoversNothing]
+#[CoversClass(Reader::class)]
 final class ReaderTest extends TestCase
 {
     use BlogSchemaSetupTrait;

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests;
 
+use DH\Auditor\Configuration;
 use DH\Auditor\Tests\Traits\AuditorConfigurationTrait;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +15,8 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversNothing]
+#[CoversClass(Configuration::class)]
+#[CoversTrait(AuditorConfigurationTrait::class)]
 final class ConfigurationTest extends TestCase
 {
     use AuditorConfigurationTrait;

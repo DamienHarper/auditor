@@ -6,7 +6,7 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Auditing\Annotation;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\EntityManagerInterfaceTrait;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversNothing]
+#[CoversClass(AnnotationLoader::class)]
 final class AnnotationLoaderTest extends TestCase
 {
     use EntityManagerInterfaceTrait;

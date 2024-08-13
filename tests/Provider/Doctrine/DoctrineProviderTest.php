@@ -25,7 +25,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Traits\DoctrineProviderTrait;
 use DH\Auditor\User\User;
 use DH\Auditor\User\UserInterface;
 use DH\Auditor\User\UserProviderInterface;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -34,7 +34,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversNothing]
+#[CoversClass(DoctrineProvider::class)]
 final class DoctrineProviderTest extends TestCase
 {
     use DoctrineProviderTrait;

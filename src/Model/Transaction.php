@@ -18,26 +18,36 @@ class Transaction implements TransactionInterface
 {
     /**
      * @var string
+     *
+     * @phpstan-ignore-next-line
      */
     public const INSERT = 'insert';
 
     /**
      * @var string
+     *
+     * @phpstan-ignore-next-line
      */
     public const UPDATE = 'update';
 
     /**
      * @var string
+     *
+     * @phpstan-ignore-next-line
      */
     public const REMOVE = 'remove';
 
     /**
      * @var string
+     *
+     * @phpstan-ignore-next-line
      */
     public const ASSOCIATE = 'associate';
 
     /**
      * @var string
+     *
+     * @phpstan-ignore-next-line
      */
     public const DISSOCIATE = 'dissociate';
 

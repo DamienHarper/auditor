@@ -17,7 +17,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue95\RelatedDummyEntityData;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -25,7 +25,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversNothing]
+#[CoversClass(Issue95::class)]
 final class Issue95Test extends TestCase
 {
     use ReaderTrait;
