@@ -2,7 +2,7 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.3/phpunit.xsd" bootstrap="vendor/autoload.php"
          executionOrder="depends,defects" beStrictAboutOutputDuringTests="true" cacheDirectory=".phpunit.cache"
-         requireCoverageMetadata="false" beStrictAboutCoverageMetadata="false">
+         requireCoverageMetadata="false" beStrictAboutCoverageMetadata="true">
     <coverage includeUncoveredFiles="true">
         <report>
             <html outputDirectory="tests/coverage"/>

@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\EventSubscriber;
 
+use DH\Auditor\Auditor;
+use DH\Auditor\Configuration;
+use DH\Auditor\Event\AuditEvent;
 use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\EventSubscriber\AuditEventSubscriber;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Tests\Fixtures\EventSubscriber\CustomAuditEventSubscriber;
 use DH\Auditor\Tests\Traits\AuditorTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -17,6 +22,11 @@ use PHPUnit\Framework\TestCase;
  */
 #[Small]
 #[CoversClass(AuditEventSubscriber::class)]
+#[CoversClass(Auditor::class)]
+#[CoversClass(Configuration::class)]
+#[CoversClass(AuditEvent::class)]
+#[CoversClass(DoctrineHelper::class)]
+#[CoversClass(SchemaHelper::class)]
 final class AuditEventSubscriberTest extends TestCase
 {
     use AuditorTrait;
