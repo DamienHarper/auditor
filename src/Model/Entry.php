@@ -11,7 +11,7 @@ use DH\Auditor\Tests\Model\EntryTest;
  */
 final class Entry
 {
-    private int $id = 0;
+    private ?int $id = null;
 
     private string $type = '';
 
@@ -38,7 +38,7 @@ final class Entry
     /**
      * Get the value of id.
      */
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
