@@ -1,6 +1,5 @@
 FROM php:${PHP_VERSION:-8.3}-cli AS auditor
 
-#COPY . /app
 WORKDIR /app
 
 # install PHP extensions

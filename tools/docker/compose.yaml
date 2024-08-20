@@ -8,7 +8,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - XDEBUG_MODE=${XDEBUG_MODE:-coverage}
     volumes:
-      - .:/app
+      - ../..:/app
       - vendor_php${PHP_VERSION}_sf${SYMFONY_VERSION}:/app/vendor
 
 volumes:
