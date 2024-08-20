@@ -1,3 +1,4 @@
+name: auditor-tester
 services:
   php-cli:
     build:
