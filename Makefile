@@ -28,11 +28,10 @@ endif
 
 # Validate PHP and Symfony version matrix
 validate_matrix:
-	@if echo "$(valid_combinations)" | grep -q "$(current_combination)"; then \
-		echo "Valid combination: php=$(php), sf=$(sf)"; \
-	else \
+	@if ! echo "$(valid_combinations)" | grep -q "$(current_combination)"; then \
 		echo "Error: Invalid combination of PHP and Symfony versions: php=$(php), sf=$(sf)"; \
 		echo "Allowed combinations are:"; \
+		echo "(PHP_VERSION;SYMFONY_VERSION)"; \
 		echo "$(valid_combinations)" | tr ' ' '\n'; \
 		exit 1; \
 	fi
