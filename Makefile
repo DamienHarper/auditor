@@ -29,7 +29,7 @@ help:
 # Run tests target
 .PHONY: tests
 tests:
-	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) DATABASE_URL=$(DATABASE_URL) docker compose -f compose.yaml run php composer install && vendor/bin/phpunit $(args)
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) DATABASE_URL=$(DATABASE_URL) docker compose -f compose.yaml run --rm --remove-orphans php-cli composer install && vendor/bin/phpunit $(args)
 
 # Clean up Docker containers, networks, and volumes
 #.PHONY: clean

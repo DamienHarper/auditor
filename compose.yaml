@@ -1,5 +1,5 @@
 services:
-  php:
+  php-cli:
     build:
       context: .
       target: auditor
