@@ -25,6 +25,9 @@ ifeq ($(db),mysql)
 else ifeq ($(db),pgsql)
   DATABASE_URL = "pgsql://postgres:password@127.0.0.1:5432/auditor?serverVersion=15&charset=utf8"
   compose_files := $(compose_files) -f tools/docker/compose.pgsql.yaml
+else ifeq ($(db),mariadb)
+  DATABASE_URL = "mysql://auditor:password@127.0.0.1:3366/auditor?serverVersion=8&charset=utf8mb4"
+  compose_files := $(compose_files) -f tools/docker/compose.mariadb.yaml
 else ifeq ($(db),sqlite)
   DATABASE_URL = "sqlite:///:memory:"
 else
@@ -39,7 +42,7 @@ help:
 	@echo "Options:"
 	@echo "  php      PHP version to use (default: $(php))"
 	@echo "  sf       Symfony version to use (default: $(sf))"
-	@echo "  db       Database type (sqlite, mysql, pgsql; default: $(db))"
+	@echo "  db       Database type (sqlite, mysql, pgsql, mariadb; default: $(db))"
 	@echo "  args     PHPUnit arguments (default: $(args))"
 
 # Run tests target
