@@ -15,11 +15,16 @@ valid_combinations = \
 
 current_combination = $(php);$(sf)
 
-# Set the DATABASE_URL based on the selected database
+# list of config files to provide to docker compose
+compose_files = -f tools/docker/compose.yaml
+
+# Set the DATABASE_URL and dedicated compose file based on the selected database
 ifeq ($(db),mysql)
-  DATABASE_URL = "mysql://auditor:password@mysql:3306/auditor?charset=utf8mb4"
+  DATABASE_URL = "mysql://auditor:password@127.0.0.1:3360/auditor?serverVersion=8&charset=utf8mb4"
+  compose_files := $(compose_files) -f tools/docker/compose.mysql.yaml
 else ifeq ($(db),pgsql)
-  DATABASE_URL = "pgsql://auditor:password@pgsql:5432/auditor?charset=utf8"
+  DATABASE_URL = "pgsql://postgres:password@127.0.0.1:5432/auditor?serverVersion=15&charset=utf8"
+  compose_files := $(compose_files) -f tools/docker/compose.pgsql.yaml
 else ifeq ($(db),sqlite)
   DATABASE_URL = "sqlite:///:memory:"
 else
@@ -40,7 +45,7 @@ help:
 # Run tests target
 .PHONY: tests
 tests: validate_matrix
-	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) DATABASE_URL=$(DATABASE_URL) docker compose -f tools/docker/compose.yaml run --rm --remove-orphans php-cli composer install && vendor/bin/phpunit $(args)
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) DATABASE_URL=$(DATABASE_URL) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer install && vendor/bin/phpunit $(args)"
 
 # Clean up Docker containers, networks, and volumes
 #.PHONY: clean

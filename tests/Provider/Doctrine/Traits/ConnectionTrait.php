@@ -10,6 +10,7 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Tools\DsnParser;
 
 trait ConnectionTrait
 {
@@ -69,14 +70,7 @@ trait ConnectionTrait
      */
     private static function getConnectionParameters(?array $params = null): array
     {
-        if (null === $params && !isset(
-            $GLOBALS['db_type'],
-            $GLOBALS['db_username'],
-            $GLOBALS['db_password'],
-            $GLOBALS['db_host'],
-            $GLOBALS['db_name'],
-            $GLOBALS['db_port']
-        )) {
+        if (null === $params && false === getenv('DATABASE_URL')) {
             // in memory SQLite DB
             return [
                 'driver' => 'pdo_sqlite',
@@ -89,16 +83,10 @@ trait ConnectionTrait
             return $params;
         }
 
-        // fallback to what's defined in $GLOBALS (from phpunit config file)
-        return [
-            'driver' => $GLOBALS['db_type'],
-            'user' => $GLOBALS['db_username'],
-            'password' => $GLOBALS['db_password'],
-            'host' => $GLOBALS['db_host'],
-            'dbname' => $GLOBALS['db_name'],
-            'port' => $GLOBALS['db_port'],
-            'charset' => $GLOBALS['db_charset'],
-        ];
+        // extract params from DATABASE_URL env variable
+        $dsnParser = new DsnParser(['mysql' => 'pdo_mysql', 'pgsql' => 'pdo_pgsql', 'sqlite' => 'pdo_sqlite']);
+
+        return $dsnParser->parse(getenv('DATABASE_URL'));
     }
 
     private function dropAndCreateDatabase(AbstractSchemaManager $schemaManager, string $dbname): void
