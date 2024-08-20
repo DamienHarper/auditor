@@ -2,7 +2,7 @@
 php ?= 8.3
 sf ?= 7.1
 db ?= sqlite
-args ?= "--colors=always --no-coverage"
+args ?= --colors=always --no-coverage
 
 # Allowed PHP and Symfony version combinations
 # (PHP_VERSION;SYMFONY_VERSION)
