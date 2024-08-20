@@ -26,16 +26,6 @@ else
   $(error Unknown database type: $(db))
 endif
 
-# Validate PHP and Symfony version matrix
-validate_matrix:
-	@if ! echo "$(valid_combinations)" | grep -q "$(current_combination)"; then \
-		echo "Error: Invalid combination of PHP and Symfony versions: php=$(php), sf=$(sf)"; \
-		echo "Allowed combinations are:"; \
-		echo "(PHP_VERSION;SYMFONY_VERSION)"; \
-		echo "$(valid_combinations)" | tr ' ' '\n'; \
-		exit 1; \
-	fi
-
 # Help target
 .PHONY: help
 help:
@@ -57,3 +47,13 @@ tests: validate_matrix
 #clean:
 #	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) DATABASE_URL=$(DATABASE_URL) \
 #	docker compose -f ./docker/compose.yaml -f ./docker/compose.$(db).yaml down
+
+# Validate PHP and Symfony version matrix
+validate_matrix:
+	@if ! echo "$(valid_combinations)" | grep -q "$(current_combination)"; then \
+		echo "Error: Invalid combination of PHP and Symfony versions: php=$(php), sf=$(sf)"; \
+		echo "Allowed combinations are:"; \
+		echo "(PHP_VERSION;SYMFONY_VERSION)"; \
+		echo "$(valid_combinations)" | tr ' ' '\n'; \
+		exit 1; \
+	fi
