@@ -1,0 +1,19 @@
+services:
+  php:
+    build:
+      context: .
+      target: auditor
+    environment:
+      - SYMFONY_VERSION=${SYMFONY_VERSION}
+      - DATABASE_URL=${DATABASE_URL}
+      - XDEBUG_MODE=${XDEBUG_MODE:-coverage}
+    volumes:
+      - .:/app
+      - vendor_php${PHP_VERSION}_sf${SYMFONY_VERSION}:/app/vendor
+
+volumes:
+  vendor_php8.2_sf5.4:
+  vendor_php8.2_sf6.4:
+  vendor_php8.2_sf7.1:
+  vendor_php8.3_sf6.4:
+  vendor_php8.3_sf7.1:
