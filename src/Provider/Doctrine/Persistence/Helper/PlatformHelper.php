@@ -7,6 +7,7 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\AbstractMySQLDriver;
 use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
+use ReflectionClass;
 
 abstract class PlatformHelper
 {
@@ -35,7 +36,7 @@ abstract class PlatformHelper
 
         $mariadb = false !== mb_stripos($version, 'mariadb');
 
-        $reflectedClass = new \ReflectionClass(AbstractMySQLDriver::class);
+        $reflectedClass = new ReflectionClass(AbstractMySQLDriver::class);
         $reflectedMethod = $reflectedClass->getMethod($mariadb ? 'getMariaDbMysqlVersionNumber' : 'getOracleMysqlVersionNumber');
         $reflectedMethod->setAccessible(true);
 
@@ -65,7 +66,7 @@ abstract class PlatformHelper
             return true;
         }
 
-        $reflectedClass = new \ReflectionClass(AbstractMySQLDriver::class);
+        $reflectedClass = new ReflectionClass(AbstractMySQLDriver::class);
         $reflectedMethod = $reflectedClass->getMethod('getMariaDbMysqlVersionNumber');
         $reflectedMethod->setAccessible(true);
 
