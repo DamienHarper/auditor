@@ -6,11 +6,15 @@ services:
       target: auditor
     environment:
       - SYMFONY_VERSION=${SYMFONY_VERSION}
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL=${DATABASE_URL:-}
       - XDEBUG_MODE=${XDEBUG_MODE:-coverage}
     volumes:
       - ../..:/app
       - vendor_php${PHP_VERSION}_sf${SYMFONY_VERSION}:/app/vendor
+      - phpcsfixer_php${PHP_VERSION}:/app/tools/php-cs-fixer/vendor
+      - phpstan_php${PHP_VERSION}:/app/tools/phpstan/vendor
+      - rector_php${PHP_VERSION}:/app/tools/rector/vendor
+      - phpstan_cache:/tmp/phpstan
 
 volumes:
   vendor_php8.2_sf5.4:
@@ -18,3 +22,10 @@ volumes:
   vendor_php8.2_sf7.1:
   vendor_php8.3_sf6.4:
   vendor_php8.3_sf7.1:
+  phpcsfixer_php8.2:
+  phpcsfixer_php8.3:
+  phpstan_php8.2:
+  phpstan_php8.3:
+  rector_php8.2:
+  rector_php8.3:
+  phpstan_cache:
