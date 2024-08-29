@@ -37,7 +37,12 @@ endif
 # Help target
 .PHONY: help
 help:
-	@echo "Usage: make tests [php=<php_version>] [sf=<symfony_version>] [db=<database>] [args=<phpunit_args>]"
+	@echo "Usage: make <target> [php=<php_version>] [sf=<symfony_version>] [db=<database>] [args=<phpunit_args>]"
+	@echo ""
+	@echo "Targets:"
+	@echo "  tests	  Run tests"
+	@echo "  cs-fix   Run PHP-CS-Fixer"
+	@echo "  phpstan  Run PHPStan"
 	@echo ""
 	@echo "Options:"
 	@echo "  php      PHP version to use (default: $(php))"
@@ -51,11 +56,19 @@ tests: validate_matrix
 	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) DATABASE_URL=$(DATABASE_URL) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer install --quiet"
 	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) DATABASE_URL=$(DATABASE_URL) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli vendor/bin/phpunit $(args)"
 
-# Clean up Docker containers, networks, and volumes
-#.PHONY: clean
-#clean:
-#	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) DATABASE_URL=$(DATABASE_URL) \
-#	docker compose -f ./docker/compose.yaml -f ./docker/compose.$(db).yaml down
+# Run phpstan target
+.PHONY: phpstan
+phpstan: validate_matrix
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer install --quiet"
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer update --quiet --working-dir=tools/phpstan"
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli tools/phpstan/vendor/bin/phpstan --memory-limit=1G --ansi analyse src"
+
+# Run phpstan target
+.PHONY: cs-fix
+cs-fix: validate_matrix
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer install --quiet"
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer update --quiet --working-dir=tools/php-cs-fixer"
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --using-cache=no --verbose --ansi"
 
 # Validate PHP and Symfony version matrix
 validate_matrix:
