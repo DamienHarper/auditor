@@ -82,6 +82,15 @@ jobs:
       fail-fast: false
 
     steps:
+      - name: Configure Database
+        run: |
+          if [ "${{ matrix.db }}" = "sqlite" ]; then
+            echo "DATABASE_URL=sqlite:///:memory:" >> $GITHUB_ENV
+          elif [ "${{ matrix.db }}" = "mysql" ]; then
+            echo "DATABASE_URL=mysql://root@localhost/auditor" >> $GITHUB_ENV
+          elif [ "${{ matrix.db }}" = "pgsql" ]; then
+            echo "DATABASE_URL=pgsql://postgres:password@localhost/auditor" >> $GITHUB_ENV
+          fi
       - name: Shutdown Ubuntu MySQL (SUDO)
         run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please do not remove it
 
@@ -114,15 +123,21 @@ jobs:
 
       - name: Update project dependencies (5.*)
         if: matrix.symfony == '5.*'
-        run: SYMFONY_REQUIRE="^5.4" composer update --no-progress --ansi --prefer-stable
+        env:
+          SYMFONY_REQUIRE: "^5.4"
+        run: composer update --no-progress --ansi --prefer-stable
 
       - name: Update project dependencies (6.*)
         if: matrix.symfony == '6.*'
-        run: SYMFONY_REQUIRE="^6.0" composer update --no-progress --ansi --prefer-stable
+        env:
+          SYMFONY_REQUIRE: "^6.0"
+        run: composer update --no-progress --ansi --prefer-stable
 
       - name: Update project dependencies (7.*)
         if: matrix.symfony == '7.*'
-        run: SYMFONY_REQUIRE="^7.0" composer update --no-progress --ansi --prefer-stable
+        env:
+          SYMFONY_REQUIRE: "^7.0"
+        run: composer update --no-progress --ansi --prefer-stable
 
       - name: Install PHPStan
         run: composer install --no-progress --ansi --working-dir=tools/phpstan
@@ -131,10 +146,13 @@ jobs:
         run: composer phpstan
 
       - name: Run tests
+        env:
+          XDEBUG_MODE: coverage
+          DATABASE_URL: ${{ env.DATABASE_URL }}
         run: |
           RAW_CODECOV_REPORT="php-${{ matrix.php }}-sf-${{ matrix.symfony }}-${{ matrix.db }}-coverage"
           echo "CODECOV_REPORT=$(echo $RAW_CODECOV_REPORT | sed 's/\.\*//')" >> $GITHUB_ENV
-          vendor/bin/phpunit -c phpunit.${{ matrix.db }}.xml --coverage-clover=coverage.xml
+          vendor/bin/phpunit -c phpunit.xml --coverage-clover=coverage.xml
 
       - name: Upload coverage file
         uses: actions/upload-artifact@v3
