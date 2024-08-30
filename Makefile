@@ -53,22 +53,34 @@ help:
 # Run tests target
 .PHONY: tests
 tests: validate_matrix
+	rm -f composer.lock
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer global config --no-plugins allow-plugins.symfony/flex true"
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer global require --no-progress --no-scripts --no-plugins symfony/flex --quiet"
 	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) DATABASE_URL=$(DATABASE_URL) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer install --quiet"
 	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) DATABASE_URL=$(DATABASE_URL) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli vendor/bin/phpunit $(args)"
+	rm -f composer.lock
 
 # Run phpstan target
 .PHONY: phpstan
 phpstan: validate_matrix
-	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer install --quiet"
-	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer update --quiet --working-dir=tools/phpstan"
+	rm -f composer.lock
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer update --working-dir=tools/phpstan --no-interaction --quiet"
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer global config --no-plugins allow-plugins.symfony/flex true"
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer global require --no-progress --no-scripts --no-plugins symfony/flex --quiet"
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer install --no-interaction --quiet"
 	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli tools/phpstan/vendor/bin/phpstan --memory-limit=1G --ansi analyse src"
+	rm -f composer.lock
 
 # Run phpstan target
 .PHONY: cs-fix
 cs-fix: validate_matrix
-	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer install --quiet"
+	rm -f composer.lock
 	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer update --quiet --working-dir=tools/php-cs-fixer"
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer global config --no-plugins allow-plugins.symfony/flex true"
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer global require --no-progress --no-scripts --no-plugins symfony/flex --quiet"
+	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer install --quiet"
 	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --using-cache=no --verbose --ansi"
+	rm -f composer.lock
 
 # Validate PHP and Symfony version matrix
 validate_matrix:
