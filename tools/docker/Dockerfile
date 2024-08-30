@@ -1,4 +1,5 @@
-FROM php:${PHP_VERSION:-8.3}-cli AS auditor
+ARG PHP_VERSION
+FROM php:${PHP_VERSION}-cli AS auditor
 
 WORKDIR /app
 
