@@ -33,8 +33,6 @@ final class DoctrineProvider extends AbstractProvider
 {
     /**
      * @var array<string, string>
-     *
-     * @phpstan-ignore-next-line
      */
     private const FIELDS = [
         'type' => '?',

@@ -6,6 +6,7 @@ parameters:
         return_type: 100
         param_type: 100
         property_type: 100
+        constant: 0
 
     paths:
         - src

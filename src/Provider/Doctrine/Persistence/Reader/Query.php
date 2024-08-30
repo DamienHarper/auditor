@@ -23,50 +23,36 @@ final class Query
 {
     /**
      * @var string
-     *
-     * @phpstan-ignore-next-line
      */
     public const TYPE = 'type';
 
     /**
      * @var string
-     *
-     * @phpstan-ignore-next-line
      */
     public const CREATED_AT = 'created_at';
 
     /**
      * @var string
-     *
-     * @phpstan-ignore-next-line
      */
     public const TRANSACTION_HASH = 'transaction_hash';
 
     /**
      * @var string
-     *
-     * @phpstan-ignore-next-line
      */
     public const OBJECT_ID = 'object_id';
 
     /**
      * @var string
-     *
-     * @phpstan-ignore-next-line
      */
     public const USER_ID = 'blame_id';
 
     /**
      * @var string
-     *
-     * @phpstan-ignore-next-line
      */
     public const ID = 'id';
 
     /**
      * @var string
-     *
-     * @phpstan-ignore-next-line
      */
     public const DISCRIMINATOR = 'discriminator';
 

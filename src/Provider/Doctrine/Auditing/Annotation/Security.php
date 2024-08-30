@@ -11,8 +11,6 @@ final class Security
 {
     /**
      * @var string
-     *
-     * @phpstan-ignore-next-line
      */
     public const VIEW_SCOPE = 'view';
 
