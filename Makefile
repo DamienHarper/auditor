@@ -48,7 +48,13 @@ help:
 	@echo "  php      - PHP version to use (default: $(php)). Supported: 8.2, 8.3"
 	@echo "  sf       - Symfony version to use (default: $(sf)). Supported: 5.4, 6.4, 7.1"
 	@echo "  db       - Database type (default: $(db)). Supported: sqlite, mysql, pgsql, mariadb"
-	@echo "  args     - Additional arguments for PHPUnit (default: $(args))."
+	@echo "  args     - Additional arguments:"
+	$(eval $(call set_args,tests))
+	@echo "             Defaults for 'tests' target:    $(args)"
+	$(eval $(call set_args,phpstan))
+	@echo "             Defaults for 'phpstan' target:  $(args)"
+	$(eval $(call set_args,cs-fix))
+	@echo "             Defaults for 'cs-fix' target:   $(args)"
 	@echo ""
 	@echo "Examples:"
 	@echo "  make tests php=8.2 sf=6.4 db=mysql"
@@ -84,7 +90,7 @@ phpstan: validate_matrix
 	$(eval $(call set_args,phpstan))
 	$(call common_setup)
 	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) \
-	sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli tools/phpstan/vendor/bin/phpstan $(args) analyse src"
+	sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli tools/phpstan/vendor/bin/phpstan $(args)"
 
 # Run PHP-CS-Fixer target
 .PHONY: cs-fix
@@ -92,7 +98,7 @@ cs-fix: validate_matrix
 	$(eval $(call set_args,cs-fix))
 	$(call common_setup)
 	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) \
-	sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli tools/php-cs-fixer/vendor/bin/php-cs-fixer fix $(args)"
+	sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli tools/php-cs-fixer/vendor/bin/php-cs-fixer $(args)"
 
 # Validate PHP and Symfony version matrix
 validate_matrix:
@@ -109,8 +115,8 @@ define set_args
   ifeq ($(1),tests)
     args := --colors=always --no-coverage
   else ifeq ($(1),phpstan)
-    args := --memory-limit=1G --ansi
+    args := analyse src --memory-limit=1G --ansi
   else ifeq ($(1),cs-fix)
-    args := --config=.php-cs-fixer.php --using-cache=no --verbose --ansi
+    args := fix --using-cache=no --verbose --ansi
   endif
 endef
