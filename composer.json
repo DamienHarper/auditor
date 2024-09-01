@@ -33,15 +33,15 @@
     }
   },
   "require-dev": {
-    "gedmo/doctrine-extensions": "^3.0",
     "doctrine/data-fixtures": "^1.5.3",
-    "phpunit/phpunit": "^9.0",
+    "gedmo/doctrine-extensions": "^3.0",
+    "phpunit/phpunit": "^11.0",
     "symfony/var-dumper": "^5.4|^6.0|^7.0"
   },
   "scripts": {
-    "test": "php -d pcov.enabled=1 ./vendor/bin/phpunit --colors=always",
-    "csfixer": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --using-cache=no --verbose --ansi",
-    "cs-check": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --using-cache=no --verbose --ansi --dry-run",
+    "test": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --colors=always",
+    "cs-fix": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --using-cache=no --verbose --ansi",
+    "cs-check": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --using-cache=no --verbose --ansi --dry-run",
     "phpstan": "tools/phpstan/vendor/bin/phpstan --memory-limit=1G --ansi analyse src",
     "rector": "tools/rector/vendor/bin/rector",
     "rector-check": "tools/rector/vendor/bin/rector --dry-run",

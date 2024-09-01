@@ -9,12 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class Transaction extends BaseTransaction
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
+    public function __construct(private readonly EntityManagerInterface $entityManager) {}
 
     public function getEntityManager(): EntityManagerInterface
     {

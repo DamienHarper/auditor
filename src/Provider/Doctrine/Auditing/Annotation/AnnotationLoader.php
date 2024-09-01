@@ -8,19 +8,13 @@ use DH\Auditor\Tests\Provider\Doctrine\Auditing\Annotation\AnnotationLoaderTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\Mapping\ClassMetadata;
-use ReflectionClass;
 
 /**
  * @see AnnotationLoaderTest
  */
-final class AnnotationLoader
+final readonly class AnnotationLoader
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
+    public function __construct(private EntityManagerInterface $entityManager) {}
 
     public function load(): array
     {
@@ -82,7 +76,7 @@ final class AnnotationLoader
         ];
     }
 
-    private function getAllProperties(ReflectionClass $reflection): array
+    private function getAllProperties(\ReflectionClass $reflection): array
     {
         $properties = [];
 
@@ -99,7 +93,7 @@ final class AnnotationLoader
         }
 
         if (false !== $reflection->getParentClass()) {
-            $properties = array_unique(array_merge($this->getAllProperties($reflection->getParentClass()), $properties));
+            return array_unique(array_merge($this->getAllProperties($reflection->getParentClass()), $properties));
         }
 
         return $properties;

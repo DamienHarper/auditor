@@ -1,0 +1,29 @@
+services:
+  php-cli:
+    depends_on:
+      mariadb:
+        condition: service_healthy
+        restart: true
+
+  mariadb:
+    image: mariadb:11
+    restart: always
+    container_name: auditor-mariadb
+    environment:
+      MARIADB_DATABASE: auditor
+      MARIADB_RANDOM_ROOT_PASSWORD: "true"
+      MARIADB_PASSWORD: password
+      MARIADB_USER: auditor
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "3366:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      timeout: 2s
+      retries: 5
+      interval: 5s
+      start_period: 5s
+
+volumes:
+  mariadb_data:

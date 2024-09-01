@@ -11,19 +11,13 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Persistence\Event\CreateSchemaListenerTest;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
-use Exception;
 
 /**
  * @see CreateSchemaListenerTest
  */
-final class CreateSchemaListener
+final readonly class CreateSchemaListener
 {
-    private DoctrineProvider $provider;
-
-    public function __construct(DoctrineProvider $provider)
-    {
-        $this->provider = $provider;
-    }
+    public function __construct(private DoctrineProvider $provider) {}
 
     public function postGenerateSchemaTable(GenerateSchemaTableEventArgs $eventArgs): void
     {
@@ -35,7 +29,7 @@ final class CreateSchemaListener
             ClassMetadataInfo::INHERITANCE_TYPE_JOINED,
             ClassMetadataInfo::INHERITANCE_TYPE_SINGLE_TABLE,
         ], true)) {
-            throw new Exception(\sprintf('Inheritance type "%s" is not yet supported', $metadata->inheritanceType));
+            throw new \Exception(\sprintf('Inheritance type "%s" is not yet supported', $metadata->inheritanceType));
         }
 
         $targetEntity = $metadata->name;

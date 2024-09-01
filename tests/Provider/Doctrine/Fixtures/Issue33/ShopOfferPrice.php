@@ -10,24 +10,13 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'shop_offer_price')]
 class ShopOfferPrice
 {
-    #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: 'Shop', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'shop_id')]
-    private Shop $shop;
-
-    #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: 'Offer', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'offer_id')]
-    private Offer $offer;
-
-    private float|string $value;
-
-    public function __construct(Shop $shop, Offer $offer, float $value)
-    {
-        $this->shop = $shop;
-        $this->offer = $offer;
-        $this->value = $value;
-    }
+    public function __construct(#[ORM\Id]
+        #[ORM\ManyToOne(targetEntity: 'Shop', cascade: ['persist', 'remove'])]
+        #[ORM\JoinColumn(name: 'shop_id')]
+        private Shop $shop, #[ORM\Id]
+        #[ORM\ManyToOne(targetEntity: 'Offer', cascade: ['persist', 'remove'])]
+        #[ORM\JoinColumn(name: 'offer_id')]
+        private Offer $offer, private float|string $value) {}
 
     public function getShop(): Shop
     {

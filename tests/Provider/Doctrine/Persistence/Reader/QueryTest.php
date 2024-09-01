@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader;
 
-use DateTimeImmutable;
 use DH\Auditor\Exception\InvalidArgumentException;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHConnection;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHMiddleware;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\DateRangeFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\RangeFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Query;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ConnectionTrait;
 use DH\Auditor\Tests\Traits\ReflectionTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -20,6 +25,15 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversClass(Query::class)]
+#[CoversClass(DHConnection::class)]
+#[CoversClass(DHDriver::class)]
+#[CoversClass(DHMiddleware::class)]
+#[CoversClass(DoctrineHelper::class)]
+#[CoversClass(SchemaHelper::class)]
+#[CoversClass(RangeFilter::class)]
+#[CoversClass(DateRangeFilter::class)]
+#[CoversClass(SimpleFilter::class)]
 final class QueryTest extends TestCase
 {
     use ConnectionTrait;
@@ -31,7 +45,7 @@ final class QueryTest extends TestCase
 
         $filters = $query->getFilters();
         foreach ($filters as $values) {
-            self::assertSame([], $values, 'No filter by default.');
+            $this->assertSame([], $values, 'No filter by default.');
         }
     }
 
@@ -43,22 +57,22 @@ final class QueryTest extends TestCase
         $query->addFilter($filter1);
 
         $filters = $query->getFilters();
-        self::assertCount(1, $filters[Query::TRANSACTION_HASH], 'Filter is added.');
-        self::assertSame([$filter1], $filters[Query::TRANSACTION_HASH], 'Filter is added.');
+        $this->assertCount(1, $filters[Query::TRANSACTION_HASH], 'Filter is added.');
+        $this->assertSame([$filter1], $filters[Query::TRANSACTION_HASH], 'Filter is added.');
 
         $filter2 = new SimpleFilter(Query::TRANSACTION_HASH, '456def');
         $query->addFilter($filter2);
 
         $filters = $query->getFilters();
-        self::assertCount(2, $filters[Query::TRANSACTION_HASH], 'Filter is added.');
-        self::assertSame([$filter1, $filter2], $filters[Query::TRANSACTION_HASH], 'Second filter is added.');
+        $this->assertCount(2, $filters[Query::TRANSACTION_HASH], 'Filter is added.');
+        $this->assertSame([$filter1, $filter2], $filters[Query::TRANSACTION_HASH], 'Second filter is added.');
 
         $filter3 = new SimpleFilter(Query::TRANSACTION_HASH, ['789ghi', '012jkl']);
         $query->addFilter($filter3);
 
         $filters = $query->getFilters();
-        self::assertCount(3, $filters[Query::TRANSACTION_HASH], 'Filter is added.');
-        self::assertSame([$filter1, $filter2, $filter3], $filters[Query::TRANSACTION_HASH], 'Second filter is added.');
+        $this->assertCount(3, $filters[Query::TRANSACTION_HASH], 'Filter is added.');
+        $this->assertSame([$filter1, $filter2, $filter3], $filters[Query::TRANSACTION_HASH], 'Second filter is added.');
     }
 
     #[Depends('testAddSimpleFilter')]
@@ -80,7 +94,7 @@ final class QueryTest extends TestCase
         $query->addFilter($filter);
 
         $filters = $query->getFilters();
-        self::assertSame([$filter], $filters[Query::OBJECT_ID], 'Range filter with min bound only is added.');
+        $this->assertSame([$filter], $filters[Query::OBJECT_ID], 'Range filter with min bound only is added.');
 
         // only max bound
         $query = new Query('author_audit', $this->createConnection(), 'UTC');
@@ -88,7 +102,7 @@ final class QueryTest extends TestCase
         $query->addFilter($filter);
 
         $filters = $query->getFilters();
-        self::assertSame([$filter], $filters[Query::OBJECT_ID], 'Range filter with max bound only is added.');
+        $this->assertSame([$filter], $filters[Query::OBJECT_ID], 'Range filter with max bound only is added.');
 
         // min and max bound
         $query = new Query('author_audit', $this->createConnection(), 'UTC');
@@ -96,14 +110,14 @@ final class QueryTest extends TestCase
         $query->addFilter($filter);
 
         $filters = $query->getFilters();
-        self::assertSame([$filter], $filters[Query::OBJECT_ID], 'Range filter with both bound is added.');
+        $this->assertSame([$filter], $filters[Query::OBJECT_ID], 'Range filter with both bound is added.');
     }
 
     #[Depends('testAddUnexpectedFilter')]
     public function testAddDateRangeFilter(): void
     {
-        $min = new DateTimeImmutable('-1 day');
-        $max = new DateTimeImmutable('+1 day');
+        $min = new \DateTimeImmutable('-1 day');
+        $max = new \DateTimeImmutable('+1 day');
 
         // only min bound
         $query = new Query('author_audit', $this->createConnection(), 'UTC');
@@ -111,7 +125,7 @@ final class QueryTest extends TestCase
         $query->addFilter($filter);
 
         $filters = $query->getFilters();
-        self::assertSame([$filter], $filters[Query::CREATED_AT], 'Date range filter with min bound only is added.');
+        $this->assertSame([$filter], $filters[Query::CREATED_AT], 'Date range filter with min bound only is added.');
 
         // only max bound
         $query = new Query('author_audit', $this->createConnection(), 'UTC');
@@ -119,7 +133,7 @@ final class QueryTest extends TestCase
         $query->addFilter($filter);
 
         $filters = $query->getFilters();
-        self::assertSame([$filter], $filters[Query::CREATED_AT], 'Date range filter with max bound only is added.');
+        $this->assertSame([$filter], $filters[Query::CREATED_AT], 'Date range filter with max bound only is added.');
 
         // min and max bound
         $query = new Query('author_audit', $this->createConnection(), 'UTC');
@@ -127,14 +141,14 @@ final class QueryTest extends TestCase
         $query->addFilter($filter);
 
         $filters = $query->getFilters();
-        self::assertSame([$filter], $filters[Query::CREATED_AT], 'Date range filter with both bound is added.');
+        $this->assertSame([$filter], $filters[Query::CREATED_AT], 'Date range filter with both bound is added.');
     }
 
     public function testNoOrderByByDefault(): void
     {
         $query = new Query('author_audit', $this->createConnection(), 'UTC');
 
-        self::assertSame([], $query->getOrderBy(), 'No ORDER BY by default.');
+        $this->assertSame([], $query->getOrderBy(), 'No ORDER BY by default.');
     }
 
     #[Depends('testNoOrderByByDefault')]
@@ -144,11 +158,11 @@ final class QueryTest extends TestCase
         $query->addOrderBy(Query::TRANSACTION_HASH, 'ASC');
 
         $orderBy = $query->getOrderBy();
-        self::assertSame('ASC', $orderBy[Query::TRANSACTION_HASH], 'ORDER BY is added.');
+        $this->assertSame('ASC', $orderBy[Query::TRANSACTION_HASH], 'ORDER BY is added.');
 
         $query->addOrderBy(Query::TRANSACTION_HASH, 'DESC');
         $orderBy = $query->getOrderBy();
-        self::assertSame('DESC', $orderBy[Query::TRANSACTION_HASH], 'ORDER BY is overwritten.');
+        $this->assertSame('DESC', $orderBy[Query::TRANSACTION_HASH], 'ORDER BY is overwritten.');
 
         $query->addOrderBy(Query::OBJECT_ID, 'ASC');
         $orderBy = $query->getOrderBy();
@@ -158,7 +172,7 @@ final class QueryTest extends TestCase
             Query::OBJECT_ID => 'ASC',
         ];
 
-        self::assertSame($expected, $orderBy, 'Second ORDER BY is added.');
+        $this->assertSame($expected, $orderBy, 'Second ORDER BY is added.');
     }
 
     #[Depends('testAddOrderBy')]
@@ -175,7 +189,7 @@ final class QueryTest extends TestCase
     {
         $query = new Query('author_audit', $this->createConnection(), 'UTC');
 
-        self::assertSame([0, 0], $query->getLimit(), 'No LIMIT by default.');
+        $this->assertSame([0, 0], $query->getLimit(), 'No LIMIT by default.');
     }
 
     #[Depends('testNoLimitNoOffsetByDefault')]
@@ -184,7 +198,7 @@ final class QueryTest extends TestCase
         $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $query->limit(10);
 
-        self::assertSame([10, 0], $query->getLimit(), 'LIMIT without offset is OK.');
+        $this->assertSame([10, 0], $query->getLimit(), 'LIMIT without offset is OK.');
     }
 
     #[Depends('testNoLimitNoOffsetByDefault')]
@@ -193,7 +207,7 @@ final class QueryTest extends TestCase
         $query = new Query('author_audit', $this->createConnection(), 'UTC');
         $query->limit(10, 50);
 
-        self::assertSame([10, 50], $query->getLimit(), 'LIMIT with offset is OK.');
+        $this->assertSame([10, 50], $query->getLimit(), 'LIMIT with offset is OK.');
     }
 
     #[Depends('testNoLimitNoOffsetByDefault')]
@@ -225,8 +239,8 @@ final class QueryTest extends TestCase
         // test default SQL query
         $expectedQuery = 'SELECT * FROM author_audit at';
         $expectedParameters = [];
-        self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'Default SQL query is OK.');
-        self::assertSame($expectedParameters, $queryBuilder->getParameters(), 'No parameters if no filters.');
+        $this->assertSame($expectedQuery, $queryBuilder->getSQL(), 'Default SQL query is OK.');
+        $this->assertSame($expectedParameters, $queryBuilder->getParameters(), 'No parameters if no filters.');
     }
 
     #[Depends('testBuildQueryBuilderDefault')]
@@ -242,8 +256,8 @@ final class QueryTest extends TestCase
         ];
         $query->addFilter(new SimpleFilter(Query::TRANSACTION_HASH, '123abc'));
         $queryBuilder = $reflectedMethod->invokeArgs($query, []);
-        self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with 1 filter.');
-        self::assertSame($expectedParameters, $queryBuilder->getParameters(), 'Parameters OK with 1 filter.');
+        $this->assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with 1 filter.');
+        $this->assertSame($expectedParameters, $queryBuilder->getParameters(), 'Parameters OK with 1 filter.');
 
         // test SQL query with 2 filters
         $expectedQuery = 'SELECT * FROM author_audit at WHERE transaction_hash IN (:transaction_hash)';
@@ -252,8 +266,8 @@ final class QueryTest extends TestCase
         ];
         $query->addFilter(new SimpleFilter(Query::TRANSACTION_HASH, '456def'));
         $queryBuilder = $reflectedMethod->invokeArgs($query, []);
-        self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with 2 filters.');
-        self::assertSame($expectedParameters, $queryBuilder->getParameters(), 'Parameters OK with 2 filters.');
+        $this->assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with 2 filters.');
+        $this->assertSame($expectedParameters, $queryBuilder->getParameters(), 'Parameters OK with 2 filters.');
 
         // test SQL query with 3 filters
         $expectedQuery = 'SELECT * FROM author_audit at WHERE transaction_hash IN (:transaction_hash)';
@@ -262,8 +276,8 @@ final class QueryTest extends TestCase
         ];
         $query->addFilter(new SimpleFilter(Query::TRANSACTION_HASH, ['789ghj', '012jkl']));
         $queryBuilder = $reflectedMethod->invokeArgs($query, []);
-        self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with 3 filters.');
-        self::assertSame($expectedParameters, $queryBuilder->getParameters(), 'Parameters OK with 3 filters.');
+        $this->assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with 3 filters.');
+        $this->assertSame($expectedParameters, $queryBuilder->getParameters(), 'Parameters OK with 3 filters.');
     }
 
     #[Depends('testBuildQueryBuilderDefault')]
@@ -276,13 +290,13 @@ final class QueryTest extends TestCase
         $expectedQuery = 'SELECT * FROM author_audit at ORDER BY created_at DESC';
         $query->addOrderBy(Query::CREATED_AT, 'DESC');
         $queryBuilder = $reflectedMethod->invokeArgs($query, []);
-        self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with 1 ORDER BY.');
+        $this->assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with 1 ORDER BY.');
 
         // test SQL query with 2 ORDER BY
         $expectedQuery = 'SELECT * FROM author_audit at ORDER BY created_at DESC, id DESC';
         $query->addOrderBy(Query::ID, 'DESC');
         $queryBuilder = $reflectedMethod->invokeArgs($query, []);
-        self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with 2 ORDER BY.');
+        $this->assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with 2 ORDER BY.');
     }
 
     #[Depends('testBuildQueryBuilderDefault')]
@@ -295,13 +309,13 @@ final class QueryTest extends TestCase
         $expectedQuery = 'SELECT * FROM author_audit at LIMIT 10';
         $query->limit(10);
         $queryBuilder = $reflectedMethod->invokeArgs($query, []);
-        self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with LIMIT.');
+        $this->assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with LIMIT.');
 
         // test SQL query with LIMIT
         $expectedQuery = 'SELECT * FROM author_audit at LIMIT 10 OFFSET 50';
         $query->limit(10, 50);
         $queryBuilder = $reflectedMethod->invokeArgs($query, []);
-        self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with LIMIT.');
+        $this->assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with LIMIT.');
     }
 
     #[Depends('testBuildQueryBuilderDefault')]
@@ -314,7 +328,7 @@ final class QueryTest extends TestCase
         $expectedQuery = 'SELECT * FROM author_audit at WHERE object_id >= :min_object_id';
         $query->addFilter(new RangeFilter(Query::OBJECT_ID, 5));
         $queryBuilder = $reflectedMethod->invokeArgs($query, []);
-        self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with min bound only.');
+        $this->assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with min bound only.');
 
         // test SQL query with a range filter, max bound only
         $query = new Query('author_audit', $this->createConnection(), 'UTC');
@@ -323,7 +337,7 @@ final class QueryTest extends TestCase
         $expectedQuery = 'SELECT * FROM author_audit at WHERE object_id <= :max_object_id';
         $query->addFilter(new RangeFilter(Query::OBJECT_ID, null, 25));
         $queryBuilder = $reflectedMethod->invokeArgs($query, []);
-        self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with max bound only.');
+        $this->assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with max bound only.');
 
         // test SQL query with a range filter with both bounds
         $query = new Query('author_audit', $this->createConnection(), 'UTC');
@@ -332,14 +346,14 @@ final class QueryTest extends TestCase
         $expectedQuery = 'SELECT * FROM author_audit at WHERE object_id >= :min_object_id AND object_id <= :max_object_id';
         $query->addFilter(new RangeFilter(Query::OBJECT_ID, 5, 25));
         $queryBuilder = $reflectedMethod->invokeArgs($query, []);
-        self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with max bound only.');
+        $this->assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with max bound only.');
     }
 
     #[Depends('testBuildQueryBuilderDefault')]
     public function testBuildQueryBuilderDateRangeFilter(): void
     {
-        $min = new DateTimeImmutable('-1 day');
-        $max = new DateTimeImmutable('+1 day');
+        $min = new \DateTimeImmutable('-1 day');
+        $max = new \DateTimeImmutable('+1 day');
 
         // test SQL query with a date range filter, min bound only
         $query = new Query('author_audit', $this->createConnection(), 'UTC');
@@ -348,7 +362,7 @@ final class QueryTest extends TestCase
         $expectedQuery = 'SELECT * FROM author_audit at WHERE object_id >= :min_object_id';
         $query->addFilter(new RangeFilter(Query::OBJECT_ID, $min->format('Y-m-d H:i:s')));
         $queryBuilder = $reflectedMethod->invokeArgs($query, []);
-        self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with min bound only.');
+        $this->assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with min bound only.');
 
         // test SQL query with a date range filter, max bound only
         $query = new Query('author_audit', $this->createConnection(), 'UTC');
@@ -357,7 +371,7 @@ final class QueryTest extends TestCase
         $expectedQuery = 'SELECT * FROM author_audit at WHERE object_id <= :max_object_id';
         $query->addFilter(new RangeFilter(Query::OBJECT_ID, null, $max->format('Y-m-d H:i:s')));
         $queryBuilder = $reflectedMethod->invokeArgs($query, []);
-        self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with max bound only.');
+        $this->assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with max bound only.');
 
         // test SQL query with a date range filter with both bounds
         $query = new Query('author_audit', $this->createConnection(), 'UTC');
@@ -366,6 +380,6 @@ final class QueryTest extends TestCase
         $expectedQuery = 'SELECT * FROM author_audit at WHERE object_id >= :min_object_id AND object_id <= :max_object_id';
         $query->addFilter(new RangeFilter(Query::OBJECT_ID, $min->format('Y-m-d H:i:s'), $max->format('Y-m-d H:i:s')));
         $queryBuilder = $reflectedMethod->invokeArgs($query, []);
-        self::assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with max bound only.');
+        $this->assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with max bound only.');
     }
 }

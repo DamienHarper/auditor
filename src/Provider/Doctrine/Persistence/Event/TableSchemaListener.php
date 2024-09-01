@@ -10,14 +10,9 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 
-final class TableSchemaListener
+final readonly class TableSchemaListener
 {
-    private DoctrineProvider $provider;
-
-    public function __construct(DoctrineProvider $provider)
-    {
-        $this->provider = $provider;
-    }
+    public function __construct(private DoctrineProvider $provider) {}
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs): void
     {

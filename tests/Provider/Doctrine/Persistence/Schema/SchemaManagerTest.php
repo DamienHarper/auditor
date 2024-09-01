@@ -4,14 +4,29 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema;
 
+use DH\Auditor\Auditor;
+use DH\Auditor\EventSubscriber\AuditEventSubscriber;
+use DH\Auditor\Provider\AbstractProvider;
+use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
+use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHConnection;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHMiddleware;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionHydrator;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionProcessor;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
+use DH\Auditor\Provider\Doctrine\Persistence\Event\TableSchemaListener;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\PlatformHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
+use DH\Auditor\Provider\Doctrine\Service\DoctrineService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
+use DH\Auditor\Provider\Service\AbstractService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Dog;
@@ -28,6 +43,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -36,6 +52,28 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversClass(SchemaManager::class)]
+#[CoversClass(Auditor::class)]
+#[CoversClass(\DH\Auditor\Configuration::class)]
+#[CoversClass(AuditEventSubscriber::class)]
+#[CoversClass(AbstractProvider::class)]
+#[CoversClass(AnnotationLoader::class)]
+#[CoversClass(DoctrineSubscriber::class)]
+#[CoversClass(TransactionHydrator::class)]
+#[CoversClass(TransactionManager::class)]
+#[CoversClass(TransactionProcessor::class)]
+#[CoversClass(Configuration::class)]
+#[CoversClass(DoctrineProvider::class)]
+#[CoversClass(CreateSchemaListener::class)]
+#[CoversClass(TableSchemaListener::class)]
+#[CoversClass(DoctrineHelper::class)]
+#[CoversClass(PlatformHelper::class)]
+#[CoversClass(SchemaHelper::class)]
+#[CoversClass(DoctrineService::class)]
+#[CoversClass(AbstractService::class)]
+#[CoversClass(DHConnection::class)]
+#[CoversClass(DHDriver::class)]
+#[CoversClass(DHMiddleware::class)]
 final class SchemaManagerTest extends TestCase
 {
     use DefaultSchemaSetupTrait;
@@ -127,19 +165,19 @@ final class SchemaManagerTest extends TestCase
         $commentStorageService = $this->provider->getStorageServiceForEntity(Comment::class);
         $tagStorageService = $this->provider->getStorageServiceForEntity(Tag::class);
 
-        self::assertSame($authorStorageService, $postStorageService, 'Author and Post use the same storage entity manager.');
-        self::assertSame($authorStorageService, $commentStorageService, 'Author and Comment use the same storage entity manager.');
-        self::assertSame($authorStorageService, $tagStorageService, 'Author and Tag use the same storage entity manager.');
+        $this->assertSame($authorStorageService, $postStorageService, 'Author and Post use the same storage entity manager.');
+        $this->assertSame($authorStorageService, $commentStorageService, 'Author and Comment use the same storage entity manager.');
+        $this->assertSame($authorStorageService, $tagStorageService, 'Author and Tag use the same storage entity manager.');
 
         $animalStorageService = $this->provider->getStorageServiceForEntity(Animal::class);
         $catStorageService = $this->provider->getStorageServiceForEntity(Cat::class);
         $dogStorageService = $this->provider->getStorageServiceForEntity(Dog::class);
         $vehicleStorageService = $this->provider->getStorageServiceForEntity(Vehicle::class);
 
-        self::assertSame($authorStorageService, $animalStorageService, 'Author and Animal use the same storage entity manager.');
-        self::assertSame($animalStorageService, $catStorageService, 'Animal and Cat use the same storage entity manager.');
-        self::assertSame($animalStorageService, $dogStorageService, 'Animal and Dog use the same storage entity manager.');
-        self::assertSame($animalStorageService, $vehicleStorageService, 'Animal and Vehicle use the same storage entity manager.');
+        $this->assertSame($authorStorageService, $animalStorageService, 'Author and Animal use the same storage entity manager.');
+        $this->assertSame($animalStorageService, $catStorageService, 'Animal and Cat use the same storage entity manager.');
+        $this->assertSame($animalStorageService, $dogStorageService, 'Animal and Dog use the same storage entity manager.');
+        $this->assertSame($animalStorageService, $vehicleStorageService, 'Animal and Vehicle use the same storage entity manager.');
     }
 
     public function testCreateAuditTable(): void
@@ -154,7 +192,7 @@ final class SchemaManagerTest extends TestCase
         $fromSchema = $schemaManager->introspectSchema();
 
         // at this point, schema is populated but does not contain any audit table
-        self::assertNull($this->getTable($schemaManager->listTables(), 'author_audit'), 'author_audit does not exist yet.');
+        $this->assertNull($this->getTable($schemaManager->listTables(), 'author_audit'), 'author_audit does not exist yet.');
 
         // create audit table for Author entity
         $this->doConfigureEntities();
@@ -163,21 +201,21 @@ final class SchemaManagerTest extends TestCase
 
         // check audit table has been created
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
-        self::assertNotNull($authorAuditTable, 'author_audit table has been created.');
+        $this->assertNotNull($authorAuditTable, 'author_audit table has been created.');
 
         // check expected columns
         $expected = SchemaHelper::getAuditTableColumns();
         foreach (array_keys($expected) as $name) {
-            self::assertTrue($authorAuditTable->hasColumn($name), 'audit table has a column named "'.$name.'".');
+            $this->assertTrue($authorAuditTable->hasColumn($name), 'audit table has a column named "'.$name.'".');
         }
 
         // check expected indices
         $expected = SchemaHelper::getAuditTableIndices($authorAuditTable->getName());
         foreach ($expected as $name => $options) {
             if ('primary' === $options['type']) {
-                self::assertNotNull($authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
+                $this->assertNotNull($authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
             } else {
-                self::assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
+                $this->assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
             }
         }
     }
@@ -195,7 +233,7 @@ final class SchemaManagerTest extends TestCase
         $fromSchema = DoctrineHelper::introspectSchema($schemaManager);
 
         // at this point, schema is populated but does not contain any audit table
-        self::assertNull($this->getTable($schemaManager->listTables(), 'author_audit'), 'author_audit does not exist yet.');
+        $this->assertNull($this->getTable($schemaManager->listTables(), 'author_audit'), 'author_audit does not exist yet.');
 
         // create audit table for Author entity
         $this->doConfigureEntities();
@@ -243,15 +281,15 @@ final class SchemaManagerTest extends TestCase
 
         // check expected alternate columns
         foreach (array_keys(self::ALTERNATE_COLUMNS) as $name) {
-            self::assertTrue($authorAuditTable->hasColumn($name), 'audit table has a column named "'.$name.'".');
+            $this->assertTrue($authorAuditTable->hasColumn($name), 'audit table has a column named "'.$name.'".');
         }
 
         // check expected alternate indices
         foreach ($alternateIndices as $name => $options) {
             if ('primary' === $options['type']) {
-                self::assertNotNull($authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
+                $this->assertNotNull($authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
             } else {
-                self::assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
+                $this->assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
             }
         }
 
@@ -265,15 +303,15 @@ final class SchemaManagerTest extends TestCase
 
         // check expected columns
         foreach (array_keys(SchemaHelper::getAuditTableColumns()) as $name) {
-            self::assertTrue($authorAuditTable->hasColumn($name), 'audit table has a column named "'.$name.'".');
+            $this->assertTrue($authorAuditTable->hasColumn($name), 'audit table has a column named "'.$name.'".');
         }
 
         // check expected indices
         foreach (SchemaHelper::getAuditTableIndices($authorAuditTable->getName()) as $name => $options) {
             if ('primary' === $options['type']) {
-                self::assertNotNull($authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
+                $this->assertNotNull($authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
             } else {
-                self::assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
+                $this->assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
             }
         }
     }

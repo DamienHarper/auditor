@@ -6,15 +6,7 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter;
 
 final class SimpleFilter implements FilterInterface
 {
-    private string $name;
-
-    private mixed $value;
-
-    public function __construct(string $name, mixed $value)
-    {
-        $this->name = $name;
-        $this->value = $value;
-    }
+    public function __construct(private readonly string $name, private mixed $value) {}
 
     public function getName(): string
     {

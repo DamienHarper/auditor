@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests;
 
+use DH\Auditor\Configuration;
 use DH\Auditor\Tests\Traits\AuditorConfigurationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -12,6 +15,8 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversClass(Configuration::class)]
+#[CoversTrait(AuditorConfigurationTrait::class)]
 final class ConfigurationTest extends TestCase
 {
     use AuditorConfigurationTrait;
@@ -20,7 +25,7 @@ final class ConfigurationTest extends TestCase
     {
         $configuration = $this->createAuditorConfiguration();
 
-        self::assertTrue($configuration->isEnabled(), 'Auditor is enabled by default.');
+        $this->assertTrue($configuration->isEnabled(), 'Auditor is enabled by default.');
     }
 
     public function testDisable(): void
@@ -28,7 +33,7 @@ final class ConfigurationTest extends TestCase
         $configuration = $this->createAuditorConfiguration();
         $configuration->disable();
 
-        self::assertFalse($configuration->isEnabled(), 'Auditor is disabled.');
+        $this->assertFalse($configuration->isEnabled(), 'Auditor is disabled.');
     }
 
     public function testEnable(): void
@@ -37,14 +42,14 @@ final class ConfigurationTest extends TestCase
         $configuration->disable();
         $configuration->enable();
 
-        self::assertTrue($configuration->isEnabled(), 'Auditor is enabled.');
+        $this->assertTrue($configuration->isEnabled(), 'Auditor is enabled.');
     }
 
     public function testDefaultTimezoneIsUTC(): void
     {
         $configuration = $this->createAuditorConfiguration();
 
-        self::assertSame('UTC', $configuration->getTimezone(), 'Default timezone is UTC.');
+        $this->assertSame('UTC', $configuration->getTimezone(), 'Default timezone is UTC.');
     }
 
     public function testCustomTimezone(): void
@@ -53,6 +58,6 @@ final class ConfigurationTest extends TestCase
             'timezone' => 'Europe/Paris',
         ]);
 
-        self::assertSame('Europe/Paris', $configuration->getTimezone(), 'Custom timezone is "Europe/Paris".');
+        $this->assertSame('Europe/Paris', $configuration->getTimezone(), 'Custom timezone is "Europe/Paris".');
     }
 }

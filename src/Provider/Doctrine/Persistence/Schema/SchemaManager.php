@@ -26,14 +26,9 @@ use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 /**
  * @see SchemaManagerTest
  */
-final class SchemaManager
+final readonly class SchemaManager
 {
-    private DoctrineProvider $provider;
-
-    public function __construct(DoctrineProvider $provider)
-    {
-        $this->provider = $provider;
-    }
+    public function __construct(private DoctrineProvider $provider) {}
 
     public function updateAuditSchema(?array $sqls = null, ?callable $callback = null): void
     {
@@ -244,7 +239,7 @@ final class SchemaManager
      */
     public function resolveTableName(string $tableName, string $namespaceName, AbstractPlatform $platform): string
     {
-        if (empty($namespaceName)) {
+        if ('' === $namespaceName || '0' === $namespaceName) {
             $prefix = '';
         } elseif (!$platform->supportsSchemas()) {
             $prefix = $namespaceName.'__';

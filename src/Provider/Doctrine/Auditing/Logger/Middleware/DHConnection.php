@@ -12,12 +12,9 @@ use Doctrine\DBAL\Driver\Middleware\AbstractConnectionMiddleware;
  */
 final class DHConnection extends AbstractConnectionMiddleware
 {
-    private DHDriver $DHDriver;
-
-    public function __construct(ConnectionInterface $connection, DHDriver $DHDriver)
+    public function __construct(ConnectionInterface $connection, private readonly DHDriver $DHDriver)
     {
         parent::__construct($connection);
-        $this->DHDriver = $DHDriver;
     }
 
     public function commit(): bool

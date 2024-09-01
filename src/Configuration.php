@@ -13,7 +13,7 @@ final class Configuration
 {
     private bool $enabled;
 
-    private string $timezone;
+    private readonly string $timezone;
 
     /**
      * @var null|callable

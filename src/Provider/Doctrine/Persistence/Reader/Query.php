@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
 
-use DateTimeImmutable;
-use DateTimeZone;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Model\Entry;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
@@ -17,7 +15,6 @@ use DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader\QueryTest;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
-use Exception;
 
 /**
  * @see QueryTest
@@ -63,21 +60,15 @@ final class Query
 
     private array $orderBy = [];
 
-    private Connection $connection;
-
-    private string $table;
-
     private int $offset = 0;
 
     private int $limit = 0;
 
-    private DateTimeZone $timezone;
+    private readonly \DateTimeZone $timezone;
 
-    public function __construct(string $table, Connection $connection, string $timezone)
+    public function __construct(private readonly string $table, private readonly Connection $connection, string $timezone)
     {
-        $this->connection = $connection;
-        $this->table = $table;
-        $this->timezone = new DateTimeZone($timezone);
+        $this->timezone = new \DateTimeZone($timezone);
 
         foreach ($this->getSupportedFilters() as $filterType) {
             $this->filters[$filterType] = [];
@@ -96,7 +87,7 @@ final class Query
         \assert($statement instanceof Result);
         foreach ($statement->fetchAllAssociative() as $row) {
             \assert(\is_string($row['created_at']));
-            $row['created_at'] = new DateTimeImmutable($row['created_at'], $this->timezone);
+            $row['created_at'] = new \DateTimeImmutable($row['created_at'], $this->timezone);
             $result[] = Entry::fromArray($row);
         }
 
@@ -117,7 +108,7 @@ final class Query
 
             /** @var false|int $result */
             $result = $queryBuilder->executeQuery()->fetchOne();
-        } catch (Exception) {
+        } catch (\Exception) {
             $result = false;
         }
 

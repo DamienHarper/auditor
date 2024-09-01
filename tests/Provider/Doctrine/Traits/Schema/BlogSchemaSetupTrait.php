@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits\Schema;
 
-use DateTimeImmutable;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
@@ -67,7 +66,7 @@ trait BlogSchemaSetupTrait
         $post1
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new DateTimeImmutable('2020-01-17 22:17:34'))
+            ->setCreatedAt(new \DateTimeImmutable('2020-01-17 22:17:34'))
         ;
         $auditingServices[Post::class]->getEntityManager()->persist($post1);
 
@@ -75,7 +74,7 @@ trait BlogSchemaSetupTrait
         $post2
             ->setTitle('Second post')
             ->setBody('Here is another body')
-            ->setCreatedAt(new DateTimeImmutable('2020-01-17 22:17:34'))
+            ->setCreatedAt(new \DateTimeImmutable('2020-01-17 22:17:34'))
         ;
         $auditingServices[Post::class]->getEntityManager()->persist($post2);
 
@@ -83,7 +82,7 @@ trait BlogSchemaSetupTrait
         $post3
             ->setTitle('Third post')
             ->setBody('Here is another body')
-            ->setCreatedAt(new DateTimeImmutable('2020-01-17 22:17:34'))
+            ->setCreatedAt(new \DateTimeImmutable('2020-01-17 22:17:34'))
         ;
         $auditingServices[Post::class]->getEntityManager()->persist($post3);
 
@@ -91,7 +90,7 @@ trait BlogSchemaSetupTrait
         $post4
             ->setTitle('Fourth post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new DateTimeImmutable('2020-01-17 22:17:34'))
+            ->setCreatedAt(new \DateTimeImmutable('2020-01-17 22:17:34'))
         ;
         $auditingServices[Post::class]->getEntityManager()->persist($post4);
 
@@ -100,7 +99,7 @@ trait BlogSchemaSetupTrait
         $comment1
             ->setBody('First comment about post #1')
             ->setAuthor('Dark Vador')
-            ->setCreatedAt(new DateTimeImmutable('2020-01-17 22:17:34'))
+            ->setCreatedAt(new \DateTimeImmutable('2020-01-17 22:17:34'))
         ;
         $auditingServices[Comment::class]->getEntityManager()->persist($comment1);
 
@@ -108,7 +107,7 @@ trait BlogSchemaSetupTrait
         $comment2
             ->setBody('First comment about post #3')
             ->setAuthor('Yoshi')
-            ->setCreatedAt(new DateTimeImmutable('2020-01-17 22:17:34'))
+            ->setCreatedAt(new \DateTimeImmutable('2020-01-17 22:17:34'))
         ;
         $auditingServices[Comment::class]->getEntityManager()->persist($comment2);
 
@@ -116,7 +115,7 @@ trait BlogSchemaSetupTrait
         $comment3
             ->setBody('Second comment about post #3')
             ->setAuthor('Mario')
-            ->setCreatedAt(new DateTimeImmutable('2020-01-17 22:17:34'))
+            ->setCreatedAt(new \DateTimeImmutable('2020-01-17 22:17:34'))
         ;
         $auditingServices[Comment::class]->getEntityManager()->persist($comment3);
 

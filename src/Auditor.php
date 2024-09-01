@@ -8,7 +8,6 @@ use DH\Auditor\EventSubscriber\AuditEventSubscriber;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Exception\ProviderException;
 use DH\Auditor\Provider\ProviderInterface;
-use ReflectionException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -16,8 +15,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 final class Auditor
 {
-    private Configuration $configuration;
-
     /**
      * @var ProviderInterface[]
      */
@@ -33,18 +30,13 @@ final class Auditor
      */
     private array $auditProviders = [];
 
-    private EventDispatcherInterface $dispatcher;
-
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
-    public function __construct(Configuration $configuration, EventDispatcherInterface $dispatcher)
+    public function __construct(private readonly Configuration $configuration, private readonly EventDispatcherInterface $dispatcher)
     {
-        $this->configuration = $configuration;
-        $this->dispatcher = $dispatcher;
-
         // Attach persistence event subscriber to provided dispatcher
-        $dispatcher->addSubscriber(new AuditEventSubscriber($this));
+        $this->dispatcher->addSubscriber(new AuditEventSubscriber($this));
     }
 
     public function getEventDispatcher(): EventDispatcherInterface

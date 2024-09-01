@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Model;
 
-use DateTimeImmutable;
 use DH\Auditor\Model\Entry;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 /**
  * @internal
  */
 #[Small]
+#[CoversClass(Entry::class)]
 final class EntryTest extends TestCase
 {
     public function testAccessors(): void
@@ -28,11 +28,11 @@ final class EntryTest extends TestCase
             'blame_user_fqdn' => 'Acme\User',
             'blame_user_firewall' => 'main',
             'ip' => '1.2.3.4',
-            'created_at' => new DateTimeImmutable(),
+            'created_at' => new \DateTimeImmutable(),
         ];
 
         $entry = new Entry();
-        $reflectionClass = new ReflectionClass(Entry::class);
+        $reflectionClass = new \ReflectionClass(Entry::class);
         foreach ($attributes as $name => $value) {
             $attribute = $reflectionClass->getProperty($name);
             $attribute->setAccessible(true);
@@ -40,36 +40,36 @@ final class EntryTest extends TestCase
             $attribute->setAccessible(false);
         }
 
-        self::assertSame(1, $entry->getId(), 'Entry::getId() is ok.');
-        self::assertSame('type', $entry->getType(), 'Entry::getType() is ok.');
-        self::assertSame('1', $entry->getObjectId(), 'Entry::getObjectId() is ok.');
-        self::assertSame([], $entry->getDiffs(), 'Entry::getDiffs() is ok.');
-        self::assertSame(1, $entry->getUserId(), 'Entry::getUserId() is ok.');
-        self::assertSame('John Doe', $entry->getUsername(), 'Entry::getUsername() is ok.');
-        self::assertSame('Acme\User', $entry->getUserFqdn(), 'Entry::getUserFqdn() is ok.');
-        self::assertSame('main', $entry->getUserFirewall(), 'Entry::getUserFirewall() is ok.');
-        self::assertSame('1.2.3.4', $entry->getIp(), 'Entry::getIp() is ok.');
-        self::assertSame($attributes['created_at'], $entry->getCreatedAt(), 'Entry::getCreatedAt() is ok.');
+        $this->assertSame(1, $entry->getId(), 'Entry::getId() is ok.');
+        $this->assertSame('type', $entry->getType(), 'Entry::getType() is ok.');
+        $this->assertSame('1', $entry->getObjectId(), 'Entry::getObjectId() is ok.');
+        $this->assertSame([], $entry->getDiffs(), 'Entry::getDiffs() is ok.');
+        $this->assertSame(1, $entry->getUserId(), 'Entry::getUserId() is ok.');
+        $this->assertSame('John Doe', $entry->getUsername(), 'Entry::getUsername() is ok.');
+        $this->assertSame('Acme\User', $entry->getUserFqdn(), 'Entry::getUserFqdn() is ok.');
+        $this->assertSame('main', $entry->getUserFirewall(), 'Entry::getUserFirewall() is ok.');
+        $this->assertSame('1.2.3.4', $entry->getIp(), 'Entry::getIp() is ok.');
+        $this->assertSame($attributes['created_at'], $entry->getCreatedAt(), 'Entry::getCreatedAt() is ok.');
     }
 
     public function testUndefinedUser(): void
     {
         $entry = new Entry();
 
-        self::assertNull($entry->getUserId(), 'Entry::getUserId() is ok with undefined user.');
-        self::assertNull($entry->getUsername(), 'Entry::getUsername() is ok with undefined user.');
+        $this->assertNull($entry->getUserId(), 'Entry::getUserId() is ok with undefined user.');
+        $this->assertNull($entry->getUsername(), 'Entry::getUsername() is ok with undefined user.');
     }
 
     public function testGetDiffsReturnsAnArray(): void
     {
         $entry = new Entry();
-        $reflectionClass = new ReflectionClass(Entry::class);
+        $reflectionClass = new \ReflectionClass(Entry::class);
 
         $attribute = $reflectionClass->getProperty('diffs');
         $attribute->setAccessible(true);
         $attribute->setValue($entry, '{}');
         $attribute->setAccessible(false);
 
-        self::assertIsArray($entry->getDiffs(), 'Entry::getDiffs() returns an array.');
+        $this->assertIsArray($entry->getDiffs(), 'Entry::getDiffs() returns an array.');
     }
 }

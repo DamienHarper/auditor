@@ -5,7 +5,14 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine\Auditing\Annotation;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
+use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Auditable;
+use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHConnection;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHMiddleware;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\EntityManagerInterfaceTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -13,6 +20,13 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversClass(AnnotationLoader::class)]
+#[CoversClass(Auditable::class)]
+#[CoversClass(Security::class)]
+#[CoversClass(DHConnection::class)]
+#[CoversClass(DHDriver::class)]
+#[CoversClass(DHMiddleware::class)]
+#[CoversClass(DoctrineHelper::class)]
 final class AnnotationLoaderTest extends TestCase
 {
     use EntityManagerInterfaceTrait;
@@ -30,7 +44,7 @@ final class AnnotationLoaderTest extends TestCase
 
         $annotationLoader = new AnnotationLoader($entityManager);
         $loaded = $annotationLoader->load();
-        self::assertCount(0, $loaded, 'No annotation loaded using attribute driver');
+        $this->assertCount(0, $loaded, 'No annotation loaded using attribute driver');
     }
 
     public function testLoadEntitiesWithAttributesOnly(): void
@@ -45,6 +59,6 @@ final class AnnotationLoaderTest extends TestCase
         );
         $annotationLoader = new AnnotationLoader($entityManager);
         $loaded = $annotationLoader->load();
-        self::assertCount(2, $loaded);
+        $this->assertCount(2, $loaded);
     }
 }

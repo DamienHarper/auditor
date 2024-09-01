@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Auditing\Event;
 
-use Closure;
 use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Transaction\TransactionManagerInterface;
@@ -13,7 +12,6 @@ use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
-use ReflectionClass;
 
 final class DoctrineSubscriber implements EventSubscriber
 {
@@ -61,7 +59,7 @@ final class DoctrineSubscriber implements EventSubscriber
     /**
      * @internal this method is used to retrieve the wrapped driver from the given driver
      */
-    public function getWrappedDriver(Driver $driver): Closure|Driver
+    public function getWrappedDriver(Driver $driver): \Closure|Driver
     {
         $that = $this;
 
@@ -72,15 +70,14 @@ final class DoctrineSubscriber implements EventSubscriber
 
         // if the driver is an instance of AbstractDriverMiddleware, return the wrapped driver
         if ($driver instanceof AbstractDriverMiddleware) {
-            return Closure::bind(function () use ($that) {
+            return \Closure::bind(fn (): \Closure|\Doctrine\DBAL\Driver =>
                 // @var AbstractDriverMiddleware $this
-                return $that->getWrappedDriver($this->wrappedDriver);
-            }, $driver, AbstractDriverMiddleware::class)();
+                $that->getWrappedDriver($this->wrappedDriver), $driver, AbstractDriverMiddleware::class)();
         }
 
-        return Closure::bind(function () use ($that): Closure|Driver|null {
+        return \Closure::bind(function () use ($that): \Closure|Driver|null {
             /** @var Driver $this */
-            $properties = (new ReflectionClass($this))->getProperties();
+            $properties = (new \ReflectionClass($this))->getProperties();
             foreach ($properties as $property) {
                 $property->setAccessible(true);
                 $value = $property->getValue($this);

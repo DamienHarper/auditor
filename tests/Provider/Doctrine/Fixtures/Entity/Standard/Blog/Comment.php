@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 
-use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -27,7 +26,7 @@ class Comment
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
-    protected ?DateTimeImmutable $created_at = null;
+    protected ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true], nullable: true)]
     protected ?int $post_id = null;
@@ -98,7 +97,7 @@ class Comment
     /**
      * Set the value of created_at.
      */
-    public function setCreatedAt(?DateTimeImmutable $created_at): self
+    public function setCreatedAt(?\DateTimeImmutable $created_at): self
     {
         $this->created_at = $created_at;
 
@@ -108,7 +107,7 @@ class Comment
     /**
      * Get the value of created_at.
      */
-    public function getCreatedAt(): ?DateTimeImmutable
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->created_at;
     }

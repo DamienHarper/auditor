@@ -24,7 +24,6 @@ use DH\Auditor\Tests\Provider\Doctrine\DoctrineProviderTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ToolEvents;
-use Exception;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -49,7 +48,7 @@ final class DoctrineProvider extends AbstractProvider
         'created_at' => '?',
     ];
 
-    private TransactionManager $transactionManager;
+    private readonly TransactionManager $transactionManager;
 
     public function __construct(ConfigurationInterface $configuration)
     {
@@ -91,7 +90,7 @@ final class DoctrineProvider extends AbstractProvider
                 $service->getEntityManager()->getClassMetadata($entity)->getTableName();
 
                 return $service;
-            } catch (Exception) {
+            } catch (\Exception) {
             }
         }
 

@@ -12,8 +12,6 @@ use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
-use Throwable;
-use UnitEnum;
 
 trait AuditTrait
 {
@@ -72,7 +70,7 @@ trait AuditTrait
             return null;
         }
 
-        if (interface_exists(UnitEnum::class) && $value instanceof UnitEnum && property_exists($value, 'value')) { /** @phpstan-ignore-line */
+        if (interface_exists(\UnitEnum::class) && $value instanceof \UnitEnum && property_exists($value, 'value')) { /** @phpstan-ignore-line */
             $value = $value->value;
         }
 
@@ -80,6 +78,8 @@ trait AuditTrait
 
         switch (array_search($type::class, Type::getTypesMap(), true)) {
             case DoctrineHelper::getDoctrineType('BIGINT'):
+            case 'ulid':
+                // Ramsey UUID / Symfony UID (UUID/ULID)
                 $convertedValue = (string) $value;  // @phpstan-ignore-line
 
                 break;
@@ -100,12 +100,6 @@ trait AuditTrait
             case 'uuid_binary':
             case 'uuid_binary_ordered_time':
             case 'uuid':
-            case 'ulid':
-                // Ramsey UUID / Symfony UID (UUID/ULID)
-                $convertedValue = (string) $value;  // @phpstan-ignore-line
-
-                break;
-
             case DoctrineHelper::getDoctrineType('BLOB'):
             case DoctrineHelper::getDoctrineType('BINARY'):
                 if (\is_resource($value)) {
@@ -202,7 +196,7 @@ trait AuditTrait
         if (method_exists($entity, '__toString')) {
             try {
                 $label = (string) $entity;
-            } catch (Throwable) {
+            } catch (\Throwable) {
                 $label = DoctrineHelper::getRealClassName($entity).(null === $pkValue ? '' : '#'.$pkValue);
             }
         } else {
