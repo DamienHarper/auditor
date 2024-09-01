@@ -10,6 +10,7 @@ use DH\Auditor\Transaction\TransactionManagerInterface;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
 
@@ -18,7 +19,10 @@ final class DoctrineSubscriber implements EventSubscriber
     /** @var Transaction[] */
     private array $transactions = [];
 
-    public function __construct(private readonly TransactionManagerInterface $transactionManager) {}
+    public function __construct(
+        private readonly TransactionManagerInterface $transactionManager,
+        private readonly EntityManagerInterface $entityManager
+    ) {}
 
     /**
      * It is called inside EntityManager#flush() after the changes to all the managed entities
@@ -28,16 +32,15 @@ final class DoctrineSubscriber implements EventSubscriber
      */
     public function onFlush(OnFlushEventArgs $args): void
     {
-        $entityManager = $args->getObjectManager();
-        $entityManagerId = spl_object_id($entityManager);
+        $entityManagerId = spl_object_id($this->entityManager);
 
         // cached transaction model, if it holds same EM no need to create a new one
-        $transaction = ($this->transactions[$entityManagerId] ??= new Transaction($entityManager));
+        $transaction = ($this->transactions[$entityManagerId] ??= new Transaction($this->entityManager));
 
         // Populate transaction
         $this->transactionManager->populate($transaction);
 
-        $driver = $entityManager->getConnection()->getDriver();
+        $driver = $this->entityManager->getConnection()->getDriver();
 
         if (!$driver instanceof DHDriver) {
             $driver = $this->getWrappedDriver($driver);
