@@ -24,7 +24,7 @@ class Comment
     #[ORM\Column(type: Types::STRING, length: 255)]
     protected ?string $author = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
     protected ?\DateTimeImmutable $created_at = null;
 
