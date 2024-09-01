@@ -27,6 +27,7 @@ return RectorConfig::configure()
         SymfonySetList::SYMFONY_54,
         PHPUnitSetList::PHPUNIT_110,
         DoctrineSetList::DOCTRINE_CODE_QUALITY,
+        DoctrineSetList::DOCTRINE_ORM_29,
         DoctrineSetList::DOCTRINE_DBAL_40,
     ])
     ->withAttributesSets(
