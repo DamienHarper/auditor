@@ -33,27 +33,35 @@ trait AuditTrait
         }
 
         if (isset($meta->fieldMappings[$pk])) {
+            \assert(\is_string($meta->fieldMappings[$pk]['type']));
             $type = Type::getType($meta->fieldMappings[$pk]['type']);
+
+            \assert(\is_object($meta->getReflectionProperty($pk)));
 
             return $this->value($entityManager, $type, $meta->getReflectionProperty($pk)->getValue($entity));
         }
 
-        /**
+        /*
          * Primary key is not part of fieldMapping.
          *
          * @see https://github.com/DamienHarper/auditor-bundle/issues/40
          * @see https://www.doctrine-project.org/projects/doctrine-orm/en/latest/tutorials/composite-primary-keys.html#identity-through-foreign-entities
          * We try to get it from associationMapping (will throw a MappingException if not available)
          */
+        \assert(\is_object($meta->getReflectionProperty($pk)));
         $targetEntity = $meta->getReflectionProperty($pk)->getValue($entity);
 
         $mapping = $meta->getAssociationMapping($pk);
 
+        \assert(\is_string($mapping['targetEntity']));
         $meta = $entityManager->getClassMetadata($mapping['targetEntity']);
         $pk = $meta->getSingleIdentifierFieldName();
+
+        \assert(\is_string($meta->fieldMappings[$pk]['type']));
         $type = Type::getType($meta->fieldMappings[$pk]['type']);
 
         \assert(\is_object($targetEntity));
+        \assert(\is_object($meta->getReflectionProperty($pk)));
 
         return $this->value($entityManager, $type, $meta->getReflectionProperty($pk)->getValue($targetEntity));
     }
@@ -151,6 +159,7 @@ trait AuditTrait
                 && $this->provider->isAuditedField($entity, $fieldName)
             ) {
                 $mapping = $meta->fieldMappings[$fieldName];
+                \assert(\is_string($mapping['type']));
                 $type = Type::getType($mapping['type']);
                 $o = $this->value($entityManager, $type, $old);
                 $n = $this->value($entityManager, $type, $new);

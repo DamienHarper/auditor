@@ -25,7 +25,7 @@ trait EntityManagerInterfaceTrait
 
         $connection = $this->getConnection($connectionName, $params);
 
-        $em = EntityManager::create($connection, $configuration);
+        $em = new EntityManager($connection, $configuration);
         $evm = $em->getEventManager();
         $allListeners = method_exists($evm, 'getAllListeners') ? $evm->getAllListeners() : $evm->getListeners();
         foreach ($allListeners as $event => $listeners) {

@@ -70,7 +70,7 @@ final class DoctrineProvider extends AbstractProvider
         // Register subscribers
         $evm->addEventListener([Events::loadClassMetadata], new TableSchemaListener($this));
         $evm->addEventListener([ToolEvents::postGenerateSchemaTable], new CreateSchemaListener($this));
-        $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager));
+        $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager, $entityManager));
 
         return $this;
     }

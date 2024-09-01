@@ -62,7 +62,7 @@ final class DoctrineSubscriberTest extends TestCase
             ->willReturn($driver)
         ;
 
-        $target = new DoctrineSubscriber($transactionManager);
+        $target = new DoctrineSubscriber($transactionManager, $objectManager);
         $target->onFlush($args);
 
         foreach ($dhDriver->getFlusherList() as $item) {
@@ -117,7 +117,7 @@ final class DoctrineSubscriberTest extends TestCase
             ->willReturn($driver)
         ;
 
-        $target = new DoctrineSubscriber($transactionManager);
+        $target = new DoctrineSubscriber($transactionManager, $objectManager);
         $target->onFlush($args);
 
         foreach ($dhDriver->getFlusherList() as $item) {
@@ -171,7 +171,7 @@ final class DoctrineSubscriberTest extends TestCase
             ->willReturn($configuration = $this->createMock(Configuration::class))
         ;
 
-        $target = new DoctrineSubscriber($transactionManager);
+        $target = new DoctrineSubscriber($transactionManager, $objectManager);
         $target->onFlush($args);
 
         $this->assertTrue(true);
