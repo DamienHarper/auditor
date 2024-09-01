@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware;
+namespace DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware;
 
 use Doctrine\DBAL\Driver as BaseDriver;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;

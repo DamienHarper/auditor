@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Auditing\Event;
 
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\AuditorDriver;
+use DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware\AuditorDriver;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Transaction\TransactionManagerInterface;
 use Doctrine\Common\EventSubscriber;
