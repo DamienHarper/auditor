@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine\Event;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\AuditorDriver;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Transaction\TransactionManagerInterface;
 use Doctrine\DBAL\Configuration;
@@ -27,7 +27,7 @@ use PHPUnit\Framework\TestCase;
 #[Small]
 #[CoversClass(DoctrineSubscriber::class)]
 #[CoversClass(Transaction::class)]
-#[CoversClass(DHDriver::class)]
+#[CoversClass(AuditorDriver::class)]
 final class DoctrineSubscriberTest extends TestCase
 {
     public function testIssue184IfAbstractDriverMiddleware(): void
@@ -49,7 +49,7 @@ final class DoctrineSubscriberTest extends TestCase
         $args = new OnFlushEventArgs($objectManager);
 
         $nativeDriver = $this->createMock(Driver::class);
-        $dhDriver = new DHDriver($nativeDriver);
+        $dhDriver = new AuditorDriver($nativeDriver);
         $driver = new class($dhDriver) extends AbstractDriverMiddleware {};
 
         $objectManager
@@ -91,7 +91,7 @@ final class DoctrineSubscriberTest extends TestCase
         $args = new OnFlushEventArgs($objectManager);
 
         $nativeDriver = $this->createMock(Driver::class);
-        $dhDriver = new DHDriver($nativeDriver);
+        $dhDriver = new AuditorDriver($nativeDriver);
         $driver = new class($dhDriver) implements VersionAwarePlatformDriver {
             public function connect(array $params): void {}
 

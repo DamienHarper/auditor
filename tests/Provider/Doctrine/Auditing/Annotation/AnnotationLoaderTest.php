@@ -7,9 +7,9 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Auditing\Annotation;
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Auditable;
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHConnection;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHMiddleware;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\AuditorConnection;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\AuditorDriver;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\AuditorMiddleware;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\EntityManagerInterfaceTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -23,9 +23,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(AnnotationLoader::class)]
 #[CoversClass(Auditable::class)]
 #[CoversClass(Security::class)]
-#[CoversClass(DHConnection::class)]
-#[CoversClass(DHDriver::class)]
-#[CoversClass(DHMiddleware::class)]
+#[CoversClass(AuditorConnection::class)]
+#[CoversClass(AuditorDriver::class)]
+#[CoversClass(AuditorMiddleware::class)]
 #[CoversClass(DoctrineHelper::class)]
 final class AnnotationLoaderTest extends TestCase
 {

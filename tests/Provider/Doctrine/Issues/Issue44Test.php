@@ -15,9 +15,9 @@ use DH\Auditor\Model\Transaction;
 use DH\Auditor\Provider\AbstractProvider;
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
 use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHConnection;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHMiddleware;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\AuditorConnection;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\AuditorDriver;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\AuditorMiddleware;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\AuditTrait;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionHydrator;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
@@ -58,9 +58,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(AbstractProvider::class)]
 #[CoversClass(AnnotationLoader::class)]
 #[CoversClass(DoctrineSubscriber::class)]
-#[CoversClass(DHConnection::class)]
-#[CoversClass(DHDriver::class)]
-#[CoversClass(DHMiddleware::class)]
+#[CoversClass(AuditorConnection::class)]
+#[CoversClass(AuditorDriver::class)]
+#[CoversClass(AuditorMiddleware::class)]
 #[CoversTrait(AuditTrait::class)]
 #[CoversClass(TransactionHydrator::class)]
 #[CoversClass(TransactionManager::class)]
@@ -79,7 +79,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(DoctrineService::class)]
 #[CoversClass(AbstractService::class)]
 #[CoversClass(User::class)]
-#[CoversClass(DHMiddleware::class)]
+#[CoversClass(AuditorMiddleware::class)]
 final class Issue44Test extends TestCase
 {
     use ReaderTrait;

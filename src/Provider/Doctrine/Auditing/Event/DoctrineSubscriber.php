@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Auditing\Event;
 
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\AuditorDriver;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Transaction\TransactionManagerInterface;
 use Doctrine\Common\EventSubscriber;
@@ -42,12 +42,12 @@ final class DoctrineSubscriber implements EventSubscriber
 
         $driver = $this->entityManager->getConnection()->getDriver();
 
-        if (!$driver instanceof DHDriver) {
+        if (!$driver instanceof AuditorDriver) {
             $driver = $this->getWrappedDriver($driver);
         }
 
-        if ($driver instanceof DHDriver) {
-            $driver->addDHFlusher(function () use ($transaction): void {
+        if ($driver instanceof AuditorDriver) {
+            $driver->addFlusher(function () use ($transaction): void {
                 $this->transactionManager->process($transaction);
                 $transaction->reset();
             });
@@ -67,7 +67,7 @@ final class DoctrineSubscriber implements EventSubscriber
         $that = $this;
 
         // if the driver is already a DHDriver, return it
-        if ($driver instanceof DHDriver) {
+        if ($driver instanceof AuditorDriver) {
             return $driver;
         }
 
