@@ -12,9 +12,10 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection as ConnectionDbal;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\API\MySQL\ExceptionConverter;
+use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\VersionAwarePlatformDriver;
+use Doctrine\DBAL\ServerVersionProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -92,19 +93,23 @@ final class DoctrineSubscriberTest extends TestCase
 
         $nativeDriver = $this->createMock(Driver::class);
         $dhDriver = new AuditorDriver($nativeDriver);
-        $driver = new class($dhDriver) implements VersionAwarePlatformDriver {
-            public function connect(array $params): void {}
+        $driver = new class($dhDriver) implements Driver {
+            public function __construct(private readonly Driver $dhDriver) {}
 
-            public function getDatabasePlatform(): void {}
+            public function connect(array $params): DriverConnection
+            {
+                return $this->dhDriver->connect($params);
+            }
 
-            public function getSchemaManager(ConnectionDbal $conn, AbstractPlatform $platform): void {}
+            public function getDatabasePlatform(ServerVersionProvider $versionProvider): AbstractPlatform
+            {
+                return $this->dhDriver->getDatabasePlatform($versionProvider);
+            }
 
             public function getExceptionConverter(): Driver\API\ExceptionConverter
             {
                 return new ExceptionConverter();
             }
-
-            public function createDatabasePlatformForVersion($version): void {}
         };
 
         $objectManager
@@ -141,19 +146,25 @@ final class DoctrineSubscriberTest extends TestCase
 
         $args = new OnFlushEventArgs($objectManager);
 
-        $driver = new class implements VersionAwarePlatformDriver {
-            public function connect(array $params): void {}
+        $nativeDriver = $this->createMock(Driver::class);
+        $dhDriver = new AuditorDriver($nativeDriver);
+        $driver = new class($dhDriver) implements Driver {
+            public function __construct(private readonly Driver $dhDriver) {}
 
-            public function getDatabasePlatform(): void {}
+            public function connect(array $params): DriverConnection
+            {
+                return $this->dhDriver->connect($params);
+            }
 
-            public function getSchemaManager(ConnectionDbal $conn, AbstractPlatform $platform): void {}
+            public function getDatabasePlatform(ServerVersionProvider $versionProvider): AbstractPlatform
+            {
+                return $this->dhDriver->getDatabasePlatform($versionProvider);
+            }
 
             public function getExceptionConverter(): Driver\API\ExceptionConverter
             {
                 return new ExceptionConverter();
             }
-
-            public function createDatabasePlatformForVersion($version): void {}
         };
 
         $objectManager
