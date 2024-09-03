@@ -11,6 +11,10 @@ parameters:
     paths:
         - src
 
+    excludePaths:
+        # TODO: Remove following lines once doctrine/dbal 4.0 is the minimum supported version
+        - src/Provider/Doctrine/Auditing/DBAL/Middleware/AuditorConnection.php
+
     ignoreErrors:
         - identifier: missingType.iterableValue
         - identifier: missingType.generics

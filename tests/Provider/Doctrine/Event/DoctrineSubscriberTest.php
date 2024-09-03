@@ -16,6 +16,7 @@ use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\ServerVersionProvider;
+use Doctrine\DBAL\VersionAwarePlatformDriver;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -92,25 +93,47 @@ final class DoctrineSubscriberTest extends TestCase
         $args = new OnFlushEventArgs($objectManager);
 
         $nativeDriver = $this->createMock(Driver::class);
-        $dhDriver = new AuditorDriver($nativeDriver);
-        $driver = new class($dhDriver) implements Driver {
-            public function __construct(private readonly Driver $dhDriver) {}
+        $auditorDriver = new AuditorDriver($nativeDriver);
+        if (!interface_exists(VersionAwarePlatformDriver::class)) {
+            $driver = new class($auditorDriver) implements Driver {
+                public function __construct(private readonly Driver $auditorDriver) {}
 
-            public function connect(array $params): DriverConnection
-            {
-                return $this->dhDriver->connect($params);
-            }
+                public function connect(array $params): DriverConnection
+                {
+                    return $this->auditorDriver->connect($params);
+                }
 
-            public function getDatabasePlatform(ServerVersionProvider $versionProvider): AbstractPlatform
-            {
-                return $this->dhDriver->getDatabasePlatform($versionProvider);
-            }
+                public function getDatabasePlatform(ServerVersionProvider $versionProvider): AbstractPlatform
+                {
+                    return $this->auditorDriver->getDatabasePlatform($versionProvider);
+                }
 
-            public function getExceptionConverter(): Driver\API\ExceptionConverter
-            {
-                return new ExceptionConverter();
-            }
-        };
+                public function getExceptionConverter(): Driver\API\ExceptionConverter
+                {
+                    return new ExceptionConverter();
+                }
+            };
+        } else {
+            $driver = new class($auditorDriver) implements VersionAwarePlatformDriver {
+                public function __construct(private readonly Driver $auditorDriver) {}
+
+                public function connect(array $params): DriverConnection
+                {
+                    return $this->auditorDriver->connect($params);
+                }
+
+                public function getDatabasePlatform(): void {}
+
+                public function createDatabasePlatformForVersion($version): void {}
+
+                public function getSchemaManager(ConnectionDbal $conn, AbstractPlatform $platform): void {}
+
+                public function getExceptionConverter(): Driver\API\ExceptionConverter
+                {
+                    return new ExceptionConverter();
+                }
+            };
+        }
 
         $objectManager
             ->method('getConnection')
@@ -125,7 +148,7 @@ final class DoctrineSubscriberTest extends TestCase
         $target = new DoctrineSubscriber($transactionManager, $objectManager);
         $target->onFlush($args);
 
-        foreach ($dhDriver->getFlusherList() as $item) {
+        foreach ($auditorDriver->getFlusherList() as $item) {
             ($item)();
         }
 
@@ -147,25 +170,47 @@ final class DoctrineSubscriberTest extends TestCase
         $args = new OnFlushEventArgs($objectManager);
 
         $nativeDriver = $this->createMock(Driver::class);
-        $dhDriver = new AuditorDriver($nativeDriver);
-        $driver = new class($dhDriver) implements Driver {
-            public function __construct(private readonly Driver $dhDriver) {}
+        $auditorDriver = new AuditorDriver($nativeDriver);
+        if (!interface_exists(VersionAwarePlatformDriver::class)) {
+            $driver = new class($auditorDriver) implements Driver {
+                public function __construct(private readonly Driver $auditorDriver) {}
 
-            public function connect(array $params): DriverConnection
-            {
-                return $this->dhDriver->connect($params);
-            }
+                public function connect(array $params): DriverConnection
+                {
+                    return $this->auditorDriver->connect($params);
+                }
 
-            public function getDatabasePlatform(ServerVersionProvider $versionProvider): AbstractPlatform
-            {
-                return $this->dhDriver->getDatabasePlatform($versionProvider);
-            }
+                public function getDatabasePlatform(ServerVersionProvider $versionProvider): AbstractPlatform
+                {
+                    return $this->auditorDriver->getDatabasePlatform($versionProvider);
+                }
 
-            public function getExceptionConverter(): Driver\API\ExceptionConverter
-            {
-                return new ExceptionConverter();
-            }
-        };
+                public function getExceptionConverter(): Driver\API\ExceptionConverter
+                {
+                    return new ExceptionConverter();
+                }
+            };
+        } else {
+            $driver = new class($auditorDriver) implements VersionAwarePlatformDriver {
+                public function __construct(private readonly Driver $auditorDriver) {}
+
+                public function connect(array $params): DriverConnection
+                {
+                    return $this->auditorDriver->connect($params);
+                }
+
+                public function getDatabasePlatform(): void {}
+
+                public function createDatabasePlatformForVersion($version): void {}
+
+                public function getSchemaManager(ConnectionDbal $conn, AbstractPlatform $platform): void {}
+
+                public function getExceptionConverter(): Driver\API\ExceptionConverter
+                {
+                    return new ExceptionConverter();
+                }
+            };
+        }
 
         $objectManager
             ->method('getConnection')

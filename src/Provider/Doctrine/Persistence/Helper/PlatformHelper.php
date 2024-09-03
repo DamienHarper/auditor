@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\AbstractMySQLDriver;
 
 abstract class PlatformHelper
@@ -49,7 +48,7 @@ abstract class PlatformHelper
     public static function getServerVersion(Connection $connection): ?string
     {
         $nativeConnection = $connection->getNativeConnection();
-        if ($nativeConnection instanceof Driver\Connection) {
+        if (\is_object($nativeConnection) && method_exists($nativeConnection, 'getServerVersion')) {
             return $nativeConnection->getServerVersion();
         }
 
