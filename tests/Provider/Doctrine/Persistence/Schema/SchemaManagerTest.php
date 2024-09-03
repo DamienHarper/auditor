@@ -110,6 +110,7 @@ final class SchemaManagerTest extends TestCase
             'options' => [
                 'default' => null,
                 'notnull' => false,
+                'length' => 50,
             ],
         ],
         'diffs' => [
@@ -125,6 +126,7 @@ final class SchemaManagerTest extends TestCase
                 'default' => null,
                 'notnull' => false,
                 'unsigned' => true,
+                'length' => 50,
             ],
         ],
         'blame_user' => [
