@@ -20,13 +20,13 @@ compose_files = -f tools/docker/compose.yaml
 
 # Set the DATABASE_URL and dedicated compose file based on the selected database
 ifeq ($(db),mysql)
-  DATABASE_URL = "mysql://auditor:password@127.0.0.1:3360/auditor?serverVersion=8&charset=utf8mb4"
+  DATABASE_URL = "mysql://auditor:password@mysql/auditor?serverVersion=8&charset=utf8mb4"
   compose_files += -f tools/docker/compose.mysql.yaml
 else ifeq ($(db),pgsql)
-  DATABASE_URL = "pgsql://postgres:password@127.0.0.1:5432/auditor?serverVersion=15&charset=utf8"
+  DATABASE_URL = "pgsql://postgres:password@pgsql/auditor?serverVersion=15&charset=utf8"
   compose_files += -f tools/docker/compose.pgsql.yaml
 else ifeq ($(db),mariadb)
-  DATABASE_URL = "mysql://auditor:password@127.0.0.1:3366/auditor?serverVersion=8&charset=utf8mb4"
+  DATABASE_URL = "mysql://auditor:password@mariadb/auditor?serverVersion=11&charset=utf8mb4"
   compose_files += -f tools/docker/compose.mariadb.yaml
 else ifeq ($(db),sqlite)
   DATABASE_URL = "sqlite:///:memory:"
