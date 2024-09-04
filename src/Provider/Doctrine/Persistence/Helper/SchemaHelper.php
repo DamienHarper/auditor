@@ -32,6 +32,7 @@ abstract class SchemaHelper
                 'type' => DoctrineHelper::getDoctrineType('STRING'),
                 'options' => [
                     'notnull' => true,
+                    'length' => 255,
                 ],
             ],
             'discriminator' => [
@@ -39,6 +40,7 @@ abstract class SchemaHelper
                 'options' => [
                     'default' => null,
                     'notnull' => false,
+                    'length' => 255,
                 ],
             ],
             'transaction_hash' => [
@@ -60,6 +62,7 @@ abstract class SchemaHelper
                 'options' => [
                     'default' => null,
                     'notnull' => false,
+                    'length' => 255,
                 ],
             ],
             'blame_user' => [

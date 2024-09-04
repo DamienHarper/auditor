@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHMiddleware;
+use DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware\AuditorMiddleware;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
@@ -34,7 +34,7 @@ trait ConnectionTrait
 
         $config = new Configuration();
         $config->setMiddlewares([
-            new DHMiddleware(),
+            new AuditorMiddleware(),
         ]);
         if ('pdo_sqlite' === $params['driver']) {
             // SQLite

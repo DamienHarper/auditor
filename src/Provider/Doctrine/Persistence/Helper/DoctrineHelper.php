@@ -91,8 +91,8 @@ final class DoctrineHelper
      */
     public static function getMigrateToSql(Connection $connection, Schema $fromSchema, Schema $toSchema): array
     {
-        $schemaComparator = new Comparator();
         $platform = $connection->getDatabasePlatform();
+        $schemaComparator = new Comparator($platform);
 
         if (method_exists($platform, 'getAlterSchemaSQL')) {
             return $platform->getAlterSchemaSQL(

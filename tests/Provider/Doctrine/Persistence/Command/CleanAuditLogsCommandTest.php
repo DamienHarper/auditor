@@ -8,10 +8,10 @@ use DH\Auditor\Auditor;
 use DH\Auditor\EventSubscriber\AuditEventSubscriber;
 use DH\Auditor\Provider\AbstractProvider;
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
+use DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware\AuditorConnection;
+use DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware\AuditorDriver;
+use DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware\AuditorMiddleware;
 use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHConnection;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHMiddleware;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionHydrator;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionProcessor;
@@ -65,9 +65,9 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[CoversClass(SchemaManager::class)]
 #[CoversClass(DoctrineService::class)]
 #[CoversClass(AbstractService::class)]
-#[CoversClass(DHConnection::class)]
-#[CoversClass(DHDriver::class)]
-#[CoversClass(DHMiddleware::class)]
+#[CoversClass(AuditorConnection::class)]
+#[CoversClass(AuditorDriver::class)]
+#[CoversClass(AuditorMiddleware::class)]
 final class CleanAuditLogsCommandTest extends TestCase
 {
     use LockableTrait;

@@ -2,29 +2,29 @@
 
 declare(strict_types=1);
 
-namespace DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware;
+namespace DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware;
 
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 
 /**
  * @interal
  */
-final class DHDriver extends AbstractDriverMiddleware
+final class AuditorDriver extends AbstractDriverMiddleware
 {
     /** @var array<callable> */
     private array $flusherList = [];
 
-    public function connect(array $params): DHConnection
+    public function connect(array $params): AuditorConnection
     {
-        return new DHConnection(parent::connect($params), $this);
+        return new AuditorConnection(parent::connect($params), $this);
     }
 
-    public function addDHFlusher(callable $flusher): void
+    public function addFlusher(callable $flusher): void
     {
         $this->flusherList[] = $flusher;
     }
 
-    public function resetDHFlusherList(): void
+    public function resetFlusherList(): void
     {
         $this->flusherList = [];
     }

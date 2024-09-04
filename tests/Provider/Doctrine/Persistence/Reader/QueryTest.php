@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader;
 
 use DH\Auditor\Exception\InvalidArgumentException;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHConnection;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHMiddleware;
+use DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware\AuditorConnection;
+use DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware\AuditorDriver;
+use DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware\AuditorMiddleware;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\DateRangeFilter;
@@ -26,9 +26,9 @@ use PHPUnit\Framework\TestCase;
  */
 #[Small]
 #[CoversClass(Query::class)]
-#[CoversClass(DHConnection::class)]
-#[CoversClass(DHDriver::class)]
-#[CoversClass(DHMiddleware::class)]
+#[CoversClass(AuditorConnection::class)]
+#[CoversClass(AuditorDriver::class)]
+#[CoversClass(AuditorMiddleware::class)]
 #[CoversClass(DoctrineHelper::class)]
 #[CoversClass(SchemaHelper::class)]
 #[CoversClass(RangeFilter::class)]

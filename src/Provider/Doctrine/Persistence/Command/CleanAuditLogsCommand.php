@@ -156,6 +156,8 @@ final class CleanAuditLogsCommand extends Command
             foreach ($repository as $name => $classes) {
                 foreach (array_keys($classes) as $entity) {
                     $connection = $storageServices[$name]->getEntityManager()->getConnection();
+
+                    /** @var string $auditTable */
                     $auditTable = $schemaManager->resolveAuditTableName($entity, $configuration, $connection->getDatabasePlatform());
 
                     $queryBuilder = $connection->createQueryBuilder();

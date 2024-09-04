@@ -27,11 +27,11 @@ class Post implements \Stringable
     #[ORM\Column(type: Types::TEXT)]
     protected ?string $body = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
     protected ?\DateTimeImmutable $created_at = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     protected ?\DateTimeImmutable $deleted_at = null;
 
     #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true], nullable: true)]
