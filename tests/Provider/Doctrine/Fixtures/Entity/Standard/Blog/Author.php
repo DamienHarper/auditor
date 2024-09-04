@@ -8,11 +8,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Stringable;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'author')]
-class Author implements Stringable
+class Author implements \Stringable
 {
     #[ORM\Id]
     #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true])]

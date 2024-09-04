@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Command;
 
-use DateInterval;
-use DateTimeImmutable;
 use DH\Auditor\Auditor;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Persistence\Command\CleanAuditLogsCommandTest;
-use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -78,16 +75,16 @@ final class CleanAuditLogsCommand extends Command
         if (null !== $date) {
             // Use custom date if provided
             try {
-                $until = new DateTimeImmutable($date);
-            } catch (Exception) {
-                $io->error(sprintf('Invalid date format provided: %s', $date));
+                $until = new \DateTimeImmutable($date);
+            } catch (\Exception) {
+                $io->error(\sprintf('Invalid date format provided: %s', $date));
             }
         } else {
             // Fall back to default retention period
             $until = $this->validateKeepArgument($keep, $io);
         }
 
-        if (!$until instanceof DateTimeImmutable) {
+        if (!$until instanceof \DateTimeImmutable) {
             return Command::SUCCESS;
         }
 
@@ -129,7 +126,7 @@ final class CleanAuditLogsCommand extends Command
             $count += \count($entities);
         }
 
-        $message = sprintf(
+        $message = \sprintf(
             "You are about to clean audits created before <comment>%s</comment>: %d classes involved.\n Do you want to proceed?",
             $until->format(self::UNTIL_DATE_FORMAT),
             $count
@@ -176,7 +173,7 @@ final class CleanAuditLogsCommand extends Command
                         $queryBuilder->executeStatement();
                     }
 
-                    $progressBar->setMessage(sprintf('Cleaning audit tables... (<info>%s</info>)', $auditTable));
+                    $progressBar->setMessage(\sprintf('Cleaning audit tables... (<info>%s</info>)', $auditTable));
                     $progressBar->advance();
                 }
             }
@@ -206,17 +203,17 @@ final class CleanAuditLogsCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function validateKeepArgument(string $keep, SymfonyStyle $io): ?DateTimeImmutable
+    private function validateKeepArgument(string $keep, SymfonyStyle $io): ?\DateTimeImmutable
     {
         try {
-            $dateInterval = new DateInterval($keep);
-        } catch (Exception) {
-            $io->error(sprintf("'keep' argument must be a valid ISO 8601 date interval, '%s' given.", $keep));
+            $dateInterval = new \DateInterval($keep);
+        } catch (\Exception) {
+            $io->error(\sprintf("'keep' argument must be a valid ISO 8601 date interval, '%s' given.", $keep));
             $this->release();
 
             return null;
         }
 
-        return (new DateTimeImmutable())->sub($dateInterval);
+        return (new \DateTimeImmutable())->sub($dateInterval);
     }
 }

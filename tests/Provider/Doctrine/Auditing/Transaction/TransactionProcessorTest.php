@@ -4,17 +4,46 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Auditing\Transaction;
 
-use DateTimeImmutable;
+use DH\Auditor\Auditor;
+use DH\Auditor\Configuration;
+use DH\Auditor\Event\AuditEvent;
+use DH\Auditor\Event\Dto\AbstractAssociationEventDto;
+use DH\Auditor\Event\Dto\AbstractEventDto;
+use DH\Auditor\Event\Dto\InsertEventDto;
+use DH\Auditor\Event\Dto\RemoveEventDto;
+use DH\Auditor\Event\Dto\UpdateEventDto;
+use DH\Auditor\EventSubscriber\AuditEventSubscriber;
+use DH\Auditor\Model\Entry;
+use DH\Auditor\Provider\AbstractProvider;
+use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
+use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHConnection;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHMiddleware;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionHydrator;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionProcessor;
+use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
+use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
+use DH\Auditor\Provider\Doctrine\Persistence\Event\TableSchemaListener;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\PlatformHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Query;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
+use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
+use DH\Auditor\Provider\Doctrine\Service\DoctrineService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
+use DH\Auditor\Provider\Service\AbstractService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use DH\Auditor\Tests\Traits\ReflectionTrait;
+use DH\Auditor\User\User;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -22,6 +51,40 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[CoversClass(TransactionProcessor::class)]
+#[CoversClass(Auditor::class)]
+#[CoversClass(Configuration::class)]
+#[CoversClass(AuditEventSubscriber::class)]
+#[CoversClass(AuditEvent::class)]
+#[CoversClass(Entry::class)]
+#[CoversClass(AbstractProvider::class)]
+#[CoversClass(AnnotationLoader::class)]
+#[CoversClass(DoctrineSubscriber::class)]
+#[CoversClass(DHConnection::class)]
+#[CoversClass(DHDriver::class)]
+#[CoversClass(DHMiddleware::class)]
+#[CoversClass(TransactionHydrator::class)]
+#[CoversClass(TransactionManager::class)]
+#[CoversClass(\DH\Auditor\Provider\Doctrine\Configuration::class)]
+#[CoversClass(DoctrineProvider::class)]
+#[CoversClass(CreateSchemaListener::class)]
+#[CoversClass(TableSchemaListener::class)]
+#[CoversClass(DoctrineHelper::class)]
+#[CoversClass(PlatformHelper::class)]
+#[CoversClass(SchemaHelper::class)]
+#[CoversClass(Query::class)]
+#[CoversClass(Reader::class)]
+#[CoversClass(SchemaManager::class)]
+#[CoversClass(DoctrineService::class)]
+#[CoversClass(AbstractService::class)]
+#[CoversClass(User::class)]
+#[CoversClass(AbstractAssociationEventDto::class)]
+#[CoversClass(AbstractEventDto::class)]
+#[CoversClass(\DH\Auditor\Model\Transaction::class)]
+#[CoversClass(Transaction::class)]
+#[CoversClass(InsertEventDto::class)]
+#[CoversClass(RemoveEventDto::class)]
+#[CoversClass(UpdateEventDto::class)]
 final class TransactionProcessorTest extends TestCase
 {
     use DefaultSchemaSetupTrait;
@@ -54,15 +117,15 @@ final class TransactionProcessorTest extends TestCase
         ]);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        self::assertCount(1, $audits, 'TransactionProcessor::insert() creates an audit entry.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::insert() creates an audit entry.');
 
         $entry = array_shift($audits);
-        self::assertSame(1, $entry->getId(), 'audit entry ID is ok.');
-        self::assertSame(Transaction::INSERT, $entry->getType(), 'audit entry type is ok.');
-        self::assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
-        self::assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
-        self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
-        self::assertSame([
+        $this->assertSame(1, $entry->getId(), 'audit entry ID is ok.');
+        $this->assertSame(Transaction::INSERT, $entry->getType(), 'audit entry type is ok.');
+        $this->assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
+        $this->assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
+        $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
+        $this->assertSame([
             'email' => [
                 'new' => 'john.doe@gmail.com',
                 'old' => null,
@@ -101,15 +164,15 @@ final class TransactionProcessorTest extends TestCase
         ]);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        self::assertCount(1, $audits, 'TransactionProcessor::update() creates an audit entry.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::update() creates an audit entry.');
 
         $entry = array_shift($audits);
-        self::assertSame(1, $entry->getId(), 'audit entry ID is ok.');
-        self::assertSame(Transaction::UPDATE, $entry->getType(), 'audit entry type is ok.');
-        self::assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
-        self::assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
-        self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
-        self::assertSame([
+        $this->assertSame(1, $entry->getId(), 'audit entry ID is ok.');
+        $this->assertSame(Transaction::UPDATE, $entry->getType(), 'audit entry type is ok.');
+        $this->assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
+        $this->assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
+        $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
+        $this->assertSame([
             'email' => [
                 'new' => 'dark.vador@gmail.com',
                 'old' => 'john.doe@gmail.com',
@@ -141,15 +204,15 @@ final class TransactionProcessorTest extends TestCase
         $method->invokeArgs($processor, [$entityManager, $author, 1, 'what-a-nice-transaction-hash']);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        self::assertCount(1, $audits, 'TransactionProcessor::remove() creates an audit entry.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::remove() creates an audit entry.');
 
         $entry = array_shift($audits);
-        self::assertSame(1, $entry->getId(), 'audit entry ID is ok.');
-        self::assertSame(Transaction::REMOVE, $entry->getType(), 'audit entry type is ok.');
-        self::assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
-        self::assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
-        self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
-        self::assertSame([
+        $this->assertSame(1, $entry->getId(), 'audit entry ID is ok.');
+        $this->assertSame(Transaction::REMOVE, $entry->getType(), 'audit entry type is ok.');
+        $this->assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
+        $this->assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
+        $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
+        $this->assertSame([
             'class' => Author::class,
             'id' => 1,
             'label' => 'John Doe',  // Author::class.'#1',
@@ -180,7 +243,7 @@ final class TransactionProcessorTest extends TestCase
             ->setAuthor($author)
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new DateTimeImmutable())
+            ->setCreatedAt(new \DateTimeImmutable())
         ;
 
         $mapping = [
@@ -207,15 +270,15 @@ final class TransactionProcessorTest extends TestCase
         $method->invokeArgs($processor, [$entityManager, $author, $post, $mapping, 'what-a-nice-transaction-hash']);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        self::assertCount(1, $audits, 'TransactionProcessor::associate() creates an audit entry.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::associate() creates an audit entry.');
 
         $entry = array_shift($audits);
-        self::assertSame(1, $entry->getId(), 'audit entry ID is ok.');
-        self::assertSame(Transaction::ASSOCIATE, $entry->getType(), 'audit entry type is ok.');
-        self::assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
-        self::assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
-        self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
-        self::assertSame([
+        $this->assertSame(1, $entry->getId(), 'audit entry ID is ok.');
+        $this->assertSame(Transaction::ASSOCIATE, $entry->getType(), 'audit entry type is ok.');
+        $this->assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
+        $this->assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
+        $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
+        $this->assertSame([
             'is_owning_side' => false,
             'source' => [
                 'class' => Author::class,
@@ -257,7 +320,7 @@ final class TransactionProcessorTest extends TestCase
             ->setAuthor($author)
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new DateTimeImmutable())
+            ->setCreatedAt(new \DateTimeImmutable())
         ;
 
         $mapping = [
@@ -281,15 +344,15 @@ final class TransactionProcessorTest extends TestCase
         $method->invokeArgs($processor, [$entityManager, $author, $post, $mapping, 'what-a-nice-transaction-hash']);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        self::assertCount(1, $audits, 'TransactionProcessor::dissociate() creates an audit entry.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::dissociate() creates an audit entry.');
 
         $entry = array_shift($audits);
-        self::assertSame(1, $entry->getId(), 'audit entry ID is ok.');
-        self::assertSame(Transaction::DISSOCIATE, $entry->getType(), 'audit entry type is ok.');
-        self::assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
-        self::assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
-        self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
-        self::assertSame([
+        $this->assertSame(1, $entry->getId(), 'audit entry ID is ok.');
+        $this->assertSame(Transaction::DISSOCIATE, $entry->getType(), 'audit entry type is ok.');
+        $this->assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
+        $this->assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
+        $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
+        $this->assertSame([
             'is_owning_side' => false,
             'source' => [
                 'class' => Author::class,
@@ -331,7 +394,7 @@ final class TransactionProcessorTest extends TestCase
             ->setAuthor($author)
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new DateTimeImmutable())
+            ->setCreatedAt(new \DateTimeImmutable())
         ;
 
         $tag1 = new Tag();
@@ -402,15 +465,15 @@ final class TransactionProcessorTest extends TestCase
         $method->invokeArgs($processor, [$entityManager, $post, $tag2, $mapping, 'what-a-nice-transaction-hash']);
 
         $audits = $reader->createQuery(Post::class)->execute();
-        self::assertCount(2, $audits, 'TransactionProcessor::associate() creates an audit entry per association.');
+        $this->assertCount(2, $audits, 'TransactionProcessor::associate() creates an audit entry per association.');
 
         $entry = array_shift($audits);
-        self::assertSame(2, $entry->getId(), 'audit entry ID is ok.');
-        self::assertSame(Transaction::ASSOCIATE, $entry->getType(), 'audit entry type is ok.');
-        self::assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
-        self::assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
-        self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
-        self::assertSame([
+        $this->assertSame(2, $entry->getId(), 'audit entry ID is ok.');
+        $this->assertSame(Transaction::ASSOCIATE, $entry->getType(), 'audit entry type is ok.');
+        $this->assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
+        $this->assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
+        $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
+        $this->assertSame([
             'is_owning_side' => true,
             'source' => [
                 'class' => Post::class,
@@ -430,12 +493,12 @@ final class TransactionProcessorTest extends TestCase
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
 
         $entry = array_shift($audits);
-        self::assertSame(1, $entry->getId(), 'audit entry ID is ok.');
-        self::assertSame(Transaction::ASSOCIATE, $entry->getType(), 'audit entry type is ok.');
-        self::assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
-        self::assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
-        self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
-        self::assertSame([
+        $this->assertSame(1, $entry->getId(), 'audit entry ID is ok.');
+        $this->assertSame(Transaction::ASSOCIATE, $entry->getType(), 'audit entry type is ok.');
+        $this->assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
+        $this->assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
+        $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
+        $this->assertSame([
             'is_owning_side' => true,
             'source' => [
                 'class' => Post::class,
@@ -479,7 +542,7 @@ final class TransactionProcessorTest extends TestCase
             ->setAuthor($author)
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new DateTimeImmutable())
+            ->setCreatedAt(new \DateTimeImmutable())
         ;
 
         $tag1 = new Tag();
@@ -552,15 +615,15 @@ final class TransactionProcessorTest extends TestCase
         $dissociateMethod->invokeArgs($processor, [$entityManager, $post, $tag2, $mapping, 'what-a-nice-transaction-hash']);
 
         $audits = $reader->createQuery(Post::class)->execute();
-        self::assertCount(3, $audits, 'TransactionProcessor::dissociate() creates an audit entry.');
+        $this->assertCount(3, $audits, 'TransactionProcessor::dissociate() creates an audit entry.');
 
         $entry = array_shift($audits);
-        self::assertSame(3, $entry->getId(), 'audit entry ID is ok.');
-        self::assertSame(Transaction::DISSOCIATE, $entry->getType(), 'audit entry type is ok.');
-        self::assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
-        self::assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
-        self::assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
-        self::assertSame([
+        $this->assertSame(3, $entry->getId(), 'audit entry ID is ok.');
+        $this->assertSame(Transaction::DISSOCIATE, $entry->getType(), 'audit entry type is ok.');
+        $this->assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
+        $this->assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
+        $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
+        $this->assertSame([
             'is_owning_side' => true,
             'source' => [
                 'class' => Post::class,
@@ -609,7 +672,7 @@ final class TransactionProcessorTest extends TestCase
         $processor->process($transaction);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        self::assertCount(1, $audits, 'TransactionProcessor::processInsertions() creates an "'.Transaction::INSERT.'" audit entry.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::processInsertions() creates an "'.Transaction::INSERT.'" audit entry.');
     }
 
     public function testProcessUpdates(): void
@@ -641,7 +704,7 @@ final class TransactionProcessorTest extends TestCase
         $processor->process($transaction);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        self::assertCount(1, $audits, 'TransactionProcessor::processUpdates() creates an "'.Transaction::UPDATE.'" audit entry.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::processUpdates() creates an "'.Transaction::UPDATE.'" audit entry.');
 
         $transaction->reset();
 
@@ -653,7 +716,7 @@ final class TransactionProcessorTest extends TestCase
         $processor->process($transaction);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        self::assertCount(1, $audits, 'TransactionProcessor::processUpdates() does not create an "'.Transaction::UPDATE.'" audit entry with empty diffs.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::processUpdates() does not create an "'.Transaction::UPDATE.'" audit entry with empty diffs.');
     }
 
     public function testProcessAssociations(): void
@@ -680,7 +743,7 @@ final class TransactionProcessorTest extends TestCase
             ->setAuthor($author)
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new DateTimeImmutable())
+            ->setCreatedAt(new \DateTimeImmutable())
         ;
 
         $mapping = [
@@ -713,7 +776,7 @@ final class TransactionProcessorTest extends TestCase
         $processor->process($transaction);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        self::assertCount(1, $audits, 'TransactionProcessor::processAssociations() creates an "'.Transaction::ASSOCIATE.'" audit entry.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::processAssociations() creates an "'.Transaction::ASSOCIATE.'" audit entry.');
     }
 
     public function testProcessDissociations(): void
@@ -740,7 +803,7 @@ final class TransactionProcessorTest extends TestCase
             ->setAuthor($author)
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new DateTimeImmutable())
+            ->setCreatedAt(new \DateTimeImmutable())
         ;
 
         $mapping = [
@@ -770,7 +833,7 @@ final class TransactionProcessorTest extends TestCase
         $processor->process($transaction);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        self::assertCount(1, $audits, 'TransactionProcessor::processDissociations() creates an "'.Transaction::DISSOCIATE.'" audit entry.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::processDissociations() creates an "'.Transaction::DISSOCIATE.'" audit entry.');
     }
 
     public function testProcessDeletions(): void
@@ -799,7 +862,7 @@ final class TransactionProcessorTest extends TestCase
         $processor->process($transaction);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        self::assertCount(1, $audits, 'TransactionProcessor::processDeletions() creates a "'.Transaction::REMOVE.'" audit entry.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::processDeletions() creates a "'.Transaction::REMOVE.'" audit entry.');
     }
 
     private function configureEntities(): void

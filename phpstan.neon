@@ -6,6 +6,10 @@ parameters:
         return_type: 100
         param_type: 100
         property_type: 100
+        constant: 0
+
+    paths:
+        - src
 
     ignoreErrors:
         - identifier: missingType.iterableValue
@@ -14,4 +18,3 @@ parameters:
         - '~Dead catch - Throwable is never thrown in the try block~'
         - '~Parameter \#1 \$className of method Doctrine\\ORM\\EntityManagerInterface\:\:getClassMetadata\(\) expects class-string<object>, string given\.~'
         - '~Unable to resolve the template type T in call to method Doctrine\\ORM\\EntityManagerInterface\:\:getClassMetadata\(\)~'
-        - '~Property DH\\Auditor\\Provider\\Doctrine\\Configuration\:\:\$(storage|auditing)Services is never read, only written\.~'

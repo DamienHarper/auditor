@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
 
-use ArrayIterator;
 use DH\Auditor\Exception\AccessDeniedException;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
@@ -19,22 +18,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @see ReaderTest
  */
-final class Reader
+final readonly class Reader
 {
     /**
      * @var int
      */
     public const PAGE_SIZE = 50;
 
-    private DoctrineProvider $provider;
-
     /**
      * Reader constructor.
      */
-    public function __construct(DoctrineProvider $provider)
-    {
-        $this->provider = $provider;
-    }
+    public function __construct(private DoctrineProvider $provider) {}
 
     public function getProvider(): DoctrineProvider
     {
@@ -119,17 +113,17 @@ final class Reader
     }
 
     /**
-     * @return array{results: ArrayIterator<int|string, \DH\Auditor\Model\Entry>, currentPage: int, hasPreviousPage: bool, hasNextPage: bool, previousPage: null|int, nextPage: null|int, numPages: int, haveToPaginate: bool, numResults: int, pageSize: int}
+     * @return array{results: \ArrayIterator<int|string, \DH\Auditor\Model\Entry>, currentPage: int, hasPreviousPage: bool, hasNextPage: bool, previousPage: null|int, nextPage: null|int, numPages: int, haveToPaginate: bool, numResults: int, pageSize: int}
      */
     public function paginate(Query $query, int $page = 1, int $pageSize = self::PAGE_SIZE): array
     {
         $numResults = $query->count();
-        $currentPage = $page < 1 ? 1 : $page;
+        $currentPage = max(1, $page);
         $hasPreviousPage = $currentPage > 1;
         $hasNextPage = ($currentPage * $pageSize) < $numResults;
 
         return [
-            'results' => new ArrayIterator($query->execute()),
+            'results' => new \ArrayIterator($query->execute()),
             'currentPage' => $currentPage,
             'hasPreviousPage' => $hasPreviousPage,
             'hasNextPage' => $hasNextPage,
@@ -169,7 +163,7 @@ final class Reader
             $schema = $entityManager->getClassMetadata($entity)->getSchemaName().'.';
         }
 
-        return sprintf(
+        return \sprintf(
             '%s%s%s%s',
             $schema,
             $configuration->getTablePrefix(),

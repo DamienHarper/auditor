@@ -4,19 +4,17 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog;
 
-use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Stringable;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'post')]
 #[ORM\Index(name: 'fk_author_id', columns: ['author_id'])]
 #[Gedmo\SoftDeleteable(fieldName: 'deleted_at', timeAware: false, hardDelete: false)]
-class Post implements Stringable
+class Post implements \Stringable
 {
     #[ORM\Id]
     #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true])]
@@ -31,10 +29,10 @@ class Post implements Stringable
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
-    protected ?DateTimeImmutable $created_at = null;
+    protected ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    protected ?DateTimeImmutable $deleted_at = null;
+    protected ?\DateTimeImmutable $deleted_at = null;
 
     #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true], nullable: true)]
     protected ?int $author_id = null;
@@ -109,26 +107,26 @@ class Post implements Stringable
         return $this->body;
     }
 
-    public function setCreatedAt(?DateTimeImmutable $created_at): self
+    public function setCreatedAt(?\DateTimeImmutable $created_at): self
     {
         $this->created_at = $created_at;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTimeImmutable
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->created_at;
     }
 
-    public function setDeletedAt(?DateTimeImmutable $deleted_at): self
+    public function setDeletedAt(?\DateTimeImmutable $deleted_at): self
     {
         $this->deleted_at = $deleted_at;
 
         return $this;
     }
 
-    public function getDeletedAt(): ?DateTimeImmutable
+    public function getDeletedAt(): ?\DateTimeImmutable
     {
         return $this->deleted_at;
     }

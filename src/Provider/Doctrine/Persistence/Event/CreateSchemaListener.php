@@ -9,21 +9,15 @@ use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Persistence\Event\CreateSchemaListenerTest;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
-use Exception;
 
 /**
  * @see CreateSchemaListenerTest
  */
-final class CreateSchemaListener
+final readonly class CreateSchemaListener
 {
-    private DoctrineProvider $provider;
-
-    public function __construct(DoctrineProvider $provider)
-    {
-        $this->provider = $provider;
-    }
+    public function __construct(private DoctrineProvider $provider) {}
 
     public function postGenerateSchemaTable(GenerateSchemaTableEventArgs $eventArgs): void
     {
@@ -31,11 +25,11 @@ final class CreateSchemaListener
 
         // check inheritance type and returns if unsupported
         if (!\in_array($metadata->inheritanceType, [
-            ClassMetadataInfo::INHERITANCE_TYPE_NONE,
-            ClassMetadataInfo::INHERITANCE_TYPE_JOINED,
-            ClassMetadataInfo::INHERITANCE_TYPE_SINGLE_TABLE,
+            ClassMetadata::INHERITANCE_TYPE_NONE,
+            ClassMetadata::INHERITANCE_TYPE_JOINED,
+            ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE,
         ], true)) {
-            throw new Exception(sprintf('Inheritance type "%s" is not yet supported', $metadata->inheritanceType));
+            throw new \Exception(\sprintf('Inheritance type "%s" is not yet supported', $metadata->inheritanceType));
         }
 
         $targetEntity = $metadata->name;
@@ -44,7 +38,7 @@ final class CreateSchemaListener
             $audited = false;
             if (
                 $metadata->rootEntityName === $metadata->name
-                && ClassMetadataInfo::INHERITANCE_TYPE_SINGLE_TABLE === $metadata->inheritanceType
+                && ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE === $metadata->inheritanceType
             ) {
                 foreach ($metadata->subClasses as $subClass) {
                     if ($this->provider->isAuditable($subClass)) {

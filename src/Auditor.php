@@ -8,7 +8,6 @@ use DH\Auditor\EventSubscriber\AuditEventSubscriber;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Exception\ProviderException;
 use DH\Auditor\Provider\ProviderInterface;
-use ReflectionException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -16,8 +15,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 final class Auditor
 {
-    private Configuration $configuration;
-
     /**
      * @var ProviderInterface[]
      */
@@ -33,18 +30,13 @@ final class Auditor
      */
     private array $auditProviders = [];
 
-    private EventDispatcherInterface $dispatcher;
-
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
-    public function __construct(Configuration $configuration, EventDispatcherInterface $dispatcher)
+    public function __construct(private readonly Configuration $configuration, private readonly EventDispatcherInterface $dispatcher)
     {
-        $this->configuration = $configuration;
-        $this->dispatcher = $dispatcher;
-
         // Attach persistence event subscriber to provided dispatcher
-        $dispatcher->addSubscriber(new AuditEventSubscriber($this));
+        $this->dispatcher->addSubscriber(new AuditEventSubscriber($this));
     }
 
     public function getEventDispatcher(): EventDispatcherInterface
@@ -71,7 +63,7 @@ final class Auditor
     public function getProvider(string $name): ProviderInterface
     {
         if (!$this->hasProvider($name)) {
-            throw new InvalidArgumentException(sprintf('Unknown provider "%s"', $name));
+            throw new InvalidArgumentException(\sprintf('Unknown provider "%s"', $name));
         }
 
         return $this->providers[$name];
@@ -88,7 +80,7 @@ final class Auditor
     public function registerProvider(ProviderInterface $provider): self
     {
         if (!$provider->supportsStorage() && !$provider->supportsAuditing()) {
-            throw new ProviderException(sprintf('Provider "%s" does not support storage and auditing.', $provider::class));
+            throw new ProviderException(\sprintf('Provider "%s" does not support storage and auditing.', $provider::class));
         }
 
         $this->providers[$provider::class] = $provider;
@@ -111,7 +103,7 @@ final class Auditor
     public function enableStorage(ProviderInterface $provider): self
     {
         if (!$provider->supportsStorage()) {
-            throw new ProviderException(sprintf('Provider "%s" does not support storage.', $provider::class));
+            throw new ProviderException(\sprintf('Provider "%s" does not support storage.', $provider::class));
         }
 
         $this->storageProviders[$provider::class] = $provider;
@@ -125,7 +117,7 @@ final class Auditor
     public function disableStorage(ProviderInterface $provider): self
     {
         if (!$provider->supportsStorage()) {
-            throw new ProviderException(sprintf('Provider "%s" does not support storage.', $provider::class));
+            throw new ProviderException(\sprintf('Provider "%s" does not support storage.', $provider::class));
         }
 
         if (1 === \count($this->storageProviders)) {
@@ -144,7 +136,7 @@ final class Auditor
     {
         $key = $provider::class;
         if (!$this->hasProvider($key)) {
-            throw new InvalidArgumentException(sprintf('Unknown provider "%s"', $key));
+            throw new InvalidArgumentException(\sprintf('Unknown provider "%s"', $key));
         }
 
         return \array_key_exists($key, $this->storageProviders);
@@ -156,7 +148,7 @@ final class Auditor
     public function enableAuditing(ProviderInterface $provider): self
     {
         if (!$provider->supportsAuditing()) {
-            throw new ProviderException(sprintf('Provider "%s" does not support audit hooks.', $provider::class));
+            throw new ProviderException(\sprintf('Provider "%s" does not support audit hooks.', $provider::class));
         }
 
         $this->auditProviders[$provider::class] = $provider;
@@ -170,7 +162,7 @@ final class Auditor
     public function disableAuditing(ProviderInterface $provider): self
     {
         if (!$provider->supportsAuditing()) {
-            throw new ProviderException(sprintf('Provider "%s" does not support audit hooks.', $provider::class));
+            throw new ProviderException(\sprintf('Provider "%s" does not support audit hooks.', $provider::class));
         }
 
         if (1 === \count($this->auditProviders)) {
@@ -188,7 +180,7 @@ final class Auditor
     public function isAuditingEnabled(ProviderInterface $provider): bool
     {
         if (!$this->hasProvider($provider::class)) {
-            throw new InvalidArgumentException(sprintf('Unknown provider "%s"', $provider::class));
+            throw new InvalidArgumentException(\sprintf('Unknown provider "%s"', $provider::class));
         }
 
         return \array_key_exists($provider::class, $this->auditProviders);

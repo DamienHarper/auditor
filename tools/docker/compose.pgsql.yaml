@@ -1,0 +1,27 @@
+services:
+  php-cli:
+    depends_on:
+      pgsql:
+        condition: service_healthy
+        restart: true
+
+  pgsql:
+    image: postgres:15
+    container_name: auditor-pgsql
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: auditor
+    volumes:
+      - pgsql_data:/var/lib/postgresql/data:rw
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-d", "auditor", "-U", "postgres" ]
+      timeout: 2s
+      retries: 5
+      interval: 5s
+      start_period: 5s
+
+volumes:
+  pgsql_data:

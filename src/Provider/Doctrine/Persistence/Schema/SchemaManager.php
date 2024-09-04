@@ -26,14 +26,9 @@ use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 /**
  * @see SchemaManagerTest
  */
-final class SchemaManager
+final readonly class SchemaManager
 {
-    private DoctrineProvider $provider;
-
-    public function __construct(DoctrineProvider $provider)
-    {
-        $this->provider = $provider;
-    }
+    public function __construct(private DoctrineProvider $provider) {}
 
     public function updateAuditSchema(?array $sqls = null, ?callable $callback = null): void
     {
@@ -198,7 +193,7 @@ final class SchemaManager
                         PlatformHelper::isIndexLengthLimited($columnName, $connection) ? ['lengths' => [191]] : []
                     );
                 } else {
-                    throw new InvalidArgumentException(sprintf("Missing key 'name' for column '%s'", $columnName));
+                    throw new InvalidArgumentException(\sprintf("Missing key 'name' for column '%s'", $columnName));
                 }
             }
         }
@@ -244,7 +239,7 @@ final class SchemaManager
      */
     public function resolveTableName(string $tableName, string $namespaceName, AbstractPlatform $platform): string
     {
-        if (empty($namespaceName)) {
+        if ('' === $namespaceName || '0' === $namespaceName) {
             $prefix = '';
         } elseif (!$platform->supportsSchemas()) {
             $prefix = $namespaceName.'__';
@@ -274,7 +269,7 @@ final class SchemaManager
     {
         return preg_replace(
             '#^([^.]+\.)?(.+)$#',
-            sprintf(
+            \sprintf(
                 '$1%s$2%s',
                 preg_quote($configuration->getTablePrefix(), '#'),
                 preg_quote($configuration->getTableSuffix(), '#')

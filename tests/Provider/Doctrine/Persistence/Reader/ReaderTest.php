@@ -4,14 +4,42 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader;
 
-use DateTimeImmutable;
+use DH\Auditor\Auditor;
+use DH\Auditor\Configuration;
+use DH\Auditor\Event\AuditEvent;
+use DH\Auditor\Event\Dto\AbstractAssociationEventDto;
+use DH\Auditor\Event\Dto\AbstractEventDto;
+use DH\Auditor\Event\Dto\InsertEventDto;
+use DH\Auditor\Event\Dto\RemoveEventDto;
+use DH\Auditor\Event\Dto\UpdateEventDto;
+use DH\Auditor\EventSubscriber\AuditEventSubscriber;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Model\Entry;
 use DH\Auditor\Model\Transaction;
+use DH\Auditor\Provider\AbstractProvider;
+use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
+use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHConnection;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHMiddleware;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\AuditTrait;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionHydrator;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionProcessor;
+use DH\Auditor\Provider\Doctrine\DoctrineProvider;
+use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
+use DH\Auditor\Provider\Doctrine\Persistence\Event\TableSchemaListener;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\PlatformHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\DateRangeFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Query;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
+use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
+use DH\Auditor\Provider\Doctrine\Service\DoctrineService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
+use DH\Auditor\Provider\Service\AbstractService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
@@ -19,6 +47,9 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\BlogSchemaSetupTrait;
 use DH\Auditor\Tests\Traits\ReflectionTrait;
+use DH\Auditor\User\User;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -28,6 +59,43 @@ use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException as Opti
  * @internal
  */
 #[Small]
+#[CoversClass(Reader::class)]
+#[CoversClass(Auditor::class)]
+#[CoversClass(Configuration::class)]
+#[CoversClass(AuditEventSubscriber::class)]
+#[CoversClass(AuditEvent::class)]
+#[CoversClass(AbstractAssociationEventDto::class)]
+#[CoversClass(AbstractEventDto::class)]
+#[CoversClass(InsertEventDto::class)]
+#[CoversClass(RemoveEventDto::class)]
+#[CoversClass(UpdateEventDto::class)]
+#[CoversClass(Entry::class)]
+#[CoversClass(Transaction::class)]
+#[CoversClass(AbstractProvider::class)]
+#[CoversClass(AnnotationLoader::class)]
+#[CoversClass(DoctrineSubscriber::class)]
+#[CoversClass(DHConnection::class)]
+#[CoversClass(DHDriver::class)]
+#[CoversTrait(AuditTrait::class)]
+#[CoversClass(TransactionHydrator::class)]
+#[CoversClass(TransactionManager::class)]
+#[CoversClass(TransactionProcessor::class)]
+#[CoversClass(\DH\Auditor\Provider\Doctrine\Configuration::class)]
+#[CoversClass(DoctrineProvider::class)]
+#[CoversClass(\DH\Auditor\Provider\Doctrine\Model\Transaction::class)]
+#[CoversClass(CreateSchemaListener::class)]
+#[CoversClass(TableSchemaListener::class)]
+#[CoversClass(DoctrineHelper::class)]
+#[CoversClass(PlatformHelper::class)]
+#[CoversClass(SchemaHelper::class)]
+#[CoversClass(SimpleFilter::class)]
+#[CoversClass(Query::class)]
+#[CoversClass(SchemaManager::class)]
+#[CoversClass(DoctrineService::class)]
+#[CoversClass(AbstractService::class)]
+#[CoversClass(User::class)]
+#[CoversClass(DateRangeFilter::class)]
+#[CoversClass(DHMiddleware::class)]
 final class ReaderTest extends TestCase
 {
     use BlogSchemaSetupTrait;
@@ -63,8 +131,8 @@ final class ReaderTest extends TestCase
         $this->provider->getConfiguration()->setEntities($entities);
         $reader = $this->createReader();
 
-        self::assertSame('post', $reader->getEntityTableName(Post::class), 'tablename is ok.');
-        self::assertSame('comment', $reader->getEntityTableName(Comment::class), 'tablename is ok.');
+        $this->assertSame('post', $reader->getEntityTableName(Post::class), 'tablename is ok.');
+        $this->assertSame('comment', $reader->getEntityTableName(Comment::class), 'tablename is ok.');
     }
 
     #[Depends('testGetEntityTableName')]
@@ -78,8 +146,8 @@ final class ReaderTest extends TestCase
         $this->provider->getConfiguration()->setEntities($entities);
         $reader = $this->createReader();
 
-        self::assertSame('post_audit', $reader->getEntityAuditTableName(Post::class), 'tablename is ok.');
-        self::assertSame('comment_audit', $reader->getEntityAuditTableName(Comment::class), 'tablename is ok.');
+        $this->assertSame('post_audit', $reader->getEntityAuditTableName(Post::class), 'tablename is ok.');
+        $this->assertSame('comment_audit', $reader->getEntityAuditTableName(Comment::class), 'tablename is ok.');
     }
 
     public function testGetAudits(): void
@@ -88,17 +156,17 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class)->execute();
-        self::assertIsInt($audits[0]->getId());
-        self::assertIsString($audits[0]->getObjectId());
-        self::assertNull($audits[0]->getDiscriminator());
-        self::assertIsString($audits[0]->getTransactionHash());
-        self::assertIsArray($audits[0]->getDiffs());
-        self::assertIsString($audits[0]->getUserId());
-        self::assertIsString($audits[0]->getUsername());
-        self::assertIsString($audits[0]->getUserFqdn());
-        self::assertSame('main', $audits[0]->getUserFirewall());
-        self::assertIsString($audits[0]->getIp());
-        self::assertInstanceOf(DateTimeImmutable::class, $audits[0]->getCreatedAt());
+        $this->assertIsInt($audits[0]->getId());
+        $this->assertIsString($audits[0]->getObjectId());
+        $this->assertNull($audits[0]->getDiscriminator());
+        $this->assertIsString($audits[0]->getTransactionHash());
+        $this->assertIsArray($audits[0]->getDiffs());
+        $this->assertIsString($audits[0]->getUserId());
+        $this->assertIsString($audits[0]->getUsername());
+        $this->assertIsString($audits[0]->getUserFqdn());
+        $this->assertSame('main', $audits[0]->getUserFirewall());
+        $this->assertIsString($audits[0]->getIp());
+        $this->assertInstanceOf(\DateTimeImmutable::class, $audits[0]->getCreatedAt());
 
         $expected = [
             'Inserted DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author#3: [email: luke.skywalker@gmail.com, fullname: Luke Skywalker]',
@@ -112,9 +180,9 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class)->resetOrderBy()->execute();
-        self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
+        $this->assertCount(\count($expected), $audits, 'Expected audits count is ok.');
         foreach ($expected as $i => $singleExpected) {
-            self::assertSame($singleExpected, self::explain($audits[$i], Author::class));
+            $this->assertSame($singleExpected, self::explain($audits[$i], Author::class));
         }
 
         $expected = [
@@ -143,9 +211,9 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Post::class)->resetOrderBy()->execute();
-        self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
+        $this->assertCount(\count($expected), $audits, 'Expected audits count is ok.');
         foreach ($expected as $i => $singleExpected) {
-            self::assertSame($singleExpected, self::explain($audits[$i], Post::class));
+            $this->assertSame($singleExpected, self::explain($audits[$i], Post::class));
         }
 
         $expected = [
@@ -156,9 +224,9 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Comment::class)->resetOrderBy()->execute();
-        self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
+        $this->assertCount(\count($expected), $audits, 'Expected audits count is ok.');
         foreach ($expected as $i => $singleExpected) {
-            self::assertSame($singleExpected, self::explain($audits[$i], Comment::class));
+            $this->assertSame($singleExpected, self::explain($audits[$i], Comment::class));
         }
 
         $expected = [
@@ -181,9 +249,9 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Tag::class)->resetOrderBy()->execute();
-        self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
+        $this->assertCount(\count($expected), $audits, 'Expected audits count is ok.');
         foreach ($expected as $i => $singleExpected) {
-            self::assertSame($singleExpected, self::explain($audits[$i], Tag::class));
+            $this->assertSame($singleExpected, self::explain($audits[$i], Tag::class));
         }
 
         $this->expectException(OptionsResolverInvalidArgumentException::class);
@@ -199,11 +267,11 @@ final class ReaderTest extends TestCase
         $reader = $this->createReader();
 
         $pager = $reader->paginate($reader->createQuery(Author::class), 1, 2);
-        self::assertIsArray($pager);
-        self::assertFalse($pager['hasPreviousPage'], 'Pager is at page 1.');
-        self::assertTrue($pager['hasNextPage'], 'Pager has next page.');
-        self::assertTrue($pager['haveToPaginate'], 'Pager has to paginate.');
-        self::assertSame(4, $pager['numPages'], 'Pager has 4 pages.');
+        $this->assertIsArray($pager);
+        $this->assertFalse($pager['hasPreviousPage'], 'Pager is at page 1.');
+        $this->assertTrue($pager['hasNextPage'], 'Pager has next page.');
+        $this->assertTrue($pager['haveToPaginate'], 'Pager has to paginate.');
+        $this->assertSame(4, $pager['numPages'], 'Pager has 4 pages.');
     }
 
     public function testMultipleFilters(): void
@@ -212,14 +280,14 @@ final class ReaderTest extends TestCase
 
         $query = $reader->createQuery(Author::class);
         $audits = $query->execute();
-        self::assertCount(7, $audits);
+        $this->assertCount(7, $audits);
 
         $query = $reader->createQuery(Author::class);
         $query->addFilter(new SimpleFilter('object_id', 1));
         $query->addFilter(new SimpleFilter('object_id', 2));
 
         $audits = $query->execute();
-        self::assertCount(4, $audits);
+        $this->assertCount(4, $audits);
     }
 
     #[Depends('testGetAudits')]
@@ -240,35 +308,35 @@ final class ReaderTest extends TestCase
         /** @var Entry[] $audits */
         $audits = $reader
             ->createQuery(Author::class)
-            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTimeImmutable('-1 day')))
+            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new \DateTimeImmutable('-1 day')))
             ->resetOrderBy()
             ->execute()
         ;
-        self::assertCount(\count($expected), $audits, 'Expected audits count is ok.');
+        $this->assertCount(\count($expected), $audits, 'Expected audits count is ok.');
         foreach ($expected as $i => $singleExpected) {
-            self::assertSame($singleExpected, self::explain($audits[$i], Author::class));
+            $this->assertSame($singleExpected, self::explain($audits[$i], Author::class));
         }
 
         /** @var Entry[] $audits */
         $audits = $reader
             ->createQuery(Author::class)
-            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTimeImmutable('-5 days'), new DateTimeImmutable('-4 days')))
+            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new \DateTimeImmutable('-5 days'), new \DateTimeImmutable('-4 days')))
             ->execute()
         ;
-        self::assertCount(0, $audits, 'result count is ok.');
+        $this->assertCount(0, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
         $audits = $reader
             ->createQuery(Author::class, ['page_size' => 2])
-            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTimeImmutable('-1 day')))
+            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new \DateTimeImmutable('-1 day')))
             ->execute()
         ;
-        self::assertCount(2, $audits, 'result count is ok.');
+        $this->assertCount(2, $audits, 'result count is ok.');
 
         $this->expectException(InvalidArgumentException::class);
         $reader
             ->createQuery(Post::class)
-            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new DateTimeImmutable('now'), new DateTimeImmutable('-1 day')))
+            ->addFilter(new DateRangeFilter(Query::CREATED_AT, new \DateTimeImmutable('now'), new \DateTimeImmutable('-1 day')))
             ->execute()
         ;
     }
@@ -279,7 +347,7 @@ final class ReaderTest extends TestCase
         $reader = $this->createReader();
 
         $count = $reader->createQuery(Author::class)->count();
-        self::assertSame(7, $count, 'count is ok.');
+        $this->assertSame(7, $count, 'count is ok.');
     }
 
     #[Depends('testGetAudits')]
@@ -289,19 +357,19 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['object_id' => 1])->execute();
-        self::assertCount(2, $audits, 'result count is ok.');
+        $this->assertCount(2, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Post::class, ['object_id' => 1])->execute();
-        self::assertCount(5, $audits, 'result count is ok.');
+        $this->assertCount(5, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Comment::class, ['object_id' => 1])->execute();
-        self::assertCount(1, $audits, 'result count is ok.');
+        $this->assertCount(1, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Post::class, ['object_id' => 0])->execute();
-        self::assertSame([], $audits, 'no result when id is invalid.');
+        $this->assertSame([], $audits, 'no result when id is invalid.');
     }
 
     #[Depends('testGetAudits')]
@@ -311,15 +379,15 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['page_size' => 2])->execute();
-        self::assertCount(2, $audits, 'result count is ok.');
+        $this->assertCount(2, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['page' => 2, 'page_size' => 2])->execute();
-        self::assertCount(2, $audits, 'result count is ok.');
+        $this->assertCount(2, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['page' => 3, 'page_size' => 2])->execute();
-        self::assertCount(2, $audits, 'result count is ok.');
+        $this->assertCount(2, $audits, 'result count is ok.');
     }
 
     public function testReaderHonorsPaging(): void
@@ -338,23 +406,23 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['type' => Transaction::UPDATE])->execute();
-        self::assertCount(1, $audits, 'result count is ok.');
+        $this->assertCount(1, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['type' => Transaction::INSERT])->execute();
-        self::assertCount(3, $audits, 'result count is ok.');
+        $this->assertCount(3, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['type' => Transaction::REMOVE])->execute();
-        self::assertCount(1, $audits, 'result count is ok.');
+        $this->assertCount(1, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['type' => Transaction::ASSOCIATE])->execute();
-        self::assertCount(2, $audits, 'result count is ok.');
+        $this->assertCount(2, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class, ['type' => Transaction::DISSOCIATE])->execute();
-        self::assertCount(0, $audits, 'result count is ok.');
+        $this->assertCount(0, $audits, 'result count is ok.');
     }
 
     #[Depends('testGetAudits')]
@@ -377,7 +445,7 @@ final class ReaderTest extends TestCase
             ->setAuthor($author)
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new DateTimeImmutable())
+            ->setCreatedAt(new \DateTimeImmutable())
         ;
 
         $post2 = new Post();
@@ -385,7 +453,7 @@ final class ReaderTest extends TestCase
             ->setAuthor($author)
             ->setTitle('Second post')
             ->setBody('Here is another body')
-            ->setCreatedAt(new DateTimeImmutable())
+            ->setCreatedAt(new \DateTimeImmutable())
         ;
 
         $storageService->getEntityManager()->persist($post1);
@@ -398,7 +466,7 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Post::class, ['transaction_hash' => $hash])->execute();
-        self::assertCount(2, $audits, 'result count is ok.');
+        $this->assertCount(2, $audits, 'result count is ok.');
     }
 
     #[Depends('testGetAuditByTransactionHash')]
@@ -421,7 +489,7 @@ final class ReaderTest extends TestCase
             ->setAuthor($author)
             ->setTitle('First post')
             ->setBody('Here is the body')
-            ->setCreatedAt(new DateTimeImmutable())
+            ->setCreatedAt(new \DateTimeImmutable())
         ;
 
         $post2 = new Post();
@@ -429,7 +497,7 @@ final class ReaderTest extends TestCase
             ->setAuthor($author)
             ->setTitle('Second post')
             ->setBody('Here is another body')
-            ->setCreatedAt(new DateTimeImmutable())
+            ->setCreatedAt(new \DateTimeImmutable())
         ;
 
         $storageService->getEntityManager()->persist($post1);
@@ -447,9 +515,9 @@ final class ReaderTest extends TestCase
         $reader = $this->createReader();
         $audits = $reader->getAuditsByTransactionHash($hash);
 
-        self::assertCount(2, $audits, 'Reader::getAllAuditsByTransactionHash() is ok.');
-        self::assertCount(1, $audits[Author::class], 'Reader::getAllAuditsByTransactionHash() is ok.');
-        self::assertCount(2, $audits[Post::class], 'Reader::getAllAuditsByTransactionHash() is ok.');
+        $this->assertCount(2, $audits, 'Reader::getAllAuditsByTransactionHash() is ok.');
+        $this->assertCount(1, $audits[Author::class], 'Reader::getAllAuditsByTransactionHash() is ok.');
+        $this->assertCount(2, $audits[Post::class], 'Reader::getAllAuditsByTransactionHash() is ok.');
     }
 
     private function explain(Entry $entry, string $class, bool $verbose = true): string

@@ -16,13 +16,8 @@ class Offer
     #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true])]
     private int $id;
 
-    #[ORM\Column(type: Types::STRING, length: 255)]
-    private string $name;
-
-    public function __construct(string $name)
-    {
-        $this->name = $name;
-    }
+    public function __construct(#[ORM\Column(type: Types::STRING, length: 255)]
+        private string $name) {}
 
     public function getId(): int
     {

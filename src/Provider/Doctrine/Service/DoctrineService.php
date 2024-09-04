@@ -9,13 +9,9 @@ use Doctrine\ORM\EntityManagerInterface;
 
 abstract class DoctrineService extends AbstractService
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(string $name, EntityManagerInterface $entityManager)
+    public function __construct(string $name, private readonly EntityManagerInterface $entityManager)
     {
         parent::__construct($name);
-
-        $this->entityManager = $entityManager;
     }
 
     public function getEntityManager(): EntityManagerInterface

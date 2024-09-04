@@ -24,7 +24,6 @@ use DH\Auditor\Tests\Provider\Doctrine\DoctrineProviderTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ToolEvents;
-use Exception;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -49,7 +48,7 @@ final class DoctrineProvider extends AbstractProvider
         'created_at' => '?',
     ];
 
-    private TransactionManager $transactionManager;
+    private readonly TransactionManager $transactionManager;
 
     public function __construct(ConfigurationInterface $configuration)
     {
@@ -71,7 +70,7 @@ final class DoctrineProvider extends AbstractProvider
         // Register subscribers
         $evm->addEventListener([Events::loadClassMetadata], new TableSchemaListener($this));
         $evm->addEventListener([ToolEvents::postGenerateSchemaTable], new CreateSchemaListener($this));
-        $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager));
+        $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager, $entityManager));
 
         return $this;
     }
@@ -91,11 +90,11 @@ final class DoctrineProvider extends AbstractProvider
                 $service->getEntityManager()->getClassMetadata($entity)->getTableName();
 
                 return $service;
-            } catch (Exception) {
+            } catch (\Exception) {
             }
         }
 
-        throw new InvalidArgumentException(sprintf('Auditing service not found for "%s".', $entity));
+        throw new InvalidArgumentException(\sprintf('Auditing service not found for "%s".', $entity));
     }
 
     public function getStorageServiceForEntity(string $entity): StorageService
@@ -130,7 +129,7 @@ final class DoctrineProvider extends AbstractProvider
         unset($payload['table'], $payload['entity']);
 
         $keys = array_keys(self::FIELDS);
-        $query = sprintf(
+        $query = \sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
             $auditTable,
             implode(', ', $keys),

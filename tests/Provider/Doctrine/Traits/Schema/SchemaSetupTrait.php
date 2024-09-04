@@ -11,7 +11,6 @@ use DH\Auditor\Provider\Service\StorageServiceInterface;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\DoctrineProviderTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
-use Exception;
 
 trait SchemaSetupTrait
 {
@@ -76,7 +75,7 @@ trait SchemaSetupTrait
                     $entityManager->getConnection()->executeStatement('DROP SCHEMA IF EXISTS '.$schemaName);
                 }
             }
-        } catch (Exception) {
+        } catch (\Exception) {
         }
     }
 
@@ -145,7 +144,7 @@ trait SchemaSetupTrait
                     $entityManager->getConnection()->executeStatement('DROP SCHEMA IF EXISTS '.$schemaName);
                 }
             }
-        } catch (Exception) {
+        } catch (\Exception) {
         }
     }
 

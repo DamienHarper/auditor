@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Model;
 
-use DateTimeImmutable;
 use DH\Auditor\Tests\Model\EntryTest;
 
 /**
@@ -12,17 +11,17 @@ use DH\Auditor\Tests\Model\EntryTest;
  */
 final class Entry
 {
-    private int $id;
+    private ?int $id = null;
 
-    private string $type;
+    private string $type = '';
 
-    private string $object_id;
+    private string $object_id = '';
 
     private ?string $discriminator = null;
 
     private ?string $transaction_hash = null;
 
-    private string $diffs;
+    private string $diffs = '{}';
 
     private null|int|string $blame_id = null;
 
@@ -34,12 +33,12 @@ final class Entry
 
     private ?string $ip = null;
 
-    private DateTimeImmutable $created_at;
+    private ?\DateTimeImmutable $created_at = null;
 
     /**
      * Get the value of id.
      */
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -113,7 +112,7 @@ final class Entry
     /**
      * Get the value of created_at.
      */
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->created_at;
     }

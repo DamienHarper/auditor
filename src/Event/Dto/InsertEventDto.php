@@ -6,13 +6,9 @@ namespace DH\Auditor\Event\Dto;
 
 final class InsertEventDto extends AbstractEventDto
 {
-    private array $changeset;
-
-    public function __construct(object $source, array $changeset)
+    public function __construct(object $source, private readonly array $changeset)
     {
         parent::__construct($source);
-
-        $this->changeset = $changeset;
     }
 
     public function getChangeset(): array

@@ -4,17 +4,36 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Command;
 
+use DH\Auditor\Auditor;
+use DH\Auditor\EventSubscriber\AuditEventSubscriber;
+use DH\Auditor\Provider\AbstractProvider;
+use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
+use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHConnection;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHMiddleware;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionHydrator;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionProcessor;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Command\UpdateSchemaCommand;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
+use DH\Auditor\Provider\Doctrine\Persistence\Event\TableSchemaListener;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\PlatformHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
+use DH\Auditor\Provider\Doctrine\Service\DoctrineService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
+use DH\Auditor\Provider\Service\AbstractService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -25,6 +44,29 @@ use Symfony\Component\Console\Tester\CommandTester;
  * @internal
  */
 #[Small]
+#[CoversClass(UpdateSchemaCommand::class)]
+#[CoversClass(Auditor::class)]
+#[CoversClass(\DH\Auditor\Configuration::class)]
+#[CoversClass(AuditEventSubscriber::class)]
+#[CoversClass(AbstractProvider::class)]
+#[CoversClass(AnnotationLoader::class)]
+#[CoversClass(DoctrineSubscriber::class)]
+#[CoversClass(TransactionHydrator::class)]
+#[CoversClass(TransactionManager::class)]
+#[CoversClass(TransactionProcessor::class)]
+#[CoversClass(Configuration::class)]
+#[CoversClass(DoctrineProvider::class)]
+#[CoversClass(CreateSchemaListener::class)]
+#[CoversClass(TableSchemaListener::class)]
+#[CoversClass(DoctrineHelper::class)]
+#[CoversClass(PlatformHelper::class)]
+#[CoversClass(SchemaHelper::class)]
+#[CoversClass(SchemaManager::class)]
+#[CoversClass(DoctrineService::class)]
+#[CoversClass(AbstractService::class)]
+#[CoversClass(DHConnection::class)]
+#[CoversClass(DHDriver::class)]
+#[CoversClass(DHMiddleware::class)]
 final class UpdateSchemaCommandTest extends TestCase
 {
     use LockableTrait;
@@ -52,9 +94,9 @@ final class UpdateSchemaCommandTest extends TestCase
 
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('[CAUTION] This operation should not be executed in a production environment!', $output);
-        self::assertStringContainsString('The Schema-Tool would execute ', $output);
-        self::assertStringContainsString(' queries to update the database.', $output);
+        $this->assertStringContainsString('[CAUTION] This operation should not be executed in a production environment!', $output);
+        $this->assertStringContainsString('The Schema-Tool would execute ', $output);
+        $this->assertStringContainsString(' queries to update the database.', $output);
     }
 
     #[Depends('testExecute')]
@@ -66,7 +108,7 @@ final class UpdateSchemaCommandTest extends TestCase
 
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('The following SQL statements will be executed:', $output);
+        $this->assertStringContainsString('The following SQL statements will be executed:', $output);
     }
 
     #[Depends('testExecute')]
@@ -78,8 +120,8 @@ final class UpdateSchemaCommandTest extends TestCase
 
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('Updating database schema...', $output);
-        self::assertStringContainsString('[OK] Database schema updated successfully!', $output);
+        $this->assertStringContainsString('Updating database schema...', $output);
+        $this->assertStringContainsString('[OK] Database schema updated successfully!', $output);
     }
 
     #[Depends('testExecute')]
@@ -94,9 +136,9 @@ final class UpdateSchemaCommandTest extends TestCase
 
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('The following SQL statements will be executed:', $output);
-        self::assertStringContainsString('Updating database schema...', $output);
-        self::assertStringContainsString('[OK] Database schema updated successfully!', $output);
+        $this->assertStringContainsString('The following SQL statements will be executed:', $output);
+        $this->assertStringContainsString('Updating database schema...', $output);
+        $this->assertStringContainsString('[OK] Database schema updated successfully!', $output);
     }
 
     #[Depends('testExecute')]
@@ -110,7 +152,7 @@ final class UpdateSchemaCommandTest extends TestCase
 
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('[OK] Nothing to update.', $output);
+        $this->assertStringContainsString('[OK] Nothing to update.', $output);
     }
 
     #[Depends('testExecute')]
@@ -124,7 +166,7 @@ final class UpdateSchemaCommandTest extends TestCase
 
         // the output of the command in the auditor
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('The command is already running in another process.', $output);
+        $this->assertStringContainsString('The command is already running in another process.', $output);
 
         $this->release();
     }

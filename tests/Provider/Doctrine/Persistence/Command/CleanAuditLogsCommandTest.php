@@ -4,9 +4,28 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Command;
 
+use DH\Auditor\Auditor;
+use DH\Auditor\EventSubscriber\AuditEventSubscriber;
+use DH\Auditor\Provider\AbstractProvider;
+use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
+use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHConnection;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
+use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHMiddleware;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionHydrator;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionProcessor;
 use DH\Auditor\Provider\Doctrine\Configuration;
+use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Command\CleanAuditLogsCommand;
+use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
+use DH\Auditor\Provider\Doctrine\Persistence\Event\TableSchemaListener;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\PlatformHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
+use DH\Auditor\Provider\Doctrine\Service\DoctrineService;
+use DH\Auditor\Provider\Service\AbstractService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Dog;
@@ -15,6 +34,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -25,6 +45,29 @@ use Symfony\Component\Console\Tester\CommandTester;
  * @internal
  */
 #[Small]
+#[CoversClass(CleanAuditLogsCommand::class)]
+#[CoversClass(Auditor::class)]
+#[CoversClass(\DH\Auditor\Configuration::class)]
+#[CoversClass(AuditEventSubscriber::class)]
+#[CoversClass(AbstractProvider::class)]
+#[CoversClass(AnnotationLoader::class)]
+#[CoversClass(DoctrineSubscriber::class)]
+#[CoversClass(TransactionHydrator::class)]
+#[CoversClass(TransactionManager::class)]
+#[CoversClass(TransactionProcessor::class)]
+#[CoversClass(Configuration::class)]
+#[CoversClass(DoctrineProvider::class)]
+#[CoversClass(CreateSchemaListener::class)]
+#[CoversClass(TableSchemaListener::class)]
+#[CoversClass(DoctrineHelper::class)]
+#[CoversClass(PlatformHelper::class)]
+#[CoversClass(SchemaHelper::class)]
+#[CoversClass(SchemaManager::class)]
+#[CoversClass(DoctrineService::class)]
+#[CoversClass(AbstractService::class)]
+#[CoversClass(DHConnection::class)]
+#[CoversClass(DHDriver::class)]
+#[CoversClass(DHMiddleware::class)]
 final class CleanAuditLogsCommandTest extends TestCase
 {
     use LockableTrait;
@@ -46,7 +89,7 @@ final class CleanAuditLogsCommandTest extends TestCase
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString(sprintf("[ERROR] 'keep' argument must be a valid ISO 8601 date interval, '%s' given.", self::KEEP), $output);
+        $this->assertStringContainsString(\sprintf("[ERROR] 'keep' argument must be a valid ISO 8601 date interval, '%s' given.", self::KEEP), $output);
     }
 
     public function testDumpSQL(): void
@@ -71,10 +114,10 @@ final class CleanAuditLogsCommandTest extends TestCase
             $storageService = $this->provider->getStorageServiceForEntity($entity);
             $platform = $storageService->getEntityManager()->getConnection()->getDatabasePlatform();
             $expected = 'DELETE FROM '.$schemaManager->resolveAuditTableName($entity, $configuration, $platform);
-            self::assertStringContainsString($expected, $output);
+            $this->assertStringContainsString($expected, $output);
         }
 
-        self::assertStringContainsString('[OK] Success', $output);
+        $this->assertStringContainsString('[OK] Success', $output);
     }
 
     #[Depends('testDumpSQL')]
@@ -88,7 +131,7 @@ final class CleanAuditLogsCommandTest extends TestCase
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('[OK] Success', $output);
+        $this->assertStringContainsString('[OK] Success', $output);
     }
 
     #[Depends('testExecute')]
@@ -104,7 +147,7 @@ final class CleanAuditLogsCommandTest extends TestCase
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('The command is already running in another process.', $output);
+        $this->assertStringContainsString('The command is already running in another process.', $output);
 
         $this->release();
     }
@@ -119,7 +162,7 @@ final class CleanAuditLogsCommandTest extends TestCase
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('clean audits created before 2023-04-26 09:00:00', $output);
+        $this->assertStringContainsString('clean audits created before 2023-04-26 09:00:00', $output);
     }
 
     public function testExcludeOptionSingleValue(): void
@@ -132,7 +175,7 @@ final class CleanAuditLogsCommandTest extends TestCase
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('6 classes involved', $output);
+        $this->assertStringContainsString('6 classes involved', $output);
     }
 
     public function testExcludeOptionMultipleValues(): void
@@ -148,7 +191,7 @@ final class CleanAuditLogsCommandTest extends TestCase
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('5 classes involved', $output);
+        $this->assertStringContainsString('5 classes involved', $output);
     }
 
     public function testIncludeOptionSignleValue(): void
@@ -161,7 +204,7 @@ final class CleanAuditLogsCommandTest extends TestCase
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('1 classes involved', $output);
+        $this->assertStringContainsString('1 classes involved', $output);
     }
 
     public function testIncludeOptionMultipleValues(): void
@@ -177,7 +220,7 @@ final class CleanAuditLogsCommandTest extends TestCase
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('2 classes involved', $output);
+        $this->assertStringContainsString('2 classes involved', $output);
     }
 
     private function createCommand(): CleanAuditLogsCommand
