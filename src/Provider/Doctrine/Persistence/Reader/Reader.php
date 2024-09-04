@@ -61,8 +61,11 @@ final readonly class Reader
             $query->addFilter(new SimpleFilter(Query::OBJECT_ID, $config['object_id']));
         }
 
-        if (null !== $config['user_id']) {
-            $query->addFilter(new SimpleFilter(Query::USER_ID, $config['user_id']));
+        // user_id is considered as an alias for blame_id
+        // if both are provided, blame_id will be used
+        if (null !== $config['blame_id'] || null !== $config['user_id']) {
+            $blame_id = $config['blame_id'] ?? $config['user_id'];
+            $query->addFilter(new SimpleFilter(Query::USER_ID, $blame_id));
         }
 
         if (null !== $config['transaction_hash']) {
@@ -179,6 +182,7 @@ final readonly class Reader
             ->setDefaults([
                 'type' => null,
                 'object_id' => null,
+                'blame_id' => null,
                 'user_id' => null,
                 'transaction_hash' => null,
                 'page' => 1,
@@ -187,6 +191,7 @@ final readonly class Reader
             ])
             ->setAllowedTypes('type', ['null', 'string', 'array'])
             ->setAllowedTypes('object_id', ['null', 'int', 'string', 'array'])
+            ->setAllowedTypes('blame_id', ['null', 'int', 'string', 'array'])
             ->setAllowedTypes('user_id', ['null', 'int', 'string', 'array'])
             ->setAllowedTypes('transaction_hash', ['null', 'string', 'array'])
             ->setAllowedTypes('page', ['null', 'int'])

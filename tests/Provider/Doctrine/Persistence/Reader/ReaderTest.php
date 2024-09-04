@@ -290,6 +290,56 @@ final class ReaderTest extends TestCase
         $this->assertCount(4, $audits);
     }
 
+    public function testGetAuditsByBlameId(): void
+    {
+        $reader = $this->createReader();
+
+        $query = $reader->createQuery(Author::class);
+        $audits = $query->execute();
+        $countAll = \count($audits);
+
+        $query = $reader->createQuery(Author::class, ['blame_id' => 1]);
+        $countId1 = $query->count();
+
+        $query = $reader->createQuery(Author::class, ['blame_id' => 2]);
+        $countId2 = $query->count();
+
+        $this->assertSame($countAll, $countId1 + $countId2, 'Query by blame_id is ok.');
+    }
+
+    public function testGetAuditsByUserId(): void
+    {
+        $reader = $this->createReader();
+
+        $query = $reader->createQuery(Author::class);
+        $audits = $query->execute();
+        $countAll = \count($audits);
+
+        $query = $reader->createQuery(Author::class, ['user_id' => 1]);
+        $countId1 = $query->count();
+
+        $query = $reader->createQuery(Author::class, ['user_id' => 2]);
+        $countId2 = $query->count();
+
+        $this->assertSame($countAll, $countId1 + $countId2, 'Query by user_id is ok.');
+    }
+
+    public function testGetAuditsByBlameIdAndUserId(): void
+    {
+        $reader = $this->createReader();
+
+        $query = $reader->createQuery(Author::class, ['blame_id' => 1]);
+        $countBlameId = $query->count();
+
+        $query = $reader->createQuery(Author::class, ['user_id' => 1]);
+        $countUserId = $query->count();
+
+        $this->assertSame($countBlameId, $countUserId, 'Query by blame_id or user_id produce the same result.');
+
+        $query = $reader->createQuery(Author::class, ['blame_id' => 1, 'user_id' => 2]);
+        $this->assertSame($countBlameId, $query->count(), 'blame_id is used if both blame_id and user_id are provided.');
+    }
+
     #[Depends('testGetAudits')]
     public function testGetAuditsByDate(): void
     {
