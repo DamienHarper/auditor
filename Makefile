@@ -89,6 +89,8 @@ tests: validate_matrix
 phpstan: validate_matrix
 	$(eval $(call set_args,phpstan))
 	$(call common_setup)
+	@PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) DATABASE_URL=$(DATABASE_URL) \
+	sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer install --working-dir=tools/phpstan --quiet"
 	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) \
 	sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli tools/phpstan/vendor/bin/phpstan $(args)"
 
@@ -97,6 +99,8 @@ phpstan: validate_matrix
 cs-fix: validate_matrix
 	$(eval $(call set_args,cs-fix))
 	$(call common_setup)
+	@PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) DATABASE_URL=$(DATABASE_URL) \
+	sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli composer install --working-dir=tools/php-cs-fixer --quiet"
 	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) \
 	sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli tools/php-cs-fixer/vendor/bin/php-cs-fixer $(args)"
 
