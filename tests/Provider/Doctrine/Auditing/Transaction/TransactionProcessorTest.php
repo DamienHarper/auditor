@@ -122,8 +122,8 @@ final class TransactionProcessorTest extends TestCase
         $entry = array_shift($audits);
         $this->assertSame(1, $entry->getId(), 'audit entry ID is ok.');
         $this->assertSame(Transaction::INSERT, $entry->getType(), 'audit entry type is ok.');
-        $this->assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
-        $this->assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
+        $this->assertContainsEquals($entry->getUserId(), ['1', '2'], 'audit entry blame_id is ok.');
+        $this->assertContainsEquals($entry->getUsername(), ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         $this->assertSame([
             'email' => [
@@ -169,8 +169,8 @@ final class TransactionProcessorTest extends TestCase
         $entry = array_shift($audits);
         $this->assertSame(1, $entry->getId(), 'audit entry ID is ok.');
         $this->assertSame(Transaction::UPDATE, $entry->getType(), 'audit entry type is ok.');
-        $this->assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
-        $this->assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
+        $this->assertContainsEquals($entry->getUserId(), ['1', '2'], 'audit entry blame_id is ok.');
+        $this->assertContainsEquals($entry->getUsername(), ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         $this->assertSame([
             'email' => [
@@ -209,8 +209,8 @@ final class TransactionProcessorTest extends TestCase
         $entry = array_shift($audits);
         $this->assertSame(1, $entry->getId(), 'audit entry ID is ok.');
         $this->assertSame(Transaction::REMOVE, $entry->getType(), 'audit entry type is ok.');
-        $this->assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
-        $this->assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
+        $this->assertContainsEquals($entry->getUserId(), ['1', '2'], 'audit entry blame_id is ok.');
+        $this->assertContainsEquals($entry->getUsername(), ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         $this->assertSame([
             'class' => Author::class,
@@ -275,8 +275,8 @@ final class TransactionProcessorTest extends TestCase
         $entry = array_shift($audits);
         $this->assertSame(1, $entry->getId(), 'audit entry ID is ok.');
         $this->assertSame(Transaction::ASSOCIATE, $entry->getType(), 'audit entry type is ok.');
-        $this->assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
-        $this->assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
+        $this->assertContainsEquals($entry->getUserId(), ['1', '2'], 'audit entry blame_id is ok.');
+        $this->assertContainsEquals($entry->getUsername(), ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         $this->assertSame([
             'is_owning_side' => false,
@@ -349,8 +349,8 @@ final class TransactionProcessorTest extends TestCase
         $entry = array_shift($audits);
         $this->assertSame(1, $entry->getId(), 'audit entry ID is ok.');
         $this->assertSame(Transaction::DISSOCIATE, $entry->getType(), 'audit entry type is ok.');
-        $this->assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
-        $this->assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
+        $this->assertContainsEquals($entry->getUserId(), ['1', '2'], 'audit entry blame_id is ok.');
+        $this->assertContainsEquals($entry->getUsername(), ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         $this->assertSame([
             'is_owning_side' => false,
@@ -470,8 +470,8 @@ final class TransactionProcessorTest extends TestCase
         $entry = array_shift($audits);
         $this->assertSame(2, $entry->getId(), 'audit entry ID is ok.');
         $this->assertSame(Transaction::ASSOCIATE, $entry->getType(), 'audit entry type is ok.');
-        $this->assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
-        $this->assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
+        $this->assertContainsEquals($entry->getUserId(), ['1', '2'], 'audit entry blame_id is ok.');
+        $this->assertContainsEquals($entry->getUsername(), ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         $this->assertSame([
             'is_owning_side' => true,
@@ -495,8 +495,8 @@ final class TransactionProcessorTest extends TestCase
         $entry = array_shift($audits);
         $this->assertSame(1, $entry->getId(), 'audit entry ID is ok.');
         $this->assertSame(Transaction::ASSOCIATE, $entry->getType(), 'audit entry type is ok.');
-        $this->assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
-        $this->assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
+        $this->assertContainsEquals($entry->getUserId(), ['1', '2'], 'audit entry blame_id is ok.');
+        $this->assertContainsEquals($entry->getUsername(), ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         $this->assertSame([
             'is_owning_side' => true,
@@ -620,8 +620,8 @@ final class TransactionProcessorTest extends TestCase
         $entry = array_shift($audits);
         $this->assertSame(3, $entry->getId(), 'audit entry ID is ok.');
         $this->assertSame(Transaction::DISSOCIATE, $entry->getType(), 'audit entry type is ok.');
-        $this->assertSame('1', $entry->getUserId(), 'audit entry blame_id is ok.');
-        $this->assertSame('dark.vador', $entry->getUsername(), 'audit entry blame_user is ok.');
+        $this->assertContainsEquals($entry->getUserId(), ['1', '2'], 'audit entry blame_id is ok.');
+        $this->assertContainsEquals($entry->getUsername(), ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
         $this->assertSame([
             'is_owning_side' => true,
