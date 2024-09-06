@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Model;
 
 use DH\Auditor\Model\Entry;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +12,6 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversClass(Entry::class)]
 final class EntryTest extends TestCase
 {
     public function testAccessors(): void

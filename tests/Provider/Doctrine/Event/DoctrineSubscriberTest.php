@@ -6,7 +6,6 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Event;
 
 use DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware\AuditorDriver;
 use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
-use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Transaction\TransactionManagerInterface;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection as ConnectionDbal;
@@ -19,7 +18,6 @@ use Doctrine\DBAL\ServerVersionProvider;
 use Doctrine\DBAL\VersionAwarePlatformDriver;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -27,9 +25,6 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversClass(DoctrineSubscriber::class)]
-#[CoversClass(Transaction::class)]
-#[CoversClass(AuditorDriver::class)]
 final class DoctrineSubscriberTest extends TestCase
 {
     public function testIssue184IfAbstractDriverMiddleware(): void

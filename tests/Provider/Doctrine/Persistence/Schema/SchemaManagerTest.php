@@ -4,29 +4,14 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema;
 
-use DH\Auditor\Auditor;
-use DH\Auditor\EventSubscriber\AuditEventSubscriber;
-use DH\Auditor\Provider\AbstractProvider;
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
-use DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware\AuditorConnection;
-use DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware\AuditorDriver;
-use DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware\AuditorMiddleware;
-use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
-use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionHydrator;
-use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
-use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionProcessor;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
-use DH\Auditor\Provider\Doctrine\Persistence\Event\TableSchemaListener;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\PlatformHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
-use DH\Auditor\Provider\Doctrine\Service\DoctrineService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
-use DH\Auditor\Provider\Service\AbstractService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Dog;
@@ -43,7 +28,6 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -52,28 +36,6 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversClass(SchemaManager::class)]
-#[CoversClass(Auditor::class)]
-#[CoversClass(\DH\Auditor\Configuration::class)]
-#[CoversClass(AuditEventSubscriber::class)]
-#[CoversClass(AbstractProvider::class)]
-#[CoversClass(AnnotationLoader::class)]
-#[CoversClass(DoctrineSubscriber::class)]
-#[CoversClass(TransactionHydrator::class)]
-#[CoversClass(TransactionManager::class)]
-#[CoversClass(TransactionProcessor::class)]
-#[CoversClass(Configuration::class)]
-#[CoversClass(DoctrineProvider::class)]
-#[CoversClass(CreateSchemaListener::class)]
-#[CoversClass(TableSchemaListener::class)]
-#[CoversClass(DoctrineHelper::class)]
-#[CoversClass(PlatformHelper::class)]
-#[CoversClass(SchemaHelper::class)]
-#[CoversClass(DoctrineService::class)]
-#[CoversClass(AbstractService::class)]
-#[CoversClass(AuditorConnection::class)]
-#[CoversClass(AuditorDriver::class)]
-#[CoversClass(AuditorMiddleware::class)]
 final class SchemaManagerTest extends TestCase
 {
     use DefaultSchemaSetupTrait;
