@@ -16,7 +16,7 @@ class DataObject
     #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true])]
     protected int $id;
 
-    #[ORM\Column(type: Types::BINARY)]
+    #[ORM\Column(type: Types::BINARY, length: 255)]
     protected mixed $data = null;
 
     public function getId(): int

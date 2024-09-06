@@ -4,18 +4,14 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests;
 
-use DH\Auditor\Auditor;
 use DH\Auditor\Configuration;
-use DH\Auditor\EventSubscriber\AuditEventSubscriber;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Exception\ProviderException;
-use DH\Auditor\Provider\AbstractProvider;
 use DH\Auditor\Tests\Fixtures\Provider\AuditNoStorageProvider;
 use DH\Auditor\Tests\Fixtures\Provider\NoStorageNoAuditProvider;
 use DH\Auditor\Tests\Fixtures\Provider\StorageAndAuditProvider;
 use DH\Auditor\Tests\Fixtures\Provider\StorageNoAuditProvider;
 use DH\Auditor\Tests\Traits\AuditorTrait;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -25,10 +21,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  * @internal
  */
 #[Small]
-#[CoversClass(Auditor::class)]
-#[CoversClass(Configuration::class)]
-#[CoversClass(AuditEventSubscriber::class)]
-#[CoversClass(AbstractProvider::class)]
 final class AuditorTest extends TestCase
 {
     use AuditorTrait;

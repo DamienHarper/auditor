@@ -4,30 +4,13 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine;
 
-use DH\Auditor\Auditor;
-use DH\Auditor\EventSubscriber\AuditEventSubscriber;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Exception\ProviderException;
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Auditable;
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
-use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHConnection;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHMiddleware;
-use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionHydrator;
-use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
-use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionProcessor;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
-use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
-use DH\Auditor\Provider\Doctrine\Persistence\Event\TableSchemaListener;
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
-use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
-use DH\Auditor\Provider\Doctrine\Service\DoctrineService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
-use DH\Auditor\Provider\Service\AbstractService;
 use DH\Auditor\Provider\Service\StorageServiceInterface;
 use DH\Auditor\Security\RoleCheckerInterface;
 use DH\Auditor\Security\SecurityProviderInterface;
@@ -42,7 +25,6 @@ use DH\Auditor\Tests\Provider\Doctrine\Traits\DoctrineProviderTrait;
 use DH\Auditor\User\User;
 use DH\Auditor\User\UserInterface;
 use DH\Auditor\User\UserProviderInterface;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -51,28 +33,6 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversClass(DoctrineProvider::class)]
-#[CoversClass(Auditor::class)]
-#[CoversClass(\DH\Auditor\Configuration::class)]
-#[CoversClass(AuditEventSubscriber::class)]
-#[CoversClass(AnnotationLoader::class)]
-#[CoversClass(DoctrineSubscriber::class)]
-#[CoversClass(TransactionHydrator::class)]
-#[CoversClass(TransactionManager::class)]
-#[CoversClass(TransactionProcessor::class)]
-#[CoversClass(Configuration::class)]
-#[CoversClass(CreateSchemaListener::class)]
-#[CoversClass(TableSchemaListener::class)]
-#[CoversClass(DoctrineHelper::class)]
-#[CoversClass(SchemaManager::class)]
-#[CoversClass(DoctrineService::class)]
-#[CoversClass(AbstractService::class)]
-#[CoversClass(Auditable::class)]
-#[CoversClass(Security::class)]
-#[CoversClass(DHConnection::class)]
-#[CoversClass(DHDriver::class)]
-#[CoversClass(DHMiddleware::class)]
-#[CoversClass(User::class)]
 final class DoctrineProviderTest extends TestCase
 {
     use DoctrineProviderTrait;

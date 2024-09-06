@@ -5,18 +5,12 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader;
 
 use DH\Auditor\Exception\InvalidArgumentException;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHConnection;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHDriver;
-use DH\Auditor\Provider\Doctrine\Auditing\Logger\Middleware\DHMiddleware;
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\DateRangeFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\RangeFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Query;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ConnectionTrait;
 use DH\Auditor\Tests\Traits\ReflectionTrait;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -25,15 +19,6 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversClass(Query::class)]
-#[CoversClass(DHConnection::class)]
-#[CoversClass(DHDriver::class)]
-#[CoversClass(DHMiddleware::class)]
-#[CoversClass(DoctrineHelper::class)]
-#[CoversClass(SchemaHelper::class)]
-#[CoversClass(RangeFilter::class)]
-#[CoversClass(DateRangeFilter::class)]
-#[CoversClass(SimpleFilter::class)]
 final class QueryTest extends TestCase
 {
     use ConnectionTrait;

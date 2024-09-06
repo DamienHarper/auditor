@@ -23,9 +23,6 @@ class DummyEntity
     #[ORM\Column(type: Types::BOOLEAN, nullable: true, options: ['default' => '0'])]
     protected ?bool $bool_value = null;
 
-    #[ORM\Column(type: Types::ARRAY)]
-    protected ?array $php_array = null;
-
     #[ORM\Column(type: Types::JSON, nullable: true)]
     protected $json_array;
 
@@ -50,18 +47,6 @@ class DummyEntity
     public function setLabel(mixed $label): self
     {
         $this->label = $label;
-
-        return $this;
-    }
-
-    public function getPhpArray(): ?array
-    {
-        return $this->php_array;
-    }
-
-    public function setPhpArray(array $php_array): self
-    {
-        $this->php_array = $php_array;
 
         return $this;
     }

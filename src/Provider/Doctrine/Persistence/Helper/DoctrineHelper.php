@@ -10,7 +10,6 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Types;
 
 /**
  * @see DoctrineHelperTest
@@ -47,17 +46,6 @@ final class DoctrineHelper
         );
     }
 
-    public static function getDoctrineType(string $type): string
-    {
-        if (!\defined(Types::class.'::'.$type)) {
-            throw new \InvalidArgumentException(\sprintf('Undefined Doctrine type "%s"', $type));
-        }
-
-        \assert(\is_string(\constant(Types::class.'::'.$type)));
-
-        return \constant(Types::class.'::'.$type);
-    }
-
     /**
      * TODO: remove this method when we drop support of doctrine/dbal 2.13.x.
      *
@@ -91,8 +79,8 @@ final class DoctrineHelper
      */
     public static function getMigrateToSql(Connection $connection, Schema $fromSchema, Schema $toSchema): array
     {
-        $schemaComparator = new Comparator();
         $platform = $connection->getDatabasePlatform();
+        $schemaComparator = new Comparator($platform);
 
         if (method_exists($platform, 'getAlterSchemaSQL')) {
             return $platform->getAlterSchemaSQL(

@@ -7,10 +7,7 @@ namespace DH\Auditor\Tests\Event;
 use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\EventSubscriber\AuditEventSubscriber;
 use DH\Auditor\Exception\InvalidArgumentException;
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Tests\Traits\AuditorTrait;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -18,9 +15,6 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[CoversClass(LifecycleEvent::class)]
-#[CoversClass(DoctrineHelper::class)]
-#[CoversClass(SchemaHelper::class)]
 final class LifecycleEventTest extends TestCase
 {
     use AuditorTrait;
