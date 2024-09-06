@@ -10,6 +10,7 @@ use DH\Auditor\User\UserInterface;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 
@@ -85,22 +86,22 @@ trait AuditTrait
         $platform = $entityManager->getConnection()->getDatabasePlatform();
 
         switch (array_search($type::class, Type::getTypesMap(), true)) {
-            case DoctrineHelper::getDoctrineType('BIGINT'):
+            case Types::BIGINT:
             case 'ulid':
                 // Ramsey UUID / Symfony UID (UUID/ULID)
                 $convertedValue = (string) $value;  // @phpstan-ignore-line
 
                 break;
 
-            case DoctrineHelper::getDoctrineType('INTEGER'):
-            case DoctrineHelper::getDoctrineType('SMALLINT'):
+            case Types::INTEGER:
+            case Types::SMALLINT:
                 $convertedValue = (int) $value; // @phpstan-ignore-line
 
                 break;
 
-            case DoctrineHelper::getDoctrineType('DECIMAL'):
-            case DoctrineHelper::getDoctrineType('FLOAT'):
-            case DoctrineHelper::getDoctrineType('BOOLEAN'):
+            case Types::DECIMAL:
+            case Types::FLOAT:
+            case Types::BOOLEAN:
                 $convertedValue = $type->convertToPHPValue($value, $platform);
 
                 break;
@@ -108,8 +109,8 @@ trait AuditTrait
             case 'uuid_binary':
             case 'uuid_binary_ordered_time':
             case 'uuid':
-            case DoctrineHelper::getDoctrineType('BLOB'):
-            case DoctrineHelper::getDoctrineType('BINARY'):
+            case Types::BLOB:
+            case Types::BINARY:
                 if (\is_resource($value)) {
                     // let's replace resources with a "simple" representation: resourceType#resourceId
                     $convertedValue = get_resource_type($value).'#'.get_resource_id($value);
@@ -119,7 +120,7 @@ trait AuditTrait
 
                 break;
 
-            case DoctrineHelper::getDoctrineType('JSON'):
+            case Types::JSON:
                 return $value;
 
             default:

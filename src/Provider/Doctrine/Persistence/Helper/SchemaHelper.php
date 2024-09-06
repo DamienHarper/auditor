@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
+use Doctrine\DBAL\Types\Types;
+
 abstract class SchemaHelper
 {
     /**
@@ -15,28 +17,28 @@ abstract class SchemaHelper
     {
         return [
             'id' => [
-                'type' => DoctrineHelper::getDoctrineType('INTEGER'),
+                'type' => Types::INTEGER,
                 'options' => [
                     'autoincrement' => true,
                     'unsigned' => true,
                 ],
             ],
             'type' => [
-                'type' => DoctrineHelper::getDoctrineType('STRING'),
+                'type' => Types::STRING,
                 'options' => [
                     'notnull' => true,
                     'length' => 10,
                 ],
             ],
             'object_id' => [
-                'type' => DoctrineHelper::getDoctrineType('STRING'),
+                'type' => Types::STRING,
                 'options' => [
                     'notnull' => true,
                     'length' => 255,
                 ],
             ],
             'discriminator' => [
-                'type' => DoctrineHelper::getDoctrineType('STRING'),
+                'type' => Types::STRING,
                 'options' => [
                     'default' => null,
                     'notnull' => false,
@@ -44,21 +46,21 @@ abstract class SchemaHelper
                 ],
             ],
             'transaction_hash' => [
-                'type' => DoctrineHelper::getDoctrineType('STRING'),
+                'type' => Types::STRING,
                 'options' => [
                     'notnull' => false,
                     'length' => 40,
                 ],
             ],
             'diffs' => [
-                'type' => DoctrineHelper::getDoctrineType('JSON'),
+                'type' => Types::JSON,
                 'options' => [
                     'default' => null,
                     'notnull' => false,
                 ],
             ],
             'blame_id' => [
-                'type' => DoctrineHelper::getDoctrineType('STRING'),
+                'type' => Types::STRING,
                 'options' => [
                     'default' => null,
                     'notnull' => false,
@@ -66,7 +68,7 @@ abstract class SchemaHelper
                 ],
             ],
             'blame_user' => [
-                'type' => DoctrineHelper::getDoctrineType('STRING'),
+                'type' => Types::STRING,
                 'options' => [
                     'default' => null,
                     'notnull' => false,
@@ -74,7 +76,7 @@ abstract class SchemaHelper
                 ],
             ],
             'blame_user_fqdn' => [
-                'type' => DoctrineHelper::getDoctrineType('STRING'),
+                'type' => Types::STRING,
                 'options' => [
                     'default' => null,
                     'notnull' => false,
@@ -82,7 +84,7 @@ abstract class SchemaHelper
                 ],
             ],
             'blame_user_firewall' => [
-                'type' => DoctrineHelper::getDoctrineType('STRING'),
+                'type' => Types::STRING,
                 'options' => [
                     'default' => null,
                     'notnull' => false,
@@ -90,7 +92,7 @@ abstract class SchemaHelper
                 ],
             ],
             'ip' => [
-                'type' => DoctrineHelper::getDoctrineType('STRING'),
+                'type' => Types::STRING,
                 'options' => [
                     'default' => null,
                     'notnull' => false,
@@ -98,7 +100,7 @@ abstract class SchemaHelper
                 ],
             ],
             'created_at' => [
-                'type' => DoctrineHelper::getDoctrineType('DATETIME_IMMUTABLE'),
+                'type' => Types::DATETIME_IMMUTABLE,
                 'options' => [
                     'notnull' => true,
                 ],

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\Types;
 
 abstract class PlatformHelper
 {
@@ -18,7 +19,7 @@ abstract class PlatformHelper
         $columns = SchemaHelper::getAuditTableColumns();
         if (
             !isset($columns[$name])
-            || $columns[$name]['type'] !== DoctrineHelper::getDoctrineType('STRING')
+            || Types::STRING !== $columns[$name]['type']
             || (isset($columns[$name]['options']['length']) && $columns[$name]['options']['length'] < 191)
         ) {
             return false;
