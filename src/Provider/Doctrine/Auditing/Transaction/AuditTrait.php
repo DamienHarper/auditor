@@ -34,7 +34,7 @@ trait AuditTrait
         }
 
         if (isset($meta->fieldMappings[$pk])) {
-            $type = Type::getType($meta->fieldMappings[$pk]->type);
+            $type = Type::getType(\is_array($meta->fieldMappings[$pk]) ? $meta->fieldMappings[$pk]['type'] : $meta->fieldMappings[$pk]->type);
 
             \assert(\is_object($meta->getReflectionProperty($pk)));
 
@@ -57,7 +57,7 @@ trait AuditTrait
         $meta = $entityManager->getClassMetadata($mapping['targetEntity']);
         $pk = $meta->getSingleIdentifierFieldName();
 
-        $type = Type::getType($meta->fieldMappings[$pk]->type);
+        $type = Type::getType(\is_array($meta->fieldMappings[$pk]) ? $meta->fieldMappings[$pk]['type'] : $meta->fieldMappings[$pk]->type);
 
         \assert(\is_object($targetEntity));
         \assert(\is_object($meta->getReflectionProperty($pk)));
