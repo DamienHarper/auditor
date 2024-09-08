@@ -25,6 +25,7 @@ volumes:
   vendor_php8.2_sf5.4:
   vendor_php8.2_sf6.4:
   vendor_php8.2_sf7.1:
+  vendor_php8.3_sf5.4:
   vendor_php8.3_sf6.4:
   vendor_php8.3_sf7.1:
   phpcsfixer_php8.2:
