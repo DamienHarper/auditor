@@ -1,6 +1,7 @@
 parameters:
     level: max
     inferPrivatePropertyTypeFromConstructor: true
+    treatPhpDocTypesAsCertain: false
 
     type_coverage:
         return_type: 100

@@ -8,7 +8,7 @@ services:
       args:
         PHP_VERSION: ${PHP_VERSION}
     environment:
-      SYMFONY_REQUIRE: ${SYMFONY_VERSION}
+      SYMFONY_REQUIRE: ^${SYMFONY_VERSION}
       DATABASE_URL: ${DATABASE_URL:-}
       XDEBUG_MODE: ${XDEBUG_MODE:-coverage}
     volumes:
@@ -25,6 +25,7 @@ volumes:
   vendor_php8.2_sf5.4:
   vendor_php8.2_sf6.4:
   vendor_php8.2_sf7.1:
+  vendor_php8.3_sf5.4:
   vendor_php8.3_sf6.4:
   vendor_php8.3_sf7.1:
   phpcsfixer_php8.2:
