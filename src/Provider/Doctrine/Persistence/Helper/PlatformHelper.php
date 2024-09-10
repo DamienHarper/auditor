@@ -46,7 +46,7 @@ abstract class PlatformHelper
             return $connection->getWrappedConnection()->getServerVersion();
         }
         if (method_exists($connection, 'getNativeConnection')) {
-            return $connection->getServerVersion();
+            return $connection->getNativeConnection()->getServerVersion();
         }
 
         return null;
