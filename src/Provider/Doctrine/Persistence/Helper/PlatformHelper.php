@@ -104,11 +104,11 @@ abstract class PlatformHelper
     public static function getMariaDbMysqlVersionNumber(string $versionString): string
     {
         preg_match(
-            '#^(?:5\.5\.5-)?(mariadb-)?(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<patch>\d+))?#i',
+            '#^(?:5\.5\.5-)?(mariadb-)?(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)#i',
             $versionString,
             $versionParts
         );
 
-        return $versionParts['major'].'.'.$versionParts['minor'].'.'.($versionParts['patch'] ?? '0');
+        return $versionParts['major'].'.'.$versionParts['minor'].'.'.$versionParts['patch'];
     }
 }
