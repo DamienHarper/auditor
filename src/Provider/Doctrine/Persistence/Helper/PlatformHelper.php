@@ -45,7 +45,12 @@ abstract class PlatformHelper
     public static function getServerVersion(Connection $connection): ?string
     {
         if (method_exists($connection, 'getNativeConnection') && ($pdo = $connection->getNativeConnection()) instanceof \PDO) {
-            return $pdo->getAttribute(\PDO::ATTR_SERVER_VERSION);
+            $version = $pdo->getAttribute(\PDO::ATTR_SERVER_VERSION);
+            if (\is_string($version)) {
+                return $version;
+            }
+
+            return null;
         }
         $reflected = new \ReflectionObject($connection);
         if ($reflected->hasMethod('getServerVersion') && $reflected->getMethod('getServerVersion')->isPublic()) {
