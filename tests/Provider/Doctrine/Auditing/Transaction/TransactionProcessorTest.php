@@ -801,6 +801,50 @@ final class TransactionProcessorTest extends TestCase
         $this->assertCount(1, $audits, 'TransactionProcessor::processDeletions() creates a "'.Transaction::REMOVE.'" audit entry.');
     }
 
+    public function testEncodingConversion(): void
+    {
+        $processor = new TransactionProcessor($this->provider);
+        $method = $this->reflectMethod(TransactionProcessor::class, 'convertEncoding');
+
+        $invalidUtf8String = "\xC3\x28"; // Invalid UTF-8 byte sequence.
+        $convertedString = $method->invokeArgs($processor, [$invalidUtf8String]);
+
+        // Invalid UTF-8 byte sequence should be converted to valid UTF-8.
+        $this->assertNotSame(
+            $invalidUtf8String,
+            $convertedString,
+        );
+        $this->assertTrue(mb_check_encoding($convertedString, 'UTF-8'));
+
+        $obj = new \stdClass();
+        $complexArray = [
+            1,
+            false,
+            'string',
+            [
+                'key' => 'value',
+                'invalid' => $invalidUtf8String,
+            ],
+            $obj,
+        ];
+
+        $convertedArray = $method->invokeArgs($processor, [$complexArray]);
+        // Invalid UTF-8 byte sequence should be converted to valid UTF-8 and the rest of the array should remain unchanged.
+        $this->assertSame(
+            [
+                1,
+                false,
+                'string',
+                [
+                    'key' => 'value',
+                    'invalid' => $convertedString,
+                ],
+                $obj,
+            ],
+            $convertedArray,
+        );
+    }
+
     private function configureEntities(): void
     {
         $this->provider->getConfiguration()->setEntities([
