@@ -28,19 +28,14 @@ abstract class PlatformHelper
         }
 
         $platform = $connection->getDatabasePlatform();
-        $version = self::getServerVersion($connection);
-
-        if (null === $version) {
-            return false;
-        }
 
         // JSON wasn't supported on MariaDB before 10.2.7
         // @see https://mariadb.com/kb/en/json-data-type/
-        if ($platform instanceof MariaDBPlatform) {
+        if ($platform instanceof MariaDBPlatform && ($version = self::getServerVersion($connection))) {
             return version_compare(self::getMariaDbMysqlVersionNumber($version), '10.2.2', '<');
         }
 
-        if ($platform instanceof MySQLPlatform) {
+        if ($platform instanceof MySQLPlatform && ($version = self::getServerVersion($connection))) {
             return version_compare(self::getOracleMysqlVersionNumber($version), '5.7.7', '<');
         }
 
@@ -49,6 +44,14 @@ abstract class PlatformHelper
 
     public static function getServerVersion(Connection $connection): ?string
     {
+        if (method_exists($connection, 'getNativeConnection') && ($pdo = $connection->getNativeConnection()) instanceof \PDO) {
+            $version = $pdo->getAttribute(\PDO::ATTR_SERVER_VERSION);
+            if (\is_string($version)) {
+                return $version;
+            }
+
+            return null;
+        }
         $reflected = new \ReflectionObject($connection);
         if ($reflected->hasMethod('getServerVersion') && $reflected->getMethod('getServerVersion')->isPublic()) {
             return $connection->getServerVersion();
