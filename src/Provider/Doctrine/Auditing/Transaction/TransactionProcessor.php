@@ -210,7 +210,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
         $dt = new \DateTimeImmutable('now', new \DateTimeZone($this->provider->getAuditor()->getConfiguration()->getTimezone()));
         $diff = $data['diff'];
         $convertCharEncoding = (\is_string($diff) || \is_array($diff));
-        $diff = $convertCharEncoding ? mb_convert_encoding($diff, 'UTF-8', 'UTF-8') : $diff;
+        $diff = $convertCharEncoding ? $this->convertEncoding($diff) : $diff;
 
         $payload = [
             'entity' => $data['entity'],
@@ -230,6 +230,22 @@ final class TransactionProcessor implements TransactionProcessorInterface
 
         // send an `AuditEvent` event
         $this->notify($payload);
+    }
+
+    // Avoid warning (and dismissal) of objects in input array when using mb_convert_encoding
+    private function convertEncoding(mixed $input): mixed
+    {
+        if (\is_string($input)) {
+            return mb_convert_encoding($input, 'UTF-8', 'UTF-8');
+        }
+        if (\is_array($input)) {
+            foreach ($input as $key => $value) {
+                $input[$this->convertEncoding($key)] = $this->convertEncoding($value); // inbuilt mb_convert_encoding also converts keys
+            }
+        }
+
+        // Leave any other thing as is
+        return $input;
     }
 
     private function getDiscriminator(object $entity, int $inheritanceType): ?string
