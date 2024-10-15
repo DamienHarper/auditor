@@ -5,22 +5,27 @@ declare(strict_types=1);
 namespace DH\Auditor\Provider\Doctrine\Auditing\Event;
 
 use DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware\AuditorDriver;
+use DH\Auditor\Provider\Doctrine\Auditing\Transaction\AuditTrait;
+use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
-use DH\Auditor\Transaction\TransactionManagerInterface;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
+use Gedmo\SoftDeleteable\SoftDeleteableListener;
 
 final class DoctrineSubscriber implements EventSubscriber
 {
+    use AuditTrait;
+
     /** @var Transaction[] */
     private array $transactions = [];
 
     public function __construct(
-        private readonly TransactionManagerInterface $transactionManager,
+        private readonly DoctrineProvider $provider,
         private readonly EntityManagerInterface $entityManager
     ) {}
 
@@ -38,7 +43,7 @@ final class DoctrineSubscriber implements EventSubscriber
         $transaction = ($this->transactions[$entityManagerId] ??= new Transaction($this->entityManager));
 
         // Populate transaction
-        $this->transactionManager->populate($transaction);
+        $this->provider->getTransactionManager()->populate($transaction);
 
         $driver = $this->entityManager->getConnection()->getDriver();
 
@@ -48,15 +53,32 @@ final class DoctrineSubscriber implements EventSubscriber
 
         if ($driver instanceof AuditorDriver) {
             $driver->addFlusher(function () use ($transaction): void {
-                $this->transactionManager->process($transaction);
+                $this->provider->getTransactionManager()->process($transaction);
                 $transaction->reset();
             });
         }
     }
 
+    public function postSoftDelete(LifecycleEventArgs $args): void
+    {
+        $entityManagerId = spl_object_id($this->entityManager);
+
+        // cached transaction model, if it holds same EM no need to create a new one
+        $transaction = ($this->transactions[$entityManagerId] ??= new Transaction($this->entityManager));
+
+        if ($this->provider->isAudited($args->getObject())) {
+            $transaction->remove(
+                $args->getObject(),
+                $this->id($this->entityManager, $args->getObject()),
+            );
+        }
+    }
+
     public function getSubscribedEvents(): array
     {
-        return [Events::onFlush];
+        return class_exists(SoftDeleteableListener::class) ?
+            [Events::onFlush, SoftDeleteableListener::POST_SOFT_DELETE] :
+            [Events::onFlush];
     }
 
     /**

@@ -59,6 +59,11 @@ final class DoctrineProvider extends AbstractProvider
         $this->configuration->setProvider($this);
     }
 
+    public function getTransactionManager(): TransactionManager
+    {
+        return $this->transactionManager;
+    }
+
     public function registerAuditingService(AuditingServiceInterface $service): ProviderInterface
     {
         parent::registerAuditingService($service);
@@ -67,10 +72,10 @@ final class DoctrineProvider extends AbstractProvider
         $entityManager = $service->getEntityManager();
         $evm = $entityManager->getEventManager();
 
-        // Register subscribers
+        // Register audit listeners and subscribers
         $evm->addEventListener([Events::loadClassMetadata], new TableSchemaListener($this));
         $evm->addEventListener([ToolEvents::postGenerateSchemaTable], new CreateSchemaListener($this));
-        $evm->addEventSubscriber(new DoctrineSubscriber($this->transactionManager, $entityManager));
+        $evm->addEventSubscriber(new DoctrineSubscriber($this, $entityManager));
 
         return $this;
     }

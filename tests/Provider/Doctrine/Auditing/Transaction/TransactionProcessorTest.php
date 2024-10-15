@@ -156,6 +156,65 @@ final class TransactionProcessorTest extends TestCase
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
     }
 
+    public function testRemoveWithSoftDelete(): void
+    {
+        $processor = new TransactionProcessor($this->provider);
+        $reader = new Reader($this->provider);
+        $method = $this->reflectMethod(TransactionProcessor::class, 'remove');
+
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Post::class);
+        $entityManager = $storageService->getEntityManager();
+
+        $post = new Post();
+        $post
+            ->setId(1)
+            ->setTitle('First post')
+            ->setBody('Here is the body')
+            ->setCreatedAt(new \DateTimeImmutable('now'))
+        ;
+
+        $method->invokeArgs($processor, [$entityManager, $post, 1, 'what-a-nice-transaction-hash']);
+
+        // 1 "remove" audit entry added => count is 1
+        $audits = $reader->createQuery(Post::class)->execute();
+        $this->assertCount(1, $audits, 'TransactionProcessor::remove() creates an audit entry.');
+
+        $entry = array_shift($audits);
+        $this->assertSame(1, $entry->getId(), 'audit entry ID is ok.');
+        $this->assertSame(Transaction::REMOVE, $entry->getType(), 'audit entry type is ok.');
+        $this->assertContainsEquals($entry->getUserId(), ['1', '2'], 'audit entry blame_id is ok.');
+        $this->assertContainsEquals($entry->getUsername(), ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
+        $this->assertSame('1.2.3.4', $entry->getIp(), 'audit entry IP is ok.');
+        $this->assertSame([
+            'class' => Post::class,
+            'id' => 1,
+            'label' => 'First post',
+            'table' => $entityManager->getClassMetadata(Post::class)->getTableName(),
+        ], $entry->getDiffs(), 'audit entry diffs is ok.');
+
+        $post = new Post();
+        $post
+            ->setId(1)
+            ->setTitle('First post')
+            ->setBody('Here is the body')
+            ->setCreatedAt(new \DateTimeImmutable('now'))
+        ;
+        $entityManager->persist($post);
+        $entityManager->flush();
+
+        // 1 "remove" audit entry added => count is 2
+        $audits = $reader->createQuery(Post::class)->execute();
+        $this->assertCount(2, $audits, '1 "insert" audit entry added.');
+
+        $entityManager->remove($post);
+        $entityManager->flush();
+
+        // 1 "remove" audit entry added => count is 3
+        $audits = $reader->createQuery(Post::class)->execute();
+        $this->assertCount(3, $audits, '1 "remove" audit entry added.');
+    }
+
     public function testAssociateOneToMany(): void
     {
         $processor = new TransactionProcessor($this->provider);
