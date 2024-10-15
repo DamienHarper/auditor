@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
+use Doctrine\Common\EventManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
 use Doctrine\ORM\ORMSetup;
+use Gedmo\SoftDeleteable\SoftDeleteableListener;
 
 trait EntityManagerInterfaceTrait
 {
@@ -27,12 +30,9 @@ trait EntityManagerInterfaceTrait
 
         $em = new EntityManager($connection, $configuration);
         $evm = $em->getEventManager();
-        $allListeners = method_exists($evm, 'getAllListeners') ? $evm->getAllListeners() : $evm->getListeners();
-        foreach ($allListeners as $event => $listeners) {
-            foreach ($listeners as $listener) {
-                $evm->removeEventListener([$event], $listener);
-            }
-        }
+
+        // Attach SoftDeleteableListener to the EventManager
+        $evm->addEventListener(Events::onFlush, new SoftDeleteableListener());
 
         return $em;
     }
