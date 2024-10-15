@@ -76,7 +76,9 @@ final class DoctrineSubscriber implements EventSubscriber
 
     public function getSubscribedEvents(): array
     {
-        return [Events::onFlush, SoftDeleteableListener::POST_SOFT_DELETE];
+        return class_exists(SoftDeleteableListener::class) ?
+            [Events::onFlush, SoftDeleteableListener::POST_SOFT_DELETE] :
+            [Events::onFlush];
     }
 
     /**
