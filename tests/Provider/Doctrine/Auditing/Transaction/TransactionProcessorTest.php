@@ -64,11 +64,9 @@ final class TransactionProcessorTest extends TestCase
         $this->assertSame([
             'email' => [
                 'new' => 'john.doe@gmail.com',
-                'old' => null,
             ],
             'fullname' => [
                 'new' => 'John Doe',
-                'old' => null,
             ],
         ], $entry->getDiffs(), 'audit entry diffs is ok.');
     }

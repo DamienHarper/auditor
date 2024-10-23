@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DH\Auditor\Tests\Provider\Doctrine;
+namespace DH\Auditor\Tests\Provider\Doctrine\Auditing;
 
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
@@ -111,19 +111,11 @@ final class InheritanceTest extends TestCase
         $this->provider = new DoctrineProvider($this->createProviderConfiguration());
 
         $entityManager = $this->createEntityManager([
-            __DIR__.'/../../../src/Provider/Doctrine/Auditing/Annotation',
-            __DIR__.'/Fixtures/Entity/Inheritance',
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../Fixtures/Entity/Inheritance',
         ]);
         $this->provider->registerStorageService(new StorageService('default', $entityManager));
         $this->provider->registerAuditingService(new AuditingService('default', $entityManager));
-        //        $this->provider->registerEntityManager(
-        //            $this->createEntityManager([
-        //                __DIR__.'/../../../src/Provider/Doctrine/Auditing/Annotation',
-        //                __DIR__.'/Fixtures/Entity/Inheritance',
-        //            ]),
-        //            DoctrineProvider::BOTH,
-        //            'default'
-        //        );
 
         $auditor->registerProvider($this->provider);
     }

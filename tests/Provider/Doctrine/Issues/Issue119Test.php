@@ -29,9 +29,10 @@ final class Issue119Test extends TestCase
         $transaction = new Transaction($entityManager);
         $entity = new DummyEntity();
         $transaction->insert($entity, [
-            'json_array' => [null, [
-                'example' => '例',
-            ]],
+            'json_array' => [
+                null,
+                ['example' => '例'],
+            ],
         ]);
         $processor->process($transaction);
         $audits = $reader->createQuery(DummyEntity::class)->execute();
@@ -41,8 +42,8 @@ final class Issue119Test extends TestCase
         $audit = $audits[0];
         $diffs = $audit->getDiffs()['json_array'];
         $this->assertSame([
-            'example' => '例',
-        ], $diffs['new']);
+            'example' => ['new' => '例'],
+        ], $diffs);
     }
 
     private function configureEntities(): void
