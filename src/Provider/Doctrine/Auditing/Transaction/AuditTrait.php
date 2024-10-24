@@ -129,7 +129,36 @@ trait AuditTrait
     }
 
     /**
-     * Computes a usable diff.
+     * Computes a usable diff formatted as follow:
+     * [
+     *   // field1 value has changed
+     *   'field1' => [
+     *      'old' => $oldValue, // value before change
+     *      'new' => $newValue  // value after change
+     *   ],
+     *   // field2 value has been added
+     *   'field2' => [
+     *     'new' => $newValue
+     *   ],
+     *   ...
+     *   // jsonField1 has changed
+     *   'jsonField1' => [
+     *     // field1 value has changed
+     *     'field1' => [
+     *       'old' => $oldValue,
+     *       'new' => $newValue
+     *     ],
+     *     // field2 value has been added
+     *     'field2' => [
+     *       'new' => $newValue
+     *     ],
+     *     // field3 value has been removed
+     *     'field3' => [
+     *       'old' => $oldValue
+     *     ],
+     *     ...
+     *   ],
+     * ]
      *
      * @throws MappingException
      * @throws Exception
@@ -152,6 +181,7 @@ trait AuditTrait
                 continue;
             }
 
+            $type = null;
             if (
                 !isset($meta->embeddedClasses[$fieldName])
                 && $meta->hasField($fieldName)
@@ -172,10 +202,20 @@ trait AuditTrait
             }
 
             if ($o !== $n) {
-                $diff[$fieldName] = [
-                    'new' => $n,
-                    'old' => $o,
-                ];
+                if (isset($type) && Type::getType(Types::JSON) === $type) {
+                    /**
+                     * @var ?array $o
+                     * @var ?array $n
+                     */
+                    $diff[$fieldName] = $this->deepDiff($o, $n);
+                } else {
+                    if (null !== $o) {
+                        $diff[$fieldName]['old'] = $o;
+                    }
+                    if (null !== $n) {
+                        $diff[$fieldName]['new'] = $n;
+                    }
+                }
             }
         }
 
@@ -256,5 +296,56 @@ trait AuditTrait
             'user_id' => $user_id,
             'username' => $username,
         ];
+    }
+
+    private function deepDiff(?array $old, ?array $new): array
+    {
+        $diff = [];
+
+        // Check for differences in $old
+        if (null !== $old && null !== $new) {
+            foreach ($old as $key => $value) {
+                if (!\array_key_exists($key, $new)) {
+                    // $key does not exist in $new, it's been removed
+                    $diff[$key] = \is_array($value) ? $this->formatArray($value, 'old') : ['old' => $value];
+                } elseif (\is_array($value) && \is_array($new[$key])) {
+                    // both values are arrays, compare them recursively
+                    $recursiveDiff = $this->deepDiff($value, $new[$key]);
+                    if ([] !== $recursiveDiff) {
+                        $diff[$key] = $recursiveDiff;
+                    }
+                } elseif ($new[$key] !== $value) {
+                    // values are different
+                    $diff[$key] = ['old' => $value, 'new' => $new[$key]];
+                }
+            }
+        }
+
+        // Check for new elements in $new
+        if (null !== $new) {
+            foreach ($new as $key => $value) {
+                if (!\array_key_exists($key, $old ?? [])) {
+                    // $key does not exist in $old, it's been added
+                    $diff[$key] = \is_array($value) ? $this->formatArray($value, 'new') : ['new' => $value];
+                }
+            }
+        }
+
+        return $diff;
+    }
+
+    private function formatArray(array $array, string $prefix): array
+    {
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            if (\is_array($value)) {
+                $result[$key] = $this->formatArray($value, $prefix);
+            } else {
+                $result[$key][$prefix] = $value;
+            }
+        }
+
+        return $result;
     }
 }
