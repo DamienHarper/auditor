@@ -22,20 +22,24 @@ final class PlatformHelperTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $connection->method('getDatabasePlatform')
-            ->willReturn(new MariaDbPlatform());
+            ->willReturn(new MariaDBPlatform())
+        ;
         $connection->method('getServerVersion')
-            ->willReturn($mariaDbVersion);
+            ->willReturn($mariaDbVersion)
+        ;
 
         $this->assertSame($expectedResult, PlatformHelper::isJsonSupported($connection));
     }
 
     /**
-     * @return iterable<string, array<string|bool>>
+     * @return iterable<string, array<bool|string>>
      */
     public static function provideMariaDbVersionCases(): iterable
     {
         yield '10.2.6' => ['10.2.6', false];
+
         yield '10.2.7' => ['10.2.7', true];
+
         yield '10.11.8-MariaDB-0ubuntu0.24.04.1' => ['10.11.8-MariaDB-0ubuntu0.24.04.1', true];
     }
 }
