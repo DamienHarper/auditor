@@ -76,7 +76,7 @@ abstract class PlatformHelper
                 return true;
             }
 
-            return version_compare(self::getMariaDbMysqlVersionNumber($version), '10.2.7', '<');
+            return version_compare(self::getMariaDbMysqlVersionNumber($version), '10.2.7', '>=');
         }
 
         return true;
