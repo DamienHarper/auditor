@@ -202,7 +202,10 @@ trait AuditTrait
             }
 
             if ($o !== $n) {
-                if (isset($type) && Type::getType(Types::JSON) === $type && (null === $o || is_array($o)) && (null === $n || is_array($n))) {
+                if (
+                    isset($type) && Type::getType(Types::JSON) === $type
+                    && (null === $o || \is_array($o)) && (null === $n || \is_array($n))
+                ) {
                     /**
                      * @var ?array $o
                      * @var ?array $n
