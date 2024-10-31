@@ -103,7 +103,7 @@ final readonly class Reader
         $entities = $configuration->getEntities();
         foreach (array_keys($entities) as $entity) {
             try {
-                $audits = $this->createQuery($entity, ['transaction_hash' => $transactionHash])->execute();
+                $audits = $this->createQuery($entity, ['transaction_hash' => $transactionHash, 'page_size' => null])->execute();
                 if ([] !== $audits) {
                     $results[$entity] = $audits;
                 }
@@ -118,8 +118,11 @@ final readonly class Reader
     /**
      * @return array{results: \ArrayIterator<int|string, \DH\Auditor\Model\Entry>, currentPage: int, hasPreviousPage: bool, hasNextPage: bool, previousPage: null|int, nextPage: null|int, numPages: int, haveToPaginate: bool, numResults: int, pageSize: int}
      */
-    public function paginate(Query $query, int $page = 1, int $pageSize = self::PAGE_SIZE): array
+    public function paginate(Query $query, int $page = 1, ?int $pageSize = null): array
     {
+        /** @var Configuration $configuration */
+        $configuration = $this->provider->getConfiguration();
+        $pageSize ??= $configuration->getViewerPageSize();
         $numResults = $query->count();
         $currentPage = max(1, $page);
         $hasPreviousPage = $currentPage > 1;
