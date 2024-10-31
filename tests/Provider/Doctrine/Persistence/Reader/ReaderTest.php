@@ -10,6 +10,7 @@ use DH\Auditor\Model\Transaction;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\DateRangeFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Query;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
@@ -197,8 +198,17 @@ final class ReaderTest extends TestCase
     {
         $reader = $this->createReader();
 
+        $pager = $reader->paginate($reader->createQuery(Author::class));
+        $this->assertIsArray($pager);
+        $this->assertSame(Reader::PAGE_SIZE, $pager['pageSize'], \sprintf('PageSize is %d.', Reader::PAGE_SIZE));
+        $this->assertFalse($pager['hasPreviousPage'], 'Pager is at page 1.');
+        $this->assertFalse($pager['hasNextPage'], 'Pager has next page.');
+        $this->assertFalse($pager['haveToPaginate'], 'Pager has to paginate.');
+        $this->assertSame(1, $pager['numPages'], 'Pager has 1 page.');
+
         $pager = $reader->paginate($reader->createQuery(Author::class), 1, 2);
         $this->assertIsArray($pager);
+        $this->assertSame(2, $pager['pageSize'], 'PageSize is 2.');
         $this->assertFalse($pager['hasPreviousPage'], 'Pager is at page 1.');
         $this->assertTrue($pager['hasNextPage'], 'Pager has next page.');
         $this->assertTrue($pager['haveToPaginate'], 'Pager has to paginate.');
