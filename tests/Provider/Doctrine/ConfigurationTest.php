@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation\AuditableButUnauditedEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation\AuditedEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
@@ -86,10 +87,24 @@ final class ConfigurationTest extends TestCase
     public function testEnableViewer(): void
     {
         $configuration = $this->createProviderConfiguration();
-        $configuration->disableViewer();
         $configuration->enableViewer();
 
         $this->assertTrue($configuration->isViewerEnabled(), 'Viewer is enabled.');
+    }
+
+    public function testDefaultViewerPageSize(): void
+    {
+        $configuration = $this->createProviderConfiguration();
+
+        $this->assertSame(Reader::PAGE_SIZE, $configuration->getViewerPageSize(), \sprintf('Viewer pageSize is %d by default.', Reader::PAGE_SIZE));
+    }
+
+    public function testChangeViewerPageSize(): void
+    {
+        $configuration = $this->createProviderConfiguration();
+        $configuration->setViewerPageSize(25);
+
+        $this->assertSame(25, $configuration->getViewerPageSize(), 'Viewer pageSize is 25.');
     }
 
     public function testGloballyIgnoredColumns(): void
