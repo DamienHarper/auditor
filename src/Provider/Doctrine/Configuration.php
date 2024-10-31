@@ -6,6 +6,7 @@ namespace DH\Auditor\Provider\Doctrine;
 
 use DH\Auditor\Provider\ConfigurationInterface;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Tests\Provider\Doctrine\ConfigurationTest;
@@ -30,6 +31,8 @@ final class Configuration implements ConfigurationInterface
     private ?array $entities = null;
 
     private bool $isViewerEnabled;
+
+    private int $viewerPageSize;
 
     private bool $initialized = false;
 
@@ -57,8 +60,36 @@ final class Configuration implements ConfigurationInterface
             }
         }
 
-        $this->isViewerEnabled = $config['viewer'];
+        $this->isViewerEnabled = self::isViewerEnabledInConfig($config['viewer']);
+        $this->viewerPageSize = self::getViewerPageSizeFromConfig($config['viewer']);
         $this->storageMapper = $config['storage_mapper'];
+    }
+
+    public static function isViewerEnabledInConfig(mixed $config): bool
+    {
+        if (\is_array($config)) {
+            if (!\array_key_exists('enabled', $config) || !\is_bool($config['enabled'])) {
+                return false;
+            }
+
+            return $config['enabled'];
+        }
+
+        // "viewer" is disabled by default
+        return \is_bool($config) ? $config : false;
+    }
+
+    public static function getViewerPageSizeFromConfig(mixed $config): int
+    {
+        if (\is_array($config)) {
+            if (!\array_key_exists('page_size', $config) || !\is_int($config['page_size'])) {
+                return Reader::PAGE_SIZE;
+            }
+
+            return abs($config['page_size']);
+        }
+
+        return \is_int($config) ? abs($config) : Reader::PAGE_SIZE;
     }
 
     /**
@@ -99,6 +130,18 @@ final class Configuration implements ConfigurationInterface
         $this->isViewerEnabled = false;
 
         return $this;
+    }
+
+    public function setViewerPageSize(int $pageSize): self
+    {
+        $this->viewerPageSize = abs($pageSize);
+
+        return $this;
+    }
+
+    public function getViewerPageSize(): int
+    {
+        return $this->viewerPageSize;
     }
 
     /**
@@ -168,11 +211,11 @@ final class Configuration implements ConfigurationInterface
                     $computedTableName = $schemaManager->resolveTableName($entityTableName, $namespaceName, $platform);
                     $this->entities[$entity]['table_schema'] = $namespaceName;
                     $this->entities[$entity]['table_name'] = $entityTableName;
-                    //                    $this->entities[$entity]['computed_table_name'] = $entityTableName;
+                    // $this->entities[$entity]['computed_table_name'] = $entityTableName;
                     $this->entities[$entity]['computed_table_name'] = $computedTableName;
                     $this->entities[$entity]['audit_table_schema'] = $namespaceName;
                     $this->entities[$entity]['audit_table_name'] = $schemaManager->computeAuditTablename($entityTableName, $this);
-                    //                    $this->entities[$entity]['computed_audit_table_name'] = $schemaManager->computeAuditTablename($this->entities[$entity], $this, $platform);
+                    // $this->entities[$entity]['computed_audit_table_name'] = $schemaManager->computeAuditTablename($this->entities[$entity], $this, $platform);
                     $this->entities[$entity]['computed_audit_table_name'] = $schemaManager->computeAuditTablename(
                         $computedTableName,
                         $this
@@ -264,7 +307,7 @@ final class Configuration implements ConfigurationInterface
             ->setAllowedTypes('entities', 'array')
             ->setAllowedTypes('storage_services', 'array')
             ->setAllowedTypes('auditing_services', 'array')
-            ->setAllowedTypes('viewer', 'bool')
+            ->setAllowedTypes('viewer', ['bool', 'array'])
             ->setAllowedTypes('storage_mapper', ['null', 'string', 'callable'])
         ;
     }
