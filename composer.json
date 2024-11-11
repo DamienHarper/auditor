@@ -33,6 +33,7 @@
     }
   },
   "require-dev": {
+    "ext-pdo": "*",
     "doctrine/data-fixtures": "^1.5.3",
     "gedmo/doctrine-extensions": "^3.0",
     "phpunit/phpunit": "^11.0",

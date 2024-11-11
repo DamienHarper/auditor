@@ -13,7 +13,7 @@ abstract class SchemaHelper
      *
      * @return array{id: array{type: string, options: array{autoincrement: true, unsigned: true}}, type: array{type: string, options: array{notnull: true, length: int}}, object_id: array{type: string, options: array{notnull: true}}, discriminator: array{type: string, options: array{default: null, notnull: false}}, transaction_hash: array{type: string, options: array{notnull: false, length: int}}, diffs: array{type: string, options: array{default: null, notnull: false}}, blame_id: array{type: string, options: array{default: null, notnull: false}}, blame_user: array{type: string, options: array{default: null, notnull: false, length: int}}, blame_user_fqdn: array{type: string, options: array{default: null, notnull: false, length: int}}, blame_user_firewall: array{type: string, options: array{default: null, notnull: false, length: int}}, ip: array{type: string, options: array{default: null, notnull: false, length: int}}, created_at: array{type: string, options: array{notnull: true}}}
      */
-    public static function getAuditTableColumns(): array
+    public static function getAuditTableColumns(array $defaultTableOptions = []): array
     {
         return [
             'id' => [
@@ -28,6 +28,7 @@ abstract class SchemaHelper
                 'options' => [
                     'notnull' => true,
                     'length' => 10,
+                    'platformOptions' => $defaultTableOptions,
                 ],
             ],
             'object_id' => [
@@ -35,6 +36,7 @@ abstract class SchemaHelper
                 'options' => [
                     'notnull' => true,
                     'length' => 255,
+                    'platformOptions' => $defaultTableOptions,
                 ],
             ],
             'discriminator' => [
@@ -43,6 +45,7 @@ abstract class SchemaHelper
                     'default' => null,
                     'notnull' => false,
                     'length' => 255,
+                    'platformOptions' => $defaultTableOptions,
                 ],
             ],
             'transaction_hash' => [
@@ -50,6 +53,7 @@ abstract class SchemaHelper
                 'options' => [
                     'notnull' => false,
                     'length' => 40,
+                    'platformOptions' => $defaultTableOptions,
                 ],
             ],
             'diffs' => [
@@ -65,6 +69,7 @@ abstract class SchemaHelper
                     'default' => null,
                     'notnull' => false,
                     'length' => 255,
+                    'platformOptions' => $defaultTableOptions,
                 ],
             ],
             'blame_user' => [
@@ -73,6 +78,7 @@ abstract class SchemaHelper
                     'default' => null,
                     'notnull' => false,
                     'length' => 255,
+                    'platformOptions' => $defaultTableOptions,
                 ],
             ],
             'blame_user_fqdn' => [
@@ -81,6 +87,7 @@ abstract class SchemaHelper
                     'default' => null,
                     'notnull' => false,
                     'length' => 255,
+                    'platformOptions' => $defaultTableOptions,
                 ],
             ],
             'blame_user_firewall' => [
@@ -89,6 +96,7 @@ abstract class SchemaHelper
                     'default' => null,
                     'notnull' => false,
                     'length' => 100,
+                    'platformOptions' => $defaultTableOptions,
                 ],
             ],
             'ip' => [
@@ -97,6 +105,7 @@ abstract class SchemaHelper
                     'default' => null,
                     'notnull' => false,
                     'length' => 45,
+                    'platformOptions' => $defaultTableOptions,
                 ],
             ],
             'created_at' => [
