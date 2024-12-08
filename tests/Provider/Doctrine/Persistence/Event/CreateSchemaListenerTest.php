@@ -27,7 +27,7 @@ final class CreateSchemaListenerTest extends TestCase
     use DefaultSchemaSetupTrait;
 
     /**
-     * @var array<class-string<\DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal>>
+     * @var array<class-string<Animal>>
      */
     private const CLASSES = [Dog::class, Cat::class];
 

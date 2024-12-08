@@ -20,7 +20,7 @@ final class LifecycleEventTest extends TestCase
     use AuditorTrait;
 
     /**
-     * @var array<string, class-string<\DH\Auditor\EventSubscriber\AuditEventSubscriber>|string>
+     * @var array<string, class-string<AuditEventSubscriber>|string>
      */
     private const PAYLOAD = [
         'entity' => AuditEventSubscriber::class,
