@@ -45,10 +45,7 @@ final readonly class Reader
         $this->configureOptions($resolver);
         $config = $resolver->resolve($options);
 
-        $connection = $this->provider->getStorageServiceForEntity($entity)->getEntityManager()->getConnection();
-        $timezone = $this->provider->getAuditor()->getConfiguration()->getTimezone();
-
-        $query = new Query($this->getEntityAuditTableName($entity), $connection, $timezone);
+        $query = $this->provider->createBaseQuery($entity);
         $query
             ->addOrderBy(Query::CREATED_AT, 'DESC')
             ->addOrderBy(Query::ID, 'DESC')
@@ -159,24 +156,7 @@ final readonly class Reader
      */
     public function getEntityAuditTableName(string $entity): string
     {
-        /** @var Configuration $configuration */
-        $configuration = $this->provider->getConfiguration();
-
-        /** @var AuditingService $auditingService */
-        $auditingService = $this->provider->getAuditingServiceForEntity($entity);
-        $entityManager = $auditingService->getEntityManager();
-        $schema = '';
-        if ($entityManager->getClassMetadata($entity)->getSchemaName()) {
-            $schema = $entityManager->getClassMetadata($entity)->getSchemaName().'.';
-        }
-
-        return \sprintf(
-            '%s%s%s%s',
-            $schema,
-            $configuration->getTablePrefix(),
-            $this->getEntityTableName($entity),
-            $configuration->getTableSuffix()
-        );
+        return $this->provider->getEntityAuditTableName($entity);
     }
 
     private function configureOptions(OptionsResolver $resolver): void

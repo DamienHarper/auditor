@@ -1,22 +1,21 @@
 <?php
 
-declare(strict_types=1);
-
 namespace DH\Auditor\Provider\Doctrine\Service;
 
 use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\Provider\Doctrine\Configuration;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Query;
-use DH\Auditor\Provider\Service\AbstractService;
-use Doctrine\ORM\EntityManagerInterface;
+use DH\Auditor\Provider\Service\StorageServiceInterface;
 
-abstract class DoctrineService extends AbstractService
+class SingleTableDoctrineService extends DoctrineService implements StorageServiceInterface
 {
     /**
      * @var array<string, string>
      */
     private const FIELDS = [
         'type' => '?',
+        'object_fqdn' => '?',
         'object_id' => '?',
         'discriminator' => '?',
         'transaction_hash' => '?',
@@ -29,33 +28,31 @@ abstract class DoctrineService extends AbstractService
         'created_at' => '?',
     ];
 
-    public function __construct(string $name, private readonly EntityManagerInterface $entityManager)
+    public function __construct(DoctrineService $doctrineService, private string $auditTableName = 'audit')
     {
-        parent::__construct($name);
-    }
-
-    public function getEntityManager(): EntityManagerInterface
-    {
-        return $this->entityManager;
+        parent::__construct($doctrineService->getName(), $doctrineService->getEntityManager());
     }
 
     public function createBaseQuery(Configuration $configuration, string $entity, string $timezone): Query
     {
         $connection = $this->getEntityManager()->getConnection();
+        $query = new Query($this->auditTableName, $connection, $timezone, ['id', ...array_keys(self::FIELDS)]);
+        $query->addFilter(new SimpleFilter('object_fqdn', $entity));
 
-        return new Query($this->getEntityAuditTableName($configuration, $entity), $connection, $timezone, ['id', ...array_keys(self::FIELDS)]);
+        return $query;
     }
 
     public function persist(LifecycleEvent $event): int
     {
         $payload = $event->getPayload();
-        $auditTable = $payload['table'];
+        $entity = $payload['entity'];
+        $payload['object_fqdn'] = $entity;
         unset($payload['table'], $payload['entity']);
 
         $keys = array_keys(self::FIELDS);
         $query = \sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
-            $auditTable,
+            $this->auditTableName,
             implode(', ', $keys),
             implode(', ', array_values(self::FIELDS))
         );
@@ -69,24 +66,5 @@ abstract class DoctrineService extends AbstractService
         $statement->executeStatement();
 
         return (int) $this->getEntityManager()->getConnection()->lastInsertId();
-    }
-
-    /**
-     * Returns the audit table name for $entity.
-     */
-    public function getEntityAuditTableName(Configuration $configuration, string $entity): string
-    {
-        $schema = '';
-        if ($this->entityManager->getClassMetadata($entity)->getSchemaName()) {
-            $schema = $this->entityManager->getClassMetadata($entity)->getSchemaName().'.';
-        }
-
-        return \sprintf(
-            '%s%s%s%s',
-            $schema,
-            $configuration->getTablePrefix(),
-            $this->entityManager->getClassMetadata($entity)->getTableName(),
-            $configuration->getTableSuffix()
-        );
     }
 }
