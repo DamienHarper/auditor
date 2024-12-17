@@ -67,10 +67,11 @@ final class Query
 
     private readonly \DateTimeZone $timezone;
 
-    public function __construct(private readonly string $table, private readonly Connection $connection, string $timezone)
+    public function __construct(private readonly string $table, private readonly Connection $connection, string $timezone, private ?array $supportedFilters = null)
     {
         $this->timezone = new \DateTimeZone($timezone);
 
+        $this->supportedFilters = ($supportedFilters ?? array_keys(SchemaHelper::getAuditTableIndices('fake')));
         foreach ($this->getSupportedFilters() as $filterType) {
             $this->filters[$filterType] = [];
         }
@@ -162,7 +163,7 @@ final class Query
 
     public function getSupportedFilters(): array
     {
-        return array_keys(SchemaHelper::getAuditTableIndices('fake'));
+        return $this->supportedFilters ?? [];
     }
 
     public function getFilters(): array
