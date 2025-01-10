@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @see ReaderTest
  */
-final readonly class Reader
+final readonly class Reader implements ReaderInterface
 {
     /**
      * @var int

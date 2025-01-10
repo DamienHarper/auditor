@@ -20,7 +20,7 @@ use Doctrine\DBAL\Result;
 /**
  * @see QueryTest
  */
-final class Query
+final class Query implements QueryInterface
 {
     /**
      * @var string
