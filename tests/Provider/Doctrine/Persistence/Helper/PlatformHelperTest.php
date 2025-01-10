@@ -36,10 +36,10 @@ final class PlatformHelperTest extends TestCase
      */
     public static function provideMariaDbVersionCases(): iterable
     {
-        yield '10.2.6' => ['10.2.6', false];
+        yield ['10.2.6', false];
 
-        yield '10.2.7' => ['10.2.7', true];
+        yield ['10.2.7', true];
 
-        yield '10.11.8-MariaDB-0ubuntu0.24.04.1' => ['10.11.8-MariaDB-0ubuntu0.24.04.1', true];
+        yield ['10.11.8-MariaDB-0ubuntu0.24.04.1', true];
     }
 }

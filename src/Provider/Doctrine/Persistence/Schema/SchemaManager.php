@@ -267,13 +267,39 @@ final readonly class SchemaManager
      */
     public function computeAuditTablename(string $entityTableName, Configuration $configuration): ?string
     {
-        return preg_replace(
-            '#^([^.]+\.)?(.+)$#',
-            \sprintf(
-                '$1%s$2%s',
-                preg_quote($configuration->getTablePrefix(), '#'),
-                preg_quote($configuration->getTableSuffix(), '#')
-            ),
+        $prefix = $configuration->getTablePrefix();
+        $suffix = $configuration->getTableSuffix();
+
+        // For performance reasons, we only process the table name with preg_replace_callback and a regex
+        // if the entity's table name contains a dot, a quote or a backtick
+        if (!str_contains($entityTableName, '.') && !str_contains($entityTableName, '"') && !str_contains($entityTableName, '`')) {
+            return $prefix.$entityTableName.$suffix;
+        }
+
+        return preg_replace_callback(
+            '#^(?:(["`])?([^."`]+)["`]?\.)?(["`]?)([^."`]+)["`]?$#',
+            static function (array $matches) use ($prefix, $suffix): string {
+                $schemaDelimiter = $matches[1];     // Opening schema quote/backtick
+                $schema = $matches[2];              // Captures raw schema name (if exists)
+                $tableDelimiter = $matches[3];      // Opening table quote/backtick
+                $tableName = $matches[4];           // Captures raw table name
+
+                $newTableName = $prefix.$tableName.$suffix;
+
+                if ('"' === $tableDelimiter || '`' === $tableDelimiter) {
+                    $newTableName = $tableDelimiter.$newTableName.$tableDelimiter;
+                }
+
+                if ($schema) {
+                    if ('"' === $schemaDelimiter || '`' === $schemaDelimiter) {
+                        $schema = $schemaDelimiter.$schema.$schemaDelimiter;
+                    }
+
+                    return $schema.'.'.$newTableName;
+                }
+
+                return $newTableName;
+            },
             $entityTableName
         );
     }

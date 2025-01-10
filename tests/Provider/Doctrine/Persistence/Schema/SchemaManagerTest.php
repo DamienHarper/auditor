@@ -28,6 +28,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -278,6 +279,43 @@ final class SchemaManagerTest extends TestCase
                 $this->assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
             }
         }
+    }
+
+    #[DataProvider('provideTableNames')]
+    public function testComputeAuditTableName(string $tableName, string $expectedResult): void
+    {
+        $schemaManager = new SchemaManager($this->provider);
+        $this->assertSame($expectedResult, $schemaManager->computeAuditTableName($tableName, $this->provider->getConfiguration()));
+    }
+
+    /**
+     * @return iterable<string, array<bool|string>>
+     */
+    public static function provideTableNames(): iterable
+    {
+        yield ['user', 'user_audit'];
+
+        yield ['schema.user', 'schema.user_audit'];
+
+        yield ['"user"', '"user_audit"'];
+
+        yield ['`user`', '`user_audit`'];
+
+        yield ['"schema"."user"', '"schema"."user_audit"'];
+
+        yield ['"schema".user', '"schema".user_audit'];
+
+        yield ['"schema".`user`', '"schema".`user_audit`'];
+
+        yield ['schema."user"', 'schema."user_audit"'];
+
+        yield ['schema.`user`', 'schema.`user_audit`'];
+
+        yield ['`schema`."user"', '`schema`."user_audit"'];
+
+        yield ['`schema`.`user`', '`schema`.`user_audit`'];
+
+        yield ['`schema`.user', '`schema`.user_audit'];
     }
 
     private function migrate(Schema $fromSchema, Schema $toSchema, EntityManagerInterface $entityManager): void
