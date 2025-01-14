@@ -12,6 +12,8 @@ use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\FieldMapping;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 
 trait AuditTrait
@@ -33,22 +35,19 @@ trait AuditTrait
             throw new MappingException(\sprintf('Composite primary keys are not supported (%s).', $entity::class));
         }
 
-        if (isset($meta->fieldMappings[$pk])) {
-            $type = Type::getType(\is_array($meta->fieldMappings[$pk]) ? $meta->fieldMappings[$pk]['type'] : $meta->fieldMappings[$pk]->type);
-
-            \assert(\is_object($meta->getReflectionProperty($pk)));
-
+        $type = $this->getType($meta, $pk);
+        \assert(\is_object($meta->getReflectionProperty($pk)));
+        if (null !== $type) {
             return $this->value($entityManager, $type, $meta->getReflectionProperty($pk)->getValue($entity));
         }
 
-        /*
+        /**
          * Primary key is not part of fieldMapping.
          *
          * @see https://github.com/DamienHarper/auditor-bundle/issues/40
          * @see https://www.doctrine-project.org/projects/doctrine-orm/en/latest/tutorials/composite-primary-keys.html#identity-through-foreign-entities
          * We try to get it from associationMapping (will throw a MappingException if not available)
          */
-        \assert(\is_object($meta->getReflectionProperty($pk)));
         $targetEntity = $meta->getReflectionProperty($pk)->getValue($entity);
 
         $mapping = $meta->getAssociationMapping($pk);
@@ -57,8 +56,8 @@ trait AuditTrait
         $meta = $entityManager->getClassMetadata($mapping['targetEntity']);
         $pk = $meta->getSingleIdentifierFieldName();
 
-        $type = Type::getType(\is_array($meta->fieldMappings[$pk]) ? $meta->fieldMappings[$pk]['type'] : $meta->fieldMappings[$pk]->type);
-
+        $type = $this->getType($meta, $pk);
+        \assert(\is_object($type));
         \assert(\is_object($targetEntity));
         \assert(\is_object($meta->getReflectionProperty($pk)));
 
@@ -191,9 +190,8 @@ trait AuditTrait
                 && $meta->hasField($fieldName)
                 && $this->provider->isAuditedField($entity, $fieldName)
             ) {
-                $mapping = $meta->fieldMappings[$fieldName];
-                \assert(\is_string($mapping['type']));
-                $type = Type::getType($mapping['type']);
+                $type = $this->getType($meta, $fieldName);
+                \assert(\is_object($type));
                 $o = $this->value($entityManager, $type, $old);
                 $n = $this->value($entityManager, $type, $new);
             } elseif (
@@ -354,5 +352,19 @@ trait AuditTrait
         }
 
         return $result;
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function getType(ClassMetadata $meta, string $fieldName): ?Type
+    {
+        $mapping = $meta->fieldMappings[$fieldName] ?? null;
+        if (null === $mapping) {
+            return null;
+        }
+        $type = $mapping instanceof FieldMapping ? $mapping->type : $mapping['type'];
+
+        return Type::getType($type);
     }
 }
