@@ -76,9 +76,9 @@ final class DoctrineSubscriber implements EventSubscriber
 
     public function getSubscribedEvents(): array
     {
-        return class_exists(SoftDeleteableListener::class) ?
-            [Events::onFlush, SoftDeleteableListener::POST_SOFT_DELETE] :
-            [Events::onFlush];
+        return class_exists(SoftDeleteableListener::class)
+            ? [Events::onFlush, SoftDeleteableListener::POST_SOFT_DELETE]
+            : [Events::onFlush];
     }
 
     /**
@@ -95,9 +95,9 @@ final class DoctrineSubscriber implements EventSubscriber
 
         // if the driver is an instance of AbstractDriverMiddleware, return the wrapped driver
         if ($driver instanceof AbstractDriverMiddleware) {
-            return \Closure::bind(fn (): \Closure|\Doctrine\DBAL\Driver =>
+            return \Closure::bind(fn (): \Closure|\Doctrine\DBAL\Driver
                 // @var AbstractDriverMiddleware $this
-                $that->getWrappedDriver($this->wrappedDriver), $driver, AbstractDriverMiddleware::class)();
+                => $that->getWrappedDriver($this->wrappedDriver), $driver, AbstractDriverMiddleware::class)();
         }
 
         return \Closure::bind(function () use ($that): \Closure|Driver|null {

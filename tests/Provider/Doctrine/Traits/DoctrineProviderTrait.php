@@ -50,10 +50,9 @@ trait DoctrineProviderTrait
 
         // Set a fake user provider that always returns the same User
         $provider->getAuditor()->getConfiguration()->setUserProvider(static function (): User {
-            return 0 === rand(0, 1) ?
-                new User('1', 'dark.vador')
-                :
-                new User('2', 'anakin.skywalker');
+            return 0 === rand(0, 1)
+                ? new User('1', 'dark.vador')
+                : new User('2', 'anakin.skywalker');
         });
 
         // Set a fake security provider that always returns the same IP and firewall name
