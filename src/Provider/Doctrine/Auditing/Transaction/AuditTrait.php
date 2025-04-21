@@ -225,7 +225,7 @@ trait AuditTrait
         }
 
         // Remove empty changes
-        return array_filter($diff, fn(array $changes): bool => [] !== $changes);
+        return array_filter($diff, static fn (?array $changes): bool => [] !== $changes);
     }
 
     /**

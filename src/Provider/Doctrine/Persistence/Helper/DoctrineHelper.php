@@ -37,7 +37,7 @@ final class DoctrineHelper
             return mb_substr($subject, $positionCg + 8);
         }
 
-        $className = ltrim($subject, '\\');
+        $className = mb_ltrim($subject, '\\');
 
         return mb_substr(
             $className,
