@@ -16,6 +16,9 @@ use DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema\SchemaManagerTest;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Schema\Name\Identifier;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
@@ -184,7 +187,11 @@ final readonly class SchemaManager
             // Add indices to audit table
             foreach (SchemaHelper::getAuditTableIndices($auditTablename) as $columnName => $struct) {
                 if ('primary' === $struct['type']) {
-                    $auditTable->setPrimaryKey([$columnName]);
+                    if (class_exists(PrimaryKeyConstraint::class)) {
+                        $auditTable->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted($columnName))], true));
+                    } else {
+                        $auditTable->setPrimaryKey([$columnName]);
+                    }
                 } elseif (isset($struct['name'])) {
                     $auditTable->addIndex(
                         [$columnName],
@@ -344,7 +351,11 @@ final readonly class SchemaManager
         foreach ($expectedIndices as $columnName => $options) {
             if ('primary' === $options['type']) {
                 $table->dropPrimaryKey();
-                $table->setPrimaryKey([$columnName]);
+                if (class_exists(PrimaryKeyConstraint::class)) {
+                    $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted($columnName))], true));
+                } else {
+                    $table->setPrimaryKey([$columnName]);
+                }
             } else {
                 if ($table->hasIndex($options['name'])) {
                     $table->dropIndex($options['name']);
