@@ -9,7 +9,12 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\Name\Identifier;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 /**
  * @see DoctrineHelperTest
@@ -89,5 +94,24 @@ final class DoctrineHelper
         }
 
         return $fromSchema->getMigrateToSql($toSchema, $platform); // @phpstan-ignore-line
+    }
+
+    public static function setPrimaryKey(Table $table, string $columnName): void
+    {
+        /** @var non-empty-string $columnName */
+        if (class_exists(PrimaryKeyConstraint::class)) {
+            $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted($columnName))], true));
+        } else {
+            $table->setPrimaryKey([$columnName]);
+        }
+    }
+
+    public static function getReflectionPropertyValue(ClassMetadata $meta, string $name, object $entity): mixed
+    {
+        if (method_exists($meta, 'getPropertyAccessor')) {
+            return $meta->getPropertyAccessor($name)?->getValue($entity);
+        }
+
+        return $meta->getReflectionProperty($name)?->getValue($entity);
     }
 }

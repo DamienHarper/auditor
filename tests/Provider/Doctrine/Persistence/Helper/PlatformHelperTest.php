@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 #[Small]
 final class PlatformHelperTest extends TestCase
 {
-    #[DataProvider('provideMariaDbVersionCases')]
+    #[DataProvider('provideIsJsonSupportedForMariaDbCases')]
     public function testIsJsonSupportedForMariaDb(string $mariaDbVersion, bool $expectedResult): void
     {
         $connection = $this->createMock(Connection::class);
@@ -34,7 +34,7 @@ final class PlatformHelperTest extends TestCase
     /**
      * @return iterable<string, array<bool|string>>
      */
-    public static function provideMariaDbVersionCases(): iterable
+    public static function provideIsJsonSupportedForMariaDbCases(): iterable
     {
         yield ['10.2.6', false];
 

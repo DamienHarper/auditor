@@ -183,8 +183,9 @@ final readonly class SchemaManager
 
             // Add indices to audit table
             foreach (SchemaHelper::getAuditTableIndices($auditTablename) as $columnName => $struct) {
+                \assert(\is_string($columnName));
                 if ('primary' === $struct['type']) {
-                    $auditTable->setPrimaryKey([$columnName]);
+                    DoctrineHelper::setPrimaryKey($auditTable, $columnName);
                 } elseif (isset($struct['name'])) {
                     $auditTable->addIndex(
                         [$columnName],
@@ -342,9 +343,10 @@ final readonly class SchemaManager
     private function processIndices(Table $table, array $expectedIndices, Connection $connection): void
     {
         foreach ($expectedIndices as $columnName => $options) {
+            \assert(\is_string($columnName));
             if ('primary' === $options['type']) {
                 $table->dropPrimaryKey();
-                $table->setPrimaryKey([$columnName]);
+                DoctrineHelper::setPrimaryKey($table, $columnName);
             } else {
                 if ($table->hasIndex($options['name'])) {
                     $table->dropIndex($options['name']);

@@ -36,9 +36,8 @@ trait AuditTrait
         }
 
         $type = $this->getType($meta, $pk);
-        \assert(\is_object($meta->getReflectionProperty($pk)));
         if (null !== $type) {
-            return $this->value($entityManager, $type, $meta->getReflectionProperty($pk)->getValue($entity));
+            return $this->value($entityManager, $type, DoctrineHelper::getReflectionPropertyValue($meta, $pk, $entity));
         }
 
         /**
@@ -48,7 +47,7 @@ trait AuditTrait
          * @see https://www.doctrine-project.org/projects/doctrine-orm/en/latest/tutorials/composite-primary-keys.html#identity-through-foreign-entities
          * We try to get it from associationMapping (will throw a MappingException if not available)
          */
-        $targetEntity = $meta->getReflectionProperty($pk)->getValue($entity);
+        $targetEntity = DoctrineHelper::getReflectionPropertyValue($meta, $pk, $entity);
 
         $mapping = $meta->getAssociationMapping($pk);
 
@@ -59,9 +58,8 @@ trait AuditTrait
         $type = $this->getType($meta, $pk);
         \assert(\is_object($type));
         \assert(\is_object($targetEntity));
-        \assert(\is_object($meta->getReflectionProperty($pk)));
 
-        return $this->value($entityManager, $type, $meta->getReflectionProperty($pk)->getValue($targetEntity));
+        return $this->value($entityManager, $type, DoctrineHelper::getReflectionPropertyValue($meta, $pk, $entity));
     }
 
     /**
