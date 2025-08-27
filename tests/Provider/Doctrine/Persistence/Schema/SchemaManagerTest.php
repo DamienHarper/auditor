@@ -281,7 +281,7 @@ final class SchemaManagerTest extends TestCase
         }
     }
 
-    #[DataProvider('provideTableNames')]
+    #[DataProvider('provideComputeAuditTableNameCases')]
     public function testComputeAuditTableName(string $tableName, string $expectedResult): void
     {
         $schemaManager = new SchemaManager($this->provider);
@@ -291,7 +291,7 @@ final class SchemaManagerTest extends TestCase
     /**
      * @return iterable<string, array<bool|string>>
      */
-    public static function provideTableNames(): iterable
+    public static function provideComputeAuditTableNameCases(): iterable
     {
         yield ['user', 'user_audit'];
 
