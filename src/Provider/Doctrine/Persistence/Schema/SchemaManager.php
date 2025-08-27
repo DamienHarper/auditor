@@ -16,9 +16,6 @@ use DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema\SchemaManagerTest;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Schema\Name\Identifier;
-use Doctrine\DBAL\Schema\Name\UnqualifiedName;
-use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
@@ -186,12 +183,9 @@ final readonly class SchemaManager
 
             // Add indices to audit table
             foreach (SchemaHelper::getAuditTableIndices($auditTablename) as $columnName => $struct) {
+                \assert(\is_string($columnName));
                 if ('primary' === $struct['type']) {
-                    if (class_exists(PrimaryKeyConstraint::class)) {
-                        $auditTable->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted($columnName))], true));
-                    } else {
-                        $auditTable->setPrimaryKey([$columnName]);
-                    }
+                    DoctrineHelper::setPrimaryKey($auditTable, $columnName);
                 } elseif (isset($struct['name'])) {
                     $auditTable->addIndex(
                         [$columnName],
@@ -349,13 +343,10 @@ final readonly class SchemaManager
     private function processIndices(Table $table, array $expectedIndices, Connection $connection): void
     {
         foreach ($expectedIndices as $columnName => $options) {
+            \assert(\is_string($columnName));
             if ('primary' === $options['type']) {
                 $table->dropPrimaryKey();
-                if (class_exists(PrimaryKeyConstraint::class)) {
-                    $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted($columnName))], true));
-                } else {
-                    $table->setPrimaryKey([$columnName]);
-                }
+                DoctrineHelper::setPrimaryKey($table, $columnName);
             } else {
                 if ($table->hasIndex($options['name'])) {
                     $table->dropIndex($options['name']);

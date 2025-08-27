@@ -32,3 +32,6 @@ parameters:
           reportUnmatched: false
         - message: '~Call to deprecated method getWrappedConnection\(\) of class Doctrine\\DBAL\\Connection:~'
           reportUnmatched: false
+        - message: '~Call to deprecated method setPrimaryKey\(\) of class Doctrine\\DBAL\\Schema\\Table~'
+          reportUnmatched: false
+        - message: '~Call to deprecated method getReflectionProperty\(\) of class Doctrine\\ORM\\Mapping\\ClassMetadata~'
