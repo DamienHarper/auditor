@@ -23,7 +23,7 @@ final class Entry
 
     private string $diffs = '{}';
 
-    private null|int|string $blame_id = null;
+    private int|string|null $blame_id = null;
 
     private ?string $blame_user = null;
 
@@ -78,7 +78,7 @@ final class Entry
     /**
      * Get the value of blame_id.
      */
-    public function getUserId(): null|int|string
+    public function getUserId(): int|string|null
     {
         return $this->blame_id;
     }
