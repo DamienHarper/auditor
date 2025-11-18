@@ -53,7 +53,12 @@
     "stan": "vendor/bin/phpstan --ansi analyse src"
   },
   "config": {
-    "sort-packages": true
+    "sort-packages": true,
+    "audit": {
+      "ignore": [
+        "PKSA-wws7-mr54-jsny"
+      ]
+    }
   },
   "extra": {
     "branch-alias": {
