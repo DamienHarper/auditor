@@ -62,7 +62,7 @@ jobs:
         run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: 1.x
 
@@ -155,7 +155,7 @@ jobs:
         run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: 1.x
 
