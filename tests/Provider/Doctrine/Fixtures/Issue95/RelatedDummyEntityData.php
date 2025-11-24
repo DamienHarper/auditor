@@ -11,7 +11,7 @@ final class RelatedDummyEntityData extends AbstractFixture
 {
     public function load(ObjectManager $manager): void
     {
-        $luke = new RelatedDummyEntity($this->getReference('dark.vador'), 'luke.skywalker');
+        $luke = new RelatedDummyEntity($this->getReference('dark.vador', DummyEntity::class), 'luke.skywalker');
 
         $manager->persist($luke);
         $manager->flush();
