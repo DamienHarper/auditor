@@ -309,11 +309,13 @@ final readonly class SchemaManager
     {
         $processed = [];
 
+        $newTable = clone $table;
+
         $isJsonSupported = PlatformHelper::isJsonSupported($connection);
         foreach ($columns as $column) {
             if (\array_key_exists($column->getName(), $expectedColumns)) {
                 // column is part of expected columns
-                $table->dropColumn($column->getName());
+                $newTable->dropColumn($column->getName());
 
                 if (Types::JSON === $expectedColumns[$column->getName()]['type'] && !$isJsonSupported) {
                     $type = Types::TEXT;
@@ -321,10 +323,10 @@ final readonly class SchemaManager
                     $type = $expectedColumns[$column->getName()]['type'];
                 }
 
-                $table->addColumn($column->getName(), $type, $expectedColumns[$column->getName()]['options']);
+                $newTable->addColumn($column->getName(), $type, $expectedColumns[$column->getName()]['options']);
             } else {
                 // column is not part of expected columns so it has to be removed
-                $table->dropColumn($column->getName());
+                $newTable->dropColumn($column->getName());
             }
 
             $processed[] = $column->getName();
@@ -332,8 +334,16 @@ final readonly class SchemaManager
 
         foreach ($expectedColumns as $columnName => $options) {
             if (!\in_array($columnName, $processed, true)) {
-                $table->addColumn($columnName, $options['type'], $options['options']);
+                $newTable->addColumn($columnName, $options['type'], $options['options']);
             }
+        }
+
+        $schemaManager = $connection->createSchemaManager();
+        $comparator = $schemaManager->createComparator();
+        $result = $comparator->compareTables($table, $newTable);
+
+        if (!$result->isEmpty()) {
+            $table = $newTable;
         }
     }
 
