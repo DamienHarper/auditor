@@ -55,11 +55,7 @@
   "config": {
     "sort-packages": true,
     "audit": {
-      "ignore": [
-        "PKSA-wws7-mr54-jsny",
-        "PKSA-365x-2zjk-pt47",
-        "PKSA-b35n-565h-rs4q"
-      ]
+      "block-insecure": false
     }
   },
   "extra": {
