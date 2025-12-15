@@ -59,7 +59,7 @@ trait AuditTrait
         \assert(\is_object($type));
         \assert(\is_object($targetEntity));
 
-        return $this->value($entityManager, $type, DoctrineHelper::getReflectionPropertyValue($meta, $pk, $entity));
+        return $this->value($entityManager, $type, DoctrineHelper::getReflectionPropertyValue($meta, $pk, $targetEntity));
     }
 
     /**
