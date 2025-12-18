@@ -26,7 +26,7 @@ trait EntityManagerInterfaceTrait
         $configuration = ORMSetup::createAttributeMetadataConfiguration($paths ?? $this->fixturesPath, true);
         $configuration->setNamingStrategy(new UnderscoreNamingStrategy(CASE_LOWER));
 
-        if (\PHP_VERSION_ID >= 80400 && \method_exists($configuration, 'enableNativeLazyObjects')) {
+        if (\PHP_VERSION_ID >= 80_400 && method_exists($configuration, 'enableNativeLazyObjects')) {
             // @phpstan-ignore-next-line
             $configuration->enableNativeLazyObjects(true);
         }
