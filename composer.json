@@ -14,10 +14,10 @@
     "php": ">=8.2",
     "doctrine/dbal": "^3.2|^4.0",
     "doctrine/orm": "^2.13|^3.2",
-    "symfony/cache": "^5.4|^6.0|^7.0",
-    "symfony/event-dispatcher": "^5.4|^6.0|^7.0",
-    "symfony/lock": "^5.4|^6.0|^7.0",
-    "symfony/options-resolver": "^5.4|^6.0|^7.0"
+    "symfony/cache": "^5.4|^6.4|^7.4|^8.0",
+    "symfony/event-dispatcher": "^5.4|^6.4|^7.4|^8.0",
+    "symfony/lock": "^5.4|^6.4|^7.4|^8.0",
+    "symfony/options-resolver": "^5.4|^6.4|^7.4|^8.0"
   },
   "suggest": {
     "damienharper/auditor-bundle": "Integrate auditor library in your Symfony projects."
@@ -37,7 +37,7 @@
     "doctrine/data-fixtures": "^2.0",
     "gedmo/doctrine-extensions": "^3.0",
     "phpunit/phpunit": "^11.0",
-    "symfony/var-dumper": "^5.4|^6.0|^7.0"
+    "symfony/var-dumper": "^5.4|^6.4|^7.4|^8.0"
   },
   "scripts": {
     "test": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --colors=always",
