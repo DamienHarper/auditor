@@ -8,3 +8,4 @@ tests/coverage/
 .phpunit.cache/
 composer.lock
 *.sqlite
+symfony.lock
