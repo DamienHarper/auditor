@@ -38,7 +38,8 @@
     "gedmo/doctrine-extensions": "^3.0",
     "phpunit/phpunit": "^11.0",
     "symfony/flex": "^2.4",
-    "symfony/var-dumper": "^5.4|^6.4|^7.4|^8.0"
+    "symfony/var-dumper": "^5.4|^6.4|^7.4|^8.0",
+    "symfony/var-exporter": "^5.4|^6.4|^7.4"
   },
   "scripts": {
     "test": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --colors=always",
