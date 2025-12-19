@@ -57,7 +57,7 @@ abstract class SchemaHelper
                 ],
             ],
             'diffs' => [
-                'type' => Types::JSON,
+                'type' => DoctrineHelper::jsonStringType(),
                 'options' => [
                     'default' => null,
                     'notnull' => false,

@@ -120,6 +120,7 @@ trait AuditTrait
                 break;
 
             case Types::JSON:
+            case 'jsonb':
                 return $value;
 
             default:
@@ -202,8 +203,9 @@ trait AuditTrait
             }
 
             if ($o !== $n) {
+                $jsonTypes = DoctrineHelper::jsonTypes();
                 if (
-                    isset($type) && Type::getType(Types::JSON) === $type
+                    isset($type) && \in_array($type, $jsonTypes, true)
                     && (null === $o || \is_array($o)) && (null === $n || \is_array($n))
                 ) {
                     /**
@@ -215,6 +217,7 @@ trait AuditTrait
                     if (null !== $o) {
                         $diff[$fieldName]['old'] = $o;
                     }
+
                     if (null !== $n) {
                         $diff[$fieldName]['new'] = $n;
                     }
@@ -362,6 +365,7 @@ trait AuditTrait
         if (null === $mapping) {
             return null;
         }
+
         $type = $mapping instanceof FieldMapping ? $mapping->type : $mapping['type'];
 
         return Type::getType($type);

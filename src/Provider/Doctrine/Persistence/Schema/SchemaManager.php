@@ -172,8 +172,8 @@ final readonly class SchemaManager
             // Add columns to audit table
             $isJsonSupported = PlatformHelper::isJsonSupported($connection);
             foreach (SchemaHelper::getAuditTableColumns($connection->getParams()['defaultTableOptions'] ?? []) as $columnName => $struct) {
-                if (Types::JSON === $struct['type'] && !$isJsonSupported) {
-                    $type = Types::TEXT;
+                if (\in_array($struct['type'], DoctrineHelper::jsonStringTypes(), true)) {
+                    $type = $isJsonSupported ? Types::JSON : Types::TEXT;
                 } else {
                     $type = $struct['type'];
                 }
@@ -315,7 +315,7 @@ final readonly class SchemaManager
                 // column is part of expected columns
                 $table->dropColumn($column->getName());
 
-                if (Types::JSON === $expectedColumns[$column->getName()]['type'] && !$isJsonSupported) {
+                if (\in_array($expectedColumns[$column->getName()]['type'], DoctrineHelper::jsonStringTypes(), true) && !$isJsonSupported) {
                     $type = Types::TEXT;
                 } else {
                     $type = $expectedColumns[$column->getName()]['type'];
