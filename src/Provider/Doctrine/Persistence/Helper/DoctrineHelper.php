@@ -14,6 +14,8 @@ use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 /**
@@ -113,5 +115,31 @@ final class DoctrineHelper
         }
 
         return $meta->getReflectionProperty($name)?->getValue($entity);
+    }
+
+    public static function jsonStringType(): string
+    {
+        return \defined(Types::class.'::JSONB') ? Types::JSONB : Types::JSON;
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function jsonStringTypes(): array
+    {
+        return [Types::JSON, 'jsonb'];
+    }
+
+    /**
+     * @return Type[]
+     */
+    public static function jsonTypes(): array
+    {
+        $jsonTypes = [Type::getType(Types::JSON)];
+        if (\defined(Types::class.'::JSONB')) {
+            $jsonTypes[] = Type::getType(Types::JSONB);
+        }
+
+        return $jsonTypes;
     }
 }
