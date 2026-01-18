@@ -14,10 +14,10 @@
     "php": ">=8.2",
     "doctrine/dbal": "^3.2|^4.0",
     "doctrine/orm": "^2.13|^3.2",
-    "symfony/cache": "^5.4|^6.0|^7.0",
-    "symfony/event-dispatcher": "^5.4|^6.0|^7.0",
-    "symfony/lock": "^5.4|^6.0|^7.0",
-    "symfony/options-resolver": "^5.4|^6.0|^7.0"
+    "symfony/cache": "^5.4|^6.4|^7.4|^8.0",
+    "symfony/event-dispatcher": "^5.4|^6.4|^7.4|^8.0",
+    "symfony/lock": "^5.4|^6.4|^7.4|^8.0",
+    "symfony/options-resolver": "^5.4|^6.4|^7.4|^8.0"
   },
   "suggest": {
     "damienharper/auditor-bundle": "Integrate auditor library in your Symfony projects."
@@ -37,7 +37,9 @@
     "doctrine/data-fixtures": "^2.0",
     "gedmo/doctrine-extensions": "^3.0",
     "phpunit/phpunit": "^11.0",
-    "symfony/var-dumper": "^5.4|^6.0|^7.0"
+    "symfony/flex": "^2.4",
+    "symfony/var-dumper": "^5.4|^6.4|^7.4|^8.0",
+    "symfony/var-exporter": "^5.4|^6.4|^7.4"
   },
   "scripts": {
     "test": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --colors=always",
@@ -46,12 +48,17 @@
     "phpstan": "tools/phpstan/vendor/bin/phpstan --memory-limit=1G --ansi analyse src",
     "rector": "tools/rector/vendor/bin/rector",
     "rector-check": "tools/rector/vendor/bin/rector --dry-run",
-    "update-tools": "composer update --working-dir=tools/php-cs-fixer ; composer update --working-dir=tools/phpstan ; composer update --working-dir=tools/rector"
+    "update-tools": "composer update --working-dir=tools/php-cs-fixer ; composer update --working-dir=tools/phpstan ; composer update --working-dir=tools/rector",
+    "setup5": "SYMFONY_REQUIRE='5.4.*' composer update --prefer-stable",
+    "setup6": "SYMFONY_REQUIRE='6.4.*' composer update --prefer-stable",
+    "setup7": "SYMFONY_REQUIRE='7.4.*' composer update --prefer-stable",
+    "setup8": "SYMFONY_REQUIRE='8.0.*' composer update --prefer-stable"
   },
   "config": {
     "sort-packages": true,
     "allow-plugins": {
-      "composer/package-versions-deprecated": true
+      "composer/package-versions-deprecated": true,
+      "symfony/flex": true
     }
   },
   "extra": {
