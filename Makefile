@@ -134,7 +134,7 @@ validate_matrix:
 # Set default args for each target
 define set_args
   ifeq ($(1),tests)
-    args := --colors=always --no-coverage
+    args := --colors=always --no-coverage --display-deprecations
   else ifeq ($(1),phpstan)
     args := analyse src --memory-limit=1G --ansi
   else ifeq ($(1),cs-fix)

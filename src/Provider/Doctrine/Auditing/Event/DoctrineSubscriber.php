@@ -104,7 +104,6 @@ final class DoctrineSubscriber implements EventSubscriber
             /** @var Driver $this */
             $properties = (new \ReflectionClass($this))->getProperties();
             foreach ($properties as $property) {
-                $property->setAccessible(true);
                 $value = $property->getValue($this);
                 if ($value instanceof Driver) {
                     return $that->getWrappedDriver($value);

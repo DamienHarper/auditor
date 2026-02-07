@@ -35,7 +35,7 @@ class Comment
     #[ORM\JoinColumn(name: 'post_id')]
     protected ?Post $post = null;
 
-    public function __sleep()
+    public function __serialize()
     {
         return ['id', 'body', 'author', 'created_at', 'post_id'];
     }

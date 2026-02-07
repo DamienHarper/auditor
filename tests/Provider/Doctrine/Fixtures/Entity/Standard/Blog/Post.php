@@ -66,7 +66,7 @@ class Post implements \Stringable
         return (string) $this->title;
     }
 
-    public function __sleep()
+    public function __serialize()
     {
         return ['id', 'title', 'body', 'created_at', 'author_id'];
     }

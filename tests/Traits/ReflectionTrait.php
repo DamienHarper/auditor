@@ -6,12 +6,10 @@ namespace DH\Auditor\Tests\Traits;
 
 trait ReflectionTrait
 {
-    public function reflectMethod($class, string $method, ?bool $setPublic = true): \ReflectionMethod
+    public function reflectMethod($class, string $method): \ReflectionMethod
     {
         $reflectedClass = new \ReflectionClass($class);
-        $reflectedMethod = $reflectedClass->getMethod($method);
-        $reflectedMethod->setAccessible($setPublic);
 
-        return $reflectedMethod;
+        return $reflectedClass->getMethod($method);
     }
 }

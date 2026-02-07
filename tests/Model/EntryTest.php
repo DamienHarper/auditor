@@ -33,9 +33,7 @@ final class EntryTest extends TestCase
         $reflectionClass = new \ReflectionClass(Entry::class);
         foreach ($attributes as $name => $value) {
             $attribute = $reflectionClass->getProperty($name);
-            $attribute->setAccessible(true);
             $attribute->setValue($entry, $value);
-            $attribute->setAccessible(false);
         }
 
         $this->assertSame(1, $entry->getId(), 'Entry::getId() is ok.');
@@ -64,9 +62,7 @@ final class EntryTest extends TestCase
         $reflectionClass = new \ReflectionClass(Entry::class);
 
         $attribute = $reflectionClass->getProperty('diffs');
-        $attribute->setAccessible(true);
         $attribute->setValue($entry, '{}');
-        $attribute->setAccessible(false);
 
         $this->assertIsArray($entry->getDiffs(), 'Entry::getDiffs() returns an array.');
     }

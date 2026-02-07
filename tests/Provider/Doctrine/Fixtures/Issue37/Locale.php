@@ -18,7 +18,7 @@ class Locale
     #[ORM\Column(type: Types::STRING, length: 255)]
     protected string $name;
 
-    public function __sleep()
+    public function __serialize()
     {
         return ['id', 'name'];
     }
