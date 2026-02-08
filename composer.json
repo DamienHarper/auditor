@@ -41,7 +41,9 @@
     "symfony/var-dumper": "^8.0"
   },
   "scripts": {
-    "test": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --colors=always",
+    "test": "./vendor/bin/phpunit --colors=always --no-coverage",
+    "test:coverage": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --colors=always",
+    "testdox": "./vendor/bin/phpunit --colors=always --testdox --no-coverage",
     "cs-fix": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --using-cache=no --verbose --ansi --allow-unsupported-php-version=yes",
     "cs-check": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --using-cache=no --verbose --ansi --dry-run --allow-unsupported-php-version=yes",
     "phpstan": "tools/phpstan/vendor/bin/phpstan --memory-limit=1G --ansi analyse",
