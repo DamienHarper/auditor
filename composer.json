@@ -42,11 +42,16 @@
   },
   "scripts": {
     "test": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --colors=always",
-    "cs-fix": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --using-cache=no --verbose --ansi",
-    "cs-check": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --using-cache=no --verbose --ansi --dry-run",
-    "phpstan": "tools/phpstan/vendor/bin/phpstan --memory-limit=1G --ansi analyse src",
+    "cs-fix": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --using-cache=no --verbose --ansi --allow-unsupported-php-version=yes",
+    "cs-check": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --using-cache=no --verbose --ansi --dry-run --allow-unsupported-php-version=yes",
+    "phpstan": "tools/phpstan/vendor/bin/phpstan --memory-limit=1G --ansi analyse",
     "rector": "tools/rector/vendor/bin/rector",
     "rector-check": "tools/rector/vendor/bin/rector --dry-run",
+    "qa": [
+      "@rector",
+      "@cs-fix",
+      "@phpstan"
+    ],
     "update-tools": "composer update --working-dir=tools/php-cs-fixer ; composer update --working-dir=tools/phpstan ; composer update --working-dir=tools/rector",
     "setup": "SYMFONY_REQUIRE='8.0.*' composer update --prefer-stable"
   },

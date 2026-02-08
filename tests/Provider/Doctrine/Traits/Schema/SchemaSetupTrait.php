@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits\Schema;
 
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Service\StorageServiceInterface;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\DoctrineProviderTrait;
+use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 
@@ -65,7 +65,7 @@ trait SchemaSetupTrait
 
         $platform = $storageConnection->getDatabasePlatform();
         $sqls = $platform->getAlterSchemaSQL(
-            (new \Doctrine\DBAL\Schema\Comparator($platform))->compareSchemas($fromSchema, $toSchema)
+            (new Comparator($platform))->compareSchemas($fromSchema, $toSchema)
         );
         foreach ($sqls as $sql) {
             $statement = $storageConnection->prepare($sql);
@@ -137,7 +137,7 @@ trait SchemaSetupTrait
 
         $platform = $storageConnection->getDatabasePlatform();
         $sqls = $platform->getAlterSchemaSQL(
-            (new \Doctrine\DBAL\Schema\Comparator($platform))->compareSchemas($fromSchema, $schema)
+            (new Comparator($platform))->compareSchemas($fromSchema, $schema)
         );
         foreach ($sqls as $sql) {
             $statement = $storageConnection->prepare($sql);

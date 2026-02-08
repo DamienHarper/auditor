@@ -16,6 +16,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema\SchemaManagerTest;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
@@ -142,7 +143,7 @@ final readonly class SchemaManager
 
             $platform = $storageConnection->getDatabasePlatform();
             $sqls[$name] = $platform->getAlterSchemaSQL(
-                (new \Doctrine\DBAL\Schema\Comparator($platform))->compareSchemas($fromSchema, $storageSchema)
+                (new Comparator($platform))->compareSchemas($fromSchema, $storageSchema)
             );
         }
 

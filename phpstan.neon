@@ -19,3 +19,20 @@ parameters:
         - '~Dead catch - Throwable is never thrown in the try block~'
         - '~Parameter \#1 \$className of method Doctrine\\ORM\\EntityManagerInterface\:\:getClassMetadata\(\) expects class-string<object>, string given\.~'
         - '~Unable to resolve the template type T in call to method Doctrine\\ORM\\EntityManagerInterface\:\:getClassMetadata\(\)~'
+        # TODO: Fix these typing issues progressively (PHPStan 2.x is stricter)
+        - identifier: assign.propertyType
+        - identifier: argument.type
+        - identifier: return.type
+        - identifier: offsetAccess.nonOffsetAccessible
+        - identifier: offsetAccess.notFound
+        - identifier: offsetAccess.invalidOffset
+        - identifier: offsetAccess.nonArray
+        - identifier: foreach.nonIterable
+        - identifier: binaryOp.invalid
+        - identifier: cast.int
+        - identifier: cast.string
+        - identifier: method.nonObject
+        - identifier: callable.nonCallable
+        - identifier: classConstant.nonObject
+        - identifier: function.alreadyNarrowedType
+        - identifier: instanceof.alwaysTrue

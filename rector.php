@@ -21,11 +21,10 @@ return RectorConfig::configure()
         phpunitCodeQuality: true,
         doctrineCodeQuality: true,
         symfonyCodeQuality: true,
-        phpunit: true,
     )
     ->withSets([
         SymfonySetList::SYMFONY_64,
-        PHPUnitSetList::PHPUNIT_110,
+        PHPUnitSetList::PHPUNIT_120,
         DoctrineSetList::DOCTRINE_CODE_QUALITY,
         DoctrineSetList::DOCTRINE_ORM_214,
         DoctrineSetList::DOCTRINE_DBAL_40,

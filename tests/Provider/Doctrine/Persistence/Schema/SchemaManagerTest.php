@@ -7,7 +7,6 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
@@ -24,6 +23,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use DH\Auditor\Tests\Traits\ReflectionTrait;
+use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
@@ -323,7 +323,7 @@ final class SchemaManagerTest extends TestCase
         $connection = $entityManager->getConnection();
         $platform = $connection->getDatabasePlatform();
         $sqls = $platform->getAlterSchemaSQL(
-            (new \Doctrine\DBAL\Schema\Comparator($platform))->compareSchemas($fromSchema, $toSchema)
+            (new Comparator($platform))->compareSchemas($fromSchema, $toSchema)
         );
         foreach ($sqls as $sql) {
             $statement = $connection->prepare($sql);

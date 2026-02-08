@@ -50,7 +50,6 @@ final class DoctrineHelper
         return $meta->getPropertyAccessor($name)?->getValue($entity);
     }
 
-
     public static function jsonStringType(): string
     {
         return \defined(Types::class.'::JSONB') ? Types::JSONB : Types::JSON;
