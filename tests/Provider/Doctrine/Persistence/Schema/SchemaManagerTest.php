@@ -194,8 +194,8 @@ final class SchemaManagerTest extends TestCase
         $storageService = $this->provider->getStorageServiceForEntity(Author::class);
         $entityManager = $storageService->getEntityManager();
         $storageConnection = $entityManager->getConnection();
-        $schemaManager = DoctrineHelper::createSchemaManager($storageConnection);
-        $fromSchema = DoctrineHelper::introspectSchema($schemaManager);
+        $schemaManager = $storageConnection->createSchemaManager();
+        $fromSchema = $schemaManager->introspectSchema();
 
         // at this point, schema is populated but does not contain any audit table
         $this->assertNull($this->getTable($schemaManager->listTables(), 'author_audit'), 'author_audit does not exist yet.');
@@ -229,7 +229,7 @@ final class SchemaManagerTest extends TestCase
         ];
 
         // apply new structure to author_audit table
-        $fromSchema = DoctrineHelper::introspectSchema($schemaManager);
+        $fromSchema = $schemaManager->introspectSchema();
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
         $table = $toSchema->getTable('author_audit');
         $columns = $schemaManager->listTableColumns($authorAuditTable->getName());
@@ -259,7 +259,7 @@ final class SchemaManagerTest extends TestCase
         }
 
         // run UpdateManager::updateAuditTable() to bring author_audit to expected structure
-        $fromSchema = DoctrineHelper::introspectSchema($schemaManager);
+        $fromSchema = $schemaManager->introspectSchema();
 
         $toSchema = $updater->updateAuditTable(Author::class);
         $this->migrate($fromSchema, $toSchema, $entityManager);
@@ -320,9 +320,13 @@ final class SchemaManagerTest extends TestCase
 
     private function migrate(Schema $fromSchema, Schema $toSchema, EntityManagerInterface $entityManager): void
     {
-        $sqls = DoctrineHelper::getMigrateToSql($entityManager->getConnection(), $fromSchema, $toSchema);
+        $connection = $entityManager->getConnection();
+        $platform = $connection->getDatabasePlatform();
+        $sqls = $platform->getAlterSchemaSQL(
+            (new \Doctrine\DBAL\Schema\Comparator($platform))->compareSchemas($fromSchema, $toSchema)
+        );
         foreach ($sqls as $sql) {
-            $statement = $entityManager->getConnection()->prepare($sql);
+            $statement = $connection->prepare($sql);
             $statement->executeStatement();
         }
     }
@@ -357,8 +361,7 @@ final class SchemaManagerTest extends TestCase
 
         // unregister CreateSchemaListener
         $evm = $entityManager->getEventManager();
-        $allListeners = method_exists($evm, 'getAllListeners') ? $evm->getAllListeners() : $evm->getListeners();
-        foreach ($allListeners as $event => $listeners) {
+        foreach ($evm->getAllListeners() as $event => $listeners) {
             foreach ($listeners as $listener) {
                 if ($listener instanceof CreateSchemaListener) {
                     $evm->removeEventListener([$event], $listener);

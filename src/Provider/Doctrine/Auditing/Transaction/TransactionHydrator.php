@@ -9,7 +9,6 @@ use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use DH\Auditor\Transaction\TransactionHydratorInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\PersistentCollection;
 
 final class TransactionHydrator implements TransactionHydratorInterface
@@ -85,12 +84,7 @@ final class TransactionHydrator implements TransactionHydratorInterface
             $owner = $collection->getOwner();
 
             if (null !== $owner && $this->provider->isAudited($owner)) {
-                $mapping = $collection->getMapping();
-
-                // TODO: backward compatibility code until we drop doctrine/orm <3.0
-                if ($mapping instanceof AssociationMapping) {
-                    $mapping = $mapping->toArray();
-                }
+                $mapping = $collection->getMapping()->toArray();
 
                 /** @var object $entity */
                 foreach ($collection->getInsertDiff() as $entity) {
@@ -126,12 +120,7 @@ final class TransactionHydrator implements TransactionHydratorInterface
             $owner = $collection->getOwner();
 
             if (null !== $owner && $this->provider->isAudited($owner)) {
-                $mapping = $collection->getMapping();
-
-                // TODO: backward compatibility code until we drop doctrine/orm <3.0
-                if ($mapping instanceof AssociationMapping) {
-                    $mapping = $mapping->toArray();
-                }
+                $mapping = $collection->getMapping()->toArray();
 
                 /** @var object $entity */
                 foreach ($collection->toArray() as $entity) {

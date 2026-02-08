@@ -1,0 +1,173 @@
+name: auditor 4.x CI
+
+on:
+  schedule:
+    - cron: 0 0 * * *
+  pull_request:
+    branches:
+      - master
+      - feature/4.0
+  push:
+    branches:
+      - master
+      - feature/4.0
+
+jobs:
+
+  code_style_composer_checks:
+    name: Runs PHP-CS-Fixer to check for CS issues, and validates composer.json
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: composer:v2
+
+      - name: Install PHP-CS-Fixer
+        run: composer install --no-progress --ansi --working-dir=tools/php-cs-fixer
+
+      - name: Run PHP-CS-Fixer
+        run: composer cs-check
+
+      - name: Validate composer
+        run: composer validate --strict --no-check-lock
+
+  tests_sf:
+    name: Tests PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, ${{ matrix.db }}
+    runs-on: ubuntu-latest
+    needs: [ code_style_composer_checks ]
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: auditor
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    strategy:
+      matrix:
+        php:
+          - '8.2'
+          - '8.3'
+          - '8.4'
+          - '8.5'
+        symfony:
+          - '8.*'
+        db:
+          - 'sqlite'
+          - 'mysql'
+          - 'pgsql'
+      fail-fast: false
+
+    steps:
+      - name: Configure Database
+        run: |
+          if [ "${{ matrix.db }}" = "sqlite" ]; then
+            echo "DATABASE_URL=sqlite:///:memory:" >> $GITHUB_ENV
+          elif [ "${{ matrix.db }}" = "mysql" ]; then
+            echo "DATABASE_URL=mysql://root:password@127.0.0.1/auditor?serverVersion=8&charset=utf8mb4" >> $GITHUB_ENV
+          elif [ "${{ matrix.db }}" = "pgsql" ]; then
+            echo "DATABASE_URL=pgsql://postgres:password@localhost/auditor?serverVersion=15&charset=utf8" >> $GITHUB_ENV
+          fi
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please do not remove it
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: composer:v2, flex, pcov
+          coverage: pcov
+
+      - name: Configure Symfony
+        run: |
+          composer global config --no-plugins allow-plugins.symfony/flex true
+          composer global require --no-progress --no-scripts --no-plugins symfony/flex
+          composer config extra.symfony.require "${{ matrix.symfony }}"
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@v5
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ matrix.php }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ matrix.php }}-composer-
+
+      - name: Update project dependencies
+        env:
+          SYMFONY_REQUIRE: "^8.0"
+        run: composer update --no-progress --ansi --prefer-stable
+
+      - name: Install PHPStan
+        run: composer install --no-progress --ansi --working-dir=tools/phpstan
+
+      - name: Run PHPStan
+        run: composer phpstan
+
+      - name: Run tests
+        env:
+          XDEBUG_MODE: coverage
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+        run: |
+          RAW_CODECOV_REPORT="php-${{ matrix.php }}-sf-${{ matrix.symfony }}-${{ matrix.db }}-coverage"
+          echo "CODECOV_REPORT=$(echo $RAW_CODECOV_REPORT | sed 's/\.\*//')" >> $GITHUB_ENV
+          vendor/bin/phpunit -c phpunit.xml --coverage-clover=coverage.xml
+
+      - name: Upload coverage file
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ env.CODECOV_REPORT }}
+          path: coverage.xml
+
+  upload_coverage:
+    name: "Upload coverage to Codecov"
+    runs-on: "ubuntu-latest"
+    needs:
+      - tests_sf
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v6"
+        with:
+          fetch-depth: 2
+
+      - name: "Download coverage files"
+        uses: "actions/download-artifact@v7.0.0"
+        with:
+          path: "reports"
+
+      - name: "Upload to Codecov"
+        uses: "codecov/codecov-action@v5"
+        with:
+          directory: reports
+          token: ${{ env.CODECOV_TOKEN }}

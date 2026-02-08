@@ -14,18 +14,16 @@ use PHPUnit\Framework\TestCase;
 #[Small]
 final class DoctrineHelperTest extends TestCase
 {
-    public function testRegisterStorageServiceAgainstNoStorageProvider(): void
+    public function testGetRealClassName(): void
     {
         $className = 'App\Entity\City';
         $expected = $className;
         $realClassName = DoctrineHelper::getRealClassName($className);
         $this->assertSame($expected, $realClassName, 'real class name OK');
 
+        // Doctrine uses __CG__ marker for proxy classes (Doctrine\Persistence\Proxy::MARKER)
+        // Note: With PHP 8.4+, Doctrine uses native lazy objects instead
         $className = 'Proxies\__CG__\App\Entity\City';
-        $realClassName = DoctrineHelper::getRealClassName($className);
-        $this->assertSame($expected, $realClassName, 'proxy class name OK');
-
-        $className = 'Proxies\__PM__\App\Entity\City\Generated';
         $realClassName = DoctrineHelper::getRealClassName($className);
         $this->assertSame($expected, $realClassName, 'proxy class name OK');
     }

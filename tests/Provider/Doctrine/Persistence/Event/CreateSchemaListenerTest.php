@@ -85,7 +85,7 @@ final class CreateSchemaListenerTest extends TestCase
 
         /** @var StorageService $storageService */
         foreach ($this->provider->getStorageServices() as $storageService) {
-            $schemaManager = DoctrineHelper::createSchemaManager($storageService->getEntityManager()->getConnection());
+            $schemaManager = $storageService->getEntityManager()->getConnection()->createSchemaManager();
 
             foreach ($schemaManager->listTables() as $table) {
                 $tableNames[] = $table->getName();

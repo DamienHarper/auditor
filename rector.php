@@ -24,10 +24,10 @@ return RectorConfig::configure()
         phpunit: true,
     )
     ->withSets([
-        SymfonySetList::SYMFONY_54,
+        SymfonySetList::SYMFONY_64,
         PHPUnitSetList::PHPUNIT_110,
         DoctrineSetList::DOCTRINE_CODE_QUALITY,
-        DoctrineSetList::DOCTRINE_ORM_29,
+        DoctrineSetList::DOCTRINE_ORM_214,
         DoctrineSetList::DOCTRINE_DBAL_40,
     ])
     ->withAttributesSets(

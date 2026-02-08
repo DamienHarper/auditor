@@ -140,7 +140,10 @@ final readonly class SchemaManager
                 }
             }
 
-            $sqls[$name] = DoctrineHelper::getMigrateToSql($storageConnection, $fromSchema, $storageSchema);
+            $platform = $storageConnection->getDatabasePlatform();
+            $sqls[$name] = $platform->getAlterSchemaSQL(
+                (new \Doctrine\DBAL\Schema\Comparator($platform))->compareSchemas($fromSchema, $storageSchema)
+            );
         }
 
         return $sqls;
@@ -158,8 +161,7 @@ final readonly class SchemaManager
         $connection = $storageService->getEntityManager()->getConnection();
 
         if (!$schema instanceof Schema) {
-            $schemaManager = DoctrineHelper::createSchemaManager($connection);
-            $schema = DoctrineHelper::introspectSchema($schemaManager);
+            $schema = $connection->createSchemaManager()->introspectSchema();
         }
 
         /** @var Configuration $configuration */
@@ -214,9 +216,9 @@ final readonly class SchemaManager
         $storageService = $this->provider->getStorageServiceForEntity($entity);
         $connection = $storageService->getEntityManager()->getConnection();
 
-        $schemaManager = DoctrineHelper::createSchemaManager($connection);
+        $schemaManager = $connection->createSchemaManager();
         if (!$schema instanceof Schema) {
-            $schema = DoctrineHelper::introspectSchema($schemaManager);
+            $schema = $schemaManager->introspectSchema();
         }
 
         /** @var Configuration $configuration */

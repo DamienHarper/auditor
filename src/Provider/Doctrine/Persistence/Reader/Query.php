@@ -269,12 +269,7 @@ final class Query implements QueryInterface
 
                     foreach ($data['params'] as $name => $value) {
                         if (\is_array($value)) {
-                            if (class_exists(ArrayParameterType::class)) {
-                                $queryBuilder->setParameter($name, $value, ArrayParameterType::STRING);
-                            } else {
-                                // TODO: replace Connection::PARAM_STR_ARRAY with ArrayParameterType::STRING when dropping support of doctrine/dbal < 3.6
-                                $queryBuilder->setParameter($name, $value, Connection::PARAM_STR_ARRAY); // @phpstan-ignore-line
-                            }
+                            $queryBuilder->setParameter($name, $value, ArrayParameterType::STRING);
                         } else {
                             $queryBuilder->setParameter($name, $value);
                         }

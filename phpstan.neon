@@ -12,10 +12,6 @@ parameters:
     paths:
         - src
 
-    excludePaths:
-        # TODO: Remove following lines once doctrine/dbal 4.0 is the minimum supported version
-        - src/Provider/Doctrine/Auditing/DBAL/Middleware/AuditorConnection.php
-
     ignoreErrors:
         - identifier: missingType.iterableValue
         - identifier: missingType.generics
@@ -23,15 +19,3 @@ parameters:
         - '~Dead catch - Throwable is never thrown in the try block~'
         - '~Parameter \#1 \$className of method Doctrine\\ORM\\EntityManagerInterface\:\:getClassMetadata\(\) expects class-string<object>, string given\.~'
         - '~Unable to resolve the template type T in call to method Doctrine\\ORM\\EntityManagerInterface\:\:getClassMetadata\(\)~'
-        # TODO: Remove following lines once doctrine/dbal 4.0 is the minimum supported version
-        - message: "~Offset '(major|minor|patch)' does not exist on array~"
-          reportUnmatched: false
-        - message: '~Call to private method getServerVersion\(\) of class Doctrine\\DBAL\\Connection.~'
-          reportUnmatched: false
-        - message: '~Call to an undefined method Doctrine\\DBAL\\Driver\\Connection::getServerVersion\(\).~'
-          reportUnmatched: false
-        - message: '~Call to deprecated method getWrappedConnection\(\) of class Doctrine\\DBAL\\Connection:~'
-          reportUnmatched: false
-        - message: '~Call to deprecated method setPrimaryKey\(\) of class Doctrine\\DBAL\\Schema\\Table~'
-          reportUnmatched: false
-        - message: '~Call to deprecated method getReflectionProperty\(\) of class Doctrine\\ORM\\Mapping\\ClassMetadata~'

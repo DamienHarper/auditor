@@ -79,7 +79,7 @@ final class SchemaManager1AEM2SEMTest extends TestCase
          */
         foreach ($storageServices as $name => $storageService) {
             $connection = $storageService->getEntityManager()->getConnection();
-            $schemaManager = DoctrineHelper::createSchemaManager($connection);
+            $schemaManager = $connection->createSchemaManager();
             $tables = array_map(
                 static fn ($t): string => $t->getName(),
                 $schemaManager->listTables()

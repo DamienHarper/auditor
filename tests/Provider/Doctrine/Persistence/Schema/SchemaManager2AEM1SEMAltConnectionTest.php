@@ -76,7 +76,7 @@ final class SchemaManager2AEM1SEMAltConnectionTest extends TestCase
             sort($expected[$name]);
 
             $connection = $storageService->getEntityManager()->getConnection();
-            $schemaManager = DoctrineHelper::createSchemaManager($connection);
+            $schemaManager = $connection->createSchemaManager();
             $tables = array_map(
                 static fn ($t): string => $t->getName(),
                 $schemaManager->listTables()
