@@ -61,7 +61,7 @@ class Author implements Stringable
         return $this->getFullname() ?? self::class.'#'.$this->getId();
     }
 
-    public function __sleep()
+    public function __serialize()
     {
         return ['id', 'fullname', 'email'];
     }

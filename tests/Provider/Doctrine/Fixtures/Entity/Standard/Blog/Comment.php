@@ -69,7 +69,7 @@ class Comment
 
     public function __construct() {}
 
-    public function __sleep()
+    public function __serialize()
     {
         return ['id', 'body', 'author', 'created_at', 'post_id'];
     }

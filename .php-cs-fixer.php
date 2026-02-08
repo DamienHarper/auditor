@@ -8,11 +8,9 @@ $config
     ->setRules([
         '@PhpCsFixer' => true,
         '@PhpCsFixer:risky' => true,
-        '@PHP74Migration:risky' => true,
-//        '@PHP80Migration' => true,
-//        '@PHP80Migration:risky' => true,
+        '@PHP7x4Migration:risky' => true,
         '@DoctrineAnnotation' => true,
-        '@PHPUnit84Migration:risky' => true,
+        '@PHPUnit8x4Migration:risky' => true,
         'date_time_immutable' => true,
         'final_public_method_for_abstract_class' => false,
         'general_phpdoc_annotation_remove' => [
