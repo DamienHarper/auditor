@@ -15,12 +15,7 @@ final class TransactionHydrator implements TransactionHydratorInterface
 {
     use AuditTrait;
 
-    private DoctrineProvider $provider;
-
-    public function __construct(DoctrineProvider $provider)
-    {
-        $this->provider = $provider;
-    }
+    public function __construct(private DoctrineProvider $provider) {}
 
     /**
      * @param Transaction $transaction

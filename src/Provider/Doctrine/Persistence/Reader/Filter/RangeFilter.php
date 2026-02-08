@@ -6,7 +6,7 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter;
 
 use DH\Auditor\Exception\InvalidArgumentException;
 
-final class RangeFilter implements FilterInterface
+final readonly class RangeFilter implements FilterInterface
 {
     private mixed $minValue;
 
@@ -15,7 +15,7 @@ final class RangeFilter implements FilterInterface
     /**
      * @throws InvalidArgumentException
      */
-    public function __construct(private readonly string $name, mixed $minValue, mixed $maxValue = null)
+    public function __construct(private string $name, mixed $minValue, mixed $maxValue = null)
     {
         if (null === $minValue && null === $maxValue) {
             throw new InvalidArgumentException('You must provide at least one of the two range bounds.');

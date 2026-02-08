@@ -18,20 +18,12 @@ return RectorConfig::configure()
         privatization: true,
         instanceOf: true,
         earlyReturn: true,
+        rectorPreset: true,
         phpunitCodeQuality: true,
         doctrineCodeQuality: true,
         symfonyCodeQuality: true,
     )
-    ->withSets([
-        SymfonySetList::SYMFONY_64,
-        PHPUnitSetList::PHPUNIT_120,
-        DoctrineSetList::DOCTRINE_CODE_QUALITY,
-        DoctrineSetList::DOCTRINE_ORM_214,
-        DoctrineSetList::DOCTRINE_DBAL_40,
-    ])
     ->withAttributesSets(
-        symfony: true,
-        doctrine: true,
-        phpunit: true,
+        all: true,
     )
 ;

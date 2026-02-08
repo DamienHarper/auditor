@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine;
 
 use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
+use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation\AuditableButUnauditedEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation\AuditedEntity;
@@ -34,7 +35,7 @@ final class ConfigurationTest extends TestCase
     {
         $configuration = $this->createProviderConfiguration();
 
-        $this->assertNull($configuration->getProvider(), 'provider is null by default.');
+        $this->assertNotInstanceOf(DoctrineProvider::class, $configuration->getProvider(), 'provider is null by default.');
     }
 
     public function testDefaultTablePrefix(): void

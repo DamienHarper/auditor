@@ -7,6 +7,7 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Helper;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\PlatformHelper;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MariaDBPlatform;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[AllowMockObjectsWithoutExpectations]
 final class PlatformHelperTest extends TestCase
 {
     #[DataProvider('provideIsJsonSupportedForMariaDbCases')]

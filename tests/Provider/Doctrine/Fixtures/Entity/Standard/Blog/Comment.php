@@ -28,10 +28,10 @@ class Comment
     #[Gedmo\Timestampable(on: 'create')]
     protected ?\DateTimeImmutable $created_at = null;
 
-    #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true], nullable: true)]
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['unsigned' => true])]
     protected ?int $post_id = null;
 
-    #[ORM\ManyToOne(targetEntity: 'Post', inversedBy: 'comments', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: 'Post', cascade: ['persist', 'remove'], inversedBy: 'comments')]
     #[ORM\JoinColumn(name: 'post_id')]
     protected ?Post $post = null;
 

@@ -294,7 +294,7 @@ final readonly class SchemaManager
                     $newTableName = $tableDelimiter.$newTableName.$tableDelimiter;
                 }
 
-                if ($schema) {
+                if ('' !== $schema && '0' !== $schema) {
                     if ('"' === $schemaDelimiter || '`' === $schemaDelimiter) {
                         $schema = $schemaDelimiter.$schema.$schemaDelimiter;
                     }

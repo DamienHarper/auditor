@@ -76,7 +76,7 @@ final class Configuration implements ConfigurationInterface
         }
 
         // "viewer" is disabled by default
-        return \is_bool($config) ? $config : false;
+        return \is_bool($config) && $config;
     }
 
     public static function getViewerPageSizeFromConfig(mixed $config): int

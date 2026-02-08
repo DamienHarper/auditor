@@ -24,6 +24,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use DH\Auditor\Tests\Traits\ReflectionTrait;
 use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
@@ -157,7 +158,7 @@ final class SchemaManagerTest extends TestCase
         $fromSchema = $schemaManager->introspectSchema();
 
         // at this point, schema is populated but does not contain any audit table
-        $this->assertNull($this->getTable($schemaManager->listTables(), 'author_audit'), 'author_audit does not exist yet.');
+        $this->assertNotInstanceOf(Table::class, $this->getTable($schemaManager->listTables(), 'author_audit'), 'author_audit does not exist yet.');
 
         // create audit table for Author entity
         $this->doConfigureEntities();
@@ -166,7 +167,7 @@ final class SchemaManagerTest extends TestCase
 
         // check audit table has been created
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
-        $this->assertNotNull($authorAuditTable, 'author_audit table has been created.');
+        $this->assertInstanceOf(Table::class, $authorAuditTable, 'author_audit table has been created.');
 
         // check expected columns
         $expected = SchemaHelper::getAuditTableColumns();
@@ -178,7 +179,7 @@ final class SchemaManagerTest extends TestCase
         $expected = SchemaHelper::getAuditTableIndices($authorAuditTable->getName());
         foreach ($expected as $name => $options) {
             if ('primary' === $options['type']) {
-                $this->assertNotNull($authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
+                $this->assertInstanceOf(Index::class, $authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
             } else {
                 $this->assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
             }
@@ -198,7 +199,7 @@ final class SchemaManagerTest extends TestCase
         $fromSchema = $schemaManager->introspectSchema();
 
         // at this point, schema is populated but does not contain any audit table
-        $this->assertNull($this->getTable($schemaManager->listTables(), 'author_audit'), 'author_audit does not exist yet.');
+        $this->assertNotInstanceOf(Table::class, $this->getTable($schemaManager->listTables(), 'author_audit'), 'author_audit does not exist yet.');
 
         // create audit table for Author entity
         $this->doConfigureEntities();
@@ -252,7 +253,7 @@ final class SchemaManagerTest extends TestCase
         // check expected alternate indices
         foreach ($alternateIndices as $name => $options) {
             if ('primary' === $options['type']) {
-                $this->assertNotNull($authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
+                $this->assertInstanceOf(Index::class, $authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
             } else {
                 $this->assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
             }
@@ -274,7 +275,7 @@ final class SchemaManagerTest extends TestCase
         // check expected indices
         foreach (SchemaHelper::getAuditTableIndices($authorAuditTable->getName()) as $name => $options) {
             if ('primary' === $options['type']) {
-                $this->assertNotNull($authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
+                $this->assertInstanceOf(Index::class, $authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
             } else {
                 $this->assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
             }

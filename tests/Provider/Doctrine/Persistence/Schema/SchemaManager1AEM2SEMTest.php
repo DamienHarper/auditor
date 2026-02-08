@@ -16,6 +16,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\BlogSchemaSetupTrait;
+use Doctrine\DBAL\Schema\Table;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -80,7 +81,7 @@ final class SchemaManager1AEM2SEMTest extends TestCase
             $connection = $storageService->getEntityManager()->getConnection();
             $schemaManager = $connection->createSchemaManager();
             $tables = array_map(
-                static fn ($t): string => $t->getName(),
+                static fn (Table $t): string => $t->getName(),
                 $schemaManager->listTables()
             );
             sort($tables);

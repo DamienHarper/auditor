@@ -40,7 +40,7 @@ final readonly class AnnotationLoader
 
         // Check that we have an Entity annotation or attribute
         $attributes = $reflection->getAttributes(Entity::class);
-        if (\is_array($attributes) && [] !== $attributes) {
+        if ([] !== $attributes) {
             $annotation = $attributes[0]->newInstance();
         }
 
@@ -50,7 +50,7 @@ final readonly class AnnotationLoader
 
         // Check that we have an Auditable annotation or attribute
         $attributes = $reflection->getAttributes(Auditable::class);
-        if (\is_array($attributes) && [] !== $attributes) {
+        if ([] !== $attributes) {
             $auditableAnnotation = $attributes[0]->newInstance();
         }
 
@@ -60,7 +60,7 @@ final readonly class AnnotationLoader
 
         // Check that we have a Security annotation or attribute
         $attributes = $reflection->getAttributes(Security::class);
-        if (\is_array($attributes) && [] !== $attributes) {
+        if ([] !== $attributes) {
             $securityAnnotation = $attributes[0]->newInstance();
         }
 

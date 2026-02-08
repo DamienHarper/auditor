@@ -57,8 +57,7 @@ final class Issue101Test extends TestCase
                 __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
                 __DIR__.'/../Fixtures/Issue101',
             ],
-            'default',
-            null
+            'default'
         );
 
         $this->provider->registerStorageService(new StorageService('default', $entityManager));

@@ -82,6 +82,10 @@ trait AuditTrait
 
         switch (array_search($type::class, Type::getTypesMap(), true)) {
             case Types::BIGINT:
+            case 'uuid_binary':
+            case 'uuid_binary_ordered_time':
+            case 'uuid':
+            case 'ulid':
                 $convertedValue = (string) $value;  // @phpstan-ignore-line
 
                 break;
@@ -96,15 +100,6 @@ trait AuditTrait
             case Types::FLOAT:
             case Types::BOOLEAN:
                 $convertedValue = $type->convertToPHPValue($value, $platform);
-
-                break;
-
-            case 'uuid_binary':
-            case 'uuid_binary_ordered_time':
-            case 'uuid':
-            case 'ulid':
-                // Ramsey UUID / Symfony UID (UUID/ULID)
-                $convertedValue = (string) $value;  // @phpstan-ignore-line
 
                 break;
 

@@ -44,7 +44,7 @@ final class Issue33Test extends TestCase
         $shopOfferPrice = new ShopOfferPrice($shop, $offer, 123);
         $storageServices[ShopOfferPrice::class]->getEntityManager()->persist($shopOfferPrice);
 
-        self::expectException(MappingException::class);
+        $this->expectException(MappingException::class);
 
         $this->flushAll($storageServices);
     }

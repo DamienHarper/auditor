@@ -46,7 +46,7 @@ final class LifecycleEventTest extends TestCase
 
     public function testLifecycleEventWithInvalidPayload(): void
     {
-        self::expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         new LifecycleEvent(['invalid payload']);
     }
 
@@ -95,7 +95,7 @@ final class LifecycleEventTest extends TestCase
 
         $event = new LifecycleEvent($payload);
 
-        self::expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $payload = ['invalid payload'];
         $event->setPayload($payload);
     }

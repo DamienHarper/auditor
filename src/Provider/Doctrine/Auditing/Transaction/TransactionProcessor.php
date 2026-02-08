@@ -22,12 +22,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
 {
     use AuditTrait;
 
-    private DoctrineProvider $provider;
-
-    public function __construct(DoctrineProvider $provider)
-    {
-        $this->provider = $provider;
-    }
+    public function __construct(private DoctrineProvider $provider) {}
 
     /**
      * @param Transaction $transaction
@@ -238,6 +233,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
         if (\is_string($input)) {
             return mb_convert_encoding($input, 'UTF-8', 'UTF-8');
         }
+
         if (\is_array($input)) {
             foreach ($input as $key => $value) {
                 $input[$this->convertEncoding($key)] = $this->convertEncoding($value); // inbuilt mb_convert_encoding also converts keys
