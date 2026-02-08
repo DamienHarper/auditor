@@ -16,10 +16,12 @@ use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\TableSchemaListener;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Query;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
-use DH\Auditor\Provider\Doctrine\Service\StorageService;
+use DH\Auditor\Provider\Doctrine\Service\DoctrineService;
 use DH\Auditor\Provider\ProviderInterface;
 use DH\Auditor\Provider\Service\AuditingServiceInterface;
+use DH\Auditor\Provider\Service\StorageServiceInterface;
 use DH\Auditor\Tests\Provider\Doctrine\DoctrineProviderTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
@@ -31,23 +33,6 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 final class DoctrineProvider extends AbstractProvider
 {
-    /**
-     * @var array<string, string>
-     */
-    private const FIELDS = [
-        'type' => '?',
-        'object_id' => '?',
-        'discriminator' => '?',
-        'transaction_hash' => '?',
-        'diffs' => '?',
-        'blame_id' => '?',
-        'blame_user' => '?',
-        'blame_user_fqdn' => '?',
-        'blame_user_firewall' => '?',
-        'ip' => '?',
-        'created_at' => '?',
-    ];
-
     private readonly TransactionManager $transactionManager;
 
     public function __construct(ConfigurationInterface $configuration)
@@ -102,7 +87,7 @@ final class DoctrineProvider extends AbstractProvider
         throw new InvalidArgumentException(\sprintf('Auditing service not found for "%s".', $entity));
     }
 
-    public function getStorageServiceForEntity(string $entity): StorageService
+    public function getStorageServiceForEntity(string $entity): DoctrineService
     {
         $this->checkStorageMapper();
 
@@ -111,10 +96,13 @@ final class DoctrineProvider extends AbstractProvider
 
         if (null === $storageMapper || 1 === \count($this->getStorageServices())) {
             // No mapper and only 1 storage entity manager
-            /** @var array<StorageService> $services */
+            /** @var array<StorageServiceInterface> $services */
             $services = $this->getStorageServices();
+            $service = array_values($services)[0];
 
-            return array_values($services)[0];
+            \assert($service instanceof DoctrineService);   // helps PHPStan
+
+            return $service;
         }
 
         if (\is_string($storageMapper) && class_exists($storageMapper)) {
@@ -126,34 +114,22 @@ final class DoctrineProvider extends AbstractProvider
         return $storageMapper($entity, $this->getStorageServices());
     }
 
+    public function getEntityAuditTableName(string $entity): string
+    {
+        \assert($this->configuration instanceof Configuration);    // helps PHPStan
+
+        return $this->getStorageServiceForEntity($entity)->getEntityAuditTableName($this->configuration, $entity);
+    }
+
     public function persist(LifecycleEvent $event): void
     {
         $payload = $event->getPayload();
-        $auditTable = $payload['table'];
         $entity = $payload['entity'];
-        unset($payload['table'], $payload['entity']);
-
-        $keys = array_keys(self::FIELDS);
-        $query = \sprintf(
-            'INSERT INTO %s (%s) VALUES (%s)',
-            $auditTable,
-            implode(', ', $keys),
-            implode(', ', array_values(self::FIELDS))
-        );
-
-        /** @var StorageService $storageService */
-        $storageService = $this->getStorageServiceForEntity($entity);
-        $statement = $storageService->getEntityManager()->getConnection()->prepare($query);
-
-        foreach ($payload as $key => $value) {
-            $statement->bindValue(array_search($key, $keys, true) + 1, $value);
-        }
-
-        $statement->executeStatement();
+        $id = $this->getStorageServiceForEntity($entity)->persist($event);
 
         // let's get the last inserted ID from the database so other providers can use that info
         $payload = $event->getPayload();
-        $payload['id'] = (int) $storageService->getEntityManager()->getConnection()->lastInsertId();
+        $payload['id'] = $id;
         $event->setPayload($payload);
     }
 
@@ -265,6 +241,17 @@ final class DoctrineProvider extends AbstractProvider
         $this->configuration->setEntities(array_merge($entities, $annotationEntities));
 
         return $this;
+    }
+
+    public function createBaseQuery(string $entity): Query
+    {
+        \assert($this->configuration instanceof Configuration);    // helps PHPStan
+
+        return $this->getStorageServiceForEntity($entity)->createBaseQuery(
+            $this->configuration,
+            $entity,
+            $this->getAuditor()->getConfiguration()->getTimezone()
+        );
     }
 
     private function checkStorageMapper(): self
