@@ -5,7 +5,7 @@ This document describes the backward incompatible changes introduced in auditor 
 ## Requirements Changes
 
 ### PHP Version
-- **Minimum PHP version is now 8.2** (was 8.1 in 3.x)
+- **Minimum PHP version is now 8.2** (same as 3.x)
 
 ### Symfony Version
 - **Minimum Symfony version is now 8.0** (was 5.4 in 3.x)
@@ -14,6 +14,9 @@ This document describes the backward incompatible changes introduced in auditor 
 ### Doctrine Versions
 - **Doctrine DBAL**: minimum version is now **4.0** (was 3.2 in 3.x)
 - **Doctrine ORM**: minimum version is now **3.2** (was 2.13 in 3.x)
+
+### PHPUnit Version
+- **PHPUnit**: minimum version is now **12.0** (was 11.0 in 3.x)
 
 ## Removed Methods
 
@@ -48,7 +51,7 @@ $sqls = $platform->getAlterSchemaSQL(
 
 ### `DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper::getRealClassName()`
 
-This method now only handles Proxy Manager (`__PM__`) proxies. The legacy `__CG__` proxy handling (for Doctrine ORM < 3.0) has been removed.
+This method now only handles `__CG__` proxies (Doctrine Common Gateway marker). With PHP 8.4+, Doctrine ORM uses native lazy objects instead of proxy classes.
 
 ## Internal Changes
 
