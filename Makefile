@@ -7,8 +7,6 @@ args ?=
 # Allowed PHP and Symfony version combinations
 # (PHP_VERSION;SYMFONY_VERSION)
 valid_combinations = \
-    8.2;8.0 \
-    8.3;8.0 \
     8.4;8.0 \
     8.5;8.0
 
@@ -44,7 +42,7 @@ help:
 	@echo "  phpstan  - Run PHPStan for static code analysis."
 	@echo ""
 	@echo "Options:"
-	@echo "  php      - PHP version to use (default: $(php)). Supported: 8.2, 8.3"
+	@echo "  php      - PHP version to use (default: $(php)). Supported: 8.4, 8.5"
 	@echo "  sf       - Symfony version to use (default: $(sf)). Supported: 8.0"
 	@echo "  db       - Database type (default: $(db)). Supported: sqlite, mysql, pgsql, mariadb"
 	@echo "  args     - Additional arguments:"
@@ -56,7 +54,7 @@ help:
 	@echo "             Defaults for 'cs-fix' target:   $(args)"
 	@echo ""
 	@echo "Examples:"
-	@echo "  make tests php=8.2 sf=8.0 db=mysql"
+	@echo "  make tests php=8.4 sf=8.0 db=mysql"
 	@echo "  make cs-fix"
 	@echo "  make phpstan"
 	@echo "  make tests args='--filter=TestClassName'"

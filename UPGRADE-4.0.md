@@ -5,7 +5,7 @@ This document describes the backward incompatible changes introduced in auditor 
 ## Requirements Changes
 
 ### PHP Version
-- **Minimum PHP version is now 8.2** (same as 3.x)
+- **Minimum PHP version is now 8.4** (was 8.2 in 3.x, required by Symfony 8.0)
 
 ### Symfony Version
 - **Minimum Symfony version is now 8.0** (was 5.4 in 3.x)
@@ -80,7 +80,7 @@ composer setup
 
 ## Migration Steps
 
-1. **Update your PHP version** to 8.2 or higher
+1. **Update your PHP version** to 8.4 or higher
 2. **Update your Symfony dependencies** to 8.0 or higher
 3. **Update Doctrine dependencies**:
    - `doctrine/dbal` to ^4.0

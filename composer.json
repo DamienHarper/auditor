@@ -11,7 +11,7 @@
     }
   ],
   "require": {
-    "php": ">=8.2",
+    "php": ">=8.4",
     "doctrine/dbal": "^4.0",
     "doctrine/orm": "^3.2",
     "symfony/cache": "^8.0",
