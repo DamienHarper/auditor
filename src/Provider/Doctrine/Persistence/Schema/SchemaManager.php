@@ -143,7 +143,7 @@ final readonly class SchemaManager
 
             $platform = $storageConnection->getDatabasePlatform();
             $sqls[$name] = $platform->getAlterSchemaSQL(
-                (new Comparator($platform))->compareSchemas($fromSchema, $storageSchema)
+                new Comparator($platform)->compareSchemas($fromSchema, $storageSchema)
             );
         }
 

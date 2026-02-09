@@ -47,7 +47,7 @@ final class SchemaManagerTest extends TestCase
     /**
      * @var array<string, array<string, array<string, int|true>|array<string, null|bool>|array<string, null|false|int>|array<string, null|true>|array<string, true>|string>>
      */
-    private const ALTERNATE_COLUMNS = [
+    private const array ALTERNATE_COLUMNS = [
         'id' => [
             'type' => Types::INTEGER,
             'options' => [
@@ -324,7 +324,7 @@ final class SchemaManagerTest extends TestCase
         $connection = $entityManager->getConnection();
         $platform = $connection->getDatabasePlatform();
         $sqls = $platform->getAlterSchemaSQL(
-            (new Comparator($platform))->compareSchemas($fromSchema, $toSchema)
+            new Comparator($platform)->compareSchemas($fromSchema, $toSchema)
         );
         foreach ($sqls as $sql) {
             $statement = $connection->prepare($sql);

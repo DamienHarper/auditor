@@ -26,7 +26,7 @@ final class ConfigurationTest extends TestCase
     /**
      * @var string[]
      */
-    private const IGNORED = [
+    private const array IGNORED = [
         'created_at',
         'updated_at',
     ];

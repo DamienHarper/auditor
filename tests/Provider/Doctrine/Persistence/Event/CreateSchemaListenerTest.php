@@ -28,7 +28,7 @@ final class CreateSchemaListenerTest extends TestCase
     /**
      * @var array<class-string<Animal>>
      */
-    private const CLASSES = [Dog::class, Cat::class];
+    private const array CLASSES = [Dog::class, Cat::class];
 
     public function testCorrectSchemaStandard(): void
     {

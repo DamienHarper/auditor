@@ -65,7 +65,7 @@ trait SchemaSetupTrait
 
         $platform = $storageConnection->getDatabasePlatform();
         $sqls = $platform->getAlterSchemaSQL(
-            (new Comparator($platform))->compareSchemas($fromSchema, $toSchema)
+            new Comparator($platform)->compareSchemas($fromSchema, $toSchema)
         );
         foreach ($sqls as $sql) {
             $statement = $storageConnection->prepare($sql);
@@ -137,7 +137,7 @@ trait SchemaSetupTrait
 
         $platform = $storageConnection->getDatabasePlatform();
         $sqls = $platform->getAlterSchemaSQL(
-            (new Comparator($platform))->compareSchemas($fromSchema, $schema)
+            new Comparator($platform)->compareSchemas($fromSchema, $schema)
         );
         foreach ($sqls as $sql) {
             $statement = $storageConnection->prepare($sql);

@@ -34,7 +34,7 @@ final class DoctrineProvider extends AbstractProvider
     /**
      * @var array<string, string>
      */
-    private const FIELDS = [
+    private const array FIELDS = [
         'type' => '?',
         'object_id' => '?',
         'discriminator' => '?',
@@ -64,6 +64,7 @@ final class DoctrineProvider extends AbstractProvider
         return $this->transactionManager;
     }
 
+    #[\Override]
     public function registerAuditingService(AuditingServiceInterface $service): ProviderInterface
     {
         parent::registerAuditingService($service);

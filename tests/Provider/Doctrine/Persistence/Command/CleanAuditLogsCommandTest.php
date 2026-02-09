@@ -30,10 +30,7 @@ final class CleanAuditLogsCommandTest extends TestCase
     use LockableTrait;
     use SchemaSetupTrait;
 
-    /**
-     * @var string
-     */
-    private const KEEP = 'WRONG';
+    private const string KEEP = 'WRONG';
 
     public function testExecuteFailsWithKeepWrongFormat(): void
     {

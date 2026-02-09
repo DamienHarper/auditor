@@ -22,7 +22,7 @@ final class LifecycleEventTest extends TestCase
     /**
      * @var array<string, class-string<AuditEventSubscriber>|string>
      */
-    private const PAYLOAD = [
+    private const array PAYLOAD = [
         'entity' => AuditEventSubscriber::class,
         'table' => '',
         'type' => '',

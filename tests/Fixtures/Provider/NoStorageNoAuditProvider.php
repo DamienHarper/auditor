@@ -10,6 +10,7 @@ use DH\Auditor\Provider\ConfigurationInterface;
 
 final class NoStorageNoAuditProvider extends AbstractProvider
 {
+    #[\Override]
     public function getConfiguration(): ConfigurationInterface {}
 
     public function persist(LifecycleEvent $event): void {}
@@ -24,7 +25,9 @@ final class NoStorageNoAuditProvider extends AbstractProvider
         return false;
     }
 
+    #[\Override]
     public function getStorageServices(): array {}
 
+    #[\Override]
     public function getAuditingServices(): array {}
 }

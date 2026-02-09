@@ -102,7 +102,7 @@ final class DoctrineSubscriber implements EventSubscriber
 
         return \Closure::bind(function () use ($that): \Closure|Driver|null {
             /** @var Driver $this */
-            $properties = (new \ReflectionClass($this))->getProperties();
+            $properties = new \ReflectionClass($this)->getProperties();
             foreach ($properties as $property) {
                 $value = $property->getValue($this);
                 if ($value instanceof Driver) {

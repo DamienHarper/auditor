@@ -27,15 +27,7 @@ final class Issue132Test extends TestCase
     {
         $manager = new SchemaManager($this->provider);
         $schema = $manager->createAuditTable(DummyEntity::class);
-        $this->assertThat('parent_entities_audit', self::callback(static function (string $tableName) use ($schema): bool {
-            foreach ($schema->getTables() as $table) {
-                if ($table->getName() === $tableName) {
-                    return true;
-                }
-            }
-
-            return false;
-        }));
+        $this->assertThat('parent_entities_audit', self::callback(static fn (string $tableName): bool => array_any($schema->getTables(), static fn ($table): bool => $table->getName() === $tableName)));
     }
 
     public function testIssue132SchemaListener(): void
