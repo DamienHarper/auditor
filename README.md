@@ -48,7 +48,7 @@ Basically you can track any change of any entity from audit logs.
 
 
 ## Official Documentation
-`auditor` official documentation can be found [here](https://damienharper.github.io/auditor-docs/).
+`auditor` official documentation can be found [here](https://damienharper.github.io/auditor-docs/) or locally in the [docs/](docs/) folder.
 
 
 ## Version Information
