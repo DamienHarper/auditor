@@ -6,11 +6,9 @@ on:
   pull_request:
     branches:
       - master
-      - feature/4.0
   push:
     branches:
       - master
-      - feature/4.0
 
 jobs:
 
