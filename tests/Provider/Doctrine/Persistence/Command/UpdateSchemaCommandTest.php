@@ -167,8 +167,7 @@ final class UpdateSchemaCommandTest extends TestCase
 
         // unregister CreateSchemaListener
         $evm = $entityManager->getEventManager();
-        $allListeners = method_exists($evm, 'getAllListeners') ? $evm->getAllListeners() : $evm->getListeners();
-        foreach ($allListeners as $event => $listeners) {
+        foreach ($evm->getAllListeners() as $event => $listeners) {
             foreach ($listeners as $listener) {
                 if ($listener instanceof CreateSchemaListener) {
                     $evm->removeEventListener([$event], $listener);

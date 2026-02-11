@@ -11,13 +11,13 @@
     }
   ],
   "require": {
-    "php": ">=8.2",
-    "doctrine/dbal": "^3.2|^4.0",
-    "doctrine/orm": "^2.13|^3.2",
-    "symfony/cache": "^5.4|^6.4|^7.4|^8.0",
-    "symfony/event-dispatcher": "^5.4|^6.4|^7.4|^8.0",
-    "symfony/lock": "^5.4|^6.4|^7.4|^8.0",
-    "symfony/options-resolver": "^5.4|^6.4|^7.4|^8.0"
+    "php": ">=8.4",
+    "doctrine/dbal": "^4.0",
+    "doctrine/orm": "^3.2",
+    "symfony/cache": "^8.0",
+    "symfony/event-dispatcher": "^8.0",
+    "symfony/lock": "^8.0",
+    "symfony/options-resolver": "^8.0"
   },
   "suggest": {
     "damienharper/auditor-bundle": "Integrate auditor library in your Symfony projects."
@@ -36,23 +36,26 @@
     "ext-pdo": "*",
     "doctrine/data-fixtures": "^2.0",
     "gedmo/doctrine-extensions": "^3.0",
-    "phpunit/phpunit": "^11.0",
+    "phpunit/phpunit": "^12.0",
     "symfony/flex": "^2.4",
-    "symfony/var-dumper": "^5.4|^6.4|^7.4|^8.0",
-    "symfony/var-exporter": "^5.4|^6.4|^7.4"
+    "symfony/var-dumper": "^8.0"
   },
   "scripts": {
-    "test": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --colors=always",
-    "cs-fix": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --using-cache=no --verbose --ansi",
-    "cs-check": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --using-cache=no --verbose --ansi --dry-run",
-    "phpstan": "tools/phpstan/vendor/bin/phpstan --memory-limit=1G --ansi analyse src",
+    "test": "./vendor/bin/phpunit --colors=always --no-coverage",
+    "test:coverage": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --colors=always",
+    "testdox": "./vendor/bin/phpunit --colors=always --testdox --no-coverage",
+    "cs-fix": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --using-cache=no --verbose --ansi --allow-unsupported-php-version=yes",
+    "cs-check": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --using-cache=no --verbose --ansi --dry-run --allow-unsupported-php-version=yes",
+    "phpstan": "tools/phpstan/vendor/bin/phpstan --memory-limit=1G --ansi analyse",
     "rector": "tools/rector/vendor/bin/rector",
     "rector-check": "tools/rector/vendor/bin/rector --dry-run",
+    "qa": [
+      "@rector",
+      "@cs-fix",
+      "@phpstan"
+    ],
     "update-tools": "composer update --working-dir=tools/php-cs-fixer ; composer update --working-dir=tools/phpstan ; composer update --working-dir=tools/rector",
-    "setup5": "SYMFONY_REQUIRE='5.4.*' composer update --prefer-stable",
-    "setup6": "SYMFONY_REQUIRE='6.4.*' composer update --prefer-stable",
-    "setup7": "SYMFONY_REQUIRE='7.4.*' composer update --prefer-stable",
-    "setup8": "SYMFONY_REQUIRE='8.0.*' composer update --prefer-stable"
+    "setup": "SYMFONY_REQUIRE='8.0.*' composer update --prefer-stable"
   },
   "config": {
     "sort-packages": true,
@@ -63,7 +66,8 @@
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "3.x-dev",
+      "dev-master": "4.x-dev",
+      "dev-3.x": "3.x-dev",
       "dev-2.x": "2.x-dev",
       "dev-1.x": "1.x-dev"
     }

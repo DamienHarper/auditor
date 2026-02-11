@@ -416,8 +416,7 @@ final class DoctrineProviderTest extends TestCase
                 __DIR__.'/../../../src/Provider/Doctrine/Auditing/Annotation',
                 __DIR__.'/Fixtures/Entity/Attribute',
             ],
-            'default',
-            null
+            'default'
         );
         $annotationLoader = new AnnotationLoader($entityManager);
         $loaded = $annotationLoader->load();
@@ -558,7 +557,7 @@ final class FakeStorageMapper
 
 final class FakeUserProvider implements UserProviderInterface
 {
-    public function __invoke(): ?UserInterface
+    public function __invoke(): UserInterface
     {
         return new User();
     }

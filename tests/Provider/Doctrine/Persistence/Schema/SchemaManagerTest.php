@@ -7,7 +7,6 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
@@ -24,6 +23,8 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\DefaultSchemaSetupTrait;
 use DH\Auditor\Tests\Traits\ReflectionTrait;
+use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
@@ -46,7 +47,7 @@ final class SchemaManagerTest extends TestCase
     /**
      * @var array<string, array<string, array<string, int|true>|array<string, null|bool>|array<string, null|false|int>|array<string, null|true>|array<string, true>|string>>
      */
-    private const ALTERNATE_COLUMNS = [
+    private const array ALTERNATE_COLUMNS = [
         'id' => [
             'type' => Types::INTEGER,
             'options' => [
@@ -157,7 +158,7 @@ final class SchemaManagerTest extends TestCase
         $fromSchema = $schemaManager->introspectSchema();
 
         // at this point, schema is populated but does not contain any audit table
-        $this->assertNull($this->getTable($schemaManager->listTables(), 'author_audit'), 'author_audit does not exist yet.');
+        $this->assertNotInstanceOf(Table::class, $this->getTable($schemaManager->listTables(), 'author_audit'), 'author_audit does not exist yet.');
 
         // create audit table for Author entity
         $this->doConfigureEntities();
@@ -166,7 +167,7 @@ final class SchemaManagerTest extends TestCase
 
         // check audit table has been created
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
-        $this->assertNotNull($authorAuditTable, 'author_audit table has been created.');
+        $this->assertInstanceOf(Table::class, $authorAuditTable, 'author_audit table has been created.');
 
         // check expected columns
         $expected = SchemaHelper::getAuditTableColumns();
@@ -178,7 +179,7 @@ final class SchemaManagerTest extends TestCase
         $expected = SchemaHelper::getAuditTableIndices($authorAuditTable->getName());
         foreach ($expected as $name => $options) {
             if ('primary' === $options['type']) {
-                $this->assertNotNull($authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
+                $this->assertInstanceOf(Index::class, $authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
             } else {
                 $this->assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
             }
@@ -194,11 +195,11 @@ final class SchemaManagerTest extends TestCase
         $storageService = $this->provider->getStorageServiceForEntity(Author::class);
         $entityManager = $storageService->getEntityManager();
         $storageConnection = $entityManager->getConnection();
-        $schemaManager = DoctrineHelper::createSchemaManager($storageConnection);
-        $fromSchema = DoctrineHelper::introspectSchema($schemaManager);
+        $schemaManager = $storageConnection->createSchemaManager();
+        $fromSchema = $schemaManager->introspectSchema();
 
         // at this point, schema is populated but does not contain any audit table
-        $this->assertNull($this->getTable($schemaManager->listTables(), 'author_audit'), 'author_audit does not exist yet.');
+        $this->assertNotInstanceOf(Table::class, $this->getTable($schemaManager->listTables(), 'author_audit'), 'author_audit does not exist yet.');
 
         // create audit table for Author entity
         $this->doConfigureEntities();
@@ -229,7 +230,7 @@ final class SchemaManagerTest extends TestCase
         ];
 
         // apply new structure to author_audit table
-        $fromSchema = DoctrineHelper::introspectSchema($schemaManager);
+        $fromSchema = $schemaManager->introspectSchema();
         $authorAuditTable = $this->getTable($schemaManager->listTables(), 'author_audit');
         $table = $toSchema->getTable('author_audit');
         $columns = $schemaManager->listTableColumns($authorAuditTable->getName());
@@ -252,14 +253,14 @@ final class SchemaManagerTest extends TestCase
         // check expected alternate indices
         foreach ($alternateIndices as $name => $options) {
             if ('primary' === $options['type']) {
-                $this->assertNotNull($authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
+                $this->assertInstanceOf(Index::class, $authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
             } else {
                 $this->assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
             }
         }
 
         // run UpdateManager::updateAuditTable() to bring author_audit to expected structure
-        $fromSchema = DoctrineHelper::introspectSchema($schemaManager);
+        $fromSchema = $schemaManager->introspectSchema();
 
         $toSchema = $updater->updateAuditTable(Author::class);
         $this->migrate($fromSchema, $toSchema, $entityManager);
@@ -274,7 +275,7 @@ final class SchemaManagerTest extends TestCase
         // check expected indices
         foreach (SchemaHelper::getAuditTableIndices($authorAuditTable->getName()) as $name => $options) {
             if ('primary' === $options['type']) {
-                $this->assertNotNull($authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
+                $this->assertInstanceOf(Index::class, $authorAuditTable->getPrimaryKey(), 'audit table has a primary key named "'.$name.'".');
             } else {
                 $this->assertTrue($authorAuditTable->hasIndex($options['name']), 'audit table has an index named "'.$name.'".');
             }
@@ -320,9 +321,13 @@ final class SchemaManagerTest extends TestCase
 
     private function migrate(Schema $fromSchema, Schema $toSchema, EntityManagerInterface $entityManager): void
     {
-        $sqls = DoctrineHelper::getMigrateToSql($entityManager->getConnection(), $fromSchema, $toSchema);
+        $connection = $entityManager->getConnection();
+        $platform = $connection->getDatabasePlatform();
+        $sqls = $platform->getAlterSchemaSQL(
+            new Comparator($platform)->compareSchemas($fromSchema, $toSchema)
+        );
         foreach ($sqls as $sql) {
-            $statement = $entityManager->getConnection()->prepare($sql);
+            $statement = $connection->prepare($sql);
             $statement->executeStatement();
         }
     }
@@ -357,8 +362,7 @@ final class SchemaManagerTest extends TestCase
 
         // unregister CreateSchemaListener
         $evm = $entityManager->getEventManager();
-        $allListeners = method_exists($evm, 'getAllListeners') ? $evm->getAllListeners() : $evm->getListeners();
-        foreach ($allListeners as $event => $listeners) {
+        foreach ($evm->getAllListeners() as $event => $listeners) {
             foreach ($listeners as $listener) {
                 if ($listener instanceof CreateSchemaListener) {
                     $evm->removeEventListener([$event], $listener);

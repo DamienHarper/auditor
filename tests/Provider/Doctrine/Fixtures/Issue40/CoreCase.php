@@ -12,10 +12,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\HasLifecycleCallbacks]
 class CoreCase
 {
-    #[ORM\Column(type: Types::STRING, name: 'type', length: 50)]
+    #[ORM\Column(name: 'type', type: Types::STRING, length: 50)]
     public ?string $type = null;
 
-    #[ORM\Column(type: Types::STRING, name: 'status', length: 50)]
+    #[ORM\Column(name: 'status', type: Types::STRING, length: 50)]
     public ?string $status = null;
 
     #[ORM\Id]

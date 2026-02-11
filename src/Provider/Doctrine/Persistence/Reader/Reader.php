@@ -21,10 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 final readonly class Reader implements ReaderInterface
 {
-    /**
-     * @var int
-     */
-    public const PAGE_SIZE = 50;
+    public const int PAGE_SIZE = 50;
 
     /**
      * Reader constructor.

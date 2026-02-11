@@ -24,8 +24,7 @@ final class AnnotationLoaderTest extends TestCase
                 __DIR__.'/../../../../../src/Provider/Doctrine/Auditing/Annotation',
                 __DIR__.'/../../Traits',
             ],
-            'default',
-            null
+            'default'
         );
 
         $annotationLoader = new AnnotationLoader($entityManager);
@@ -40,8 +39,7 @@ final class AnnotationLoaderTest extends TestCase
                 __DIR__.'/../../../../../src/Provider/Doctrine/Auditing/Annotation',
                 __DIR__.'/../../Fixtures/Entity/Attribute',
             ],
-            'default',
-            null
+            'default'
         );
         $annotationLoader = new AnnotationLoader($entityManager);
         $loaded = $annotationLoader->load();

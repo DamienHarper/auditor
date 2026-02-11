@@ -17,6 +17,7 @@ final class AuditorConnection extends AbstractConnectionMiddleware
         parent::__construct($connection);
     }
 
+    #[\Override]
     public function commit(): void
     {
         $flusherList = $this->auditorDriver->getFlusherList();
@@ -29,6 +30,7 @@ final class AuditorConnection extends AbstractConnectionMiddleware
         parent::commit();
     }
 
+    #[\Override]
     public function rollBack(): void
     {
         $this->auditorDriver->resetFlusherList();

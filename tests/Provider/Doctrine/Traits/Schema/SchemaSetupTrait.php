@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits\Schema;
 
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Service\StorageServiceInterface;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\DoctrineProviderTrait;
+use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 
@@ -54,8 +54,8 @@ trait SchemaSetupTrait
     protected function tearDownEntitySchema(EntityManagerInterface $entityManager): void
     {
         $storageConnection = $entityManager->getConnection();
-        $schemaManager = DoctrineHelper::createSchemaManager($storageConnection);
-        $fromSchema = DoctrineHelper::introspectSchema($schemaManager);
+        $schemaManager = $storageConnection->createSchemaManager();
+        $fromSchema = $schemaManager->introspectSchema();
         $toSchema = clone $fromSchema;
 
         $tables = $fromSchema->getTables();
@@ -63,7 +63,10 @@ trait SchemaSetupTrait
             $toSchema = $toSchema->dropTable($table->getName());
         }
 
-        $sqls = DoctrineHelper::getMigrateToSql($storageConnection, $fromSchema, $toSchema);
+        $platform = $storageConnection->getDatabasePlatform();
+        $sqls = $platform->getAlterSchemaSQL(
+            new Comparator($platform)->compareSchemas($fromSchema, $toSchema)
+        );
         foreach ($sqls as $sql) {
             $statement = $storageConnection->prepare($sql);
             $statement->executeStatement();
@@ -120,8 +123,8 @@ trait SchemaSetupTrait
     private function tearDownAuditSchema(EntityManagerInterface $entityManager): void
     {
         $storageConnection = $entityManager->getConnection();
-        $schemaManager = DoctrineHelper::createSchemaManager($storageConnection);
-        $schema = DoctrineHelper::introspectSchema($schemaManager);
+        $schemaManager = $storageConnection->createSchemaManager();
+        $schema = $schemaManager->introspectSchema();
         $fromSchema = clone $schema;
 
         $tables = $schemaManager->listTables();
@@ -132,7 +135,10 @@ trait SchemaSetupTrait
             }
         }
 
-        $sqls = DoctrineHelper::getMigrateToSql($storageConnection, $fromSchema, $schema);
+        $platform = $storageConnection->getDatabasePlatform();
+        $sqls = $platform->getAlterSchemaSQL(
+            new Comparator($platform)->compareSchemas($fromSchema, $schema)
+        );
         foreach ($sqls as $sql) {
             $statement = $storageConnection->prepare($sql);
             $statement->executeStatement();

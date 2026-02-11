@@ -18,6 +18,7 @@ use Doctrine\DBAL\ServerVersionProvider;
 use Doctrine\DBAL\VersionAwarePlatformDriver;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -25,6 +26,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
+#[AllowMockObjectsWithoutExpectations]
 final class DoctrineSubscriberTest extends TestCase
 {
     use DoctrineProviderTrait;
@@ -35,7 +37,7 @@ final class DoctrineSubscriberTest extends TestCase
 
         $args = new OnFlushEventArgs($objectManager);
 
-        $nativeDriver = $this->createMock(Driver::class);
+        $nativeDriver = $this->createStub(Driver::class);
         $dhDriver = new AuditorDriver($nativeDriver);
         $driver = new class($dhDriver) extends AbstractDriverMiddleware {};
 
@@ -69,11 +71,11 @@ final class DoctrineSubscriberTest extends TestCase
 
         $args = new OnFlushEventArgs($objectManager);
 
-        $nativeDriver = $this->createMock(Driver::class);
+        $nativeDriver = $this->createStub(Driver::class);
         $auditorDriver = new AuditorDriver($nativeDriver);
         if (!interface_exists(VersionAwarePlatformDriver::class)) {
-            $driver = new class($auditorDriver) implements Driver {
-                public function __construct(private readonly Driver $auditorDriver) {}
+            $driver = new readonly class($auditorDriver) implements Driver {
+                public function __construct(private Driver $auditorDriver) {}
 
                 public function connect(array $params): DriverConnection
                 {
@@ -91,8 +93,8 @@ final class DoctrineSubscriberTest extends TestCase
                 }
             };
         } else {
-            $driver = new class($auditorDriver) implements VersionAwarePlatformDriver {
-                public function __construct(private readonly Driver $auditorDriver) {}
+            $driver = new readonly class($auditorDriver) implements VersionAwarePlatformDriver {
+                public function __construct(private Driver $auditorDriver) {}
 
                 public function connect(array $params): DriverConnection
                 {
@@ -142,11 +144,11 @@ final class DoctrineSubscriberTest extends TestCase
 
         $args = new OnFlushEventArgs($objectManager);
 
-        $nativeDriver = $this->createMock(Driver::class);
+        $nativeDriver = $this->createStub(Driver::class);
         $auditorDriver = new AuditorDriver($nativeDriver);
         if (!interface_exists(VersionAwarePlatformDriver::class)) {
-            $driver = new class($auditorDriver) implements Driver {
-                public function __construct(private readonly Driver $auditorDriver) {}
+            $driver = new readonly class($auditorDriver) implements Driver {
+                public function __construct(private Driver $auditorDriver) {}
 
                 public function connect(array $params): DriverConnection
                 {
@@ -164,8 +166,8 @@ final class DoctrineSubscriberTest extends TestCase
                 }
             };
         } else {
-            $driver = new class($auditorDriver) implements VersionAwarePlatformDriver {
-                public function __construct(private readonly Driver $auditorDriver) {}
+            $driver = new readonly class($auditorDriver) implements VersionAwarePlatformDriver {
+                public function __construct(private Driver $auditorDriver) {}
 
                 public function connect(array $params): DriverConnection
                 {

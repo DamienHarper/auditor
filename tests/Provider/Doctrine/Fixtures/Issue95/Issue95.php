@@ -20,7 +20,7 @@ class Issue95 implements \Stringable
 
     private string $type;   // uninitialized property
 
-    public function __construct(#[ORM\Column(type: Types::STRING, name: 'type', length: 50)]
+    public function __construct(#[ORM\Column(name: 'type', type: Types::STRING, length: 50)]
         private string $name) {}
 
     public function __toString(): string

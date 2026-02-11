@@ -9,10 +9,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class Security
 {
-    /**
-     * @var string
-     */
-    public const VIEW_SCOPE = 'view';
+    public const string VIEW_SCOPE = 'view';
 
     public function __construct(
         /**

@@ -14,6 +14,7 @@ final class AuditorDriver extends AbstractDriverMiddleware
     /** @var array<callable> */
     private array $flusherList = [];
 
+    #[\Override]
     public function connect(array $params): AuditorConnection
     {
         return new AuditorConnection(parent::connect($params), $this);

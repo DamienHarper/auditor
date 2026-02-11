@@ -44,7 +44,8 @@ abstract class PlatformHelper
 
     public static function getServerVersion(Connection $connection): ?string
     {
-        if (method_exists($connection, 'getNativeConnection') && ($pdo = $connection->getNativeConnection()) instanceof \PDO) {
+        $pdo = $connection->getNativeConnection();
+        if ($pdo instanceof \PDO) {
             $version = $pdo->getAttribute(\PDO::ATTR_SERVER_VERSION);
             if (\is_string($version)) {
                 return $version;
@@ -52,15 +53,8 @@ abstract class PlatformHelper
 
             return null;
         }
-        $reflected = new \ReflectionObject($connection);
-        if ($reflected->hasMethod('getServerVersion') && $reflected->getMethod('getServerVersion')->isPublic()) {
-            return $connection->getServerVersion();
-        }
-        if (method_exists($connection, 'getWrappedConnection')) {
-            return $connection->getWrappedConnection()->getServerVersion();
-        }
 
-        return null;
+        return $connection->getServerVersion();
     }
 
     public static function isJsonSupported(Connection $connection): bool

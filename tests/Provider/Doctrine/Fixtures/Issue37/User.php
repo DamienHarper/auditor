@@ -19,7 +19,7 @@ class User
     #[ORM\Column(type: Types::STRING, length: 255)]
     protected string $username;
 
-    #[ORM\Column(type: Types::STRING, nullable: true, length: 5)]
+    #[ORM\Column(type: Types::STRING, length: 5, nullable: true)]
     protected ?string $locale_id = null;
 
     #[ORM\ManyToOne(targetEntity: 'Locale', cascade: ['persist', 'remove'])]

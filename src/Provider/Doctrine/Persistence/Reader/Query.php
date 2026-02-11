@@ -22,40 +22,19 @@ use Doctrine\DBAL\Result;
  */
 final class Query implements QueryInterface
 {
-    /**
-     * @var string
-     */
-    public const TYPE = 'type';
+    public const string TYPE = 'type';
 
-    /**
-     * @var string
-     */
-    public const CREATED_AT = 'created_at';
+    public const string CREATED_AT = 'created_at';
 
-    /**
-     * @var string
-     */
-    public const TRANSACTION_HASH = 'transaction_hash';
+    public const string TRANSACTION_HASH = 'transaction_hash';
 
-    /**
-     * @var string
-     */
-    public const OBJECT_ID = 'object_id';
+    public const string OBJECT_ID = 'object_id';
 
-    /**
-     * @var string
-     */
-    public const USER_ID = 'blame_id';
+    public const string USER_ID = 'blame_id';
 
-    /**
-     * @var string
-     */
-    public const ID = 'id';
+    public const string ID = 'id';
 
-    /**
-     * @var string
-     */
-    public const DISCRIMINATOR = 'discriminator';
+    public const string DISCRIMINATOR = 'discriminator';
 
     private array $filters = [];
 
@@ -269,12 +248,7 @@ final class Query implements QueryInterface
 
                     foreach ($data['params'] as $name => $value) {
                         if (\is_array($value)) {
-                            if (class_exists(ArrayParameterType::class)) {
-                                $queryBuilder->setParameter($name, $value, ArrayParameterType::STRING);
-                            } else {
-                                // TODO: replace Connection::PARAM_STR_ARRAY with ArrayParameterType::STRING when dropping support of doctrine/dbal < 3.6
-                                $queryBuilder->setParameter($name, $value, Connection::PARAM_STR_ARRAY); // @phpstan-ignore-line
-                            }
+                            $queryBuilder->setParameter($name, $value, ArrayParameterType::STRING);
                         } else {
                             $queryBuilder->setParameter($name, $value);
                         }

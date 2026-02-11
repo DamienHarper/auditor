@@ -26,10 +26,7 @@ final class CleanAuditLogsCommand extends Command
 {
     use LockableTrait;
 
-    /**
-     * @var string
-     */
-    private const UNTIL_DATE_FORMAT = 'Y-m-d H:i:s';
+    private const string UNTIL_DATE_FORMAT = 'Y-m-d H:i:s';
 
     private Auditor $auditor;
 
@@ -216,6 +213,6 @@ final class CleanAuditLogsCommand extends Command
             return null;
         }
 
-        return (new \DateTimeImmutable())->sub($dateInterval);
+        return new \DateTimeImmutable()->sub($dateInterval);
     }
 }

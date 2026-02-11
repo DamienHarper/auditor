@@ -34,14 +34,14 @@ class Post implements \Stringable
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     protected ?\DateTimeImmutable $deleted_at = null;
 
-    #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true], nullable: true)]
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['unsigned' => true])]
     protected ?int $author_id = null;
 
     #[ORM\OneToMany(targetEntity: 'Comment', mappedBy: 'post', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'id', referencedColumnName: 'post_id')]
     protected Collection $comments;
 
-    #[ORM\ManyToOne(targetEntity: 'Author', inversedBy: 'posts', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: 'Author', cascade: ['persist', 'remove'], inversedBy: 'posts')]
     #[ORM\JoinColumn(name: 'author_id')]
     protected ?Author $author = null;
 

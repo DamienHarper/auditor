@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Event;
 
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
@@ -29,7 +28,7 @@ final class CreateSchemaListenerTest extends TestCase
     /**
      * @var array<class-string<Animal>>
      */
-    private const CLASSES = [Dog::class, Cat::class];
+    private const array CLASSES = [Dog::class, Cat::class];
 
     public function testCorrectSchemaStandard(): void
     {
@@ -85,7 +84,7 @@ final class CreateSchemaListenerTest extends TestCase
 
         /** @var StorageService $storageService */
         foreach ($this->provider->getStorageServices() as $storageService) {
-            $schemaManager = DoctrineHelper::createSchemaManager($storageService->getEntityManager()->getConnection());
+            $schemaManager = $storageService->getEntityManager()->getConnection()->createSchemaManager();
 
             foreach ($schemaManager->listTables() as $table) {
                 $tableNames[] = $table->getName();

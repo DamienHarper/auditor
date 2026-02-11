@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema;
 
-use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Animal;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined\Cat;
@@ -17,6 +16,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Tag;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\BlogSchemaSetupTrait;
+use Doctrine\DBAL\Schema\Table;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -79,8 +79,8 @@ final class SchemaManager2AEM1SEMTest extends TestCase
          */
         foreach ($storageServices as $name => $storageService) {
             $connection = $storageService->getEntityManager()->getConnection();
-            $schemaManager = DoctrineHelper::createSchemaManager($connection);
-            $tables = array_map(static fn ($t): string => $t->getName(), $schemaManager->listTables());
+            $schemaManager = $connection->createSchemaManager();
+            $tables = array_map(static fn (Table $t): string => $t->getName(), $schemaManager->listTables());
             sort($tables);
             $this->assertSame($expected[$name], $tables, 'Schema of "'.$name.'" is correct.');
         }

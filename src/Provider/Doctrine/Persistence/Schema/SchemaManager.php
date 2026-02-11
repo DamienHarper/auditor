@@ -16,6 +16,7 @@ use DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema\SchemaManagerTest;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
@@ -140,7 +141,10 @@ final readonly class SchemaManager
                 }
             }
 
-            $sqls[$name] = DoctrineHelper::getMigrateToSql($storageConnection, $fromSchema, $storageSchema);
+            $platform = $storageConnection->getDatabasePlatform();
+            $sqls[$name] = $platform->getAlterSchemaSQL(
+                new Comparator($platform)->compareSchemas($fromSchema, $storageSchema)
+            );
         }
 
         return $sqls;
@@ -158,8 +162,7 @@ final readonly class SchemaManager
         $connection = $storageService->getEntityManager()->getConnection();
 
         if (!$schema instanceof Schema) {
-            $schemaManager = DoctrineHelper::createSchemaManager($connection);
-            $schema = DoctrineHelper::introspectSchema($schemaManager);
+            $schema = $connection->createSchemaManager()->introspectSchema();
         }
 
         /** @var Configuration $configuration */
@@ -214,9 +217,9 @@ final readonly class SchemaManager
         $storageService = $this->provider->getStorageServiceForEntity($entity);
         $connection = $storageService->getEntityManager()->getConnection();
 
-        $schemaManager = DoctrineHelper::createSchemaManager($connection);
+        $schemaManager = $connection->createSchemaManager();
         if (!$schema instanceof Schema) {
-            $schema = DoctrineHelper::introspectSchema($schemaManager);
+            $schema = $schemaManager->introspectSchema();
         }
 
         /** @var Configuration $configuration */
@@ -291,7 +294,7 @@ final readonly class SchemaManager
                     $newTableName = $tableDelimiter.$newTableName.$tableDelimiter;
                 }
 
-                if ($schema) {
+                if ('' !== $schema && '0' !== $schema) {
                     if ('"' === $schemaDelimiter || '`' === $schemaDelimiter) {
                         $schema = $schemaDelimiter.$schema.$schemaDelimiter;
                     }
