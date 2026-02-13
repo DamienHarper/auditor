@@ -9,6 +9,7 @@ Filters allow you to narrow down audit query results. This page documents all av
 | `SimpleFilter`    | Exact value matching                 | Filter by type, user, entity ID     |
 | `DateRangeFilter` | Date/time range                      | Audits from last week               |
 | `RangeFilter`     | Numeric range                        | Audits with ID >= 1000              |
+| `NullFilter`      | NULL value matching                  | Audits by anonymous users           |
 
 ## Filter Interface
 
@@ -312,6 +313,55 @@ $filter->getMinValue();  // 100
 $filter->getMaxValue();  // 200
 ```
 
+## NullFilter
+
+Filter for NULL values.
+
+### Namespace
+
+```php
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\NullFilter;
+```
+
+### Constructor
+
+```php
+public function __construct(
+    private readonly string $name   // Column name
+)
+```
+
+### Usage
+
+```php
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\NullFilter;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Query;
+
+$query = $reader->createQuery(User::class, ['page_size' => null]);
+
+// Filter audits made by anonymous users (no blame_id)
+$query->addFilter(new NullFilter(Query::USER_ID));
+
+// Filter audits without discriminator
+$query->addFilter(new NullFilter(Query::DISCRIMINATOR));
+```
+
+### Generated SQL
+
+```php
+$filter = new NullFilter('blame_id');
+$sql = $filter->getSQL();
+// Returns: ['sql' => 'blame_id IS NULL', 'params' => []]
+```
+
+### Methods
+
+```php
+$filter = new NullFilter(Query::USER_ID);
+
+$filter->getName();  // 'blame_id'
+```
+
 ## Combining Filters
 
 You can add multiple filters to a query. Filters are combined with AND:
@@ -392,6 +442,8 @@ final class NotNullFilter implements FilterInterface
 // Usage
 $query->addFilter(new NotNullFilter('blame_id'));
 ```
+
+> **Note:** For NULL value filtering, use the built-in `NullFilter` class.
 
 ## Next Steps
 
