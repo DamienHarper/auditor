@@ -29,40 +29,31 @@ final class EntryTest extends TestCase
             'created_at' => new \DateTimeImmutable(),
         ];
 
-        $entry = new Entry();
-        $reflectionClass = new \ReflectionClass(Entry::class);
-        foreach ($attributes as $name => $value) {
-            $attribute = $reflectionClass->getProperty($name);
-            $attribute->setValue($entry, $value);
-        }
+        $entry = Entry::fromArray($attributes);
 
-        $this->assertSame(1, $entry->getId(), 'Entry::getId() is ok.');
-        $this->assertSame('type', $entry->getType(), 'Entry::getType() is ok.');
-        $this->assertSame('1', $entry->getObjectId(), 'Entry::getObjectId() is ok.');
+        $this->assertSame(1, $entry->id, 'Entry::id is ok.');
+        $this->assertSame('type', $entry->type, 'Entry::type is ok.');
+        $this->assertSame('1', $entry->objectId, 'Entry::objectId is ok.');
         $this->assertSame([], $entry->getDiffs(), 'Entry::getDiffs() is ok.');
-        $this->assertSame(1, $entry->getUserId(), 'Entry::getUserId() is ok.');
-        $this->assertSame('John Doe', $entry->getUsername(), 'Entry::getUsername() is ok.');
-        $this->assertSame('Acme\User', $entry->getUserFqdn(), 'Entry::getUserFqdn() is ok.');
-        $this->assertSame('main', $entry->getUserFirewall(), 'Entry::getUserFirewall() is ok.');
-        $this->assertSame('1.2.3.4', $entry->getIp(), 'Entry::getIp() is ok.');
-        $this->assertSame($attributes['created_at'], $entry->getCreatedAt(), 'Entry::getCreatedAt() is ok.');
+        $this->assertSame(1, $entry->userId, 'Entry::userId is ok.');
+        $this->assertSame('John Doe', $entry->username, 'Entry::username is ok.');
+        $this->assertSame('Acme\User', $entry->userFqdn, 'Entry::userFqdn is ok.');
+        $this->assertSame('main', $entry->userFirewall, 'Entry::userFirewall is ok.');
+        $this->assertSame('1.2.3.4', $entry->ip, 'Entry::ip is ok.');
+        $this->assertSame($attributes['created_at'], $entry->createdAt, 'Entry::createdAt is ok.');
     }
 
     public function testUndefinedUser(): void
     {
         $entry = new Entry();
 
-        $this->assertNull($entry->getUserId(), 'Entry::getUserId() is ok with undefined user.');
-        $this->assertNull($entry->getUsername(), 'Entry::getUsername() is ok with undefined user.');
+        $this->assertNull($entry->userId, 'Entry::userId is ok with undefined user.');
+        $this->assertNull($entry->username, 'Entry::username is ok with undefined user.');
     }
 
     public function testGetDiffsReturnsAnArray(): void
     {
-        $entry = new Entry();
-        $reflectionClass = new \ReflectionClass(Entry::class);
-
-        $attribute = $reflectionClass->getProperty('diffs');
-        $attribute->setValue($entry, '{}');
+        $entry = Entry::fromArray(['diffs' => '{}']);
 
         $this->assertIsArray($entry->getDiffs(), 'Entry::getDiffs() returns an array.');
     }

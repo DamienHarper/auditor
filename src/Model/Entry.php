@@ -11,119 +11,65 @@ use DH\Auditor\Tests\Model\EntryTest;
  */
 final class Entry
 {
-    private ?int $id = null;
+    public private(set) ?int $id = null;
 
-    private string $type = '';
+    public private(set) string $type = '';
 
     private string $object_id = '';
 
-    private ?string $discriminator = null;
+    public string $objectId {
+        get => $this->object_id;
+    }
+
+    public private(set) ?string $discriminator = null;
 
     private ?string $transaction_hash = null;
+
+    public ?string $transactionHash {
+        get => $this->transaction_hash;
+    }
 
     private string $diffs = '{}';
 
     private int|string|null $blame_id = null;
 
+    public int|string|null $userId {
+        get => $this->blame_id;
+    }
+
     private ?string $blame_user = null;
+
+    public ?string $username {
+        get => $this->blame_user;
+    }
 
     private ?string $blame_user_fqdn = null;
 
+    public ?string $userFqdn {
+        get => $this->blame_user_fqdn;
+    }
+
     private ?string $blame_user_firewall = null;
 
-    private ?string $ip = null;
+    public ?string $userFirewall {
+        get => $this->blame_user_firewall;
+    }
+
+    public private(set) ?string $ip = null;
 
     private ?\DateTimeImmutable $created_at = null;
 
-    /**
-     * Get the value of id.
-     */
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    /**
-     * Get the value of type.
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    /**
-     * Get the value of object_id.
-     */
-    public function getObjectId(): string
-    {
-        return $this->object_id;
-    }
-
-    /**
-     * Get the value of discriminator.
-     */
-    public function getDiscriminator(): ?string
-    {
-        return $this->discriminator;
-    }
-
-    /**
-     * Get the value of transaction_hash.
-     */
-    public function getTransactionHash(): ?string
-    {
-        return $this->transaction_hash;
-    }
-
-    /**
-     * Get the value of blame_id.
-     */
-    public function getUserId(): int|string|null
-    {
-        return $this->blame_id;
-    }
-
-    /**
-     * Get the value of blame_user.
-     */
-    public function getUsername(): ?string
-    {
-        return $this->blame_user;
-    }
-
-    public function getUserFqdn(): ?string
-    {
-        return $this->blame_user_fqdn;
-    }
-
-    public function getUserFirewall(): ?string
-    {
-        return $this->blame_user_firewall;
-    }
-
-    /**
-     * Get the value of ip.
-     */
-    public function getIp(): ?string
-    {
-        return $this->ip;
-    }
-
-    /**
-     * Get the value of created_at.
-     */
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->created_at;
+    public ?\DateTimeImmutable $createdAt {
+        get => $this->created_at;
     }
 
     /**
      * Get diff values.
      */
-    public function getDiffs(bool $includeMedadata = false): array
+    public function getDiffs(bool $includeMetadata = false): array
     {
         $diffs = $this->sort(json_decode($this->diffs, true, 512, JSON_THROW_ON_ERROR));  // @phpstan-ignore-line
-        if (!$includeMedadata) {
+        if (!$includeMetadata) {
             unset($diffs['@source']);
         }
 
