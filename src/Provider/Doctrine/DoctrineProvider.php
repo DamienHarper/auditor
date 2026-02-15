@@ -252,7 +252,7 @@ final class DoctrineProvider extends AbstractProvider
         $this->configuration->setStorageMapper($storageMapper);
     }
 
-    public function loadAnnotations(EntityManagerInterface $entityManager, array $entities): self
+    public function loadAttributes(EntityManagerInterface $entityManager, array $entities): self
     {
         \assert($this->configuration instanceof Configuration);   // helps PHPStan
         $ormConfiguration = $entityManager->getConfiguration();
@@ -261,17 +261,17 @@ final class DoctrineProvider extends AbstractProvider
         $attributeLoader = new AttributeLoader($entityManager);
 
         if ($metadataCache instanceof CacheItemPoolInterface) {
-            $item = $metadataCache->getItem('__DH_ANNOTATIONS__');
-            if (!$item->isHit() || !\is_array($annotationEntities = $item->get())) {
-                $annotationEntities = $attributeLoader->load();
-                $item->set($annotationEntities);
+            $item = $metadataCache->getItem('__DH_ATTRIBUTES__');
+            if (!$item->isHit() || !\is_array($attributeEntities = $item->get())) {
+                $attributeEntities = $attributeLoader->load();
+                $item->set($attributeEntities);
                 $metadataCache->save($item);
             }
         } else {
-            $annotationEntities = $attributeLoader->load();
+            $attributeEntities = $attributeLoader->load();
         }
 
-        $this->configuration->setEntities(array_merge($entities, $annotationEntities));
+        $this->configuration->setEntities(array_merge($entities, $attributeEntities));
 
         return $this;
     }
