@@ -20,7 +20,7 @@ For a complete upgrade guide with step-by-step instructions, see the [full docum
 
 | Change | Before (3.x) | After (4.0) |
 |--------|--------------|-------------|
-| Transaction types | `Transaction::INSERT` | `TransactionType::Insert->value` |
+| Transaction types | `Transaction::INSERT` | `TransactionType::INSERT` |
 | Entry access | `$entry->getType()` | `$entry->type` |
 | User access | `$user->getIdentifier()` | `$user->identifier` |
 | Configuration | `$config->isEnabled()` | `$config->enabled` |

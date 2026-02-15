@@ -58,7 +58,7 @@ final class TransactionProcessorTest extends TestCase
 
         $entry = array_shift($audits);
         $this->assertSame(1, $entry->id, 'audit entry ID is ok.');
-        $this->assertSame(TransactionType::Insert->value, $entry->type, 'audit entry type is ok.');
+        $this->assertSame(TransactionType::INSERT, $entry->type, 'audit entry type is ok.');
         $this->assertContainsEquals($entry->userId, ['1', '2'], 'audit entry blame_id is ok.');
         $this->assertContainsEquals($entry->username, ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->ip, 'audit entry IP is ok.');
@@ -103,7 +103,7 @@ final class TransactionProcessorTest extends TestCase
 
         $entry = array_shift($audits);
         $this->assertSame(1, $entry->id, 'audit entry ID is ok.');
-        $this->assertSame(TransactionType::Update->value, $entry->type, 'audit entry type is ok.');
+        $this->assertSame(TransactionType::UPDATE, $entry->type, 'audit entry type is ok.');
         $this->assertContainsEquals($entry->userId, ['1', '2'], 'audit entry blame_id is ok.');
         $this->assertContainsEquals($entry->username, ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->ip, 'audit entry IP is ok.');
@@ -143,7 +143,7 @@ final class TransactionProcessorTest extends TestCase
 
         $entry = array_shift($audits);
         $this->assertSame(1, $entry->id, 'audit entry ID is ok.');
-        $this->assertSame(TransactionType::Remove->value, $entry->type, 'audit entry type is ok.');
+        $this->assertSame(TransactionType::REMOVE, $entry->type, 'audit entry type is ok.');
         $this->assertContainsEquals($entry->userId, ['1', '2'], 'audit entry blame_id is ok.');
         $this->assertContainsEquals($entry->username, ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->ip, 'audit entry IP is ok.');
@@ -181,7 +181,7 @@ final class TransactionProcessorTest extends TestCase
 
         $entry = array_shift($audits);
         $this->assertSame(1, $entry->id, 'audit entry ID is ok.');
-        $this->assertSame(TransactionType::Remove->value, $entry->type, 'audit entry type is ok.');
+        $this->assertSame(TransactionType::REMOVE, $entry->type, 'audit entry type is ok.');
         $this->assertContainsEquals($entry->userId, ['1', '2'], 'audit entry blame_id is ok.');
         $this->assertContainsEquals($entry->username, ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->ip, 'audit entry IP is ok.');
@@ -268,7 +268,7 @@ final class TransactionProcessorTest extends TestCase
 
         $entry = array_shift($audits);
         $this->assertSame(1, $entry->id, 'audit entry ID is ok.');
-        $this->assertSame(TransactionType::Associate->value, $entry->type, 'audit entry type is ok.');
+        $this->assertSame(TransactionType::ASSOCIATE, $entry->type, 'audit entry type is ok.');
         $this->assertContainsEquals($entry->userId, ['1', '2'], 'audit entry blame_id is ok.');
         $this->assertContainsEquals($entry->username, ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->ip, 'audit entry IP is ok.');
@@ -342,7 +342,7 @@ final class TransactionProcessorTest extends TestCase
 
         $entry = array_shift($audits);
         $this->assertSame(1, $entry->id, 'audit entry ID is ok.');
-        $this->assertSame(TransactionType::Dissociate->value, $entry->type, 'audit entry type is ok.');
+        $this->assertSame(TransactionType::DISSOCIATE, $entry->type, 'audit entry type is ok.');
         $this->assertContainsEquals($entry->userId, ['1', '2'], 'audit entry blame_id is ok.');
         $this->assertContainsEquals($entry->username, ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->ip, 'audit entry IP is ok.');
@@ -463,7 +463,7 @@ final class TransactionProcessorTest extends TestCase
 
         $entry = array_shift($audits);
         $this->assertSame(2, $entry->id, 'audit entry ID is ok.');
-        $this->assertSame(TransactionType::Associate->value, $entry->type, 'audit entry type is ok.');
+        $this->assertSame(TransactionType::ASSOCIATE, $entry->type, 'audit entry type is ok.');
         $this->assertContainsEquals($entry->userId, ['1', '2'], 'audit entry blame_id is ok.');
         $this->assertContainsEquals($entry->username, ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->ip, 'audit entry IP is ok.');
@@ -488,7 +488,7 @@ final class TransactionProcessorTest extends TestCase
 
         $entry = array_shift($audits);
         $this->assertSame(1, $entry->id, 'audit entry ID is ok.');
-        $this->assertSame(TransactionType::Associate->value, $entry->type, 'audit entry type is ok.');
+        $this->assertSame(TransactionType::ASSOCIATE, $entry->type, 'audit entry type is ok.');
         $this->assertContainsEquals($entry->userId, ['1', '2'], 'audit entry blame_id is ok.');
         $this->assertContainsEquals($entry->username, ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->ip, 'audit entry IP is ok.');
@@ -613,7 +613,7 @@ final class TransactionProcessorTest extends TestCase
 
         $entry = array_shift($audits);
         $this->assertSame(3, $entry->id, 'audit entry ID is ok.');
-        $this->assertSame(TransactionType::Dissociate->value, $entry->type, 'audit entry type is ok.');
+        $this->assertSame(TransactionType::DISSOCIATE, $entry->type, 'audit entry type is ok.');
         $this->assertContainsEquals($entry->userId, ['1', '2'], 'audit entry blame_id is ok.');
         $this->assertContainsEquals($entry->username, ['dark.vador', 'anakin.skywalker'], 'audit entry blame_user is ok.');
         $this->assertSame('1.2.3.4', $entry->ip, 'audit entry IP is ok.');
@@ -666,7 +666,7 @@ final class TransactionProcessorTest extends TestCase
         $processor->process($transaction);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        $this->assertCount(1, $audits, 'TransactionProcessor::processInsertions() creates an "'.TransactionType::Insert->value.'" audit entry.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::processInsertions() creates an "'.TransactionType::INSERT.'" audit entry.');
     }
 
     public function testProcessUpdates(): void
@@ -698,7 +698,7 @@ final class TransactionProcessorTest extends TestCase
         $processor->process($transaction);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        $this->assertCount(1, $audits, 'TransactionProcessor::processUpdates() creates an "'.TransactionType::Update->value.'" audit entry.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::processUpdates() creates an "'.TransactionType::UPDATE.'" audit entry.');
 
         $transaction->reset();
 
@@ -710,7 +710,7 @@ final class TransactionProcessorTest extends TestCase
         $processor->process($transaction);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        $this->assertCount(1, $audits, 'TransactionProcessor::processUpdates() does not create an "'.TransactionType::Update->value.'" audit entry with empty diffs.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::processUpdates() does not create an "'.TransactionType::UPDATE.'" audit entry with empty diffs.');
     }
 
     public function testProcessAssociations(): void
@@ -770,7 +770,7 @@ final class TransactionProcessorTest extends TestCase
         $processor->process($transaction);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        $this->assertCount(1, $audits, 'TransactionProcessor::processAssociations() creates an "'.TransactionType::Associate->value.'" audit entry.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::processAssociations() creates an "'.TransactionType::ASSOCIATE.'" audit entry.');
     }
 
     public function testProcessDissociations(): void
@@ -827,7 +827,7 @@ final class TransactionProcessorTest extends TestCase
         $processor->process($transaction);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        $this->assertCount(1, $audits, 'TransactionProcessor::processDissociations() creates an "'.TransactionType::Dissociate->value.'" audit entry.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::processDissociations() creates an "'.TransactionType::DISSOCIATE.'" audit entry.');
     }
 
     public function testProcessDeletions(): void
@@ -856,7 +856,7 @@ final class TransactionProcessorTest extends TestCase
         $processor->process($transaction);
 
         $audits = $reader->createQuery(Author::class)->execute();
-        $this->assertCount(1, $audits, 'TransactionProcessor::processDeletions() creates a "'.TransactionType::Remove->value.'" audit entry.');
+        $this->assertCount(1, $audits, 'TransactionProcessor::processDeletions() creates a "'.TransactionType::REMOVE.'" audit entry.');
     }
 
     public function testEncodingConversion(): void

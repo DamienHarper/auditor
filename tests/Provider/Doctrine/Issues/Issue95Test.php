@@ -40,7 +40,7 @@ final class Issue95Test extends TestCase
 
         $audits = $reader->createQuery(Issue95::class)->execute();
         $this->assertCount(1, $audits, 'results count ok.');
-        $this->assertSame(TransactionType::Insert->value, $audits[0]->type, 'Reader::INSERT operation.');
+        $this->assertSame(TransactionType::INSERT, $audits[0]->type, 'Reader::INSERT operation.');
     }
 
     public function testIssue95WithFixtures(): void
@@ -69,9 +69,9 @@ final class Issue95Test extends TestCase
         ];
 
         $this->assertCount(3, $audits, 'results count ok.');
-        $this->assertSame(TransactionType::Associate->value, $audits[0]->type, 'Association');
-        $this->assertSame(TransactionType::Insert->value, $audits[1]->type, 'Insertion');
-        $this->assertSame(TransactionType::Insert->value, $audits[2]->type, 'Insertion');
+        $this->assertSame(TransactionType::ASSOCIATE, $audits[0]->type, 'Association');
+        $this->assertSame(TransactionType::INSERT, $audits[1]->type, 'Insertion');
+        $this->assertSame(TransactionType::INSERT, $audits[2]->type, 'Insertion');
     }
 
     private function createAndInitDoctrineProvider(): void

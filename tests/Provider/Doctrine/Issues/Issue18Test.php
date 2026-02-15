@@ -43,8 +43,8 @@ final class Issue18Test extends TestCase
 
         $audits = $reader->createQuery(DataObject::class)->execute();
         $this->assertCount(2, $audits, 'results count ok.');
-        $this->assertSame(TransactionType::Update->value, $audits[0]->type, 'TransactionType::Update->value operation.');
-        $this->assertSame(TransactionType::Insert->value, $audits[1]->type, 'TransactionType::Insert->value operation.');
+        $this->assertSame(TransactionType::UPDATE, $audits[0]->type, 'TransactionType::UPDATE operation.');
+        $this->assertSame(TransactionType::INSERT, $audits[1]->type, 'TransactionType::INSERT operation.');
 
         $this->assertIsArray($audits[0]->getDiffs(), 'Valid diffs');
         $this->assertIsArray($audits[1]->getDiffs(), 'Valid diffs');

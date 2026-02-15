@@ -36,7 +36,7 @@ final class Issue98Test extends TestCase
 
         $audits = $reader->createQuery(Issue98::class)->execute();
         $this->assertCount(1, $audits, 'results count ok.');
-        $this->assertSame(TransactionType::Insert->value, $audits[0]->type, 'Reader::INSERT operation.');
+        $this->assertSame(TransactionType::INSERT, $audits[0]->type, 'Reader::INSERT operation.');
     }
 
     private function createAndInitDoctrineProvider(): void
