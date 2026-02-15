@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Issues;
 
-use DH\Auditor\Model\Transaction;
+use DH\Auditor\Model\TransactionType;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
@@ -40,7 +40,7 @@ final class Issue95Test extends TestCase
 
         $audits = $reader->createQuery(Issue95::class)->execute();
         $this->assertCount(1, $audits, 'results count ok.');
-        $this->assertSame(Transaction::INSERT, $audits[0]->getType(), 'Reader::INSERT operation.');
+        $this->assertSame(TransactionType::Insert->value, $audits[0]->type, 'Reader::INSERT operation.');
     }
 
     public function testIssue95WithFixtures(): void
@@ -69,9 +69,9 @@ final class Issue95Test extends TestCase
         ];
 
         $this->assertCount(3, $audits, 'results count ok.');
-        $this->assertSame(Transaction::ASSOCIATE, $audits[0]->getType(), 'Association');
-        $this->assertSame(Transaction::INSERT, $audits[1]->getType(), 'Insertion');
-        $this->assertSame(Transaction::INSERT, $audits[2]->getType(), 'Insertion');
+        $this->assertSame(TransactionType::Associate->value, $audits[0]->type, 'Association');
+        $this->assertSame(TransactionType::Insert->value, $audits[1]->type, 'Insertion');
+        $this->assertSame(TransactionType::Insert->value, $audits[2]->type, 'Insertion');
     }
 
     private function createAndInitDoctrineProvider(): void
@@ -80,7 +80,7 @@ final class Issue95Test extends TestCase
         $this->provider = new DoctrineProvider($this->createProviderConfiguration());
 
         $entityManager = $this->createEntityManager([
-            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/../Fixtures/Issue95',
         ]);
         $this->provider->registerStorageService(new StorageService('default', $entityManager));

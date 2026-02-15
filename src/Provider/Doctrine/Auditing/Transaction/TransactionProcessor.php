@@ -6,6 +6,7 @@ namespace DH\Auditor\Provider\Doctrine\Auditing\Transaction;
 
 use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\Model\TransactionInterface;
+use DH\Auditor\Model\TransactionType;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
@@ -50,7 +51,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
     {
         $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
         $this->audit([
-            'action' => 'insert',
+            'action' => TransactionType::Insert,
             'blame' => $this->blame(),
             'diff' => $this->diff($entityManager, $entity, $ch),
             'table' => $meta->getTableName(),
@@ -76,7 +77,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
 
         $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
         $this->audit([
-            'action' => 'update',
+            'action' => TransactionType::Update,
             'blame' => $this->blame(),
             'diff' => $diff,
             'table' => $meta->getTableName(),
@@ -95,7 +96,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
     {
         $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
         $this->audit([
-            'action' => 'remove',
+            'action' => TransactionType::Remove,
             'blame' => $this->blame(),
             'diff' => $this->summarize($entityManager, $entity, ['id' => $id]),
             'table' => $meta->getTableName(),
@@ -112,7 +113,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
      */
     private function associate(EntityManagerInterface $entityManager, object $source, object $target, array $mapping, string $transactionHash): void
     {
-        $this->associateOrDissociate('associate', $entityManager, $source, $target, $mapping, $transactionHash);
+        $this->associateOrDissociate(TransactionType::Associate, $entityManager, $source, $target, $mapping, $transactionHash);
     }
 
     /**
@@ -120,7 +121,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
      */
     private function dissociate(EntityManagerInterface $entityManager, object $source, object $target, array $mapping, string $transactionHash): void
     {
-        $this->associateOrDissociate('dissociate', $entityManager, $source, $target, $mapping, $transactionHash);
+        $this->associateOrDissociate(TransactionType::Dissociate, $entityManager, $source, $target, $mapping, $transactionHash);
     }
 
     private function processInsertions(Transaction $transaction, EntityManagerInterface $entityManager): void
@@ -128,8 +129,8 @@ final class TransactionProcessor implements TransactionProcessorInterface
         $uow = $entityManager->getUnitOfWork();
         foreach ($transaction->getInserted() as $dto) {
             // the changeset might be updated from UOW extra updates
-            $ch = array_merge($dto->getChangeset(), $uow->getEntityChangeSet($dto->getSource()));
-            $this->insert($entityManager, $dto->getSource(), $ch, $transaction->getTransactionHash());
+            $ch = array_merge($dto->getChangeset(), $uow->getEntityChangeSet($dto->source));
+            $this->insert($entityManager, $dto->source, $ch, $transaction->getTransactionHash());
         }
     }
 
@@ -138,36 +139,36 @@ final class TransactionProcessor implements TransactionProcessorInterface
         $uow = $entityManager->getUnitOfWork();
         foreach ($transaction->getUpdated() as $dto) {
             // the changeset might be updated from UOW extra updates
-            $ch = array_merge($dto->getChangeset(), $uow->getEntityChangeSet($dto->getSource()));
-            $this->update($entityManager, $dto->getSource(), $ch, $transaction->getTransactionHash());
+            $ch = array_merge($dto->getChangeset(), $uow->getEntityChangeSet($dto->source));
+            $this->update($entityManager, $dto->source, $ch, $transaction->getTransactionHash());
         }
     }
 
     private function processAssociations(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
         foreach ($transaction->getAssociated() as $dto) {
-            $this->associate($entityManager, $dto->getSource(), $dto->getTarget(), $dto->getMapping(), $transaction->getTransactionHash());
+            $this->associate($entityManager, $dto->source, $dto->getTarget(), $dto->getMapping(), $transaction->getTransactionHash());
         }
     }
 
     private function processDissociations(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
         foreach ($transaction->getDissociated() as $dto) {
-            $this->dissociate($entityManager, $dto->getSource(), $dto->getTarget(), $dto->getMapping(), $transaction->getTransactionHash());
+            $this->dissociate($entityManager, $dto->source, $dto->getTarget(), $dto->getMapping(), $transaction->getTransactionHash());
         }
     }
 
     private function processDeletions(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
         foreach ($transaction->getRemoved() as $dto) {
-            $this->remove($entityManager, $dto->getSource(), $dto->getId(), $transaction->getTransactionHash());
+            $this->remove($entityManager, $dto->source, $dto->getId(), $transaction->getTransactionHash());
         }
     }
 
     /**
      * Adds an association entry to the audit table.
      */
-    private function associateOrDissociate(string $type, EntityManagerInterface $entityManager, object $source, object $target, array $mapping, string $transactionHash): void
+    private function associateOrDissociate(TransactionType $type, EntityManagerInterface $entityManager, object $source, object $target, array $mapping, string $transactionHash): void
     {
         $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($source));
         $data = [
@@ -202,7 +203,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
         $configuration = $this->provider->getConfiguration();
         $schema = $data['schema'] ? $data['schema'].'.' : '';
         $auditTable = $schema.$configuration->getTablePrefix().$data['table'].$configuration->getTableSuffix();
-        $dt = new \DateTimeImmutable('now', new \DateTimeZone($this->provider->getAuditor()->getConfiguration()->getTimezone()));
+        $dt = new \DateTimeImmutable('now', new \DateTimeZone($this->provider->getAuditor()->getConfiguration()->timezone));
         $diff = $data['diff'];
         $convertCharEncoding = (\is_string($diff) || \is_array($diff));
         $diff = $convertCharEncoding ? $this->convertEncoding($diff) : $diff;
@@ -210,7 +211,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
         $payload = [
             'entity' => $data['entity'],
             'table' => $auditTable,
-            'type' => $data['action'],
+            'type' => $data['action']->value,
             'object_id' => (string) $data['id'],
             'discriminator' => $data['discriminator'],
             'transaction_hash' => (string) $data['transaction_hash'],

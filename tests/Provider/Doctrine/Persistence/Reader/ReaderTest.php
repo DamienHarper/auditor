@@ -6,7 +6,7 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader;
 
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Model\Entry;
-use DH\Auditor\Model\Transaction;
+use DH\Auditor\Model\TransactionType;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\DateRangeFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Query;
@@ -88,17 +88,17 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Author::class)->execute();
-        $this->assertIsInt($audits[0]->getId());
-        $this->assertIsString($audits[0]->getObjectId());
-        $this->assertNull($audits[0]->getDiscriminator());
-        $this->assertIsString($audits[0]->getTransactionHash());
+        $this->assertIsInt($audits[0]->id);
+        $this->assertIsString($audits[0]->objectId);
+        $this->assertNull($audits[0]->discriminator);
+        $this->assertIsString($audits[0]->transactionHash);
         $this->assertIsArray($audits[0]->getDiffs());
-        $this->assertIsString($audits[0]->getUserId());
-        $this->assertIsString($audits[0]->getUsername());
-        $this->assertIsString($audits[0]->getUserFqdn());
-        $this->assertSame('main', $audits[0]->getUserFirewall());
-        $this->assertIsString($audits[0]->getIp());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $audits[0]->getCreatedAt());
+        $this->assertIsString($audits[0]->userId);
+        $this->assertIsString($audits[0]->username);
+        $this->assertIsString($audits[0]->userFqdn);
+        $this->assertSame('main', $audits[0]->userFirewall);
+        $this->assertIsString($audits[0]->ip);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $audits[0]->createdAt);
 
         $expected = [
             'Inserted DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Author#3: [email: luke.skywalker@gmail.com, fullname: Luke Skywalker]',
@@ -396,23 +396,23 @@ final class ReaderTest extends TestCase
         $reader = $this->createReader();
 
         /** @var Entry[] $audits */
-        $audits = $reader->createQuery(Author::class, ['type' => Transaction::UPDATE])->execute();
+        $audits = $reader->createQuery(Author::class, ['type' => TransactionType::Update->value])->execute();
         $this->assertCount(1, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
-        $audits = $reader->createQuery(Author::class, ['type' => Transaction::INSERT])->execute();
+        $audits = $reader->createQuery(Author::class, ['type' => TransactionType::Insert->value])->execute();
         $this->assertCount(3, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
-        $audits = $reader->createQuery(Author::class, ['type' => Transaction::REMOVE])->execute();
+        $audits = $reader->createQuery(Author::class, ['type' => TransactionType::Remove->value])->execute();
         $this->assertCount(1, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
-        $audits = $reader->createQuery(Author::class, ['type' => Transaction::ASSOCIATE])->execute();
+        $audits = $reader->createQuery(Author::class, ['type' => TransactionType::Associate->value])->execute();
         $this->assertCount(2, $audits, 'result count is ok.');
 
         /** @var Entry[] $audits */
-        $audits = $reader->createQuery(Author::class, ['type' => Transaction::DISSOCIATE])->execute();
+        $audits = $reader->createQuery(Author::class, ['type' => TransactionType::Dissociate->value])->execute();
         $this->assertCount(0, $audits, 'result count is ok.');
     }
 
@@ -453,7 +453,7 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Post::class)->execute();
-        $hash = $audits[0]->getTransactionHash();
+        $hash = $audits[0]->transactionHash;
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Post::class, ['transaction_hash' => $hash])->execute();
@@ -497,7 +497,7 @@ final class ReaderTest extends TestCase
 
         /** @var Entry[] $audits */
         $audits = $reader->createQuery(Post::class)->execute();
-        $hash = $audits[0]->getTransactionHash();
+        $hash = $audits[0]->transactionHash;
 
         $author->removePost($post2);
         $storageService->getEntityManager()->remove($post2);
@@ -515,11 +515,11 @@ final class ReaderTest extends TestCase
     {
         $diff = $entry->getDiffs() ?? [];
 
-        switch ($entry->getType()) {
-            case Transaction::REMOVE:
-                return 'Deleted '.$class.'#'.$entry->getObjectId();
+        switch ($entry->type) {
+            case TransactionType::Remove->value:
+                return 'Deleted '.$class.'#'.$entry->objectId;
 
-            case Transaction::UPDATE:
+            case TransactionType::Update->value:
                 $changeset = static function (array $diff) use ($verbose): string {
                     $changes = [];
                     foreach ($diff as $key => $value) {
@@ -535,9 +535,9 @@ final class ReaderTest extends TestCase
                     return implode(', ', $changes);
                 };
 
-                return 'Updated '.$class.'#'.$entry->getObjectId().': ['.$changeset($diff).']';
+                return 'Updated '.$class.'#'.$entry->objectId.': ['.$changeset($diff).']';
 
-            case Transaction::INSERT:
+            case TransactionType::Insert->value:
                 $changeset = static function (array $diff) use ($verbose): string {
                     $changes = [];
                     foreach ($diff as $key => $value) {
@@ -553,15 +553,15 @@ final class ReaderTest extends TestCase
                     return implode(', ', $changes);
                 };
 
-                return 'Inserted '.$class.'#'.$entry->getObjectId().': ['.$changeset($diff).']';
+                return 'Inserted '.$class.'#'.$entry->objectId.': ['.$changeset($diff).']';
 
-            case Transaction::DISSOCIATE:
+            case TransactionType::Dissociate->value:
                 $source = $diff['source']['class'].'#'.$diff['source']['id'].($verbose ? ' ('.$diff['source']['label'].')' : '');
                 $target = $diff['target']['class'].'#'.$diff['target']['id'].($verbose ? ' ('.$diff['target']['label'].')' : '');
 
                 return 'Dissociated '.$source.' from '.$target;
 
-            case Transaction::ASSOCIATE:
+            case TransactionType::Associate->value:
                 $source = $diff['source']['class'].'#'.$diff['source']['id'].($verbose ? ' ('.$diff['source']['label'].')' : '');
                 $target = $diff['target']['class'].'#'.$diff['target']['id'].($verbose ? ' ('.$diff['target']['label'].')' : '');
 
