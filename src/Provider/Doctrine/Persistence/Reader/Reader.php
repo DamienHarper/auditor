@@ -7,7 +7,7 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
 use DH\Auditor\Exception\AccessDeniedException;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Model\Entry;
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
+use DH\Auditor\Provider\Doctrine\Auditing\Attribute\Security;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
@@ -43,7 +43,7 @@ final readonly class Reader implements ReaderInterface
         $config = $resolver->resolve($options);
 
         $connection = $this->provider->getStorageServiceForEntity($entity)->getEntityManager()->getConnection();
-        $timezone = $this->provider->getAuditor()->getConfiguration()->getTimezone();
+        $timezone = $this->provider->getAuditor()->getConfiguration()->timezone;
 
         $query = new Query($this->getEntityAuditTableName($entity), $connection, $timezone);
         $query

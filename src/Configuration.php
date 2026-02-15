@@ -11,24 +11,24 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 final class Configuration
 {
-    private bool $enabled;
+    public private(set) bool $enabled;
 
-    private readonly string $timezone;
-
-    /**
-     * @var null|callable
-     */
-    private $userProvider;
+    public readonly string $timezone;
 
     /**
-     * @var null|callable
+     * @var callable|null
      */
-    private $roleChecker;
+    private mixed $userProvider = null;
 
     /**
-     * @var null|callable
+     * @var callable|null
      */
-    private $securityProvider;
+    private mixed $roleChecker = null;
+
+    /**
+     * @var callable|null
+     */
+    private mixed $securityProvider = null;
 
     public function __construct(array $options)
     {
@@ -44,7 +44,7 @@ final class Configuration
     }
 
     /**
-     * enabled auditing.
+     * Enable auditing.
      */
     public function enable(): self
     {
@@ -54,29 +54,13 @@ final class Configuration
     }
 
     /**
-     * disable auditing.
+     * Disable auditing.
      */
     public function disable(): self
     {
         $this->enabled = false;
 
         return $this;
-    }
-
-    /**
-     * Is auditing enabled.
-     */
-    public function isEnabled(): bool
-    {
-        return $this->enabled;
-    }
-
-    /**
-     * Get the value of timezone.
-     */
-    public function getTimezone(): string
-    {
-        return $this->timezone;
     }
 
     public function setUserProvider(callable $userProvider): self
@@ -86,7 +70,10 @@ final class Configuration
         return $this;
     }
 
-    public function getUserProvider(): ?callable
+    /**
+     * @return callable|null
+     */
+    public function getUserProvider(): mixed
     {
         return $this->userProvider;
     }
@@ -98,7 +85,10 @@ final class Configuration
         return $this;
     }
 
-    public function getSecurityProvider(): ?callable
+    /**
+     * @return callable|null
+     */
+    public function getSecurityProvider(): mixed
     {
         return $this->securityProvider;
     }
@@ -110,7 +100,10 @@ final class Configuration
         return $this;
     }
 
-    public function getRoleChecker(): ?callable
+    /**
+     * @return callable|null
+     */
+    public function getRoleChecker(): mixed
     {
         return $this->roleChecker;
     }
