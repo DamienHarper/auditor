@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace DH\Auditor\Provider\Doctrine\Auditing\Annotation;
+namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
 
-use DH\Auditor\Tests\Provider\Doctrine\Auditing\Annotation\AnnotationLoaderTest;
+use DH\Auditor\Tests\Provider\Doctrine\Auditing\Attribute\AttributeLoaderTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 
 /**
- * @see AnnotationLoaderTest
+ * @see AttributeLoaderTest
  */
-final readonly class AnnotationLoader
+final readonly class AttributeLoader
 {
     public function __construct(private EntityManagerInterface $entityManager) {}
 

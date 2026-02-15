@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DH\Auditor\Tests\Provider\Doctrine\Auditing\Annotation;
+namespace DH\Auditor\Tests\Provider\Doctrine\Auditing\Attribute;
 
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
+use DH\Auditor\Provider\Doctrine\Auditing\Attribute\AttributeLoader;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\EntityManagerInterfaceTrait;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-final class AnnotationLoaderTest extends TestCase
+final class AttributeLoaderTest extends TestCase
 {
     use EntityManagerInterfaceTrait;
 
@@ -21,14 +21,14 @@ final class AnnotationLoaderTest extends TestCase
     {
         $entityManager = $this->createEntityManager(
             [
-                __DIR__.'/../../../../../src/Provider/Doctrine/Auditing/Annotation',
+                __DIR__.'/../../../../../src/Provider/Doctrine/Auditing/Attribute',
                 __DIR__.'/../../Traits',
             ],
             'default'
         );
 
-        $annotationLoader = new AnnotationLoader($entityManager);
-        $loaded = $annotationLoader->load();
+        $attributeLoader = new AttributeLoader($entityManager);
+        $loaded = $attributeLoader->load();
         $this->assertCount(0, $loaded, 'No annotation loaded using attribute driver');
     }
 
@@ -36,13 +36,13 @@ final class AnnotationLoaderTest extends TestCase
     {
         $entityManager = $this->createEntityManager(
             [
-                __DIR__.'/../../../../../src/Provider/Doctrine/Auditing/Annotation',
+                __DIR__.'/../../../../../src/Provider/Doctrine/Auditing/Attribute',
                 __DIR__.'/../../Fixtures/Entity/Attribute',
             ],
             'default'
         );
-        $annotationLoader = new AnnotationLoader($entityManager);
-        $loaded = $annotationLoader->load();
+        $attributeLoader = new AttributeLoader($entityManager);
+        $loaded = $attributeLoader->load();
         $this->assertCount(2, $loaded);
     }
 }

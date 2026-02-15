@@ -41,7 +41,7 @@ trait DoctrineProviderTrait
 
         // Entity manager "default" is used both for auditing and storage
         $entityManager = $this->createEntityManager([
-            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/../Fixtures/Entity/Standard',
             __DIR__.'/../Fixtures/Entity/Inheritance',
         ]);
@@ -70,7 +70,7 @@ trait DoctrineProviderTrait
 
         // Entity manager "db1" is used for storage only (db1 connection => db1.sqlite)
         $provider->registerStorageService(new StorageService('db1', $this->createEntityManager([
-            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/../Fixtures/Entity/Standard/Blog',
         ], 'db1', [
             'driver' => 'pdo_sqlite',
@@ -79,7 +79,7 @@ trait DoctrineProviderTrait
 
         // Entity manager "db2" is used for storage only (db2 connection => db2.sqlite)
         $provider->registerStorageService(new StorageService('db2', $this->createEntityManager([
-            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/../Fixtures/Entity/Inheritance',
         ], 'db2', [
             'driver' => 'pdo_sqlite',
@@ -88,7 +88,7 @@ trait DoctrineProviderTrait
 
         // Entity manager "aem1" is used for auditing only (default connection => in memory sqlite db)
         $provider->registerAuditingService(new AuditingService('aem1', $this->createEntityManager([
-            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/../Fixtures/Entity/Standard/Blog',
             __DIR__.'/../Fixtures/Entity/Inheritance',
         ], 'default', [
@@ -122,20 +122,20 @@ trait DoctrineProviderTrait
 
         // Entity manager "sem1" is used for storage only (default connection => in memory sqlite db)
         $provider->registerStorageService(new StorageService('sem1', $this->createEntityManager([
-            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/../Fixtures/Entity/Standard/Blog',
             __DIR__.'/../Fixtures/Entity/Inheritance',
         ], 'default', $params)));
 
         // Entity manager "aem1" is used for auditing only (default connection => in memory sqlite db)
         $provider->registerAuditingService(new AuditingService('aem1', $this->createEntityManager([
-            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/../Fixtures/Entity/Standard/Blog',
         ], 'default', $params)));
 
         // Entity manager "aem2" is used for auditing only (default connection => in memory sqlite db)
         $provider->registerAuditingService(new AuditingService('aem2', $this->createEntityManager([
-            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/../Fixtures/Entity/Inheritance',
         ], 'default', $params)));
 
@@ -160,7 +160,7 @@ trait DoctrineProviderTrait
 
         // Entity manager "sem1" is used for storage only (db1 connection => sem1.sqlite)
         $provider->registerStorageService(new StorageService('sem1', $this->createEntityManager([
-            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/../Fixtures/Entity/Standard',
             __DIR__.'/../Fixtures/Entity/Inheritance',
         ], 'sem1', [
@@ -170,13 +170,13 @@ trait DoctrineProviderTrait
 
         // Entity manager "aem1" is used for auditing only (default connection => in memory sqlite db)
         $provider->registerAuditingService(new AuditingService('aem1', $this->createEntityManager([
-            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/../Fixtures/Entity/Standard',
         ], 'default', $params)));
 
         // Entity manager "aem2" is used for auditing only (default connection => in memory sqlite db)
         $provider->registerAuditingService(new AuditingService('aem2', $this->createEntityManager([
-            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/../Fixtures/Entity/Inheritance',
         ], 'default', $params)));
 

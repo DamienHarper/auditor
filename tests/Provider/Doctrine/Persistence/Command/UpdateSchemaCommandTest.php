@@ -154,7 +154,7 @@ final class UpdateSchemaCommandTest extends TestCase
     private function createDoctrineProvider(?Configuration $configuration = null): DoctrineProvider
     {
         $entityManager = $this->createEntityManager([
-            __DIR__.'/../../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/../../Fixtures/Entity/Standard',
             __DIR__.'/../../Fixtures/Entity/Inheritance',
         ]);
