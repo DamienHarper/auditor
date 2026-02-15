@@ -196,6 +196,8 @@ final class TransactionProcessor implements TransactionProcessorInterface
 
     /**
      * Adds an entry to the audit table.
+     *
+     * @param array{action: TransactionType, blame: array<string, mixed>, diff: mixed, table: string, schema: ?string, id: mixed, transaction_hash: string, discriminator: ?string, entity: string} $data
      */
     private function audit(array $data): void
     {
