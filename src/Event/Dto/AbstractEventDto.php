@@ -6,10 +6,5 @@ namespace DH\Auditor\Event\Dto;
 
 abstract class AbstractEventDto
 {
-    public function __construct(private readonly object $source) {}
-
-    public function getSource(): object
-    {
-        return $this->source;
-    }
+    public function __construct(public readonly object $source) {}
 }

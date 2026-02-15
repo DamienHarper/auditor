@@ -6,7 +6,7 @@ namespace DH\Auditor\User;
 
 interface UserInterface
 {
-    public function getIdentifier(): ?string;
+    public ?string $identifier { get; }
 
-    public function getUsername(): ?string;
+    public ?string $username { get; }
 }
