@@ -10,6 +10,7 @@ use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Persistence\Command\CleanAuditLogsCommandTest;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -22,6 +23,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @see CleanAuditLogsCommandTest
  */
+#[AsCommand(
+    name: 'audit:clean',
+    description: 'Cleans audit tables',
+)]
 final class CleanAuditLogsCommand extends Command
 {
     use LockableTrait;
@@ -40,8 +45,6 @@ final class CleanAuditLogsCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Cleans audit tables')
-            ->setName('audit:clean')
             ->addOption('no-confirm', null, InputOption::VALUE_NONE, 'No interaction mode')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Do not execute SQL queries.')
             ->addOption('dump-sql', null, InputOption::VALUE_NONE, 'Prints SQL related queries.')
