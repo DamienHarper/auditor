@@ -16,7 +16,6 @@ use DH\Auditor\Tests\Model\TransactionTest;
  */
 class Transaction implements TransactionInterface
 {
-
     private ?string $transaction_hash = null;
 
     /**

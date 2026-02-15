@@ -16,17 +16,17 @@ final class Configuration
     public readonly string $timezone;
 
     /**
-     * @var callable|null
+     * @var null|callable
      */
     private mixed $userProvider = null;
 
     /**
-     * @var callable|null
+     * @var null|callable
      */
     private mixed $roleChecker = null;
 
     /**
-     * @var callable|null
+     * @var null|callable
      */
     private mixed $securityProvider = null;
 
@@ -71,7 +71,7 @@ final class Configuration
     }
 
     /**
-     * @return callable|null
+     * @return null|callable
      */
     public function getUserProvider(): mixed
     {
@@ -86,7 +86,7 @@ final class Configuration
     }
 
     /**
-     * @return callable|null
+     * @return null|callable
      */
     public function getSecurityProvider(): mixed
     {
@@ -101,7 +101,7 @@ final class Configuration
     }
 
     /**
-     * @return callable|null
+     * @return null|callable
      */
     public function getRoleChecker(): mixed
     {

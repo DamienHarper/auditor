@@ -15,41 +15,27 @@ final class Entry
 
     public private(set) string $type = '';
 
-    private string $object_id = '';
-
     public string $objectId {
         get => $this->object_id;
     }
 
     public private(set) ?string $discriminator = null;
 
-    private ?string $transaction_hash = null;
-
     public ?string $transactionHash {
         get => $this->transaction_hash;
     }
-
-    private string $diffs = '{}';
-
-    private int|string|null $blame_id = null;
 
     public int|string|null $userId {
         get => $this->blame_id;
     }
 
-    private ?string $blame_user = null;
-
     public ?string $username {
         get => $this->blame_user;
     }
 
-    private ?string $blame_user_fqdn = null;
-
     public ?string $userFqdn {
         get => $this->blame_user_fqdn;
     }
-
-    private ?string $blame_user_firewall = null;
 
     public ?string $userFirewall {
         get => $this->blame_user_firewall;
@@ -57,11 +43,25 @@ final class Entry
 
     public private(set) ?string $ip = null;
 
-    private ?\DateTimeImmutable $created_at = null;
-
     public ?\DateTimeImmutable $createdAt {
         get => $this->created_at;
     }
+
+    private string $object_id = '';
+
+    private ?string $transaction_hash = null;
+
+    private string $diffs = '{}';
+
+    private int|string|null $blame_id = null;
+
+    private ?string $blame_user = null;
+
+    private ?string $blame_user_fqdn = null;
+
+    private ?string $blame_user_firewall = null;
+
+    private ?\DateTimeImmutable $created_at = null;
 
     /**
      * Get diff values.

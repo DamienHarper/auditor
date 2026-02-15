@@ -11,7 +11,6 @@ use DH\Auditor\Provider\Doctrine\Model\Transaction;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 
 final class DoctrineSubscriber
@@ -32,18 +31,14 @@ final class DoctrineSubscriber
      *
      * @see https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/events.html#onflush
      */
-    public function onFlush(OnFlushEventArgs $args): void
+    public function onFlush(): void
     {
         $entityManagerId = spl_object_id($this->entityManager);
-
         // cached transaction model, if it holds same EM no need to create a new one
         $transaction = ($this->transactions[$entityManagerId] ??= new Transaction($this->entityManager));
-
         // Populate transaction
         $this->provider->getTransactionManager()->populate($transaction);
-
         $driver = $this->entityManager->getConnection()->getDriver();
-
         if (!$driver instanceof AuditorDriver) {
             $driver = $this->getWrappedDriver($driver);
         }
@@ -70,7 +65,6 @@ final class DoctrineSubscriber
             );
         }
     }
-
 
     /**
      * @internal this method is used to retrieve the wrapped driver from the given driver
