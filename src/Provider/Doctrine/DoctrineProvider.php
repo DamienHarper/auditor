@@ -10,7 +10,7 @@ use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Exception\ProviderException;
 use DH\Auditor\Provider\AbstractProvider;
 use DH\Auditor\Provider\ConfigurationInterface;
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
+use DH\Auditor\Provider\Doctrine\Auditing\Attribute\AttributeLoader;
 use DH\Auditor\Provider\Doctrine\Auditing\Event\DoctrineSubscriber;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\TransactionManager;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
@@ -24,6 +24,7 @@ use DH\Auditor\Tests\Provider\Doctrine\DoctrineProviderTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ToolEvents;
+use Gedmo\SoftDeleteable\SoftDeleteableListener;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -73,10 +74,17 @@ final class DoctrineProvider extends AbstractProvider
         $entityManager = $service->getEntityManager();
         $evm = $entityManager->getEventManager();
 
-        // Register audit listeners and subscribers
+        // Register audit listeners
         $evm->addEventListener([Events::loadClassMetadata], new TableSchemaListener($this));
         $evm->addEventListener([ToolEvents::postGenerateSchemaTable], new CreateSchemaListener($this));
-        $evm->addEventSubscriber(new DoctrineSubscriber($this, $entityManager));
+
+        $doctrineSubscriber = new DoctrineSubscriber($this, $entityManager);
+        $evm->addEventListener([Events::onFlush], $doctrineSubscriber);
+
+        // Register soft delete listener if Gedmo SoftDeleteable is available
+        if (class_exists(SoftDeleteableListener::class)) {
+            $evm->addEventListener([SoftDeleteableListener::POST_SOFT_DELETE], $doctrineSubscriber);
+        }
 
         return $this;
     }
@@ -177,7 +185,7 @@ final class DoctrineProvider extends AbstractProvider
     public function isAudited(object|string $entity): bool
     {
         \assert($this->auditor instanceof Auditor);
-        if (!$this->auditor->getConfiguration()->isEnabled()) {
+        if (!$this->auditor->getConfiguration()->enabled) {
             return false;
         }
 
@@ -250,17 +258,17 @@ final class DoctrineProvider extends AbstractProvider
         $ormConfiguration = $entityManager->getConfiguration();
         $metadataCache = $ormConfiguration->getMetadataCache();
 
-        $annotationLoader = new AnnotationLoader($entityManager);
+        $attributeLoader = new AttributeLoader($entityManager);
 
         if ($metadataCache instanceof CacheItemPoolInterface) {
             $item = $metadataCache->getItem('__DH_ANNOTATIONS__');
             if (!$item->isHit() || !\is_array($annotationEntities = $item->get())) {
-                $annotationEntities = $annotationLoader->load();
+                $annotationEntities = $attributeLoader->load();
                 $item->set($annotationEntities);
                 $metadataCache->save($item);
             }
         } else {
-            $annotationEntities = $annotationLoader->load();
+            $annotationEntities = $attributeLoader->load();
         }
 
         $this->configuration->setEntities(array_merge($entities, $annotationEntities));

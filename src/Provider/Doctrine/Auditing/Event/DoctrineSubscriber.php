@@ -8,16 +8,13 @@ use DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware\AuditorDriver;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\AuditTrait;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
-use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
-use Gedmo\SoftDeleteable\SoftDeleteableListener;
 
-final class DoctrineSubscriber implements EventSubscriber
+final class DoctrineSubscriber
 {
     use AuditTrait;
 
@@ -74,12 +71,6 @@ final class DoctrineSubscriber implements EventSubscriber
         }
     }
 
-    public function getSubscribedEvents(): array
-    {
-        return class_exists(SoftDeleteableListener::class)
-            ? [Events::onFlush, SoftDeleteableListener::POST_SOFT_DELETE]
-            : [Events::onFlush];
-    }
 
     /**
      * @internal this method is used to retrieve the wrapped driver from the given driver
