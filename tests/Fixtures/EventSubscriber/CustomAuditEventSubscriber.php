@@ -5,18 +5,12 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Fixtures\EventSubscriber;
 
 use DH\Auditor\Event\LifecycleEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class CustomAuditEventSubscriber implements EventSubscriberInterface
+#[AsEventListener(event: LifecycleEvent::class)]
+final class CustomAuditEventSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LifecycleEvent::class => 'onAuditEvent',
-        ];
-    }
-
-    public function onAuditEvent(LifecycleEvent $event): LifecycleEvent
+    public function __invoke(LifecycleEvent $event): LifecycleEvent
     {
         $payload = $event->getPayload();
         $payload['entity'] = self::class;
