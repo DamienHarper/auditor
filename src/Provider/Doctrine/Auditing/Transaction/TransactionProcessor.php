@@ -38,10 +38,10 @@ final class TransactionProcessor implements TransactionProcessorInterface
         $this->processDeletions($transaction, $em);
     }
 
-    private function notify(array $payload): void
+    private function notify(array $payload, ?object $entity = null): void
     {
         $dispatcher = $this->provider->getAuditor()->getEventDispatcher();
-        $dispatcher->dispatch(new LifecycleEvent($payload));
+        $dispatcher->dispatch(new LifecycleEvent($payload, $entity));
     }
 
     /**
@@ -60,6 +60,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
             'transaction_hash' => $transactionHash,
             'discriminator' => $this->getDiscriminator($entity, $meta->inheritanceType),
             'entity' => $meta->getName(),
+            'entity_object' => $entity,
         ]);
     }
 
@@ -86,6 +87,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
             'transaction_hash' => $transactionHash,
             'discriminator' => $this->getDiscriminator($entity, $meta->inheritanceType),
             'entity' => $meta->getName(),
+            'entity_object' => $entity,
         ]);
     }
 
@@ -105,6 +107,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
             'transaction_hash' => $transactionHash,
             'discriminator' => $this->getDiscriminator($entity, $meta->inheritanceType),
             'entity' => $meta->getName(),
+            'entity_object' => $entity,
         ]);
     }
 
@@ -185,6 +188,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
             'transaction_hash' => $transactionHash,
             'discriminator' => $this->getDiscriminator($source, $meta->inheritanceType),
             'entity' => $meta->getName(),
+            'entity_object' => $source,
         ];
 
         if (isset($mapping['joinTable']['name'])) {
@@ -197,10 +201,12 @@ final class TransactionProcessor implements TransactionProcessorInterface
     /**
      * Adds an entry to the audit table.
      *
-     * @param array{action: TransactionType, blame: array<string, mixed>, diff: mixed, table: string, schema: ?string, id: mixed, transaction_hash: string, discriminator: ?string, entity: string} $data
+     * @param array{action: TransactionType, blame: array<string, mixed>, diff: mixed, table: string, schema: ?string, id: mixed, transaction_hash: string, discriminator: ?string, entity: string, entity_object: ?object} $data
      */
     private function audit(array $data): void
     {
+        $entityObject = $data['entity_object'] ?? null;
+
         /** @var Configuration $configuration */
         $configuration = $this->provider->getConfiguration();
         $schema = $data['schema'] ? $data['schema'].'.' : '';
@@ -218,6 +224,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
             'discriminator' => $data['discriminator'],
             'transaction_hash' => (string) $data['transaction_hash'],
             'diffs' => json_encode($diff, JSON_THROW_ON_ERROR),
+            'extra_data' => null,
             'blame_id' => $data['blame']['user_id'],
             'blame_user' => $data['blame']['username'],
             'blame_user_fqdn' => $data['blame']['user_fqdn'],
@@ -227,7 +234,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
         ];
 
         // send an `AuditEvent` event
-        $this->notify($payload);
+        $this->notify($payload, $entityObject);
     }
 
     // Avoid warning (and dismissal) of objects in input array when using mb_convert_encoding

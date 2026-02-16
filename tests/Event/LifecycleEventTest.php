@@ -35,6 +35,7 @@ final class LifecycleEventTest extends TestCase
         'blame_user_fqdn' => '',
         'blame_user_firewall' => '',
         'ip' => '',
+        'extra_data' => '',
         'created_at' => '',
     ];
 
@@ -42,6 +43,19 @@ final class LifecycleEventTest extends TestCase
     {
         $event = new LifecycleEvent(self::PAYLOAD);
         $this->assertSame(self::PAYLOAD, $event->getPayload());
+    }
+
+    public function testLifecycleEventWithEntity(): void
+    {
+        $entity = new \stdClass();
+        $event = new LifecycleEvent(self::PAYLOAD, $entity);
+        $this->assertSame($entity, $event->entity);
+    }
+
+    public function testLifecycleEventWithoutEntity(): void
+    {
+        $event = new LifecycleEvent(self::PAYLOAD);
+        $this->assertNull($event->entity);
     }
 
     public function testLifecycleEventWithInvalidPayload(): void
@@ -60,6 +74,7 @@ final class LifecycleEventTest extends TestCase
             'discriminator' => '',
             'transaction_hash' => '',
             'diffs' => '',
+            'extra_data' => '',
             'blame_id' => '',
             'blame_user' => '',
             'blame_user_fqdn' => '',
@@ -85,6 +100,7 @@ final class LifecycleEventTest extends TestCase
             'discriminator' => '',
             'transaction_hash' => '',
             'diffs' => '',
+            'extra_data' => '',
             'blame_id' => '',
             'blame_user' => '',
             'blame_user_fqdn' => '',

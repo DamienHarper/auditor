@@ -9,4 +9,10 @@ use DH\Auditor\Tests\Event\LifecycleEventTest;
 /**
  * @see LifecycleEventTest
  */
-final class LifecycleEvent extends AuditEvent {}
+final class LifecycleEvent extends AuditEvent
+{
+    public function __construct(array $payload, public readonly ?object $entity = null)
+    {
+        parent::__construct($payload);
+    }
+}

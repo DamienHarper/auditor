@@ -57,4 +57,28 @@ final class EntryTest extends TestCase
 
         $this->assertIsArray($entry->getDiffs(), 'Entry::getDiffs() returns an array.');
     }
+
+    public function testGetExtraDataReturnsNullWhenEmpty(): void
+    {
+        $entry = Entry::fromArray(['extra_data' => null]);
+
+        $this->assertNull($entry->getExtraData(), 'Entry::getExtraData() returns null when empty.');
+        $this->assertNull($entry->extraData, 'Entry::extraData virtual property returns null when empty.');
+    }
+
+    public function testGetExtraDataReturnsArray(): void
+    {
+        $entry = Entry::fromArray(['extra_data' => '{"key":"value"}']);
+
+        $this->assertSame(['key' => 'value'], $entry->getExtraData(), 'Entry::getExtraData() returns an array.');
+        $this->assertSame(['key' => 'value'], $entry->extraData, 'Entry::extraData virtual property returns an array.');
+    }
+
+    public function testGetExtraDataWithNestedData(): void
+    {
+        $data = ['department' => 'IT', 'metadata' => ['level' => 3, 'tags' => ['admin', 'user']]];
+        $entry = Entry::fromArray(['extra_data' => json_encode($data)]);
+
+        $this->assertSame($data, $entry->getExtraData(), 'Entry::getExtraData() handles nested data.');
+    }
 }
