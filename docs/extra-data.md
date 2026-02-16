@@ -8,11 +8,32 @@ Each audit entry has a nullable JSON `extra_data` column. By default, it is `NUL
 
 ### Data Flow
 
-```
-Entity change → TransactionProcessor builds payload (extra_data = null)
-             → LifecycleEvent dispatched (with entity object)
-             → Your listener sets extra_data in payload
-             → DoctrineProvider persists the entry
+```mermaid
+flowchart TD
+    A["Entity Change
+    persist / update / remove + flush"] --> B
+
+    B["TransactionProcessor
+    Builds payload: diffs, blame, extra_data = null
+    Attaches the entity object to the event"] --> C
+
+    C["LifecycleEvent dispatched"]
+    C --- D["payload
+    diffs, blame, extra_data"]
+    C --- E["entity
+    the audited object"]
+    C --> F
+
+    F["Your Listener — optional
+    Reads $event->entity
+    Sets payload extra_data via json_encode
+    Calls $event->setPayload()"]:::optional --> G
+
+    G[("Audit Table
+    INSERT INTO *_audit
+    (..., extra_data, ...)")]
+
+    classDef optional stroke-dasharray: 5 5
 ```
 
 ## Setting Up a Listener
@@ -133,48 +154,53 @@ php bin/console audit:schema:update --dump-sql
 php bin/console audit:schema:update --force
 ```
 
-No manual migration is needed. The column uses the same JSON type as `diffs` (with automatic TEXT fallback on platforms that don't support native JSON).
+> [!TIP]
+> No manual migration is needed. The column uses the same JSON type as `diffs` (with automatic TEXT fallback on platforms that don't support native JSON).
 
 ## Important Caveats
 
 ### Entity State in `remove()` Operations
 
-During a `remove` operation, the entity object is still in memory but has been **detached from the Unit of Work**. This means:
-
-- Direct property access works (e.g., `$entity->getName()`)
-- **Lazy-loaded associations may not be accessible** (they will throw or return `null`)
-
-If you need association data during deletions, ensure those associations are eagerly loaded or fetch the data before the flush.
+> [!WARNING]
+> During a `remove` operation, the entity object is still in memory but has been **detached from the Unit of Work**.
+>
+> - Direct property access works (e.g., `$entity->getName()`)
+> - **Lazy-loaded associations may not be accessible** (they will throw or return `null`)
+>
+> If you need association data during deletions, ensure those associations are eagerly loaded or fetch the data before the flush.
 
 ### Do Not Write to the Audited EntityManager
 
-The `LifecycleEvent` is dispatched **during** a flush. The listener executes synchronously between `notify()` and `persist()`, within the same database transaction.
-
-- **SELECTs are safe** (reading from another entity manager or connection)
-- **INSERT/UPDATE/DELETE on the audited EntityManager will interfere** with the ongoing flush and may cause unexpected behavior
-
-If you need to perform write operations based on audit data, defer them (e.g., using a Symfony Messenger message).
+> [!CAUTION]
+> The `LifecycleEvent` is dispatched **during** a flush. The listener executes synchronously between `notify()` and `persist()`, within the same database transaction.
+>
+> - **SELECTs are safe** (reading from another entity manager or connection)
+> - **INSERT/UPDATE/DELETE on the audited EntityManager will interfere** with the ongoing flush and may cause unexpected behavior
+>
+> If you need to perform write operations based on audit data, defer them (e.g., using a Symfony Messenger message).
 
 ### Payload Validation
 
-The `extra_data` key is **required** in the payload. If you have custom code that builds payloads manually via `AuditEvent::setPayload()`, you must include the `extra_data` key (set it to `null` if you don't need it):
-
-```php
-$payload['extra_data'] = null; // Required, even if unused
-$event->setPayload($payload);
-```
+> [!IMPORTANT]
+> The `extra_data` key is **required** in the payload. If you have custom code that builds payloads manually via `AuditEvent::setPayload()`, you must include the `extra_data` key (set it to `null` if you don't need it):
+>
+> ```php
+> $payload['extra_data'] = null; // Required, even if unused
+> $event->setPayload($payload);
+> ```
 
 ### JSON Encoding
 
-The `extra_data` value in the payload must be either `null` or a **JSON-encoded string** (not an array). Always use `json_encode()` when setting it:
-
-```php
-// Correct
-$payload['extra_data'] = json_encode(['key' => 'value'], JSON_THROW_ON_ERROR);
-
-// Incorrect - will not be stored properly
-$payload['extra_data'] = ['key' => 'value'];
-```
+> [!WARNING]
+> The `extra_data` value in the payload must be either `null` or a **JSON-encoded string** (not an array). Always use `json_encode()` when setting it:
+>
+> ```php
+> // Correct
+> $payload['extra_data'] = json_encode(['key' => 'value'], JSON_THROW_ON_ERROR);
+>
+> // Incorrect - will not be stored properly
+> $payload['extra_data'] = ['key' => 'value'];
+> ```
 
 ### Performance
 
@@ -186,7 +212,8 @@ $payload['extra_data'] = ['key' => 'value'];
 
 ### Filtering by Extra Data
 
-Querying/filtering by extra_data content is not built-in. Users on PostgreSQL or MySQL 8+ can add GIN or functional indexes manually for specific JSON paths. You can also create a custom `FilterInterface` implementation.
+> [!NOTE]
+> Querying/filtering by `extra_data` content is not built-in. Users on PostgreSQL or MySQL 8+ can add GIN or functional indexes manually for specific JSON paths. You can also create a custom `FilterInterface` implementation.
 
 ## Next Steps
 
