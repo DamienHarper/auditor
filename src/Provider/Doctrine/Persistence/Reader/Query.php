@@ -9,6 +9,7 @@ use DH\Auditor\Model\Entry;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\SchemaHelper;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\DateRangeFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\FilterInterface;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\PlatformAwareFilterInterface;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\RangeFilter;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
 use DH\Auditor\Tests\Provider\Doctrine\Persistence\Reader\QueryTest;
@@ -35,6 +36,8 @@ final class Query implements QueryInterface
     public const string ID = 'id';
 
     public const string DISCRIMINATOR = 'discriminator';
+
+    public const string JSON = 'json';
 
     private array $filters = [];
 
@@ -141,7 +144,7 @@ final class Query implements QueryInterface
 
     public function getSupportedFilters(): array
     {
-        return array_keys(SchemaHelper::getAuditTableIndices('fake'));
+        return [...array_keys(SchemaHelper::getAuditTableIndices('fake')), self::JSON];
     }
 
     public function getFilters(): array
@@ -242,7 +245,12 @@ final class Query implements QueryInterface
                 }
 
                 foreach ($filters as $filter) {
-                    $data = $filter->getSQL();
+                    // Use platform-aware method if available
+                    if ($filter instanceof PlatformAwareFilterInterface) {
+                        $data = $filter->getSQLWithConnection($this->connection);
+                    } else {
+                        $data = $filter->getSQL();
+                    }
 
                     $queryBuilder->andWhere($data['sql']);
 

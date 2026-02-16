@@ -201,13 +201,134 @@ php bin/console audit:schema:update --force
 | Read | Negligible (+1 column in SELECT, lazy decoding) |
 | Storage | `NULL` when no listener is active (zero overhead) |
 
-### Filtering by Extra Data
+## Filtering by Extra Data
+
+You can filter audit entries by `extra_data` content using the `JsonFilter` class. This generates platform-specific SQL for optimal performance.
+
+### Basic Usage
+
+```php
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\JsonFilter;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Query;
+
+$reader = new Reader($provider);
+$query = $reader->createQuery(User::class, ['page_size' => null]);
+
+// Filter by exact value
+$query->addFilter(new JsonFilter('extra_data', 'department', 'IT'));
+
+// Filter with LIKE pattern
+$query->addFilter(new JsonFilter('extra_data', 'department', 'IT%', 'LIKE'));
+
+// Filter by multiple values (IN)
+$query->addFilter(new JsonFilter('extra_data', 'status', ['active', 'pending'], 'IN'));
+
+// Filter where value is NULL
+$query->addFilter(new JsonFilter('extra_data', 'deleted_by', null, 'IS NULL'));
+
+// Nested JSON path
+$query->addFilter(new JsonFilter('extra_data', 'user.role', 'admin'));
+
+$entries = $query->execute();
+```
+
+### Supported Operators
+
+| Operator | Description | Example |
+|----------|-------------|---------|
+| `=` | Exact match (default) | `new JsonFilter('extra_data', 'dept', 'IT')` |
+| `!=` or `<>` | Not equal | `new JsonFilter('extra_data', 'dept', 'IT', '!=')` |
+| `LIKE` | Pattern matching | `new JsonFilter('extra_data', 'dept', 'IT%', 'LIKE')` |
+| `NOT LIKE` | Negative pattern | `new JsonFilter('extra_data', 'dept', '%temp%', 'NOT LIKE')` |
+| `IN` | Multiple values | `new JsonFilter('extra_data', 'dept', ['IT', 'HR'], 'IN')` |
+| `NOT IN` | Exclude values | `new JsonFilter('extra_data', 'dept', ['IT'], 'NOT IN')` |
+| `IS NULL` | Value is null | `new JsonFilter('extra_data', 'dept', null, 'IS NULL')` |
+| `IS NOT NULL` | Value exists | `new JsonFilter('extra_data', 'dept', null, 'IS NOT NULL')` |
+
+### Supported Databases
+
+| Database   | Minimum Version | JSON Function Used |
+|------------|-----------------|-------------------|
+| MySQL      | 5.7.0           | `JSON_UNQUOTE(JSON_EXTRACT())` |
+| MariaDB    | 10.2.3          | `JSON_UNQUOTE(JSON_EXTRACT())` |
+| PostgreSQL | 9.4.0           | `->>` operator |
+| SQLite     | 3.38.0          | `json_extract()` |
+
+### Strict Mode
+
+By default, if the database doesn't support JSON functions, the filter falls back to `LIKE` pattern matching with a warning. This fallback may produce inaccurate results.
+
+To enforce JSON support and throw an exception instead:
+
+```php
+// Enable strict mode (5th parameter)
+$filter = new JsonFilter('extra_data', 'department', 'IT', '=', strict: true);
+
+// Throws InvalidArgumentException if JSON is not supported
+$query->addFilter($filter);
+```
+
+### Limitations
 
 > [!NOTE]
-> Querying/filtering by `extra_data` content is not built-in. Users on PostgreSQL or MySQL 8+ can add GIN or functional indexes manually for specific JSON paths. You can also create a custom `FilterInterface` implementation.
+> This version only supports **scalar value extraction** from JSON. Nested array/object comparisons (e.g., `JSON_CONTAINS`) are not yet implemented.
+
+```php
+// ✅ Supported: scalar values
+new JsonFilter('extra_data', 'department', 'IT');
+new JsonFilter('extra_data', 'user.role', 'admin');
+
+// ❌ Not supported: array contains
+// new JsonFilter('extra_data', 'tags', ['php', 'symfony'], 'CONTAINS');
+```
+
+## JSON Indexing for Performance
+
+For frequently queried JSON paths, consider adding database indexes to improve performance.
+
+### MySQL 8.0+
+
+```sql
+-- Functional index on a JSON path
+ALTER TABLE user_audit 
+ADD INDEX idx_extra_department ((
+    CAST(extra_data->>'$.department' AS CHAR(50) COLLATE utf8mb4_bin)
+));
+
+-- For nested paths
+ALTER TABLE user_audit 
+ADD INDEX idx_extra_user_role ((
+    CAST(extra_data->>'$.user.role' AS CHAR(50) COLLATE utf8mb4_bin)
+));
+```
+
+### MariaDB 10.2+
+
+```sql
+-- Virtual column with index
+ALTER TABLE user_audit 
+ADD COLUMN extra_department VARCHAR(50) AS (JSON_VALUE(extra_data, '$.department')) VIRTUAL,
+ADD INDEX idx_extra_department (extra_department);
+```
+
+### PostgreSQL
+
+```sql
+-- GIN index for general JSON queries
+CREATE INDEX idx_extra_data_gin ON user_audit USING GIN (extra_data jsonb_path_ops);
+
+-- B-tree index for specific path (equality queries)
+CREATE INDEX idx_extra_department ON user_audit ((extra_data->>'department'));
+```
+
+### SQLite
+
+> [!WARNING]
+> SQLite does not support indexes on JSON expressions. For high-volume audit tables, consider using a different database or denormalizing frequently queried values into separate columns.
 
 ## Next Steps
 
 - [Entry Model Reference](querying/entry.md)
 - [Querying Overview](querying/index.md)
+- [Filters Reference](querying/filters.md)
 - [Upgrade Guide](upgrade/v4.md)

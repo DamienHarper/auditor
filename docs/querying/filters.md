@@ -12,6 +12,7 @@ Filters allow you to narrow down audit query results. This page documents all av
 | `DateRangeFilter` | Date/time range                      | Audits from last week               |
 | `RangeFilter`     | Numeric range                        | Audits with ID >= 1000              |
 | `NullFilter`      | NULL value matching                  | Audits by anonymous users           |
+| `JsonFilter`      | JSON column content                  | Filter by extra_data values         |
 
 ## 🔌 Filter Interface
 
@@ -412,6 +413,127 @@ The following columns can be filtered:
 | `transaction_hash` | `Query::TRANSACTION_HASH`    | Transaction identifier         |
 | `blame_id`         | `Query::USER_ID`             | User ID who made the change    |
 | `created_at`       | `Query::CREATED_AT`          | When the audit was created     |
+| `json`             | `Query::JSON`                | JSON column content (extra_data) |
+
+## 🔎 JsonFilter
+
+Filter by JSON column content. Generates platform-specific SQL for optimal performance.
+
+### Namespace
+
+```php
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\JsonFilter;
+```
+
+### Constructor
+
+```php
+public function __construct(
+    private readonly string $column,    // JSON column name (e.g., 'extra_data')
+    private readonly string $path,      // JSON path (e.g., 'department' or 'user.role')
+    private readonly mixed $value,      // Value to match
+    private readonly string $operator = '=',  // Comparison operator
+    private readonly bool $strict = false     // Throw exception if JSON not supported
+)
+```
+
+### Basic Usage
+
+```php
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\JsonFilter;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Query;
+
+$query = $reader->createQuery(User::class, ['page_size' => null]);
+
+// Filter by exact value
+$query->addFilter(new JsonFilter('extra_data', 'department', 'IT'));
+
+$entries = $query->execute();
+```
+
+### Supported Operators
+
+```php
+// Exact match (default)
+new JsonFilter('extra_data', 'department', 'IT');
+new JsonFilter('extra_data', 'department', 'IT', '=');
+
+// Not equal
+new JsonFilter('extra_data', 'department', 'IT', '!=');
+new JsonFilter('extra_data', 'department', 'IT', '<>');
+
+// Pattern matching
+new JsonFilter('extra_data', 'department', 'IT%', 'LIKE');
+new JsonFilter('extra_data', 'department', '%temp%', 'NOT LIKE');
+
+// Multiple values
+new JsonFilter('extra_data', 'status', ['active', 'pending'], 'IN');
+new JsonFilter('extra_data', 'status', ['deleted', 'archived'], 'NOT IN');
+
+// NULL checking
+new JsonFilter('extra_data', 'deleted_by', null, 'IS NULL');
+new JsonFilter('extra_data', 'department', null, 'IS NOT NULL');
+```
+
+### Nested JSON Paths
+
+```php
+// Access nested values using dot notation
+$query->addFilter(new JsonFilter('extra_data', 'user.role', 'admin'));
+$query->addFilter(new JsonFilter('extra_data', 'metadata.source.ip', '192.168.1.1'));
+```
+
+### Database Support
+
+| Database   | Minimum Version | JSON Function |
+|------------|-----------------|---------------|
+| MySQL      | 5.7.0           | `JSON_UNQUOTE(JSON_EXTRACT())` |
+| MariaDB    | 10.2.3          | `JSON_UNQUOTE(JSON_EXTRACT())` |
+| PostgreSQL | 9.4.0           | `->>` operator |
+| SQLite     | 3.38.0          | `json_extract()` |
+
+### Fallback Behavior
+
+When the database doesn't support JSON functions, the filter falls back to `LIKE` pattern matching:
+
+```php
+// On unsupported database, this:
+new JsonFilter('extra_data', 'department', 'IT');
+
+// Becomes approximately:
+// WHERE extra_data LIKE '%"department":"IT"%'
+```
+
+> [!WARNING]
+> The LIKE fallback may produce inaccurate results (false positives). A `E_USER_WARNING` is triggered when this occurs.
+
+### Strict Mode
+
+Enable strict mode to throw an exception instead of falling back to LIKE:
+
+```php
+// Throws InvalidArgumentException if JSON is not supported
+$filter = new JsonFilter('extra_data', 'department', 'IT', '=', strict: true);
+```
+
+### Limitations
+
+> [!NOTE]
+> Only **scalar value extraction** is supported in this version. Array/object comparisons (e.g., `JSON_CONTAINS`) are not yet implemented.
+
+### Generated SQL Examples
+
+```php
+// MySQL/MariaDB
+$filter = new JsonFilter('extra_data', 'department', 'IT');
+// SQL: JSON_UNQUOTE(JSON_EXTRACT(extra_data, '$.department')) = :json_department
+
+// PostgreSQL
+// SQL: extra_data->>'department' = :json_department
+
+// SQLite
+// SQL: json_extract(extra_data, '$.department') = :json_department
+```
 
 ## 🧩 Custom Filter Example
 
