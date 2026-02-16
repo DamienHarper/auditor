@@ -179,15 +179,6 @@ php bin/console audit:schema:update --force
 >
 > If you need to perform write operations based on audit data, defer them (e.g., using a Symfony Messenger message).
 
-### Payload Validation
-
-> [!IMPORTANT]
-> The `extra_data` key is **required** in the payload. If you have custom code that builds payloads manually via `AuditEvent::setPayload()`, you must include the `extra_data` key (set it to `null` if you don't need it):
->
-> ```php
-> $payload['extra_data'] = null; // Required, even if unused
-> $event->setPayload($payload);
-> ```
 
 ### JSON Encoding
 

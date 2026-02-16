@@ -47,7 +47,6 @@ Now only handles `__CG__` proxies. With PHP 8.4+, Doctrine ORM uses native lazy 
 
 A nullable JSON `extra_data` column has been added to audit tables. After upgrading, run `audit:schema:update --force`.
 
-**Breaking:** `isValidPayload()` now requires the `extra_data` key in payloads. Custom code using `setPayload()` must include it (`'extra_data' => null`).
 
 `LifecycleEvent` now accepts an optional `?object $entity` parameter to allow listeners to populate extra data. See [Extra Data guide](docs/extra-data.md).
 
