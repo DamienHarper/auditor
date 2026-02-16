@@ -148,6 +148,32 @@ $query->limit(100, 0);  // limit, offset
 $audits = $query->execute();
 ```
 
+### Resetting Query Parts
+
+You can reset specific parts of a query using `resetQueryPart()`:
+
+```php
+$query = $reader->createQuery(User::class);
+
+// Reset order by clauses
+$query->resetQueryPart('orderBy');
+
+// Reset limit and offset
+$query->resetQueryPart('limit');
+
+// Reset all filters
+$query->resetQueryPart('filters');
+```
+
+| Part      | Description                                  |
+|-----------|----------------------------------------------|
+| `orderBy` | Resets all ORDER BY clauses                  |
+| `limit`   | Resets LIMIT and OFFSET to 0                 |
+| `filters` | Resets all filters to empty arrays           |
+
+> [!TIP]
+> You can also use the shorthand `resetOrderBy()` method which is equivalent to `resetQueryPart('orderBy')`.
+
 ### Query Constants
 
 ```php

@@ -367,4 +367,56 @@ final class QueryTest extends TestCase
         $queryBuilder = $reflectedMethod->invokeArgs($query, []);
         $this->assertSame($expectedQuery, $queryBuilder->getSQL(), 'SQL query is OK with a range filter with max bound only.');
     }
+
+    public function testResetQueryPartOrderBy(): void
+    {
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
+        $query->addOrderBy(Query::CREATED_AT, 'DESC');
+        $query->addOrderBy(Query::ID, 'ASC');
+
+        $this->assertCount(2, $query->getOrderBy(), 'ORDER BY has 2 entries.');
+
+        $query->resetQueryPart('orderBy');
+
+        $this->assertSame([], $query->getOrderBy(), 'ORDER BY is reset.');
+    }
+
+    public function testResetQueryPartLimit(): void
+    {
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
+        $query->limit(10, 50);
+
+        $this->assertSame([10, 50], $query->getLimit(), 'LIMIT is set.');
+
+        $query->resetQueryPart('limit');
+
+        $this->assertSame([0, 0], $query->getLimit(), 'LIMIT is reset.');
+    }
+
+    public function testResetQueryPartFilters(): void
+    {
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
+        $query->addFilter(new SimpleFilter(Query::TRANSACTION_HASH, '123abc'));
+        $query->addFilter(new SimpleFilter(Query::OBJECT_ID, '456'));
+
+        $filters = $query->getFilters();
+        $this->assertCount(1, $filters[Query::TRANSACTION_HASH], 'Filter is added.');
+        $this->assertCount(1, $filters[Query::OBJECT_ID], 'Filter is added.');
+
+        $query->resetQueryPart('filters');
+
+        $filters = $query->getFilters();
+        foreach ($filters as $values) {
+            $this->assertSame([], $values, 'No filter after reset.');
+        }
+    }
+
+    public function testResetQueryPartInvalidPart(): void
+    {
+        $query = new Query('author_audit', $this->createConnection(), 'UTC');
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $query->resetQueryPart('invalid_part');
+    }
 }
