@@ -127,6 +127,7 @@ The DoctrineProvider supports the following RDBMS:
 - [Configuration Reference](configuration/index.md)
 - [DoctrineProvider](providers/doctrine/index.md)
 - [Querying Audits](querying/index.md)
+- [Extra Data](extra-data.md)
 - [API Reference](api/index.md)
 
 ## Related Projects

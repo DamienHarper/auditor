@@ -42,6 +42,7 @@ $entry = Entry::fromArray([
     'discriminator' => null,
     'transaction_hash' => 'abc123',
     'diffs' => '{"name":{"old":"John","new":"Jane"}}',
+    'extra_data' => '{"department":"IT","role":"admin"}', // or null
     'blame_id' => '42',
     'blame_user' => 'admin',
     'blame_user_fqdn' => 'App\\Entity\\User',
@@ -231,6 +232,24 @@ $diffs = $entry->getDiffs(true);
     ],
 ]
 ```
+
+### getExtraData()
+
+```php
+public function getExtraData(): ?array
+```
+
+Returns any supplementary data attached to this audit entry, or `null` if none was set.
+
+```php
+$extraData = $entry->getExtraData();
+// Returns: ['department' => 'IT', 'role' => 'admin'] or null
+
+// Also available as a virtual property
+$extraData = $entry->extraData;
+```
+
+Extra data is populated via a `LifecycleEvent` listener. See the [Extra Data guide](../extra-data.md) for setup instructions and examples.
 
 ### getUserId()
 
@@ -445,6 +464,7 @@ $json = json_encode([
     'type' => $entry->getType(),
     'object_id' => $entry->getObjectId(),
     'diffs' => $entry->getDiffs(),
+    'extra_data' => $entry->getExtraData(),
     'created_at' => $entry->getCreatedAt()?->format('c'),
     'user' => $entry->getUsername(),
 ]);
@@ -452,5 +472,6 @@ $json = json_encode([
 
 ## Next Steps
 
+- [Extra Data Guide](../extra-data.md)
 - [Querying Overview](index.md)
 - [Filters Reference](filters.md)
