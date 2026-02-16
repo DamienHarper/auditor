@@ -121,7 +121,22 @@ final class Query implements QueryInterface
 
     public function resetOrderBy(): self
     {
-        $this->orderBy = [];
+        return $this->resetQueryPart('orderBy');
+    }
+
+    public function resetQueryPart(string $part): self
+    {
+        $allowedParts = ['orderBy', 'limit', 'filters'];
+
+        if (!\in_array($part, $allowedParts, true)) {
+            throw new InvalidArgumentException(\sprintf('Invalid query part "%s", allowed parts: %s.', $part, implode(', ', $allowedParts)));
+        }
+
+        match ($part) {
+            'orderBy' => $this->orderBy = [],
+            'limit' => [$this->limit, $this->offset] = [0, 0],
+            'filters' => $this->filters = array_fill_keys($this->getSupportedFilters(), []),
+        };
 
         return $this;
     }
