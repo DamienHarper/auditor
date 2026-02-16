@@ -8,6 +8,7 @@ use DH\Auditor\Auditor;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Tests\Provider\Doctrine\Persistence\Command\UpdateSchemaCommandTest;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -19,6 +20,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @see UpdateSchemaCommandTest
  */
+#[AsCommand(
+    name: 'audit:schema:update',
+    description: 'Update audit tables structure',
+)]
 final class UpdateSchemaCommand extends Command
 {
     use LockableTrait;
@@ -35,8 +40,6 @@ final class UpdateSchemaCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Update audit tables structure')
-            ->setName('audit:schema:update')
             ->addOption('dump-sql', null, InputOption::VALUE_NONE, 'Dumps the generated SQL statements to the screen (does not execute them).')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Causes the generated SQL statements to be physically executed against your database.')
         ;

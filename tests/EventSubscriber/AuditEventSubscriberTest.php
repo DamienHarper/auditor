@@ -40,11 +40,11 @@ final class AuditEventSubscriberTest extends TestCase
         $auditor = $this->createAuditor();
         $dispatcher = $auditor->getEventDispatcher();
         $subscriber = new AuditEventSubscriber($auditor);
-        $dispatcher->addSubscriber($subscriber);
+        $dispatcher->addListener(LifecycleEvent::class, $subscriber, -1_000_000);
 
-        $dispatcher->dispatch(new LifecycleEvent($payload));
+        $event = $dispatcher->dispatch(new LifecycleEvent($payload));
 
-        $this->assertArrayHasKey(LifecycleEvent::class, AuditEventSubscriber::getSubscribedEvents());
+        $this->assertInstanceOf(LifecycleEvent::class, $event);
     }
 
     public function testCustomAuditEventSubscriber(): void
@@ -69,13 +69,14 @@ final class AuditEventSubscriberTest extends TestCase
         $dispatcher = $auditor->getEventDispatcher();
 
         $subscriber = new AuditEventSubscriber($auditor);
-        $dispatcher->addSubscriber($subscriber);
+        $dispatcher->addListener(LifecycleEvent::class, $subscriber, -1_000_000);
 
-        $subscriber = new CustomAuditEventSubscriber($auditor);
-        $dispatcher->addSubscriber($subscriber);
+        $customSubscriber = new CustomAuditEventSubscriber();
+        $dispatcher->addListener(LifecycleEvent::class, $customSubscriber);
 
-        $dispatcher->dispatch(new LifecycleEvent($payload));
+        $event = $dispatcher->dispatch(new LifecycleEvent($payload));
 
-        $this->assertArrayHasKey(LifecycleEvent::class, CustomAuditEventSubscriber::getSubscribedEvents());
+        // CustomAuditEventSubscriber modifie le payload pour mettre sa propre classe
+        $this->assertSame(CustomAuditEventSubscriber::class, $event->getPayload()['entity']);
     }
 }

@@ -16,31 +16,6 @@ use DH\Auditor\Tests\Model\TransactionTest;
  */
 class Transaction implements TransactionInterface
 {
-    /**
-     * @var string
-     */
-    public const INSERT = 'insert';
-
-    /**
-     * @var string
-     */
-    public const UPDATE = 'update';
-
-    /**
-     * @var string
-     */
-    public const REMOVE = 'remove';
-
-    /**
-     * @var string
-     */
-    public const ASSOCIATE = 'associate';
-
-    /**
-     * @var string
-     */
-    public const DISSOCIATE = 'dissociate';
-
     private ?string $transaction_hash = null;
 
     /**

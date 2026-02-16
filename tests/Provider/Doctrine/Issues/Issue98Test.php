@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Issues;
 
-use DH\Auditor\Model\Transaction;
+use DH\Auditor\Model\TransactionType;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Provider\Doctrine\Service\StorageService;
@@ -36,7 +36,7 @@ final class Issue98Test extends TestCase
 
         $audits = $reader->createQuery(Issue98::class)->execute();
         $this->assertCount(1, $audits, 'results count ok.');
-        $this->assertSame(Transaction::INSERT, $audits[0]->getType(), 'Reader::INSERT operation.');
+        $this->assertSame(TransactionType::INSERT, $audits[0]->type, 'Reader::INSERT operation.');
     }
 
     private function createAndInitDoctrineProvider(): void
@@ -45,7 +45,7 @@ final class Issue98Test extends TestCase
         $this->provider = new DoctrineProvider($this->createProviderConfiguration());
 
         $entityManager = $this->createEntityManager([
-            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/../Fixtures/Issue98',
         ]);
         $this->provider->registerStorageService(new StorageService('default', $entityManager));

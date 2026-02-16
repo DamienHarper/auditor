@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor;
 
+use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\EventSubscriber\AuditEventSubscriber;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Exception\ProviderException;
@@ -35,8 +36,8 @@ final class Auditor
      */
     public function __construct(private readonly Configuration $configuration, private readonly EventDispatcherInterface $dispatcher)
     {
-        // Attach persistence event subscriber to provided dispatcher
-        $this->dispatcher->addSubscriber(new AuditEventSubscriber($this));
+        // Attach persistence event listener to provided dispatcher
+        $this->dispatcher->addListener(LifecycleEvent::class, new AuditEventSubscriber($this), -1_000_000);
     }
 
     public function getEventDispatcher(): EventDispatcherInterface

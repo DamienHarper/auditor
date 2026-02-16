@@ -86,8 +86,8 @@ use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Ignore;
 ```php
 <?php
 
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Auditable;
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Ignore;
+use DH\Auditor\Provider\Doctrine\Auditing\Attribute\Auditable;
+use DH\Auditor\Provider\Doctrine\Auditing\Attribute\Ignore;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -177,7 +177,7 @@ Defines which roles are allowed to view audits for an entity.
 ### Namespace
 
 ```php
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
+use DH\Auditor\Provider\Doctrine\Auditing\Attribute\Security;
 ```
 
 ### Usage
@@ -185,8 +185,8 @@ use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
 ```php
 <?php
 
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Auditable;
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
+use DH\Auditor\Provider\Doctrine\Auditing\Attribute\Auditable;
+use DH\Auditor\Provider\Doctrine\Auditing\Attribute\Security;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -262,9 +262,9 @@ $configuration->setRoleChecker(function (string $entity, string $scope) use ($se
 
 namespace App\Entity;
 
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Auditable;
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Ignore;
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
+use DH\Auditor\Provider\Doctrine\Auditing\Attribute\Auditable;
+use DH\Auditor\Provider\Doctrine\Auditing\Attribute\Ignore;
+use DH\Auditor\Provider\Doctrine\Auditing\Attribute\Security;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;

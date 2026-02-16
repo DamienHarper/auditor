@@ -54,7 +54,7 @@ final class Issue101Test extends TestCase
 
         $entityManager = $this->createEntityManager(
             [
-                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+                __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Attribute',
                 __DIR__.'/../Fixtures/Issue101',
             ],
             'default'

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Issue101;
 
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation as Audit;
+use DH\Auditor\Provider\Doctrine\Auditing\Attribute as Audit;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

@@ -17,7 +17,7 @@ trait EntityManagerInterfaceTrait
     use ConnectionTrait;
 
     private array $fixturesPath = [
-        __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+        __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Attribute',
         __DIR__.'/../Fixtures',
     ];
 

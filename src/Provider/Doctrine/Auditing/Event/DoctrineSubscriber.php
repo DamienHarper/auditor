@@ -8,16 +8,12 @@ use DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware\AuditorDriver;
 use DH\Auditor\Provider\Doctrine\Auditing\Transaction\AuditTrait;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Model\Transaction;
-use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
-use Gedmo\SoftDeleteable\SoftDeleteableListener;
 
-final class DoctrineSubscriber implements EventSubscriber
+final class DoctrineSubscriber
 {
     use AuditTrait;
 
@@ -35,18 +31,14 @@ final class DoctrineSubscriber implements EventSubscriber
      *
      * @see https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/events.html#onflush
      */
-    public function onFlush(OnFlushEventArgs $args): void
+    public function onFlush(): void
     {
         $entityManagerId = spl_object_id($this->entityManager);
-
         // cached transaction model, if it holds same EM no need to create a new one
         $transaction = ($this->transactions[$entityManagerId] ??= new Transaction($this->entityManager));
-
         // Populate transaction
         $this->provider->getTransactionManager()->populate($transaction);
-
         $driver = $this->entityManager->getConnection()->getDriver();
-
         if (!$driver instanceof AuditorDriver) {
             $driver = $this->getWrappedDriver($driver);
         }
@@ -72,13 +64,6 @@ final class DoctrineSubscriber implements EventSubscriber
                 $this->id($this->entityManager, $args->getObject()),
             );
         }
-    }
-
-    public function getSubscribedEvents(): array
-    {
-        return class_exists(SoftDeleteableListener::class)
-            ? [Events::onFlush, SoftDeleteableListener::POST_SOFT_DELETE]
-            : [Events::onFlush];
     }
 
     /**

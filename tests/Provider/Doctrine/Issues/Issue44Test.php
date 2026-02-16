@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Issues;
 
-use DH\Auditor\Model\Transaction;
+use DH\Auditor\Model\TransactionType;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\DummyEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ReaderTrait;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\Schema\SchemaSetupTrait;
@@ -36,7 +36,7 @@ final class Issue44Test extends TestCase
 
         $audits = $reader->createQuery(DummyEntity::class)->execute();
         $this->assertCount(1, $audits, 'results count ok.');
-        $this->assertSame(Transaction::INSERT, $audits[0]->getType(), 'Reader::INSERT operation.');
+        $this->assertSame(TransactionType::INSERT, $audits[0]->type, 'Reader::INSERT operation.');
     }
 
     private function configureEntities(): void

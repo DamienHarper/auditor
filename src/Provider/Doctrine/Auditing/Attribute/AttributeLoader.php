@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace DH\Auditor\Provider\Doctrine\Auditing\Annotation;
+namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
 
-use DH\Auditor\Tests\Provider\Doctrine\Auditing\Annotation\AnnotationLoaderTest;
+use DH\Auditor\Tests\Provider\Doctrine\Auditing\Attribute\AttributeLoaderTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 
 /**
- * @see AnnotationLoaderTest
+ * @see AttributeLoaderTest
  */
-final readonly class AnnotationLoader
+final readonly class AttributeLoader
 {
     public function __construct(private EntityManagerInterface $entityManager) {}
 
@@ -33,45 +33,45 @@ final readonly class AnnotationLoader
 
     private function getEntityConfiguration(ClassMetadata $metadata): ?array
     {
-        $annotation = null;
-        $auditableAnnotation = null;
-        $securityAnnotation = null;
+        $entityAttribute = null;
+        $auditableAttribute = null;
+        $securityAttribute = null;
         $reflection = $metadata->getReflectionClass();
 
-        // Check that we have an Entity annotation or attribute
+        // Check that we have an Entity attribute
         $attributes = $reflection->getAttributes(Entity::class);
         if ([] !== $attributes) {
-            $annotation = $attributes[0]->newInstance();
+            $entityAttribute = $attributes[0]->newInstance();
         }
 
-        if (!$annotation instanceof Entity) {
+        if (!$entityAttribute instanceof Entity) {
             return null;
         }
 
-        // Check that we have an Auditable annotation or attribute
+        // Check that we have an Auditable attribute
         $attributes = $reflection->getAttributes(Auditable::class);
         if ([] !== $attributes) {
-            $auditableAnnotation = $attributes[0]->newInstance();
+            $auditableAttribute = $attributes[0]->newInstance();
         }
 
-        if (!$auditableAnnotation instanceof Auditable) {
+        if (!$auditableAttribute instanceof Auditable) {
             return null;
         }
 
-        // Check that we have a Security annotation or attribute
+        // Check that we have a Security attribute
         $attributes = $reflection->getAttributes(Security::class);
         if ([] !== $attributes) {
-            $securityAnnotation = $attributes[0]->newInstance();
+            $securityAttribute = $attributes[0]->newInstance();
         }
 
-        $roles = $securityAnnotation instanceof Security ? [Security::VIEW_SCOPE => $securityAnnotation->view] : null;
+        $roles = $securityAttribute instanceof Security ? [Security::VIEW_SCOPE => $securityAttribute->view] : null;
 
-        // Are there any Ignore annotation or attribute?
+        // Are there any Ignore attributes?
         $ignoredColumns = $this->getAllProperties($reflection);
 
         return [
             'ignored_columns' => $ignoredColumns,
-            'enabled' => $auditableAnnotation->enabled,
+            'enabled' => $auditableAttribute->enabled,
             'roles' => $roles,
         ];
     }
@@ -81,13 +81,13 @@ final readonly class AnnotationLoader
         $properties = [];
 
         foreach ($reflection->getProperties() as $property) {
-            $annotationProperty = null;
+            $ignoreAttribute = null;
             $attributes = $property->getAttributes(Ignore::class);
             if (\is_array($attributes) && [] !== $attributes) {
-                $annotationProperty = $attributes[0]->newInstance();
+                $ignoreAttribute = $attributes[0]->newInstance();
             }
 
-            if ($annotationProperty instanceof Ignore) {
+            if ($ignoreAttribute instanceof Ignore) {
                 $properties[] = $property->getName();
             }
         }

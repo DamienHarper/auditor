@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DH\Auditor\Provider\Doctrine\Auditing\Annotation;
+namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
 
 use Symfony\Contracts\Service\Attribute\Required;
 

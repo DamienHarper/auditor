@@ -20,7 +20,7 @@ final class ConfigurationTest extends TestCase
     {
         $configuration = $this->createAuditorConfiguration();
 
-        $this->assertTrue($configuration->isEnabled(), 'Auditor is enabled by default.');
+        $this->assertTrue($configuration->enabled, 'Auditor is enabled by default.');
     }
 
     public function testDisable(): void
@@ -28,7 +28,7 @@ final class ConfigurationTest extends TestCase
         $configuration = $this->createAuditorConfiguration();
         $configuration->disable();
 
-        $this->assertFalse($configuration->isEnabled(), 'Auditor is disabled.');
+        $this->assertFalse($configuration->enabled, 'Auditor is disabled.');
     }
 
     public function testEnable(): void
@@ -37,14 +37,14 @@ final class ConfigurationTest extends TestCase
         $configuration->disable();
         $configuration->enable();
 
-        $this->assertTrue($configuration->isEnabled(), 'Auditor is enabled.');
+        $this->assertTrue($configuration->enabled, 'Auditor is enabled.');
     }
 
     public function testDefaultTimezoneIsUTC(): void
     {
         $configuration = $this->createAuditorConfiguration();
 
-        $this->assertSame('UTC', $configuration->getTimezone(), 'Default timezone is UTC.');
+        $this->assertSame('UTC', $configuration->timezone, 'Default timezone is UTC.');
     }
 
     public function testCustomTimezone(): void
@@ -53,6 +53,6 @@ final class ConfigurationTest extends TestCase
             'timezone' => 'Europe/Paris',
         ]);
 
-        $this->assertSame('Europe/Paris', $configuration->getTimezone(), 'Custom timezone is "Europe/Paris".');
+        $this->assertSame('Europe/Paris', $configuration->timezone, 'Custom timezone is "Europe/Paris".');
     }
 }

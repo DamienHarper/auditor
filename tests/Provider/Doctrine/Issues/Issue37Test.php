@@ -50,8 +50,8 @@ final class Issue37Test extends TestCase
 
         $audits = $reader->createQuery(Locale::class)->execute();
         $this->assertCount(2, $audits, 'results count ok.');
-        $this->assertSame('en_US', $audits[0]->getObjectId(), 'Entry::object_id is a string.');
-        $this->assertSame('fr_FR', $audits[1]->getObjectId(), 'Entry::object_id is a string.');
+        $this->assertSame('en_US', $audits[0]->objectId, 'Entry::object_id is a string.');
+        $this->assertSame('fr_FR', $audits[1]->objectId, 'Entry::object_id is a string.');
 
         $user1 = new User();
         $user1
@@ -79,7 +79,7 @@ final class Issue37Test extends TestCase
         $this->provider = new DoctrineProvider($this->createProviderConfiguration());
 
         $entityManager = $this->createEntityManager([
-            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/../Fixtures/Issue37',
         ]);
         $this->provider->registerStorageService(new StorageService('default', $entityManager));

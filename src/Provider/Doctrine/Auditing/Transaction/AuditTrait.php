@@ -286,8 +286,8 @@ trait AuditTrait
         $userProvider = $this->provider->getAuditor()->getConfiguration()->getUserProvider();
         $user = null === $userProvider ? null : $userProvider();
         if ($user instanceof UserInterface) {
-            $user_id = $user->getIdentifier();
-            $username = $user->getUsername();
+            $user_id = $user->identifier;
+            $username = $user->username;
             $user_fqdn = DoctrineHelper::getRealClassName($user);
         }
 

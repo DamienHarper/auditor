@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine;
 
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
+use DH\Auditor\Provider\Doctrine\Auditing\Attribute\Security;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation\AuditableButUnauditedEntity;
-use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Annotation\AuditedEntity;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Attribute\AuditableButUnauditedEntity;
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Attribute\AuditedEntity;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Comment;
 use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog\Post;
 use DH\Auditor\Tests\Provider\Doctrine\Traits\ProviderConfigurationTrait;

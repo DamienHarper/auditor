@@ -41,7 +41,7 @@ final class Configuration implements ConfigurationInterface
      */
     private $storageMapper;
 
-    private array $annotationLoaded = [];
+    private array $attributeLoaded = [];
 
     public function __construct(array $options)
     {
@@ -96,7 +96,7 @@ final class Configuration implements ConfigurationInterface
      * Set the value of entities.
      *
      * This method completely overrides entities configuration
-     * including annotation configuration
+     * including attribute configuration
      *
      * @param array<int|string, mixed> $entities
      */
@@ -196,10 +196,10 @@ final class Configuration implements ConfigurationInterface
                 $entityManager = $auditingService->getEntityManager();
                 $platform = $entityManager->getConnection()->getDatabasePlatform();
 
-                // do not load annotations if they're already loaded
-                if (!isset($this->annotationLoaded[$auditingService->getName()]) || !$this->annotationLoaded[$auditingService->getName()]) {
-                    $this->provider->loadAnnotations($entityManager, $this->entities ?? []);
-                    $this->annotationLoaded[$auditingService->getName()] = true;
+                // do not load attributes if they're already loaded
+                if (!isset($this->attributeLoaded[$auditingService->getName()]) || !$this->attributeLoaded[$auditingService->getName()]) {
+                    $this->provider->loadAttributes($entityManager, $this->entities ?? []);
+                    $this->attributeLoaded[$auditingService->getName()] = true;
                 }
 
                 \assert(null !== $this->entities);

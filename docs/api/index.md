@@ -343,7 +343,7 @@ class User implements UserInterface
 ### Auditable
 
 ```php
-namespace DH\Auditor\Provider\Doctrine\Auditing\Annotation;
+namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class Auditable
@@ -355,7 +355,7 @@ final class Auditable
 ### Ignore
 
 ```php
-namespace DH\Auditor\Provider\Doctrine\Auditing\Annotation;
+namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class Ignore {}
@@ -364,7 +364,7 @@ final class Ignore {}
 ### Security
 
 ```php
-namespace DH\Auditor\Provider\Doctrine\Auditing\Annotation;
+namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class Security

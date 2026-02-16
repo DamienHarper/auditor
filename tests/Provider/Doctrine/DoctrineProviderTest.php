@@ -6,7 +6,7 @@ namespace DH\Auditor\Tests\Provider\Doctrine;
 
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Exception\ProviderException;
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\AnnotationLoader;
+use DH\Auditor\Provider\Doctrine\Auditing\Attribute\AttributeLoader;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
@@ -105,7 +105,7 @@ final class DoctrineProviderTest extends TestCase
         $this->assertCount(0, $provider->getStorageServices(), 'There is no storage entity manager registered.');
 
         $provider->registerAuditingService(new AuditingService('auditingEM', $this->createEntityManager([
-            __DIR__.'/../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/Fixtures/Entity/Standard/Blog',
         ])));
 
@@ -113,7 +113,7 @@ final class DoctrineProviderTest extends TestCase
         $this->assertCount(0, $provider->getStorageServices(), 'There is no storage entity manager registered.');
 
         $provider->registerStorageService(new StorageService('storageEM', $this->createEntityManager([
-            __DIR__.'/../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/Fixtures/Entity/Standard/Blog',
         ])));
 
@@ -413,13 +413,13 @@ final class DoctrineProviderTest extends TestCase
     {
         $entityManager = $this->createEntityManager(
             [
-                __DIR__.'/../../../src/Provider/Doctrine/Auditing/Annotation',
+                __DIR__.'/../../../src/Provider/Doctrine/Auditing/Attribute',
                 __DIR__.'/Fixtures/Entity/Attribute',
             ],
             'default'
         );
-        $annotationLoader = new AnnotationLoader($entityManager);
-        $loaded = $annotationLoader->load();
+        $attributeLoader = new AttributeLoader($entityManager);
+        $loaded = $attributeLoader->load();
         $this->assertCount(2, $loaded);
 
         $auditor = $this->createAuditor();

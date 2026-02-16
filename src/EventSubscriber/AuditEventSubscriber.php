@@ -7,25 +7,17 @@ namespace DH\Auditor\EventSubscriber;
 use DH\Auditor\Auditor;
 use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\Tests\EventSubscriber\AuditEventSubscriberTest;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 /**
  * @see AuditEventSubscriberTest
  */
-final readonly class AuditEventSubscriber implements EventSubscriberInterface
+#[AsEventListener(event: LifecycleEvent::class, priority: -1_000_000)]
+final readonly class AuditEventSubscriber
 {
     public function __construct(private Auditor $auditor) {}
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LifecycleEvent::class => [
-                ['onAuditEvent', -1_000_000],  // should be fired last
-            ],
-        ];
-    }
-
-    public function onAuditEvent(LifecycleEvent $event): LifecycleEvent
+    public function __invoke(LifecycleEvent $event): LifecycleEvent
     {
         foreach ($this->auditor->getProviders() as $provider) {
             if ($provider->supportsStorage()) {

@@ -68,7 +68,7 @@ final class Issue115Test extends TestCase
         $this->provider = new DoctrineProvider($this->createProviderConfiguration());
 
         $entityManager = $this->createEntityManager([
-            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Annotation',
+            __DIR__.'/../../../../src/Provider/Doctrine/Auditing/Attribute',
             __DIR__.'/../Fixtures/Issue115',
         ]);
         $this->provider->registerStorageService(new StorageService('default', $entityManager));
