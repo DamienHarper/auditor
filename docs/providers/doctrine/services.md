@@ -1,26 +1,27 @@
 # Auditing and Storage Services
 
+> **Understand how DoctrineProvider detects and persists audit logs**
+
 The DoctrineProvider uses two types of services: **Auditing Services** for detecting changes and **Storage Services** for persisting audit logs.
 
-## Overview
+## 🔍 Overview
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    DoctrineProvider                         │
-├──────────────────────────┬──────────────────────────────────┤
-│   Auditing Service(s)    │     Storage Service(s)          │
-│   ┌──────────────────┐   │   ┌──────────────────┐          │
-│   │ EntityManager A  │   │   │ EntityManager X  │          │
-│   │ (App entities)   │   │   │ (Audit DB)       │          │
-│   └──────────────────┘   │   └──────────────────┘          │
-│   ┌──────────────────┐   │   ┌──────────────────┐          │
-│   │ EntityManager B  │   │   │ EntityManager Y  │          │
-│   │ (More entities)  │   │   │ (Another DB)     │          │
-│   └──────────────────┘   │   └──────────────────┘          │
-└──────────────────────────┴──────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph DoctrineProvider
+        subgraph "Auditing Services"
+            AS1["EntityManager A<br>(App entities)"]
+            AS2["EntityManager B<br>(More entities)"]
+        end
+        
+        subgraph "Storage Services"
+            SS1["EntityManager X<br>(Audit DB)"]
+            SS2["EntityManager Y<br>(Another DB)"]
+        end
+    end
 ```
 
-## Auditing Service
+## 📝 Auditing Service
 
 The `AuditingService` wraps a Doctrine EntityManager and is responsible for:
 
@@ -47,7 +48,7 @@ $auditingService = new AuditingService(
 $provider->registerAuditingService($auditingService);
 ```
 
-## Storage Service
+## 💾 Storage Service
 
 The `StorageService` wraps a Doctrine EntityManager and is responsible for:
 
@@ -73,7 +74,7 @@ $storageService = new StorageService(
 $provider->registerStorageService($storageService);
 ```
 
-## Common Setup: Single Database
+## 🏠 Common Setup: Single Database
 
 Most applications store audits in the same database as the entities:
 
@@ -95,9 +96,10 @@ $provider->registerAuditingService(new AuditingService('default', $entityManager
 $provider->registerStorageService(new StorageService('default', $entityManager));
 ```
 
-## Multi-Database Setup
+## 🗄️ Multi-Database Setup
 
-For performance or compliance reasons, you might want to store audits in a separate database.
+> [!TIP]
+> For performance or compliance reasons, you might want to store audits in a separate database.
 
 ### Separate Audit Database
 
@@ -154,7 +156,7 @@ $provider->registerStorageService(new StorageService('finance_audit', $financeAu
 
 See [Multi-Database Configuration](multi-database.md) for more details.
 
-## Getting Services from Provider
+## 🔍 Getting Services from Provider
 
 ### Get All Auditing Services
 
@@ -180,9 +182,12 @@ $auditingService = $provider->getAuditingServiceForEntity(User::class);
 $storageService = $provider->getStorageServiceForEntity(User::class);
 ```
 
-## Service Names
+## 📛 Service Names
 
-Service names must be unique within their type (auditing or storage). They're used for:
+> [!IMPORTANT]
+> Service names must be unique within their type (auditing or storage).
+
+They're used for:
 
 - Identifying services in logs and debugging
 - Mapping entities to storage services
@@ -198,7 +203,7 @@ new AuditingService('legacy_crm', $crmEm);
 new StorageService('primary_audit_storage', $auditEm);
 ```
 
-## Base Service Class
+## 📦 Base Service Class
 
 Both `AuditingService` and `StorageService` extend `DoctrineService`:
 
@@ -213,9 +218,12 @@ abstract class DoctrineService extends AbstractService
 }
 ```
 
-## Error Handling
+## ⚠️ Error Handling
 
 ### Duplicate Service Names
+
+> [!WARNING]
+> Registering services with the same name will throw an exception.
 
 ```php
 $provider->registerAuditingService(new AuditingService('default', $em1));
@@ -224,6 +232,9 @@ $provider->registerAuditingService(new AuditingService('default', $em2));
 ```
 
 ### Missing Storage Mapper
+
+> [!CAUTION]
+> If you have multiple storage services but no mapper, an exception will be thrown when storing an audit.
 
 ```php
 // If you have multiple storage services but no mapper
@@ -235,7 +246,7 @@ $provider->registerStorageService(new StorageService('storage2', $em2));
 // Throws: ProviderException - 'You must provide a mapper callback to map audits to storage.'
 ```
 
-## Best Practices
+## ✅ Best Practices
 
 1. **Use descriptive service names** - Makes debugging easier
 2. **Keep it simple when possible** - Single database is often sufficient
@@ -243,8 +254,10 @@ $provider->registerStorageService(new StorageService('storage2', $em2));
 4. **Test your multi-database setup** - Ensure transactions work correctly
 5. **Document your architecture** - Especially with multiple services
 
+---
+
 ## Next Steps
 
-- [Multi-Database Configuration](multi-database.md)
-- [Schema Management](schema.md)
-- [Querying Audits](../../querying/index.md)
+- 🗄️ [Multi-Database Configuration](multi-database.md)
+- 🛠️ [Schema Management](schema.md)
+- 🔍 [Querying Audits](../../querying/index.md)

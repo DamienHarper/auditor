@@ -1,8 +1,10 @@
 # Installation
 
+> **Install auditor using Composer**
+
 This guide covers the installation of the auditor library using Composer.
 
-## Requirements
+## 📋 Requirements
 
 ### Version 4.x (Current)
 
@@ -21,7 +23,7 @@ This guide covers the installation of the auditor library using Composer.
 | 2.x     | >= 7.4  | >= 4.4    | -             | -            |
 | 1.x     | >= 7.2  | >= 3.4    | -             | -            |
 
-## Install via Composer
+## 📦 Install via Composer
 
 Open a terminal in your project directory and run:
 
@@ -43,28 +45,29 @@ composer require damienharper/auditor:^4.0
 composer require damienharper/auditor:^3.0
 ```
 
-## Symfony Integration
+## 🎵 Symfony Integration
 
 For Symfony applications, we recommend using the **auditor-bundle** which provides:
 
-- Automatic service configuration
-- Web interface for browsing audits
-- Console commands
-- Twig extensions
+- ✅ Automatic service configuration
+- ✅ Web interface for browsing audits
+- ✅ Console commands
+- ✅ Twig extensions
 
 ```bash
 composer require damienharper/auditor-bundle
 ```
 
-See the [auditor-bundle documentation](https://github.com/DamienHarper/auditor-bundle) for more details.
+> [!TIP]
+> See the [auditor-bundle documentation](https://github.com/DamienHarper/auditor-bundle) for more details.
 
-## Standalone Usage
+## 🔧 Standalone Usage
 
 The library can be used without Symfony. You'll need to manually configure the Auditor and register providers.
 
 See the [Quick Start Guide](quick-start.md) for a complete setup example.
 
-## Dependencies
+## 📚 Dependencies
 
 The library automatically installs the following dependencies:
 
@@ -77,8 +80,10 @@ The library automatically installs the following dependencies:
 | `symfony/cache`              | Metadata caching               |
 | `symfony/lock`               | Command locking                |
 
+---
+
 ## Next Steps
 
-- [Quick Start Guide](quick-start.md) - Set up auditing in your project
-- [Configuration](../configuration/index.md) - Configure auditor for your needs
-- [DoctrineProvider](../providers/doctrine/index.md) - Learn about the Doctrine provider
+- 🚀 [Quick Start Guide](quick-start.md) - Set up auditing in your project
+- ⚙️ [Configuration](../configuration/index.md) - Configure auditor for your needs
+- 🗄️ [DoctrineProvider](../providers/doctrine/index.md) - Learn about the Doctrine provider

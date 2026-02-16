@@ -1,8 +1,10 @@
 # Configuration Reference
 
+> **All configuration options available in auditor**
+
 This section covers all configuration options available in auditor.
 
-## Auditor Configuration
+## ⚙️ Auditor Configuration
 
 The main `Configuration` class accepts the following options:
 
@@ -30,7 +32,7 @@ $configuration = new Configuration([
 | `security_provider` | `callable\|null`  | `null`  | Callback that returns security context info         |
 | `role_checker`      | `callable\|null`  | `null`  | Callback that checks if user can view entity audits |
 
-## Configuration Methods
+## 🔧 Configuration Methods
 
 ### Enable/Disable Auditing
 
@@ -53,7 +55,7 @@ if ($configuration->isEnabled()) {
 $timezone = $configuration->getTimezone();
 ```
 
-## User Provider
+## 👤 User Provider
 
 The user provider is a callable that returns information about the current user. This is used to record who made each change.
 
@@ -89,7 +91,7 @@ interface UserInterface
 
 See [User Provider Configuration](user-provider.md) for more details.
 
-## Security Provider
+## 🔐 Security Provider
 
 The security provider returns contextual security information to be stored with audit entries:
 
@@ -105,7 +107,7 @@ $configuration->setSecurityProvider(function (): array {
 
 See [Security Provider Configuration](security-provider.md) for more details.
 
-## Role Checker
+## 🛡️ Role Checker
 
 The role checker determines whether a user can view audits for a specific entity:
 
@@ -126,11 +128,11 @@ $configuration->setRoleChecker(function (string $entity, string $scope): bool {
 
 See [Role Checker Configuration](role-checker.md) for more details.
 
-## DoctrineProvider Configuration
+## 🗄️ DoctrineProvider Configuration
 
 The DoctrineProvider has its own configuration. See [DoctrineProvider Configuration](../providers/doctrine/configuration.md) for details.
 
-## Configuration Summary
+## 📝 Configuration Summary
 
 ```php
 <?php
@@ -169,9 +171,11 @@ $configuration->setRoleChecker(function (string $entity, string $scope): bool {
 $auditor = new Auditor($configuration, new EventDispatcher());
 ```
 
+---
+
 ## Next Steps
 
-- [User Provider Configuration](user-provider.md)
-- [Security Provider Configuration](security-provider.md)
-- [Role Checker Configuration](role-checker.md)
-- [DoctrineProvider Configuration](../providers/doctrine/configuration.md)
+- 👤 [User Provider Configuration](user-provider.md)
+- 🔐 [Security Provider Configuration](security-provider.md)
+- 🛡️ [Role Checker Configuration](role-checker.md)
+- 🗄️ [DoctrineProvider Configuration](../providers/doctrine/configuration.md)

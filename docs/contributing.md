@@ -1,8 +1,8 @@
 # Contributing
 
-Thank you for your interest in contributing to auditor!
+> **Thank you for your interest in contributing to auditor!**
 
-## Ways to Contribute
+## 🤝 Ways to Contribute
 
 - 🐛 **Report bugs** - Submit issues on GitHub
 - 💡 **Suggest features** - Open a discussion or issue
@@ -10,11 +10,11 @@ Thank you for your interest in contributing to auditor!
 - 🔧 **Submit code** - Fix bugs or implement new features
 - ⭐ **Star the project** - Show your support
 
-## Code Contributions
+## 💻 Code Contributions
 
 All code contributions are made via **Pull Requests (PR)**. Direct commits to the `master` branch are not allowed.
 
-### Development Setup
+### 🚀 Development Setup
 
 1. Fork the repository on GitHub
 2. Clone your fork locally:
@@ -36,7 +36,7 @@ composer install
 git checkout -b feature/my-new-feature
 ```
 
-### Running Tests
+### 🧪 Running Tests
 
 #### Quick Tests (Local PHP)
 
@@ -51,9 +51,12 @@ composer test:coverage
 composer testdox
 ```
 
-#### Testing with Docker (Recommended)
+#### 🐳 Testing with Docker (Recommended)
 
-The project includes a `Makefile` that allows you to test against different combinations of PHP versions, Symfony versions, and databases using Docker containers. This ensures your code works across all supported environments.
+The project includes a `Makefile` that allows you to test against different combinations of PHP versions, Symfony versions, and databases using Docker containers.
+
+> [!TIP]
+> This ensures your code works across all supported environments before submitting a PR.
 
 **Prerequisites:**
 - Docker
@@ -118,7 +121,8 @@ make tests args='--coverage-html=coverage'
 
 **Testing the Full Matrix:**
 
-Before submitting a pull request, it's recommended to test against multiple database types:
+> [!IMPORTANT]
+> Before submitting a pull request, it's recommended to test against multiple database types.
 
 ```bash
 # Test all databases with PHP 8.4
@@ -141,7 +145,7 @@ tools/docker/
 └── Dockerfile            # PHP CLI image
 ```
 
-### Code Quality
+### 🧹 Code Quality
 
 Before submitting, ensure your code passes all quality checks.
 
@@ -175,7 +179,7 @@ make phpstan args='analyse src --level=9'
 make cs-fix args='fix --dry-run'
 ```
 
-### Commit Messages
+### 📝 Commit Messages
 
 Write clear, concise commit messages:
 
@@ -189,7 +193,7 @@ Good examples:
 - `Fix Reader pagination when page_size is null`
 - `Update documentation for v4 migration`
 
-### Pull Request Process
+### 🔄 Pull Request Process
 
 1. Ensure all tests pass (ideally on multiple databases)
 2. Run code quality tools (`make cs-fix`, `make phpstan`)
@@ -198,7 +202,7 @@ Good examples:
 5. Submit the pull request
 6. Respond to review feedback
 
-### Continuous Integration (CI)
+### 🤖 Continuous Integration (CI)
 
 When you submit a Pull Request, GitHub Actions will automatically run:
 
@@ -210,11 +214,13 @@ When you submit a Pull Request, GitHub Actions will automatically run:
 - **PHPStan** for static analysis
 - **Code coverage** report
 
-Your PR must pass all CI checks before it can be merged. If a check fails, review the logs to identify and fix the issue.
+> [!WARNING]
+> Your PR must pass all CI checks before it can be merged. If a check fails, review the logs to identify and fix the issue.
 
-> **Tip:** Run `make tests db=mysql` and `make tests db=pgsql` locally before pushing to catch database-specific issues early.
+> [!TIP]
+> Run `make tests db=mysql` and `make tests db=pgsql` locally before pushing to catch database-specific issues early.
 
-### Writing Tests
+### ✏️ Writing Tests
 
 Tests are **highly encouraged** and often required for new features or bug fixes:
 
@@ -258,7 +264,7 @@ make tests args='--filter=MyFeatureTest'
 composer test:coverage
 ```
 
-## Reporting Bugs
+## 🐛 Reporting Bugs
 
 When reporting bugs, please include:
 
@@ -271,7 +277,7 @@ When reporting bugs, please include:
 7. **Actual behavior** - What actually happens
 8. **Error messages** - Full stack trace if available
 
-## Feature Requests
+## 💡 Feature Requests
 
 For feature requests:
 
@@ -280,7 +286,7 @@ For feature requests:
 3. Explain why existing features don't meet your needs
 4. Suggest a possible implementation if you have ideas
 
-## Documentation Contributions
+## 📖 Documentation Contributions
 
 Documentation lives in the `docs/` directory and uses Markdown.
 
@@ -299,19 +305,19 @@ Documentation lives in the `docs/` directory and uses Markdown.
 - Use tables for structured data
 - Test all code examples
 
-## Code of Conduct
+## 💬 Code of Conduct
 
 - Be respectful and inclusive
 - Welcome newcomers
 - Provide constructive feedback
 - Focus on what is best for the community
 
-## Questions?
+## ❓ Questions?
 
 - Open a [GitHub Discussion](https://github.com/DamienHarper/auditor/discussions)
 - Check existing issues and discussions first
 - Be patient - maintainers are volunteers
 
-## License
+## 📜 License
 
 By contributing, you agree that your contributions will be licensed under the MIT License.

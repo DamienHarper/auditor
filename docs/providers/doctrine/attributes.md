@@ -1,8 +1,10 @@
 # Attributes Reference
 
+> **Configure entity auditing with PHP 8 attributes**
+
 Auditor uses PHP 8 attributes to configure entity auditing. This page documents all available attributes.
 
-## Overview
+## 📋 Overview
 
 | Attribute       | Target   | Description                               |
 |-----------------|----------|-------------------------------------------|
@@ -10,7 +12,7 @@ Auditor uses PHP 8 attributes to configure entity auditing. This page documents 
 | `#[Ignore]`     | Property | Excludes a property from auditing         |
 | `#[Security]`   | Class    | Defines who can view entity audits        |
 
-## #[Auditable]
+## 📝 #[Auditable]
 
 Marks a Doctrine entity as auditable.
 
@@ -71,7 +73,7 @@ $configuration->disableAuditFor(Post::class);
 $configuration->enableAuditFor(Post::class);
 ```
 
-## #[Ignore]
+## 🚫 #[Ignore]
 
 Excludes a property from being tracked in audits.
 
@@ -170,7 +172,7 @@ class Post extends BaseEntity
 }
 ```
 
-## #[Security]
+## 🔐 #[Security]
 
 Defines which roles are allowed to view audits for an entity.
 
@@ -255,7 +257,7 @@ $configuration->setRoleChecker(function (string $entity, string $scope) use ($se
 });
 ```
 
-## Complete Example
+## 📄 Complete Example
 
 ```php
 <?php
@@ -325,9 +327,10 @@ class User
 }
 ```
 
-## Combining with Programmatic Configuration
+## 🔀 Combining with Programmatic Configuration
 
-Attributes can be combined with or overridden by programmatic configuration:
+> [!TIP]
+> Attributes can be combined with or overridden by programmatic configuration.
 
 ```php
 use DH\Auditor\Provider\Doctrine\Configuration;
@@ -352,7 +355,7 @@ $configuration = new Configuration([
 ]);
 ```
 
-## Best Practices
+## ✅ Best Practices
 
 1. **Always ignore sensitive data** - Passwords, tokens, secrets
 2. **Use Security attribute for sensitive entities** - Users, payments, etc.
@@ -360,8 +363,13 @@ $configuration = new Configuration([
 4. **Apply principle of least privilege** - Start restrictive, relax as needed
 5. **Use descriptive role names** - `ROLE_AUDIT_VIEWER` instead of generic `ROLE_USER`
 
+> [!WARNING]
+> Never audit password fields or authentication tokens. Use `#[Ignore]` on all security-sensitive properties.
+
+---
+
 ## Next Steps
 
-- [Configuration Reference](configuration.md)
-- [Querying Audits](../../querying/index.md)
-- [Role Checker Configuration](../../configuration/role-checker.md)
+- ⚙️ [Configuration Reference](configuration.md)
+- 🔍 [Querying Audits](../../querying/index.md)
+- 🛡️ [Role Checker Configuration](../../configuration/role-checker.md)

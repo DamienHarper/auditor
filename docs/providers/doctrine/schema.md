@@ -1,12 +1,14 @@
 # Schema Management
 
+> **Create and manage audit tables in your database**
+
 This guide covers how to create and manage audit tables in your database.
 
-## Overview
+## 🔍 Overview
 
 For each audited entity, auditor creates a corresponding audit table to store the change history. The `SchemaManager` class handles all schema operations.
 
-## Audit Table Structure
+## 🏗️ Audit Table Structure
 
 Each audit table has the following structure:
 
@@ -51,7 +53,7 @@ CREATE TABLE users_audit (
 | `ip`                  | VARCHAR(45)   | Client IP address (IPv4 or IPv6)                  |
 | `created_at`          | DATETIME      | When the audit entry was created                  |
 
-## Using SchemaManager
+## 🛠️ Using SchemaManager
 
 ### Creating the Schema Manager
 
@@ -99,7 +101,7 @@ $sqls = $schemaManager->getUpdateAuditSchemaSql();
 $schemaManager->updateAuditSchema($sqls);
 ```
 
-## Console Commands
+## 💻 Console Commands
 
 When using auditor-bundle, two commands are available:
 
@@ -149,7 +151,7 @@ php bin/console audit:clean --include=App\\Entity\\Post
 php bin/console audit:clean --exclude=App\\Entity\\User
 ```
 
-## Table Naming
+## 📛 Table Naming
 
 ### Default Naming
 
@@ -193,7 +195,7 @@ For databases with schema support (PostgreSQL):
 // Audit table: myschema.users_audit
 ```
 
-## Schema Changes
+## 🔄 Schema Changes
 
 ### Adding New Audited Entity
 
@@ -204,22 +206,15 @@ When you add `#[Auditable]` to a new entity:
 
 ### Removing Audited Entity
 
-When you remove `#[Auditable]` from an entity:
-
-- The audit table is **not** automatically deleted
-- Historical data is preserved
-- Manually drop the table if needed
+> [!NOTE]
+> When you remove `#[Auditable]` from an entity, the audit table is **not** automatically deleted. Historical data is preserved. Manually drop the table if needed.
 
 ### Modifying Entity Fields
 
-Adding or removing fields from an entity:
+> [!TIP]
+> Adding or removing fields from an entity requires **no schema changes**. Diffs are stored as JSON, so new fields will appear in future audits and removed fields won't appear in new audits. Historical audits retain their original data.
 
-- **No schema changes needed** - Diffs are stored as JSON
-- New fields will appear in future audits
-- Removed fields won't appear in new audits
-- Historical audits retain their original data
-
-## Programmatic Schema Operations
+## 💻 Programmatic Schema Operations
 
 ### Create a Single Audit Table
 
@@ -257,13 +252,13 @@ $repository = $schemaManager->collectAuditableEntities();
 // Returns: ['storage_name' => ['App\Entity\User' => 'users', ...], ...]
 ```
 
-## Database-Specific Notes
+## 🗄️ Database-Specific Notes
 
 ### MySQL/MariaDB
 
 - JSON column type used for `diffs`
 - InnoDB engine recommended for transactions
-- Consider ROW_FORMAT=DYNAMIC for large diffs
+- Consider `ROW_FORMAT=DYNAMIC` for large diffs
 
 ### PostgreSQL
 
@@ -273,11 +268,10 @@ $repository = $schemaManager->collectAuditableEntities();
 
 ### SQLite
 
-- `diffs` stored as TEXT (no native JSON)
-- Useful for development/testing
-- Not recommended for production with high audit volume
+> [!WARNING]
+> SQLite stores `diffs` as TEXT (no native JSON). It's useful for development/testing but not recommended for production with high audit volume.
 
-## Performance Considerations
+## ⚡ Performance Considerations
 
 1. **Index usage** - All common query columns are indexed
 2. **JSON storage** - Use native JSON types when available
@@ -285,14 +279,12 @@ $repository = $schemaManager->collectAuditableEntities();
 4. **Archiving** - Use `audit:clean` or implement custom archiving
 5. **Separate database** - Consider storing audits in a dedicated database
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
 ### "Table already exists"
 
-The schema manager checks for existing tables before creating. If you get conflicts:
-
-1. Drop the audit table manually
-2. Run `audit:schema:update --force`
+> [!NOTE]
+> The schema manager checks for existing tables before creating. If you get conflicts, drop the audit table manually, then run `audit:schema:update --force`.
 
 ### Column Type Mismatch
 
@@ -305,8 +297,10 @@ If column types don't match (e.g., TEXT vs JSON):
 
 Run `audit:schema:update --force` to add missing indices.
 
+---
+
 ## Next Steps
 
-- [Querying Audits](../../querying/index.md)
-- [Console Commands](../../commands/index.md)
-- [Multi-Database Setup](multi-database.md)
+- 🔍 [Querying Audits](../../querying/index.md)
+- 💻 [Console Commands](../../commands/index.md)
+- 🗄️ [Multi-Database Setup](multi-database.md)

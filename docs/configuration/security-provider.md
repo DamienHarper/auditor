@@ -1,8 +1,10 @@
 # Security Provider Configuration
 
+> **Capture contextual security information for each audit event**
+
 The security provider captures additional contextual information about each audit event, such as the client IP address and firewall name.
 
-## Overview
+## 🔍 Overview
 
 When an audit entry is created, the security provider can supply:
 
@@ -10,7 +12,7 @@ When an audit entry is created, the security provider can supply:
 - **blame_user_fqdn** - The fully qualified class name of the user
 - **blame_user_firewall** - The Symfony firewall name (if applicable)
 
-## Setting Up a Security Provider
+## 🚀 Setting Up a Security Provider
 
 ### Basic Example
 
@@ -66,7 +68,7 @@ function getFirewallName(?Request $request, FirewallMap $firewallMap): ?string
 }
 ```
 
-## Return Value Structure
+## 📋 Return Value Structure
 
 The security provider must return an array with these keys:
 
@@ -76,7 +78,7 @@ The security provider must return an array with these keys:
 | `user_fqdn`      | `string\|null`| The fully qualified class name of the user object|
 | `user_firewall`  | `string\|null`| The name of the security firewall used           |
 
-## Handling Different Contexts
+## 🌐 Handling Different Contexts
 
 ### Web Requests
 
@@ -94,7 +96,8 @@ $configuration->setSecurityProvider(function () use ($requestStack): array {
 
 ### Behind a Proxy
 
-When behind a load balancer or reverse proxy:
+> [!TIP]
+> When behind a load balancer or reverse proxy, ensure trusted proxies are configured in Symfony. The `getClientIp()` method will automatically handle `X-Forwarded-For`.
 
 ```php
 $configuration->setSecurityProvider(function () use ($requestStack): array {
@@ -150,7 +153,7 @@ $configuration->setSecurityProvider(function () use ($requestStack): array {
 });
 ```
 
-## Accessing Security Info from Audit Entries
+## 🔍 Accessing Security Info from Audit Entries
 
 When reading audit entries:
 
@@ -167,21 +170,26 @@ foreach ($audits as $entry) {
 }
 ```
 
-## IP Address Format
+## 🌐 IP Address Format
 
 The `ip` column supports both IPv4 and IPv6 addresses (max 45 characters):
 
 - IPv4: `192.168.1.1`
 - IPv6: `2001:0db8:85a3:0000:0000:8a2e:0370:7334`
 
-## Best Practices
+## ✅ Best Practices
 
 1. **Always handle null request** - The request may not be available (CLI, async jobs)
 2. **Configure trusted proxies** - When behind a reverse proxy
 3. **Return consistent data types** - Always return an array with all three keys
 4. **Consider privacy regulations** - IP logging may be subject to GDPR or similar laws
 
+> [!NOTE]
+> Remember to comply with privacy regulations when storing IP addresses. Consider implementing data retention policies.
+
+---
+
 ## Related
 
-- [User Provider Configuration](user-provider.md)
-- [Role Checker Configuration](role-checker.md)
+- 👤 [User Provider Configuration](user-provider.md)
+- 🛡️ [Role Checker Configuration](role-checker.md)

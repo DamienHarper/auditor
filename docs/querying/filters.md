@@ -1,8 +1,10 @@
 # Filters Reference
 
+> **Narrow down audit query results with powerful filters**
+
 Filters allow you to narrow down audit query results. This page documents all available filter types.
 
-## Overview
+## 📋 Overview
 
 | Filter            | Purpose                              | Example Use Case                    |
 |-------------------|--------------------------------------|-------------------------------------|
@@ -11,7 +13,7 @@ Filters allow you to narrow down audit query results. This page documents all av
 | `RangeFilter`     | Numeric range                        | Audits with ID >= 1000              |
 | `NullFilter`      | NULL value matching                  | Audits by anonymous users           |
 
-## Filter Interface
+## 🔌 Filter Interface
 
 All filters implement `FilterInterface`:
 
@@ -26,7 +28,7 @@ interface FilterInterface
 }
 ```
 
-## SimpleFilter
+## 🎯 SimpleFilter
 
 The most common filter for exact value matching.
 
@@ -102,7 +104,7 @@ $filter->getName();   // 'type'
 $filter->getValue();  // 'update' or ['insert', 'update']
 ```
 
-## DateRangeFilter
+## 📅 DateRangeFilter
 
 Filter by date/time range.
 
@@ -213,7 +215,8 @@ $sql = $filter->getSQL();
 
 ### Validation
 
-The filter validates that `minValue` is not after `maxValue`:
+> [!WARNING]
+> The filter validates that `minValue` is not after `maxValue`. Providing an invalid range will throw an `InvalidArgumentException`.
 
 ```php
 // This throws InvalidArgumentException
@@ -235,7 +238,7 @@ $filter->getMinValue();  // DateTimeInterface|null
 $filter->getMaxValue();  // DateTimeInterface|null
 ```
 
-## RangeFilter
+## 🔢 RangeFilter
 
 Filter by numeric range.
 
@@ -283,7 +286,8 @@ $query->addFilter(new RangeFilter(Query::ID, null, 500));
 
 ### Validation
 
-At least one bound must be provided:
+> [!IMPORTANT]
+> At least one bound must be provided. Providing neither will throw an `InvalidArgumentException`.
 
 ```php
 // This throws InvalidArgumentException
@@ -313,7 +317,7 @@ $filter->getMinValue();  // 100
 $filter->getMaxValue();  // 200
 ```
 
-## NullFilter
+## 🚫 NullFilter
 
 Filter for NULL values.
 
@@ -362,9 +366,10 @@ $filter = new NullFilter(Query::USER_ID);
 $filter->getName();  // 'blame_id'
 ```
 
-## Combining Filters
+## 🔀 Combining Filters
 
-You can add multiple filters to a query. Filters are combined with AND:
+> [!TIP]
+> You can add multiple filters to a query. Filters are combined with AND.
 
 ```php
 $query = $reader->createQuery(User::class, ['page_size' => null]);
@@ -394,7 +399,7 @@ $query->addFilter(new SimpleFilter(Query::TYPE, 'update'));
 $query->addFilter(new SimpleFilter(Query::TYPE, ['insert', 'update']));
 ```
 
-## Supported Filter Columns
+## 📋 Supported Filter Columns
 
 The following columns can be filtered:
 
@@ -408,9 +413,10 @@ The following columns can be filtered:
 | `blame_id`         | `Query::USER_ID`             | User ID who made the change    |
 | `created_at`       | `Query::CREATED_AT`          | When the audit was created     |
 
-## Custom Filter Example
+## 🧩 Custom Filter Example
 
-You can create custom filters by implementing `FilterInterface`:
+> [!NOTE]
+> You can create custom filters by implementing `FilterInterface`. For NULL value filtering, use the built-in `NullFilter` class.
 
 ```php
 <?php
@@ -443,9 +449,9 @@ final class NotNullFilter implements FilterInterface
 $query->addFilter(new NotNullFilter('blame_id'));
 ```
 
-> **Note:** For NULL value filtering, use the built-in `NullFilter` class.
+---
 
 ## Next Steps
 
-- [Querying Overview](index.md)
-- [Entry Model Reference](entry.md)
+- 🔍 [Querying Overview](index.md)
+- 📦 [Entry Model Reference](entry.md)
