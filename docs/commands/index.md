@@ -1,15 +1,17 @@
 # Console Commands
 
+> **Manage audit data via the command line**
+
 When using the auditor-bundle or standalone, the library provides console commands for managing audit data.
 
-## Available Commands
+## 📋 Available Commands
 
 | Command                 | Description                            |
 |-------------------------|----------------------------------------|
 | `audit:schema:update`   | Create or update audit table schemas   |
 | `audit:clean`           | Remove old audit entries               |
 
-## audit:schema:update
+## 🛠️ audit:schema:update
 
 Creates new audit tables and updates existing ones to match the current schema.
 
@@ -54,13 +56,8 @@ Run this command:
 - After updating auditor to a new version
 - During deployment to ensure schema is up-to-date
 
-### Safety
-
-The command is safe to run multiple times:
-
-- Existing tables are updated, not recreated
-- Existing data is preserved
-- Only necessary changes are applied
+> [!TIP]
+> The command is safe to run multiple times. Existing tables are updated (not recreated), existing data is preserved, and only necessary changes are applied.
 
 ### Exit Codes
 
@@ -69,7 +66,7 @@ The command is safe to run multiple times:
 | 0    | Success (including "nothing to update")          |
 | 1    | Error or missing required options                |
 
-## audit:clean
+## 🧹 audit:clean
 
 Removes audit entries older than a specified retention period.
 
@@ -189,7 +186,8 @@ For automated cleanup, add to your crontab:
 0 2 * * * /path/to/php /path/to/bin/console audit:clean P12M --no-confirm >> /var/log/audit-clean.log 2>&1
 ```
 
-Or use Symfony Messenger Scheduler if available.
+> [!TIP]
+> Use Symfony Messenger Scheduler if available for more robust scheduling.
 
 ### Exit Codes
 
@@ -198,7 +196,7 @@ Or use Symfony Messenger Scheduler if available.
 | 0    | Success or cancelled by user   |
 | 1    | Error                          |
 
-## Programmatic Usage
+## 💻 Programmatic Usage
 
 Both commands can be used programmatically:
 
@@ -239,7 +237,7 @@ $queryBuilder
 $deleted = $queryBuilder->executeStatement();
 ```
 
-## Command Locking
+## 🔒 Command Locking
 
 Both commands use Symfony's Lock component to prevent concurrent execution:
 
@@ -247,9 +245,10 @@ Both commands use Symfony's Lock component to prevent concurrent execution:
 The command is already running in another process.
 ```
 
-This ensures data integrity when running commands in parallel or from cron jobs.
+> [!NOTE]
+> This ensures data integrity when running commands in parallel or from cron jobs.
 
-## Registering Commands (Standalone)
+## 📦 Registering Commands (Standalone)
 
 When not using auditor-bundle, register commands manually:
 
@@ -273,7 +272,7 @@ $application->add($cleanCommand);
 $application->run();
 ```
 
-## Best Practices
+## ✅ Best Practices
 
 1. **Always preview first** - Use `--dump-sql` and `--dry-run` before executing
 2. **Backup before cleanup** - Especially for large deletions
@@ -282,19 +281,22 @@ $application->run();
 5. **Consider retention policies** - Different entities may need different retention
 6. **Test in staging** - Verify commands work as expected before production
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
 ### "The command is already running"
 
-Wait for the other instance to finish, or check for stuck processes.
+> [!WARNING]
+> Wait for the other instance to finish, or check for stuck processes.
 
 ### Schema update has no changes
 
-This means your audit tables are already up-to-date.
+> [!NOTE]
+> This means your audit tables are already up-to-date.
 
 ### Permission denied
 
-Ensure the database user has CREATE TABLE and ALTER TABLE permissions.
+> [!IMPORTANT]
+> Ensure the database user has CREATE TABLE and ALTER TABLE permissions.
 
 ### Timeout during large cleanup
 

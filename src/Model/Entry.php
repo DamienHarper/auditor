@@ -43,6 +43,10 @@ final class Entry
 
     public private(set) ?string $ip = null;
 
+    public ?array $extraData {
+        get => $this->getExtraData();
+    }
+
     public ?\DateTimeImmutable $createdAt {
         get => $this->created_at;
     }
@@ -52,6 +56,8 @@ final class Entry
     private ?string $transaction_hash = null;
 
     private string $diffs = '{}';
+
+    private ?string $extra_data = null;
 
     private int|string|null $blame_id = null;
 
@@ -74,6 +80,15 @@ final class Entry
         }
 
         return $diffs;
+    }
+
+    public function getExtraData(): ?array
+    {
+        if (null === $this->extra_data) {
+            return null;
+        }
+
+        return json_decode($this->extra_data, true, 512, JSON_THROW_ON_ERROR);
     }
 
     public static function fromArray(array $row): self

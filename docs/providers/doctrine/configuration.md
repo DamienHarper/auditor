@@ -1,8 +1,10 @@
 # DoctrineProvider Configuration
 
+> **All configuration options for the DoctrineProvider**
+
 This page covers all configuration options for the DoctrineProvider.
 
-## Configuration Options
+## ⚙️ Configuration Options
 
 ```php
 <?php
@@ -30,7 +32,7 @@ $configuration = new Configuration([
 | `viewer`          | `bool\|array`       | `true`        | Enable/configure the audit viewer                |
 | `storage_mapper`  | `callable\|null`    | `null`        | Callback to route audits to storage services     |
 
-## Table Naming
+## 📛 Table Naming
 
 Audit tables are named based on the original entity table name with optional prefix and suffix:
 
@@ -59,7 +61,7 @@ $configuration = new Configuration([
 ]);
 ```
 
-## Ignored Columns
+## 🚫 Ignored Columns
 
 ### Global Ignored Columns
 
@@ -89,7 +91,7 @@ $configuration = new Configuration([
 ]);
 ```
 
-## Entity Configuration
+## 🏷️ Entity Configuration
 
 Configure entities programmatically instead of (or in addition to) using attributes:
 
@@ -121,7 +123,7 @@ $configuration = new Configuration([
 | `ignored_columns` | `array`    | `[]`    | Columns to ignore for this entity            |
 | `roles`           | `array`    | `null`  | View permissions (`['view' => ['ROLE_X']]`)  |
 
-## Viewer Configuration
+## 👁️ Viewer Configuration
 
 The `viewer` option controls the built-in audit viewer (when using auditor-bundle):
 
@@ -145,11 +147,12 @@ $configuration = new Configuration([
 ]);
 ```
 
-## Storage Mapper
+## 🗄️ Storage Mapper
 
 When using multiple storage databases, the storage mapper determines where to store audits for each entity.
 
-See [Multi-Database Configuration](multi-database.md) for details.
+> [!NOTE]
+> See [Multi-Database Configuration](multi-database.md) for detailed information.
 
 ```php
 $configuration = new Configuration([
@@ -165,7 +168,7 @@ $configuration = new Configuration([
 ]);
 ```
 
-## Runtime Configuration
+## 🔄 Runtime Configuration
 
 ### Enable/Disable Auditing for an Entity
 
@@ -208,7 +211,7 @@ $configuration->setStorageMapper(function (string $entity, array $services) {
 });
 ```
 
-## Checking Audit Status
+## 🔍 Checking Audit Status
 
 The provider offers methods to check entity audit status:
 
@@ -224,9 +227,10 @@ $provider->isAuditedField(App\Entity\User::class, 'email');  // bool
 $provider->isAuditedField(App\Entity\User::class, 'password');  // false (if ignored)
 ```
 
-## Configuration Merging
+## 🔀 Configuration Merging
 
-Configuration from attributes and programmatic config are merged:
+> [!TIP]
+> Configuration from attributes and programmatic config are merged intelligently.
 
 1. Attributes on entities are loaded first
 2. Programmatic configuration overrides attribute settings
@@ -258,7 +262,7 @@ $configuration = new Configuration([
 // - roles: ['view' => ['ROLE_ADMIN']]
 ```
 
-## Complete Example
+## 📄 Complete Example
 
 ```php
 <?php
@@ -306,8 +310,10 @@ $configuration = new Configuration([
 ]);
 ```
 
+---
+
 ## Next Steps
 
-- [Attributes Reference](attributes.md)
-- [Multi-Database Setup](multi-database.md)
-- [Schema Management](schema.md)
+- 🏷️ [Attributes Reference](attributes.md)
+- 🗄️ [Multi-Database Setup](multi-database.md)
+- 🛠️ [Schema Management](schema.md)

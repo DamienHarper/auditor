@@ -41,6 +41,7 @@ final class DoctrineProvider extends AbstractProvider
         'discriminator' => '?',
         'transaction_hash' => '?',
         'diffs' => '?',
+        'extra_data' => '?',
         'blame_id' => '?',
         'blame_user' => '?',
         'blame_user_fqdn' => '?',

@@ -1,8 +1,10 @@
 # API Reference
 
+> **Complete API documentation for all public classes and interfaces**
+
 This section provides detailed API documentation for all public classes and interfaces.
 
-## Core Classes
+## 📚 Core Classes
 
 ### Auditor
 
@@ -64,7 +66,7 @@ final class Configuration
 }
 ```
 
-## Provider Interfaces
+## 🔌 Provider Interfaces
 
 ### ProviderInterface
 
@@ -102,9 +104,9 @@ interface ConfigurationInterface
 }
 ```
 
-## DoctrineProvider
+## 🗄️ DoctrineProvider
 
-### DoctrineProvider
+### 🗄️ DoctrineProvider
 
 ```php
 namespace DH\Auditor\Provider\Doctrine;
@@ -130,7 +132,7 @@ final class DoctrineProvider extends AbstractProvider
 }
 ```
 
-### DoctrineProvider Configuration
+### 🗄️ DoctrineProvider Configuration
 
 ```php
 namespace DH\Auditor\Provider\Doctrine;
@@ -169,7 +171,7 @@ final class Configuration implements ConfigurationInterface
 }
 ```
 
-## Reader & Query
+## 🔍 Reader & Query
 
 ### Reader
 
@@ -227,7 +229,7 @@ final class Query implements QueryInterface
 }
 ```
 
-## Filters
+## 🎯 Filters
 
 ### FilterInterface
 
@@ -292,7 +294,7 @@ final readonly class RangeFilter implements FilterInterface
 }
 ```
 
-## Models
+## 📦 Models
 
 ### Entry
 
@@ -338,7 +340,7 @@ class User implements UserInterface
 }
 ```
 
-## Attributes
+## 🏷️ Attributes
 
 ### Auditable
 
@@ -375,7 +377,7 @@ final class Security
 }
 ```
 
-## Schema Management
+## 🛠️ Schema Management
 
 ### SchemaManager
 
@@ -401,7 +403,7 @@ final readonly class SchemaManager
 }
 ```
 
-## Events
+## 📣 Events
 
 ### LifecycleEvent
 
@@ -417,7 +419,7 @@ final class LifecycleEvent extends AuditEvent
 }
 ```
 
-## Exceptions
+## ⚠️ Exceptions
 
 ### Exception Classes
 
@@ -430,7 +432,7 @@ class MappingException extends \Exception {}
 class ProviderException extends \Exception {}
 ```
 
-## Services
+## ⚙️ Services
 
 ### AuditingService
 
@@ -460,8 +462,10 @@ final class StorageService extends DoctrineService implements StorageServiceInte
 }
 ```
 
+---
+
 ## Next Steps
 
-- [Getting Started Guide](../getting-started/quick-start.md)
-- [DoctrineProvider Reference](../providers/doctrine/index.md)
-- [Querying Audits](../querying/index.md)
+- 🚀 [Getting Started Guide](../getting-started/quick-start.md)
+- 🗄️ [DoctrineProvider Reference](../providers/doctrine/index.md)
+- 🔍 [Querying Audits](../querying/index.md)

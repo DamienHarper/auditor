@@ -29,74 +29,75 @@ The library is architected around two core concepts:
 
 These services are provided by **Providers**. The library ships with a default provider for Doctrine ORM.
 
-```
-                    ┌───────────────────────────────────────┐
-                    │            Your Application           │
-                    └───────────────────┬───────────────────┘
-                                        │
-                                        ▼
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                                    AUDITOR                                      │
-│  ┌───────────────────────────────────────────────────────────────────────────┐  │
-│  │                             Configuration                                 │  │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐   │  │
-│  │  │   enabled   │  │  timezone   │  │ userProvider│  │ securityProvider│   │  │
-│  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────────┘   │  │
-│  │  ┌─────────────┐                                                          │  │
-│  │  │ roleChecker │                                                          │  │
-│  │  └─────────────┘                                                          │  │
-│  └───────────────────────────────────────────────────────────────────────────┘  │
-│                                                                                 │
-│  ┌───────────────────────────────────────────────────────────────────────────┐  │
-│  │                            DoctrineProvider                               │  │
-│  │                                                                           │  │
-│  │     ┌─────────────────────────┐       ┌─────────────────────────┐         │  │
-│  │     │    AuditingService(s)   │       │    StorageService(s)    │         │  │
-│  │     │  ┌───────────────────┐  │       │  ┌───────────────────┐  │         │  │
-│  │     │  │  EntityManager A  │  │       │  │  EntityManager X  │  │         │  │
-│  │     │  │   (source data)   │  │       │  │  (audit storage)  │  │         │  │
-│  │     │  └───────────────────┘  │       │  └───────────────────┘  │         │  │
-│  │     └───────────┬─────────────┘       └─────────────┬───────────┘         │  │
-│  │                 │                                   │                     │  │
-│  │                 │    ┌─────────────────────────┐    │                     │  │
-│  │                 └───►│  TransactionProcessor   │◄───┘                     │  │
-│  │                      │  ┌───────────────────┐  │                          │  │
-│  │                      │  │ • Track inserts   │  │                          │  │
-│  │                      │  │ • Track updates   │  │                          │  │
-│  │                      │  │ • Track deletes   │  │                          │  │
-│  │                      │  │ • Track relations │  │                          │  │
-│  │                      │  └───────────────────┘  │                          │  │
-│  │                      └────────────┬────────────┘                          │  │
-│  │                                   │                                       │  │
-│  └───────────────────────────────────┼───────────────────────────────────────┘  │
-│                                      │                                          │
-│  ┌───────────────────────────────────┼───────────────────────────────────────┐  │
-│  │                EventDispatcher    │                                       │  │
-│  │                      ┌────────────▼────────────┐                          │  │
-│  │                      │     LifecycleEvent      │                          │  │
-│  │                      └────────────┬────────────┘                          │  │
-│  └───────────────────────────────────┼───────────────────────────────────────┘  │
-└──────────────────────────────────────┼──────────────────────────────────────────┘
-                                       │
-                                       ▼
-                      ┌────────────────────────────────┐
-                      │        Audit Tables            │
-                      │  ┌──────────────────────────┐  │
-                      │  │  • users_audit           │  │
-                      │  │  • posts_audit           │  │
-                      │  │  • orders_audit          │  │
-                      │  │  • ...                   │  │
-                      │  └──────────────────────────┘  │
-                      └────────────────────────────────┘
+```mermaid
+flowchart TD
+    APP["Your Application"] --> AUDITOR
+
+    subgraph AUDITOR["AUDITOR"]
+        direction TB
+
+        subgraph CONFIG["Configuration"]
+            direction LR
+            enabled
+            timezone
+            userProvider
+            securityProvider
+            roleChecker
+        end
+
+        subgraph PROVIDER["DoctrineProvider"]
+            direction TB
+
+            subgraph AUDITING["AuditingService(s)"]
+                EMA["EntityManager A
+                (source data)"]
+            end
+
+            subgraph STORAGE["StorageService(s)"]
+                EMX["EntityManager X
+                (audit storage)"]
+            end
+
+            AUDITING --> TP
+            STORAGE --> TP
+
+            TP["TransactionProcessor
+            Track inserts, updates, deletes, relations
+            Build payload (diffs, blame, extra_data = null)"]
+        end
+
+        subgraph EVENTS["EventDispatcher"]
+            direction TB
+            TP --> LE
+
+            LE["LifecycleEvent
+            payload (diffs, blame, extra_data)
+            entity (the audited object)"]
+
+            LE --> LISTENER
+
+            LISTENER["Your Listener(s) — optional
+            Enrich extra_data from entity state"]:::optional
+        end
+    end
+
+    LISTENER --> DB
+
+    DB[("Audit Tables
+    users_audit, posts_audit, ...
+    Columns: type, diffs, extra_data, blame, ...")]
+
+    classDef optional stroke-dasharray: 5 5
 ```
 
 ### Data Flow
 
 1. **Entity Change** → Your application modifies an entity via Doctrine
 2. **Detection** → `AuditingService` detects the change through Doctrine events
-3. **Processing** → `TransactionProcessor` computes diffs and prepares audit data
-4. **Event** → A `LifecycleEvent` is dispatched with the audit payload
-5. **Persistence** → `StorageService` persists the audit entry to the database
+3. **Processing** → `TransactionProcessor` computes diffs and prepares audit data (with `extra_data = null`)
+4. **Event** → A `LifecycleEvent` is dispatched with the audit payload and the entity object
+5. **Enrichment** *(optional)* → Your listener(s) inspect the entity and populate `extra_data` in the payload
+6. **Persistence** → `StorageService` persists the audit entry to the database
 
 ## Supported Databases
 
@@ -109,7 +110,8 @@ The DoctrineProvider supports the following RDBMS:
 | PostgreSQL | ✅ Full       |
 | SQLite     | ✅ Full       |
 
-> **Note:** The DoctrineProvider should work with any database supported by Doctrine, though only the above are actively tested.
+> [!NOTE]
+> The DoctrineProvider should work with any database supported by Doctrine, though only the above are actively tested.
 
 ## Version Compatibility
 
@@ -127,6 +129,7 @@ The DoctrineProvider supports the following RDBMS:
 - [Configuration Reference](configuration/index.md)
 - [DoctrineProvider](providers/doctrine/index.md)
 - [Querying Audits](querying/index.md)
+- [Extra Data](extra-data.md)
 - [API Reference](api/index.md)
 
 ## Related Projects

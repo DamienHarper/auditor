@@ -1,17 +1,26 @@
 # Querying Audits
 
+> **Read and query audit entries with the powerful Reader and Query APIs**
+
 This guide covers how to read and query audit entries using the Reader and Query APIs.
 
-## Overview
+## 🔍 Overview
 
 The DoctrineProvider includes a powerful querying system:
+
+```mermaid
+flowchart LR
+    R["Reader"] --> Q["Query"]
+    Q --> F["Filters"]
+    Q --> E["Entry[]"]
+```
 
 - **Reader** - Factory for creating queries and utilities
 - **Query** - Builds and executes audit queries
 - **Filters** - Filter results by various criteria
 - **Entry** - Represents a single audit log entry
 
-## The Reader Class
+## 📖 The Reader Class
 
 ### Creating a Reader
 
@@ -52,7 +61,7 @@ $query = $reader->createQuery(User::class, [
 | `page_size`        | `int\|null`             | `50`    | Results per page                          |
 | `strict`           | `bool`                  | `true`  | Use discriminator for inheritance         |
 
-## Basic Queries
+## 📝 Basic Queries
 
 ### Get All Audits for an Entity
 
@@ -121,7 +130,7 @@ $audits = $reader->getAuditsByTransactionHash('abc123def456...');
 // Returns: ['App\Entity\User' => [...], 'App\Entity\Post' => [...]]
 ```
 
-## The Query Class
+## 🔧 The Query Class
 
 For more control, work directly with the Query object:
 
@@ -153,7 +162,7 @@ Query::CREATED_AT        // 'created_at'
 Query::ID                // 'id'
 ```
 
-## Filters
+## 🎯 Filters
 
 ### SimpleFilter
 
@@ -218,7 +227,7 @@ $query->addFilter(new RangeFilter(Query::ID, 100, 200));
 $query->addFilter(new RangeFilter(Query::ID, 500, null));
 ```
 
-## Pagination
+## 📄 Pagination
 
 ### Using Query Options
 
@@ -253,6 +262,9 @@ $result = $reader->paginate($query, $page = 1, $pageSize = 20);
 
 ### Disable Pagination
 
+> [!TIP]
+> Set both `page` and `page_size` to `null` to get all results without pagination.
+
 ```php
 // Get all results without pagination
 $query = $reader->createQuery(User::class, [
@@ -262,14 +274,14 @@ $query = $reader->createQuery(User::class, [
 $allAudits = $query->execute();
 ```
 
-## Counting Results
+## 🔢 Counting Results
 
 ```php
 $query = $reader->createQuery(User::class);
 $count = $query->count();
 ```
 
-## The Entry Model
+## 📦 The Entry Model
 
 Each audit result is an `Entry` object:
 
@@ -299,7 +311,7 @@ foreach ($audits as $entry) {
 }
 ```
 
-## Reading Diffs
+## 📊 Reading Diffs
 
 The `getDiffs()` method returns the changes:
 
@@ -353,7 +365,7 @@ The `getDiffs()` method returns the changes:
 ]
 ```
 
-## Utility Methods
+## 🔧 Utility Methods
 
 ### Get Entity Table Names
 
@@ -367,11 +379,12 @@ $auditTableName = $reader->getEntityAuditTableName(User::class);
 // Returns: 'users_audit'
 ```
 
-## Error Handling
+## ⚠️ Error Handling
 
 ### AccessDeniedException
 
-Thrown when the role checker denies access:
+> [!WARNING]
+> Thrown when the role checker denies access to view audits for an entity.
 
 ```php
 use DH\Auditor\Exception\AccessDeniedException;
@@ -386,7 +399,8 @@ try {
 
 ### InvalidArgumentException
 
-Thrown when querying non-auditable entities:
+> [!CAUTION]
+> Thrown when querying non-auditable entities.
 
 ```php
 use DH\Auditor\Exception\InvalidArgumentException;
@@ -398,7 +412,7 @@ try {
 }
 ```
 
-## Complete Example
+## 📄 Complete Example
 
 ```php
 <?php
@@ -456,8 +470,10 @@ foreach ($audits as $entry) {
 }
 ```
 
+---
+
 ## Next Steps
 
-- [Filters Reference](filters.md)
-- [Entry Model Reference](entry.md)
-- [Security & Access Control](../configuration/role-checker.md)
+- 🎯 [Filters Reference](filters.md)
+- 📦 [Entry Model Reference](entry.md)
+- 🛡️ [Security & Access Control](../configuration/role-checker.md)

@@ -1,8 +1,10 @@
 # User Provider Configuration
 
+> **Identify who made changes to audited entities**
+
 The user provider is responsible for identifying who made changes to audited entities.
 
-## Overview
+## 🔍 Overview
 
 When an audit entry is created, auditor can record:
 
@@ -11,7 +13,7 @@ When an audit entry is created, auditor can record:
 
 This information comes from the user provider callback.
 
-## Setting Up a User Provider
+## 🚀 Setting Up a User Provider
 
 ### Basic Example
 
@@ -92,7 +94,7 @@ $configuration->setUserProvider(function () use ($security, $entityManager): ?Us
 });
 ```
 
-## The User Class
+## 📦 The User Class
 
 The built-in `User` class is a simple value object:
 
@@ -120,7 +122,7 @@ class User implements UserInterface
 }
 ```
 
-## Custom User Implementation
+## 🧩 Custom User Implementation
 
 You can create your own user class by implementing `UserInterface`:
 
@@ -163,9 +165,10 @@ class CustomUser implements UserInterface
 }
 ```
 
-## API/CLI Context
+## 🌐 API/CLI Context
 
-For API requests or CLI commands where there might not be a traditional user:
+> [!TIP]
+> For API requests or CLI commands, consider identifying the context (API token, CLI user) rather than leaving it empty.
 
 ```php
 <?php
@@ -201,7 +204,7 @@ $configuration->setUserProvider(function (): ?User {
 });
 ```
 
-## Accessing User Info from Audit Entries
+## 🔍 Accessing User Info from Audit Entries
 
 When reading audit entries, you can access the recorded user information:
 
@@ -219,14 +222,19 @@ foreach ($audits as $entry) {
 }
 ```
 
-## Best Practices
+## ✅ Best Practices
 
 1. **Always return `null` when no user is available** - Don't create fake users
 2. **Use meaningful identifiers** - Use the actual user ID, not just the username
 3. **Include useful context in the username** - Consider including role or context info
 4. **Handle all authentication methods** - Consider API tokens, CLI, impersonation, etc.
 
+> [!IMPORTANT]
+> Always return `null` when there's no authenticated user. Don't create placeholder users as this can lead to confusing audit trails.
+
+---
+
 ## Related
 
-- [Security Provider Configuration](security-provider.md)
-- [Role Checker Configuration](role-checker.md)
+- 🔐 [Security Provider Configuration](security-provider.md)
+- 🛡️ [Role Checker Configuration](role-checker.md)

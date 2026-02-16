@@ -1,8 +1,10 @@
 # Entry Model Reference
 
+> **Understand the structure of audit log entries**
+
 The `Entry` class represents a single audit log entry. This page documents all its properties and methods.
 
-## Overview
+## 🔍 Overview
 
 ```php
 namespace DH\Auditor\Model;
@@ -20,7 +22,7 @@ final class Entry
 }
 ```
 
-## Creating Entries
+## 🏗️ Creating Entries
 
 Entries are typically created by the Reader when executing queries:
 
@@ -42,6 +44,7 @@ $entry = Entry::fromArray([
     'discriminator' => null,
     'transaction_hash' => 'abc123',
     'diffs' => '{"name":{"old":"John","new":"Jane"}}',
+    'extra_data' => '{"department":"IT","role":"admin"}', // or null
     'blame_id' => '42',
     'blame_user' => 'admin',
     'blame_user_fqdn' => 'App\\Entity\\User',
@@ -51,7 +54,7 @@ $entry = Entry::fromArray([
 ]);
 ```
 
-## Properties & Methods
+## 📋 Properties & Methods
 
 ### getId()
 
@@ -232,6 +235,27 @@ $diffs = $entry->getDiffs(true);
 ]
 ```
 
+### getExtraData()
+
+```php
+public function getExtraData(): ?array
+```
+
+Returns any supplementary data attached to this audit entry, or `null` if none was set.
+
+> [!TIP]
+> Extra data is populated via a `LifecycleEvent` listener. See the [Extra Data guide](../extra-data.md) for setup instructions and examples.
+
+```php
+$extraData = $entry->getExtraData();
+// Returns: ['department' => 'IT', 'role' => 'admin'] or null
+
+// Also available as a virtual property
+$extraData = $entry->extraData;
+```
+
+Extra data is populated via a `LifecycleEvent` listener. See the [Extra Data guide](../extra-data.md) for setup instructions and examples.
+
 ### getUserId()
 
 ```php
@@ -317,7 +341,7 @@ echo $createdAt->format('Y-m-d H:i:s');
 
 The timestamp uses the timezone configured in the Auditor configuration.
 
-## Working with Entries
+## 💡 Working with Entries
 
 ### Display Audit Log
 
@@ -430,9 +454,10 @@ foreach ($query->execute() as $entry) {
 }
 ```
 
-## JSON Serialization
+## 📄 JSON Serialization
 
-The diffs are stored as JSON and automatically decoded:
+> [!NOTE]
+> The diffs are stored as JSON and automatically decoded - no need to call `json_decode()`.
 
 ```php
 // Diffs are returned as arrays, not JSON strings
@@ -445,12 +470,16 @@ $json = json_encode([
     'type' => $entry->getType(),
     'object_id' => $entry->getObjectId(),
     'diffs' => $entry->getDiffs(),
+    'extra_data' => $entry->getExtraData(),
     'created_at' => $entry->getCreatedAt()?->format('c'),
     'user' => $entry->getUsername(),
 ]);
 ```
 
+---
+
 ## Next Steps
 
-- [Querying Overview](index.md)
-- [Filters Reference](filters.md)
+- 📊 [Extra Data Guide](../extra-data.md)
+- 🔍 [Querying Overview](index.md)
+- 🎯 [Filters Reference](filters.md)

@@ -28,6 +28,8 @@ For a complete upgrade guide with step-by-step instructions, see the [full docum
 | Loader | `AnnotationLoader` | `AttributeLoader` |
 | Subscribers | `EventSubscriberInterface` | `#[AsEventListener]` |
 | Commands | `setName()` / `setDescription()` | `#[AsCommand]` |
+| Payload | No `extra_data` key | `extra_data` required in payload |
+| LifecycleEvent | No entity access | `$event->entity` available |
 
 ### Removed Methods (DoctrineHelper)
 
@@ -40,6 +42,13 @@ For a complete upgrade guide with step-by-step instructions, see the [full docum
 ### DoctrineHelper::getRealClassName()
 
 Now only handles `__CG__` proxies. With PHP 8.4+, Doctrine ORM uses native lazy objects.
+
+### New `extra_data` Column
+
+A nullable JSON `extra_data` column has been added to audit tables. After upgrading, run `audit:schema:update --force`.
+
+
+`LifecycleEvent` now accepts an optional `?object $entity` parameter to allow listeners to populate extra data. See [Extra Data guide](docs/extra-data.md).
 
 ### Composer Scripts
 

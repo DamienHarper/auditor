@@ -1,8 +1,10 @@
 # Multi-Database Configuration
 
+> **Store audit logs in a separate database from your application data**
+
 This guide explains how to store audit logs in a separate database from your application data.
 
-## Use Cases
+## 🎯 Use Cases
 
 Storing audits in a separate database can be beneficial for:
 
@@ -12,30 +14,23 @@ Storing audits in a separate database can be beneficial for:
 - **Scalability** - Independent scaling of audit storage
 - **Retention** - Different backup/retention policies
 
-## Architecture Overview
+## 🏗️ Architecture Overview
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      Application                            │
-├─────────────────────────────────────────────────────────────┤
-│                    DoctrineProvider                         │
-├───────────────────────┬─────────────────────────────────────┤
-│   Auditing Service    │      Storage Service                │
-│   ┌───────────────┐   │      ┌───────────────┐              │
-│   │ EntityManager │   │      │ EntityManager │              │
-│   │ (App Database)│   │      │ (Audit DB)    │              │
-│   └───────┬───────┘   │      └───────┬───────┘              │
-└───────────┼───────────┴──────────────┼──────────────────────┘
-            │                          │
-            ▼                          ▼
-    ┌───────────────┐          ┌───────────────┐
-    │  App Database │          │  Audit Database│
-    │  - users      │          │  - users_audit │
-    │  - posts      │          │  - posts_audit │
-    └───────────────┘          └───────────────┘
+```mermaid
+flowchart TB
+    APP["Application"]
+    
+    subgraph DoctrineProvider
+        AS["Auditing Service<br>EntityManager (App Database)"]
+        SS["Storage Service<br>EntityManager (Audit DB)"]
+    end
+    
+    APP --> DoctrineProvider
+    AS --> DB1[("App Database<br>users, posts")]
+    SS --> DB2[("Audit Database<br>users_audit, posts_audit")]
 ```
 
-## Basic Setup
+## 🚀 Basic Setup
 
 ### 1. Configure Database Connections
 
@@ -97,7 +92,7 @@ $provider->registerStorageService(
 );
 ```
 
-## Multiple Source Databases
+## 🔀 Multiple Source Databases
 
 If you have multiple application databases:
 
@@ -125,7 +120,7 @@ $provider->registerStorageService(
 );
 ```
 
-## Multiple Storage Databases with Routing
+## 🗄️ Multiple Storage Databases with Routing
 
 For complex scenarios, use a storage mapper to route audits:
 
@@ -163,7 +158,7 @@ $provider->registerStorageService(new StorageService('financial_audit', $financi
 $provider->registerStorageService(new StorageService('user_audit', $userAuditEM));
 ```
 
-## Storage Mapper Examples
+## 📍 Storage Mapper Examples
 
 ### Route by Entity Class
 
@@ -209,7 +204,7 @@ $provider->registerStorageService(new StorageService('user_audit', $userAuditEM)
 }
 ```
 
-## Schema Management
+## 🛠️ Schema Management
 
 When using multiple storage databases, the schema manager handles each one:
 
@@ -234,7 +229,7 @@ $sqls = $schemaManager->getUpdateAuditSchemaSql();
 $schemaManager->updateAuditSchema();
 ```
 
-## Reading Audits
+## 📖 Reading Audits
 
 When reading audits, the Reader automatically uses the correct storage:
 
@@ -246,17 +241,20 @@ $query = $reader->createQuery(User::class);
 $audits = $query->execute();
 ```
 
-## Transaction Considerations
+## ⚠️ Transaction Considerations
 
 ### Same Transaction (Not Possible)
 
-When using separate databases, audit entries **cannot** be in the same transaction as entity changes. This means:
+> [!IMPORTANT]
+> When using separate databases, audit entries **cannot** be in the same transaction as entity changes.
+
+This means:
 
 - ✅ Audit entries are written after successful entity changes
 - ⚠️ If audit write fails, entity changes are still committed
 - ⚠️ No automatic rollback of entity changes on audit failure
 
-### Handling Failures
+### 🛡️ Handling Failures
 
 Consider implementing:
 
@@ -281,7 +279,7 @@ $dispatcher->addListener(LifecycleEvent::class, function (LifecycleEvent $event)
 });
 ```
 
-## Configuration Summary
+## 📝 Configuration Summary
 
 ```php
 <?php
@@ -321,7 +319,7 @@ $provider->registerStorageService(new StorageService('sensitive', $sensitiveAudi
 $auditor->registerProvider($provider);
 ```
 
-## Best Practices
+## ✅ Best Practices
 
 1. **Use connection pooling** - Multiple databases mean more connections
 2. **Monitor both databases** - Ensure audit DB has adequate resources
@@ -329,8 +327,13 @@ $auditor->registerProvider($provider);
 4. **Test failover scenarios** - What happens when audit DB is unavailable?
 5. **Document your setup** - Complex routing logic should be well-documented
 
+> [!TIP]
+> Consider using a message queue (like Symfony Messenger) for audit persistence to improve application response times and handle failures gracefully.
+
+---
+
 ## Related
 
-- [Services Reference](services.md)
-- [Schema Management](schema.md)
-- [Configuration Reference](configuration.md)
+- ⚙️ [Services Reference](services.md)
+- 🛠️ [Schema Management](schema.md)
+- 📋 [Configuration Reference](configuration.md)

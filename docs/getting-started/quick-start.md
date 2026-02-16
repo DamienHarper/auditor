@@ -1,16 +1,25 @@
 # Quick Start Guide
 
+> **Set up auditing for your Doctrine entities in minutes**
+
 This guide will help you set up auditing for your Doctrine entities in minutes.
 
-## Overview
+## 🔍 Overview
 
 Setting up auditor involves three main steps:
+
+```mermaid
+flowchart LR
+    A["1️⃣ Configure<br>Auditor"] --> B["2️⃣ Configure<br>DoctrineProvider"]
+    B --> C["3️⃣ Mark Entities<br>as Auditable"]
+    C --> D["🎉 Done!"]
+```
 
 1. **Configure the Auditor** - Set up global options
 2. **Configure the DoctrineProvider** - Define which entities to audit
 3. **Mark entities as auditable** - Use attributes or configuration
 
-## Step 1: Create the Auditor
+## 1️⃣ Step 1: Create the Auditor
 
 ```php
 <?php
@@ -35,7 +44,7 @@ $configuration = new Configuration([
 $auditor = new Auditor($configuration, $eventDispatcher);
 ```
 
-## Step 2: Configure the DoctrineProvider
+## 2️⃣ Step 2: Configure the DoctrineProvider
 
 ```php
 <?php
@@ -77,7 +86,7 @@ $provider->registerStorageService($storageService);
 $auditor->registerProvider($provider);
 ```
 
-## Step 3: Mark Entities as Auditable
+## 3️⃣ Step 3: Mark Entities as Auditable
 
 ### Using PHP Attributes (Recommended)
 
@@ -123,9 +132,10 @@ class User
 | `#[Ignore]`    | Property | Excludes a field from audit tracking     |
 | `#[Security]`  | Class    | Defines roles allowed to view audits     |
 
-## Step 4: Create Audit Tables
+## 4️⃣ Step 4: Create Audit Tables
 
-Before auditing can work, you need to create the audit tables in your database:
+> [!IMPORTANT]
+> Before auditing can work, you need to create the audit tables in your database.
 
 ```bash
 # Using the provided command (with auditor-bundle)
@@ -136,9 +146,12 @@ $schemaManager = new SchemaManager($provider);
 $schemaManager->updateAuditSchema();
 ```
 
-## Step 5: Start Auditing
+## 5️⃣ Step 5: Start Auditing
 
 Once configured, the library automatically tracks changes when you persist entities:
+
+> [!NOTE]
+> Audit entries are created automatically on `EntityManager::flush()`.
 
 ```php
 <?php
@@ -160,7 +173,7 @@ $entityManager->remove($user);
 $entityManager->flush();  // ← Delete audit entry is created
 ```
 
-## Reading Audit Logs
+## 📖 Reading Audit Logs
 
 Use the `Reader` class to query audit entries:
 
@@ -189,9 +202,11 @@ $query = $reader->createQuery(User::class, [
 $result = $reader->paginate($query);
 ```
 
+---
+
 ## What's Next?
 
-- [Configuration Reference](../configuration/index.md) - Detailed configuration options
-- [Attributes Reference](../providers/doctrine/attributes.md) - Complete attributes documentation
-- [Querying Audits](../querying/index.md) - Advanced query techniques
-- [User Attribution](../configuration/user-provider.md) - Track who made changes
+- ⚙️ [Configuration Reference](../configuration/index.md) - Detailed configuration options
+- 🏷️ [Attributes Reference](../providers/doctrine/attributes.md) - Complete attributes documentation
+- 🔍 [Querying Audits](../querying/index.md) - Advanced query techniques
+- 👤 [User Attribution](../configuration/user-provider.md) - Track who made changes

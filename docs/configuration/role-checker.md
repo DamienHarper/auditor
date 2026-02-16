@@ -1,14 +1,17 @@
 # Role Checker Configuration
 
+> **Control access to audit logs with fine-grained permissions**
+
 The role checker controls access to audit logs, allowing you to restrict who can view audits for specific entities.
 
-## Overview
+## 🔍 Overview
 
 The role checker is a callback that is invoked when someone attempts to read audit entries. It determines whether the current user has permission to view the requested audits.
 
-If access is denied, an `AccessDeniedException` is thrown.
+> [!WARNING]
+> If access is denied, an `AccessDeniedException` is thrown.
 
-## Setting Up a Role Checker
+## 🚀 Setting Up a Role Checker
 
 ### Basic Example
 
@@ -59,7 +62,7 @@ $configuration->setRoleChecker(function (string $entity, string $scope) use ($se
 });
 ```
 
-## Parameters
+## 📋 Parameters
 
 The role checker receives two parameters:
 
@@ -74,7 +77,7 @@ The role checker receives two parameters:
 |--------|------------------------------|----------------------------|
 | `view` | `Security::VIEW_SCOPE`       | Viewing audit entries      |
 
-## Using Entity-Level Security Attributes
+## 🏷️ Using Entity-Level Security Attributes
 
 You can also define view permissions directly on entities using the `#[Security]` attribute:
 
@@ -122,7 +125,7 @@ $configuration->setRoleChecker(function (string $entity, string $scope) use ($se
 });
 ```
 
-## Complex Authorization Logic
+## 🧩 Complex Authorization Logic
 
 ### Per-Entity Custom Rules
 
@@ -177,7 +180,7 @@ $configuration->setRoleChecker(function (string $entity, string $scope) use ($se
 });
 ```
 
-## Error Handling
+## ⚠️ Error Handling
 
 When the role checker returns `false`, an `AccessDeniedException` is thrown:
 
@@ -198,9 +201,10 @@ try {
 }
 ```
 
-## No Role Checker
+## 🚫 No Role Checker
 
-If no role checker is configured (`null`), all users have access to all audit logs:
+> [!CAUTION]
+> If no role checker is configured (`null`), all users have access to all audit logs. This is not recommended for production environments.
 
 ```php
 // This allows everyone to view all audits
@@ -209,7 +213,7 @@ $configuration = new Configuration([
 ]);
 ```
 
-## Best Practices
+## ✅ Best Practices
 
 1. **Always implement a role checker in production** - Don't leave audits open to everyone
 2. **Log access attempts** - Consider logging who accesses audit data
@@ -217,8 +221,10 @@ $configuration = new Configuration([
 4. **Consider data sensitivity** - Some entities may contain sensitive information
 5. **Test your rules** - Ensure your authorization logic works as expected
 
+---
+
 ## Related
 
-- [Security Attribute](../providers/doctrine/attributes.md#security)
-- [User Provider Configuration](user-provider.md)
-- [Security Provider Configuration](security-provider.md)
+- 🏷️ [Security Attribute](../providers/doctrine/attributes.md#security)
+- 👤 [User Provider Configuration](user-provider.md)
+- 🔐 [Security Provider Configuration](security-provider.md)

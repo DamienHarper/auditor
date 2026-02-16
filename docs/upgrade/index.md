@@ -1,13 +1,15 @@
 # Upgrade Guide
 
+> **Navigate between major versions of auditor**
+
 This guide helps you upgrade between major versions of auditor.
 
-## Upgrade Paths
+## 📚 Upgrade Paths
 
-- [Upgrading to 4.x from 3.x](v4.md)
-- [Upgrading to 3.x from 2.x](v3.md)
+- [⬆️ Upgrading to 4.x from 3.x](v4.md)
+- [⬆️ Upgrading to 3.x from 2.x](v3.md)
 
-## Version Support
+## 📋 Version Support
 
 | Version | Status                      | PHP       | Symfony   |
 |:--------|:----------------------------|:----------|:----------|
@@ -16,7 +18,10 @@ This guide helps you upgrade between major versions of auditor.
 | 2.x     | End of Life                 | >= 7.4    | >= 4.4    |
 | 1.x     | End of Life                 | >= 7.2    | >= 3.4    |
 
-## General Upgrade Tips
+## ✅ General Upgrade Tips
+
+> [!IMPORTANT]
+> Always follow these steps when upgrading:
 
 1. **Read the full changelog** before upgrading
 2. **Backup your database** including audit tables
@@ -25,13 +30,13 @@ This guide helps you upgrade between major versions of auditor.
 5. **Run tests** after upgrading
 6. **Check for deprecations** before the major version
 
-## Checking Your Version
+## 🔍 Checking Your Version
 
 ```bash
 composer show damienharper/auditor
 ```
 
-## Updating
+## 📦 Updating
 
 ```bash
 # Update to latest 4.x

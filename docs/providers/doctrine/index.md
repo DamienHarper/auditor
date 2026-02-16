@@ -1,8 +1,10 @@
 # DoctrineProvider
 
+> **The default provider for auditing Doctrine ORM entities**
+
 The `DoctrineProvider` is the default and primary provider shipped with auditor. It provides both **auditing** and **storage** capabilities for Doctrine ORM entities.
 
-## Overview
+## 🔍 Overview
 
 The DoctrineProvider:
 
@@ -11,7 +13,7 @@ The DoctrineProvider:
 - 💾 **Persists audit logs** - Stores audits in dedicated audit tables
 - 🔄 **Transactional integrity** - Audit entries are part of the same transaction as your changes
 
-## Key Features
+## ✨ Key Features
 
 ### Automatic Change Detection
 
@@ -52,32 +54,37 @@ For each audited entity, a corresponding audit table is created:
 | `associate`   | A many-to-many relationship was created        |
 | `dissociate`  | A many-to-many relationship was removed        |
 
-## Architecture
+## 🏗️ Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    DoctrineProvider                         │
-├─────────────────────────────────────────────────────────────┤
-│  Configuration                                              │
-│  ├── table_prefix / table_suffix                           │
-│  ├── ignored_columns                                        │
-│  ├── entities                                               │
-│  └── storage_mapper                                         │
-├─────────────────────────────────────────────────────────────┤
-│  Services                                                   │
-│  ├── AuditingService(s) → EntityManager(s) for detection   │
-│  └── StorageService(s)  → EntityManager(s) for storage     │
-├─────────────────────────────────────────────────────────────┤
-│  Components                                                 │
-│  ├── TransactionManager     → Manages audit transactions   │
-│  ├── TransactionProcessor   → Processes entity changes     │
-│  ├── SchemaManager          → Manages audit table schemas  │
-│  ├── Reader                 → Queries audit logs           │
-│  └── AnnotationLoader       → Loads entity attributes      │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph DoctrineProvider
+        direction TB
+        
+        subgraph Configuration
+            table_prefix
+            table_suffix
+            ignored_columns
+            entities
+            storage_mapper
+        end
+        
+        subgraph Services
+            AS["AuditingService(s)<br>→ EntityManager(s) for detection"]
+            SS["StorageService(s)<br>→ EntityManager(s) for storage"]
+        end
+        
+        subgraph Components
+            TM["TransactionManager"]
+            TP["TransactionProcessor"]
+            SM["SchemaManager"]
+            RD["Reader"]
+            AL["AttributeLoader"]
+        end
+    end
 ```
 
-## Supported Databases
+## 🗄️ Supported Databases
 
 | Database   | Support | Notes                               |
 |------------|---------|-------------------------------------|
@@ -86,15 +93,16 @@ For each audited entity, a corresponding audit table is created:
 | PostgreSQL | ✅       | Full support with JSON column type  |
 | SQLite     | ✅       | JSON stored as TEXT                 |
 
-## Limitations
+## ⚠️ Limitations
 
-⚠️ **Important limitations to be aware of:**
+> [!CAUTION]
+> Important limitations to be aware of:
 
 1. **Composite primary keys are not supported**
 2. **DQL/SQL direct queries are not tracked** - Only changes through EntityManager
 3. **Bulk operations are not tracked** - Use `EntityManager::flush()` after each entity
 
-## Sections
+## 📚 Sections
 
 - [Configuration](configuration.md) - Configure the DoctrineProvider
 - [Attributes](attributes.md) - Mark entities and fields for auditing
@@ -102,7 +110,7 @@ For each audited entity, a corresponding audit table is created:
 - [Schema Management](schema.md) - Audit table management
 - [Multi-Database](multi-database.md) - Store audits in separate databases
 
-## Basic Usage
+## 🚀 Basic Usage
 
 ```php
 <?php
@@ -132,8 +140,10 @@ $provider->registerStorageService(new StorageService('default', $entityManager))
 $auditor->registerProvider($provider);
 ```
 
+---
+
 ## Next Steps
 
-- [Configuration Reference](configuration.md)
-- [Attributes Reference](attributes.md)
-- [Querying Audits](../../querying/index.md)
+- ⚙️ [Configuration Reference](configuration.md)
+- 🏷️ [Attributes Reference](attributes.md)
+- 🔍 [Querying Audits](../../querying/index.md)
