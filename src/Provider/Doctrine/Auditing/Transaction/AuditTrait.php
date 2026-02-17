@@ -170,6 +170,7 @@ trait AuditTrait
             '@source' => $this->summarize($entityManager, $entity, [], $meta),
         ];
 
+        $jsonTypes = DoctrineHelper::jsonTypes();
         foreach ($changeset as $fieldName => [$old, $new]) {
             $o = null;
             $n = null;
@@ -199,7 +200,6 @@ trait AuditTrait
             }
 
             if ($o !== $n) {
-                $jsonTypes = DoctrineHelper::jsonTypes();
                 if (
                     isset($type) && \in_array($type, $jsonTypes, true)
                     && (null === $o || \is_array($o)) && (null === $n || \is_array($n))
