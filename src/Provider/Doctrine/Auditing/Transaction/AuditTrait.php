@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 
 trait AuditTrait
 {
+    private static array $typeNameCache = [];
     /**
      * Returns the primary key value of an entity.
      *
@@ -80,7 +81,7 @@ trait AuditTrait
 
         $platform = $entityManager->getConnection()->getDatabasePlatform();
 
-        switch (array_search($type::class, Type::getTypesMap(), true)) {
+        switch ($this->getTypeName($type)) {
             case Types::BIGINT:
             case 'uuid_binary':
             case 'uuid_binary_ordered_time':
@@ -349,6 +350,12 @@ trait AuditTrait
         }
 
         return $result;
+    }
+
+    private function getTypeName(Type $type): string|false
+    {
+        return self::$typeNameCache[$type::class]
+            ??= array_search($type::class, Type::getTypesMap(), true);
     }
 
     /**
