@@ -21,6 +21,7 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Provider\ProviderInterface;
 use DH\Auditor\Provider\Service\AuditingServiceInterface;
 use DH\Auditor\Tests\Provider\Doctrine\DoctrineProviderTest;
+use Doctrine\DBAL\Statement;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ToolEvents;
@@ -51,6 +52,9 @@ final class DoctrineProvider extends AbstractProvider
     ];
 
     private readonly TransactionManager $transactionManager;
+
+    /** @var array<string, Statement> */
+    private array $preparedStatements = [];
 
     public function __construct(ConfigurationInterface $configuration)
     {
@@ -153,7 +157,9 @@ final class DoctrineProvider extends AbstractProvider
 
         /** @var StorageService $storageService */
         $storageService = $this->getStorageServiceForEntity($entity);
-        $statement = $storageService->getEntityManager()->getConnection()->prepare($query);
+        $connection = $storageService->getEntityManager()->getConnection();
+        $cacheKey = spl_object_id($connection).'.'.$auditTable;
+        $statement = $this->preparedStatements[$cacheKey] ??= $connection->prepare($query);
 
         foreach ($payload as $key => $value) {
             $statement->bindValue(array_search($key, $keys, true) + 1, $value);
