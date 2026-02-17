@@ -218,7 +218,9 @@ final class TransactionProcessor implements TransactionProcessorInterface
         $dt = new \DateTimeImmutable('now', $tz);
         $diff = $data['diff'];
         $convertCharEncoding = (\is_string($diff) || \is_array($diff));
-        $diff = $convertCharEncoding ? $this->convertEncoding($diff) : $diff;
+        if ($configuration->isUtf8ConvertEnabled() && $convertCharEncoding) {
+            $diff = $this->convertEncoding($diff);
+        }
 
         $payload = [
             'entity' => $data['entity'],

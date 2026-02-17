@@ -43,6 +43,23 @@ For a complete upgrade guide with step-by-step instructions, see the [full docum
 
 Now only handles `__CG__` proxies. With PHP 8.4+, Doctrine ORM uses native lazy objects.
 
+### UTF-8 Conversion Now Opt-In (`utf8_convert`)
+
+Audit diffs are **no longer automatically re-encoded to UTF-8**. The implicit `mb_convert_encoding()` pass that ran on every audit entry has been removed from the default path.
+
+**Who is affected:** applications that store data from legacy sources containing non-UTF-8 byte sequences (e.g. ISO-8859-1 strings persisted via a Doctrine connection that was not explicitly configured as UTF-8).
+
+**Fix:** add `'utf8_convert' => true` to your `Configuration`:
+
+```php
+$configuration = new Configuration([
+    // ... existing options ...
+    'utf8_convert' => true,
+]);
+```
+
+**Why the default changed:** DBAL 4 requires PHP 8.4+ and enforces UTF-8 database connections, so the conversion is a no-op for virtually all modern applications. Keeping it as a mandatory step added unnecessary overhead on every flush.
+
 ### New `extra_data` Column
 
 A nullable JSON `extra_data` column has been added to audit tables. After upgrading, run `audit:schema:update --force`.

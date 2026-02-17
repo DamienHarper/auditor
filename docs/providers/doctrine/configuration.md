@@ -18,6 +18,7 @@ $configuration = new Configuration([
     'entities' => [],
     'viewer' => true,
     'storage_mapper' => null,
+    'utf8_convert' => false,
 ]);
 ```
 
@@ -31,6 +32,7 @@ $configuration = new Configuration([
 | `entities`        | `array`             | `[]`          | Entity-specific configuration                    |
 | `viewer`          | `bool\|array`       | `true`        | Enable/configure the audit viewer                |
 | `storage_mapper`  | `callable\|null`    | `null`        | Callback to route audits to storage services     |
+| `utf8_convert`    | `bool`              | `false`       | Re-encode diff strings to UTF-8 before persisting. Enable only if your data may contain non-UTF-8 strings (legacy encodings). |
 
 ## 📛 Table Naming
 
@@ -146,6 +148,24 @@ $configuration = new Configuration([
     ],
 ]);
 ```
+
+## 🔡 UTF-8 Conversion
+
+By default, auditor **does not** re-encode diff values to UTF-8. Since DBAL 4 requires PHP 8.4+ and modern database connections are always UTF-8, this conversion is unnecessary for most applications.
+
+If your application stores data from legacy sources that may contain non-UTF-8 byte sequences, enable this option:
+
+```php
+$configuration = new Configuration([
+    'utf8_convert' => true,
+]);
+```
+
+> [!WARNING]
+> Enabling `utf8_convert` traverses the entire diff array recursively on every audit entry and may have a noticeable performance impact on entities with large changesets.
+
+> [!NOTE]
+> **Upgrading from a version that predates this option?** The conversion was previously always applied. If your data relies on this behavior, set `'utf8_convert' => true` to restore it.
 
 ## 🗄️ Storage Mapper
 
@@ -305,8 +325,10 @@ $configuration = new Configuration([
         'enabled' => true,
         'page_size' => 50,
     ],
-    
+
     'storage_mapper' => null,  // Single database, no mapper needed
+
+    'utf8_convert' => false,   // Set to true only for legacy non-UTF-8 data sources
 ]);
 ```
 
