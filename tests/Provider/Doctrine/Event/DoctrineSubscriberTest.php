@@ -15,9 +15,7 @@ use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\ServerVersionProvider;
-use Doctrine\DBAL\VersionAwarePlatformDriver;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Event\OnFlushEventArgs;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -34,8 +32,6 @@ final class DoctrineSubscriberTest extends TestCase
     public function testIssue184IfAbstractDriverMiddleware(): void
     {
         $objectManager = $this->createMock(EntityManagerInterface::class);
-
-        $args = new OnFlushEventArgs($objectManager);
 
         $nativeDriver = $this->createStub(Driver::class);
         $dhDriver = new AuditorDriver($nativeDriver);
@@ -56,7 +52,7 @@ final class DoctrineSubscriberTest extends TestCase
         ]));
 
         $target = new DoctrineSubscriber($provider, $objectManager);
-        $target->onFlush($args);
+        $target->onFlush();
 
         foreach ($dhDriver->getFlusherList() as $item) {
             ($item)();
@@ -69,50 +65,26 @@ final class DoctrineSubscriberTest extends TestCase
     {
         $objectManager = $this->createMock(EntityManagerInterface::class);
 
-        $args = new OnFlushEventArgs($objectManager);
-
         $nativeDriver = $this->createStub(Driver::class);
         $auditorDriver = new AuditorDriver($nativeDriver);
-        if (!interface_exists(VersionAwarePlatformDriver::class)) {
-            $driver = new readonly class($auditorDriver) implements Driver {
-                public function __construct(private Driver $auditorDriver) {}
+        $driver = new readonly class($auditorDriver) implements Driver {
+            public function __construct(private Driver $auditorDriver) {}
 
-                public function connect(array $params): DriverConnection
-                {
-                    return $this->auditorDriver->connect($params);
-                }
+            public function connect(array $params): DriverConnection
+            {
+                return $this->auditorDriver->connect($params);
+            }
 
-                public function getDatabasePlatform(ServerVersionProvider $versionProvider): AbstractPlatform
-                {
-                    return $this->auditorDriver->getDatabasePlatform($versionProvider);
-                }
+            public function getDatabasePlatform(ServerVersionProvider $versionProvider): AbstractPlatform
+            {
+                return $this->auditorDriver->getDatabasePlatform($versionProvider);
+            }
 
-                public function getExceptionConverter(): Driver\API\ExceptionConverter
-                {
-                    return new ExceptionConverter();
-                }
-            };
-        } else {
-            $driver = new readonly class($auditorDriver) implements VersionAwarePlatformDriver {
-                public function __construct(private Driver $auditorDriver) {}
-
-                public function connect(array $params): DriverConnection
-                {
-                    return $this->auditorDriver->connect($params);
-                }
-
-                public function getDatabasePlatform(): void {}
-
-                public function createDatabasePlatformForVersion($version): void {}
-
-                public function getSchemaManager(ConnectionDbal $conn, AbstractPlatform $platform): void {}
-
-                public function getExceptionConverter(): Driver\API\ExceptionConverter
-                {
-                    return new ExceptionConverter();
-                }
-            };
-        }
+            public function getExceptionConverter(): Driver\API\ExceptionConverter
+            {
+                return new ExceptionConverter();
+            }
+        };
 
         $objectManager
             ->method('getConnection')
@@ -129,7 +101,7 @@ final class DoctrineSubscriberTest extends TestCase
         ]));
 
         $target = new DoctrineSubscriber($provider, $objectManager);
-        $target->onFlush($args);
+        $target->onFlush();
 
         foreach ($auditorDriver->getFlusherList() as $item) {
             ($item)();
@@ -142,50 +114,26 @@ final class DoctrineSubscriberTest extends TestCase
     {
         $objectManager = $this->createMock(EntityManagerInterface::class);
 
-        $args = new OnFlushEventArgs($objectManager);
-
         $nativeDriver = $this->createStub(Driver::class);
         $auditorDriver = new AuditorDriver($nativeDriver);
-        if (!interface_exists(VersionAwarePlatformDriver::class)) {
-            $driver = new readonly class($auditorDriver) implements Driver {
-                public function __construct(private Driver $auditorDriver) {}
+        $driver = new readonly class($auditorDriver) implements Driver {
+            public function __construct(private Driver $auditorDriver) {}
 
-                public function connect(array $params): DriverConnection
-                {
-                    return $this->auditorDriver->connect($params);
-                }
+            public function connect(array $params): DriverConnection
+            {
+                return $this->auditorDriver->connect($params);
+            }
 
-                public function getDatabasePlatform(ServerVersionProvider $versionProvider): AbstractPlatform
-                {
-                    return $this->auditorDriver->getDatabasePlatform($versionProvider);
-                }
+            public function getDatabasePlatform(ServerVersionProvider $versionProvider): AbstractPlatform
+            {
+                return $this->auditorDriver->getDatabasePlatform($versionProvider);
+            }
 
-                public function getExceptionConverter(): Driver\API\ExceptionConverter
-                {
-                    return new ExceptionConverter();
-                }
-            };
-        } else {
-            $driver = new readonly class($auditorDriver) implements VersionAwarePlatformDriver {
-                public function __construct(private Driver $auditorDriver) {}
-
-                public function connect(array $params): DriverConnection
-                {
-                    return $this->auditorDriver->connect($params);
-                }
-
-                public function getDatabasePlatform(): void {}
-
-                public function createDatabasePlatformForVersion($version): void {}
-
-                public function getSchemaManager(ConnectionDbal $conn, AbstractPlatform $platform): void {}
-
-                public function getExceptionConverter(): Driver\API\ExceptionConverter
-                {
-                    return new ExceptionConverter();
-                }
-            };
-        }
+            public function getExceptionConverter(): Driver\API\ExceptionConverter
+            {
+                return new ExceptionConverter();
+            }
+        };
 
         $objectManager
             ->method('getConnection')
@@ -207,7 +155,7 @@ final class DoctrineSubscriberTest extends TestCase
         ]));
 
         $target = new DoctrineSubscriber($provider, $objectManager);
-        $target->onFlush($args);
+        $target->onFlush();
 
         $this->assertTrue(true);
     }
