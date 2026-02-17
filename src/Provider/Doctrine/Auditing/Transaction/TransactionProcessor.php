@@ -23,6 +23,8 @@ final class TransactionProcessor implements TransactionProcessorInterface
 {
     use AuditTrait;
 
+    private ?\DateTimeZone $dateTimeZone = null;
+
     public function __construct(private DoctrineProvider $provider) {}
 
     /**
@@ -212,7 +214,8 @@ final class TransactionProcessor implements TransactionProcessorInterface
         $configuration = $this->provider->getConfiguration();
         $schema = $data['schema'] ? $data['schema'].'.' : '';
         $auditTable = $schema.$configuration->getTablePrefix().$data['table'].$configuration->getTableSuffix();
-        $dt = new \DateTimeImmutable('now', new \DateTimeZone($this->provider->getAuditor()->getConfiguration()->timezone));
+        $tz = $this->dateTimeZone ??= new \DateTimeZone($this->provider->getAuditor()->getConfiguration()->timezone);
+        $dt = new \DateTimeImmutable('now', $tz);
         $diff = $data['diff'];
         $convertCharEncoding = (\is_string($diff) || \is_array($diff));
         $diff = $convertCharEncoding ? $this->convertEncoding($diff) : $diff;
