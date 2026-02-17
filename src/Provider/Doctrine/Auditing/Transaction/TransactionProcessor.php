@@ -54,10 +54,10 @@ final class TransactionProcessor implements TransactionProcessorInterface
         $this->audit([
             'action' => TransactionType::Insert,
             'blame' => $blame,
-            'diff' => $this->diff($entityManager, $entity, $ch),
+            'diff' => $this->diff($entityManager, $entity, $ch, $meta),
             'table' => $meta->getTableName(),
             'schema' => $meta->getSchemaName(),
-            'id' => $this->id($entityManager, $entity),
+            'id' => $this->id($entityManager, $entity, $meta),
             'transaction_hash' => $transactionHash,
             'discriminator' => $this->getDiscriminator($entity, $meta->inheritanceType),
             'entity' => $meta->getName(),
@@ -70,21 +70,21 @@ final class TransactionProcessor implements TransactionProcessorInterface
      */
     private function update(EntityManagerInterface $entityManager, object $entity, array $ch, string $transactionHash, array $blame): void
     {
-        $diff = $this->diff($entityManager, $entity, $ch);
+        $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
+        $diff = $this->diff($entityManager, $entity, $ch, $meta);
         unset($diff['@source']);
 
         if ([] === $diff) {
             return; // if there is no entity diff, do not log it
         }
 
-        $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
         $this->audit([
             'action' => TransactionType::Update,
             'blame' => $blame,
             'diff' => $diff,
             'table' => $meta->getTableName(),
             'schema' => $meta->getSchemaName(),
-            'id' => $this->id($entityManager, $entity),
+            'id' => $this->id($entityManager, $entity, $meta),
             'transaction_hash' => $transactionHash,
             'discriminator' => $this->getDiscriminator($entity, $meta->inheritanceType),
             'entity' => $meta->getName(),
@@ -101,7 +101,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
         $this->audit([
             'action' => TransactionType::Remove,
             'blame' => $blame,
-            'diff' => $this->summarize($entityManager, $entity, ['id' => $id]),
+            'diff' => $this->summarize($entityManager, $entity, ['id' => $id], $meta),
             'table' => $meta->getTableName(),
             'schema' => $meta->getSchemaName(),
             'id' => $id,
@@ -179,13 +179,13 @@ final class TransactionProcessor implements TransactionProcessorInterface
             'action' => $type,
             'blame' => $blame,
             'diff' => [
-                'source' => $this->summarize($entityManager, $source, ['field' => $mapping['fieldName']]),
+                'source' => $this->summarize($entityManager, $source, ['field' => $mapping['fieldName']], $meta),
                 'target' => $this->summarize($entityManager, $target, ['field' => $mapping['isOwningSide'] ? $mapping['inversedBy'] : $mapping['mappedBy']]),
                 'is_owning_side' => $mapping['isOwningSide'],
             ],
             'table' => $meta->getTableName(),
             'schema' => $meta->getSchemaName(),
-            'id' => $this->id($entityManager, $source),
+            'id' => $this->id($entityManager, $source, $meta),
             'transaction_hash' => $transactionHash,
             'discriminator' => $this->getDiscriminator($source, $meta->inheritanceType),
             'entity' => $meta->getName(),

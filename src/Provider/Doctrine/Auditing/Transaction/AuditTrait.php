@@ -25,9 +25,9 @@ trait AuditTrait
      * @throws Exception
      * @throws ORMMappingException
      */
-    private function id(EntityManagerInterface $entityManager, object $entity): mixed
+    private function id(EntityManagerInterface $entityManager, object $entity, ?ClassMetadata $meta = null): mixed
     {
-        $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
+        $meta ??= $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
 
         try {
             $pk = $meta->getSingleIdentifierFieldName();
@@ -162,11 +162,11 @@ trait AuditTrait
      * @throws ConversionException
      * @throws ORMMappingException
      */
-    private function diff(EntityManagerInterface $entityManager, object $entity, array $changeset): array
+    private function diff(EntityManagerInterface $entityManager, object $entity, array $changeset, ?ClassMetadata $meta = null): array
     {
-        $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
+        $meta ??= $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
         $diff = [
-            '@source' => $this->summarize($entityManager, $entity),
+            '@source' => $this->summarize($entityManager, $entity, [], $meta),
         ];
 
         foreach ($changeset as $fieldName => [$old, $new]) {
@@ -231,14 +231,14 @@ trait AuditTrait
      * @throws Exception
      * @throws ORMMappingException
      */
-    private function summarize(EntityManagerInterface $entityManager, ?object $entity = null, array $extra = []): ?array
+    private function summarize(EntityManagerInterface $entityManager, ?object $entity = null, array $extra = [], ?ClassMetadata $meta = null): ?array
     {
         if (null === $entity) {
             return null;
         }
 
         $entityManager->getUnitOfWork()->initializeObject($entity); // ensure that proxies are initialized
-        $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
+        $meta ??= $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
 
         $pkValue = $extra['id'] ?? $this->id($entityManager, $entity);
         $pkName = $meta->getSingleIdentifierFieldName();
