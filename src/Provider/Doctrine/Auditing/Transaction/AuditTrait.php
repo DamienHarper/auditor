@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DH\Auditor\Provider\Doctrine\Auditing\Transaction;
 
 use DH\Auditor\Exception\MappingException;
+use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\User\UserInterface;
 use Doctrine\DBAL\Exception;
@@ -20,6 +21,7 @@ use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 trait AuditTrait
 {
     private static array $typeNameCache = [];
+
     /**
      * Returns the primary key value of an entity.
      *
@@ -171,6 +173,10 @@ trait AuditTrait
             '@source' => $this->summarize($entityManager, $entity, [], $meta),
         ];
 
+        /** @var Configuration $configuration */
+        $configuration = $this->provider->getConfiguration();
+        $globalIgnoredColumns = $configuration->getIgnoredColumns();
+        $entityIgnoredColumns = $configuration->getEntities()[$meta->name]['ignored_columns'] ?? [];
         $jsonTypes = DoctrineHelper::jsonTypes();
         foreach ($changeset as $fieldName => [$old, $new]) {
             $o = null;
@@ -181,20 +187,23 @@ trait AuditTrait
                 continue;
             }
 
+            $isAuditedField = !\in_array($fieldName, $globalIgnoredColumns, true)
+                && !\in_array($fieldName, $entityIgnoredColumns, true);
+
             $type = null;
             if (
-                !isset($meta->embeddedClasses[$fieldName])
+                $isAuditedField
+                && !isset($meta->embeddedClasses[$fieldName])
                 && $meta->hasField($fieldName)
-                && $this->provider->isAuditedField($entity, $fieldName)
             ) {
                 $type = $this->getType($meta, $fieldName);
                 \assert(\is_object($type));
                 $o = $this->value($platform, $type, $old);
                 $n = $this->value($platform, $type, $new);
             } elseif (
-                $meta->hasAssociation($fieldName)
+                $isAuditedField
+                && $meta->hasAssociation($fieldName)
                 && $meta->isSingleValuedAssociation($fieldName)
-                && $this->provider->isAuditedField($entity, $fieldName)
             ) {
                 $o = $this->summarize($entityManager, $old);
                 $n = $this->summarize($entityManager, $new);
@@ -353,7 +362,7 @@ trait AuditTrait
         return $result;
     }
 
-    private function getTypeName(Type $type): string|false
+    private function getTypeName(Type $type): false|string
     {
         return self::$typeNameCache[$type::class]
             ??= array_search($type::class, Type::getTypesMap(), true);
