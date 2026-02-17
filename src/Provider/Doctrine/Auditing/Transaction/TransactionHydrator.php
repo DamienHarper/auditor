@@ -33,7 +33,9 @@ final class TransactionHydrator implements TransactionHydratorInterface
     private function hydrateWithScheduledInsertions(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
         $uow = $entityManager->getUnitOfWork();
-        foreach (array_reverse($uow->getScheduledEntityInsertions()) as $entity) {
+        $entities = array_values($uow->getScheduledEntityInsertions());
+        for ($i = \count($entities) - 1; $i >= 0; --$i) {
+            $entity = $entities[$i];
             if ($this->provider->isAudited($entity)) {
                 $transaction->insert(
                     $entity,
@@ -46,7 +48,9 @@ final class TransactionHydrator implements TransactionHydratorInterface
     private function hydrateWithScheduledUpdates(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
         $uow = $entityManager->getUnitOfWork();
-        foreach (array_reverse($uow->getScheduledEntityUpdates()) as $entity) {
+        $entities = array_values($uow->getScheduledEntityUpdates());
+        for ($i = \count($entities) - 1; $i >= 0; --$i) {
+            $entity = $entities[$i];
             if ($this->provider->isAudited($entity)) {
                 $transaction->update(
                     $entity,
@@ -59,7 +63,9 @@ final class TransactionHydrator implements TransactionHydratorInterface
     private function hydrateWithScheduledDeletions(Transaction $transaction, EntityManagerInterface $entityManager): void
     {
         $uow = $entityManager->getUnitOfWork();
-        foreach (array_reverse($uow->getScheduledEntityDeletions()) as $entity) {
+        $entities = array_values($uow->getScheduledEntityDeletions());
+        for ($i = \count($entities) - 1; $i >= 0; --$i) {
+            $entity = $entities[$i];
             if ($this->provider->isAudited($entity)) {
                 $uow->initializeObject($entity);
                 $transaction->remove(
@@ -74,8 +80,10 @@ final class TransactionHydrator implements TransactionHydratorInterface
     {
         $uow = $entityManager->getUnitOfWork();
 
-        /** @var PersistentCollection $collection */
-        foreach (array_reverse($uow->getScheduledCollectionUpdates()) as $collection) {
+        /** @var array<PersistentCollection> $collections */
+        $collections = array_values($uow->getScheduledCollectionUpdates());
+        for ($i = \count($collections) - 1; $i >= 0; --$i) {
+            $collection = $collections[$i];
             $owner = $collection->getOwner();
 
             if (null !== $owner && $this->provider->isAudited($owner)) {
@@ -110,8 +118,10 @@ final class TransactionHydrator implements TransactionHydratorInterface
     {
         $uow = $entityManager->getUnitOfWork();
 
-        /** @var PersistentCollection $collection */
-        foreach (array_reverse($uow->getScheduledCollectionDeletions()) as $collection) {
+        /** @var array<PersistentCollection> $collections */
+        $collections = array_values($uow->getScheduledCollectionDeletions());
+        for ($i = \count($collections) - 1; $i >= 0; --$i) {
+            $collection = $collections[$i];
             $owner = $collection->getOwner();
 
             if (null !== $owner && $this->provider->isAudited($owner)) {
