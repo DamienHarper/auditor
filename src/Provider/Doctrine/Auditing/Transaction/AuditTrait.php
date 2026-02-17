@@ -8,6 +8,7 @@ use DH\Auditor\Exception\MappingException;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
 use DH\Auditor\User\UserInterface;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
@@ -29,6 +30,7 @@ trait AuditTrait
     private function id(EntityManagerInterface $entityManager, object $entity, ?ClassMetadata $meta = null): mixed
     {
         $meta ??= $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
+        $platform = $entityManager->getConnection()->getDatabasePlatform();
 
         try {
             $pk = $meta->getSingleIdentifierFieldName();
@@ -38,7 +40,7 @@ trait AuditTrait
 
         $type = $this->getType($meta, $pk);
         if (null !== $type) {
-            return $this->value($entityManager, $type, DoctrineHelper::getReflectionPropertyValue($meta, $pk, $entity));
+            return $this->value($platform, $type, DoctrineHelper::getReflectionPropertyValue($meta, $pk, $entity));
         }
 
         /**
@@ -60,7 +62,7 @@ trait AuditTrait
         \assert(\is_object($type));
         \assert(\is_object($targetEntity));
 
-        return $this->value($entityManager, $type, DoctrineHelper::getReflectionPropertyValue($meta, $pk, $targetEntity));
+        return $this->value($platform, $type, DoctrineHelper::getReflectionPropertyValue($meta, $pk, $targetEntity));
     }
 
     /**
@@ -69,7 +71,7 @@ trait AuditTrait
      * @throws Exception
      * @throws ConversionException
      */
-    private function value(EntityManagerInterface $entityManager, Type $type, mixed $value): mixed
+    private function value(AbstractPlatform $platform, Type $type, mixed $value): mixed
     {
         if (null === $value) {
             return null;
@@ -78,8 +80,6 @@ trait AuditTrait
         if ($value instanceof \UnitEnum && property_exists($value, 'value')) {
             $value = $value->value;
         }
-
-        $platform = $entityManager->getConnection()->getDatabasePlatform();
 
         switch ($this->getTypeName($type)) {
             case Types::BIGINT:
@@ -166,6 +166,7 @@ trait AuditTrait
     private function diff(EntityManagerInterface $entityManager, object $entity, array $changeset, ?ClassMetadata $meta = null): array
     {
         $meta ??= $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
+        $platform = $entityManager->getConnection()->getDatabasePlatform();
         $diff = [
             '@source' => $this->summarize($entityManager, $entity, [], $meta),
         ];
@@ -188,8 +189,8 @@ trait AuditTrait
             ) {
                 $type = $this->getType($meta, $fieldName);
                 \assert(\is_object($type));
-                $o = $this->value($entityManager, $type, $old);
-                $n = $this->value($entityManager, $type, $new);
+                $o = $this->value($platform, $type, $old);
+                $n = $this->value($platform, $type, $new);
             } elseif (
                 $meta->hasAssociation($fieldName)
                 && $meta->isSingleValuedAssociation($fieldName)
