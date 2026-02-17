@@ -15,19 +15,14 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'issue249_bar')]
 class Bar
 {
-    #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: Foo::class)]
-    #[ORM\JoinColumn(name: 'foo_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private Foo $foo;
-
-    #[ORM\Column(name: 'username', type: Types::STRING, length: 255, nullable: true)]
-    private ?string $username = null;
-
-    public function __construct(Foo $foo, ?string $username = null)
-    {
-        $this->foo = $foo;
-        $this->username = $username;
-    }
+    public function __construct(
+        #[ORM\Id]
+        #[ORM\ManyToOne(targetEntity: Foo::class)]
+        #[ORM\JoinColumn(name: 'foo_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+        private Foo $foo,
+        #[ORM\Column(name: 'username', type: Types::STRING, length: 255, nullable: true)]
+        private ?string $username = null
+    ) {}
 
     public function getFoo(): Foo
     {
