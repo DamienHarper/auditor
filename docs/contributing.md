@@ -65,12 +65,14 @@ The project includes a `Makefile` that allows you to test against different comb
 
 **Available Make Targets:**
 
-| Target    | Description                                    |
-|-----------|------------------------------------------------|
-| `tests`   | Run the test suite using PHPUnit               |
-| `cs-fix`  | Run PHP-CS-Fixer to fix coding standards       |
-| `phpstan` | Run PHPStan for static code analysis           |
-| `help`    | Display available commands and options         |
+| Target    | Description                                                    |
+|-----------|----------------------------------------------------------------|
+| `tests`   | Run the test suite using PHPUnit                               |
+| `cs-fix`  | Run PHP-CS-Fixer to fix coding standards                       |
+| `phpstan` | Run PHPStan for static code analysis                           |
+| `bench`   | Run PHPBench benchmarks (statistical, reproducible)            |
+| `profile` | Profile with Blackfire (requires `BLACKFIRE_*` env vars)       |
+| `help`    | Display available commands and options                         |
 
 **Options:**
 
@@ -138,12 +140,112 @@ The Makefile uses Docker Compose to spin up containers with the specified PHP ve
 
 ```
 tools/docker/
-├── compose.yaml          # Base configuration
-├── compose.mysql.yaml    # MySQL service
-├── compose.pgsql.yaml    # PostgreSQL service
-├── compose.mariadb.yaml  # MariaDB service
-└── Dockerfile            # PHP CLI image
+├── compose.yaml             # Base configuration
+├── compose.mysql.yaml       # MySQL service
+├── compose.pgsql.yaml       # PostgreSQL service
+├── compose.mariadb.yaml     # MariaDB service
+├── compose.blackfire.yaml   # Blackfire agent sidecar (profiling)
+└── Dockerfile               # PHP CLI image (+ auditor-blackfire stage)
 ```
+
+### ⚡ Benchmarking
+
+The project ships with a **PHPBench** benchmark suite and a **Blackfire** profiling script to measure the performance impact of changes on the Doctrine flush pipeline (audit entry generation + persistence).
+
+Benchmark files live in `benchmarks/`:
+
+```
+benchmarks/
+├── AuditBench.php   # PHPBench suite — 6 statistical scenarios
+└── profile.php      # Standalone Blackfire profiling script
+```
+
+#### Running Benchmarks Locally
+
+```bash
+# Run all benchmarks (N=50 entities, 5 iterations each)
+vendor/bin/phpbench run benchmarks/AuditBench.php --report=default
+
+# Increase entity count for more representative results
+BENCH_N=200 vendor/bin/phpbench run benchmarks/AuditBench.php --report=default
+```
+
+#### Running Benchmarks via Docker (Recommended)
+
+```bash
+# Run with defaults (N=50)
+make bench
+
+# Run with 200 entities
+BENCH_N=200 make bench
+
+# Run on PHP 8.5
+make bench php=8.5
+
+# Pass extra PHPBench arguments
+make bench args='--filter=benchInsert --report=default'
+```
+
+#### Before/After Comparison
+
+This workflow is used to **quantify the performance impact** of a branch against `master`:
+
+```bash
+# 1. On master (or a dedicated baseline branch), store a reference run
+git checkout master
+vendor/bin/phpbench run benchmarks/AuditBench.php --report=default --tag=before
+
+# 2. Switch to your branch and compare
+git checkout my-branch
+vendor/bin/phpbench run benchmarks/AuditBench.php --report=default --ref=before
+```
+
+PHPBench stores runs in `.phpbench/` (XML, gitignored). The `--ref=before` flag adds a `diff` column showing the percentage change per subject.
+
+#### Blackfire Profiling (Flame Graphs)
+
+For deep-dive profiling (call graph, function-level hotspots), use the Blackfire script.
+
+**Prerequisites:** A [Blackfire.io](https://blackfire.io) account (free tier works). Set the following environment variables:
+
+```bash
+export BLACKFIRE_SERVER_ID=<your-server-id>
+export BLACKFIRE_SERVER_TOKEN=<your-server-token>
+export BLACKFIRE_CLIENT_ID=<your-client-id>
+export BLACKFIRE_CLIENT_TOKEN=<your-client-token>
+```
+
+**Dry run (no Blackfire account needed):**
+
+```bash
+# Runs all 5 phases (INSERT / UPDATE / ASSOCIATE / DISSOCIATE / REMOVE) without profiling
+BENCH_N=100 php benchmarks/profile.php
+```
+
+**Full Blackfire profile:**
+
+```bash
+# With the Blackfire CLI installed locally
+BENCH_N=100 blackfire run php benchmarks/profile.php
+
+# Via Docker (Blackfire agent sidecar)
+BENCH_N=100 make profile
+```
+
+The `make profile` target spins up a Blackfire agent container alongside php-cli using `compose.blackfire.yaml`. The resulting profile URL is printed in the terminal and opens in your Blackfire dashboard.
+
+#### Benchmark Scenarios
+
+| Subject | What is measured |
+|---------|-----------------|
+| `benchInsert` | N entity inserts → N audit `INSERT` entries |
+| `benchUpdate` | N entity updates → N audit `UPDATE` entries |
+| `benchRemove` | N entity deletions → N audit `REMOVE` entries |
+| `benchAssociate` | N ManyToMany links → N audit `ASSOCIATE` entries |
+| `benchDissociate` | N ManyToMany unlinks → N audit `DISSOCIATE` entries |
+| `benchMixed` | Realistic flush: N/2 inserts + N/4 updates + N/4 removes |
+
+All scenarios use an **in-memory SQLite database** so results are environment-independent. The `BENCH_N` env var (default `50`) controls the number of entities per flush.
 
 ### 🧹 Code Quality
 

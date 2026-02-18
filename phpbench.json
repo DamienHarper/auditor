@@ -1,0 +1,13 @@
+{
+    "$schema": "https://raw.githubusercontent.com/phpbench/phpbench/master/phpbench.schema.json",
+    "runner.bootstrap": "vendor/autoload.php",
+    "runner.path": "benchmarks/AuditBench.php",
+    "storage.driver": "xml",
+    "storage.xml_storage_path": ".phpbench",
+    "report.generators": {
+        "bench_compare": {
+            "extends": "aggregate",
+            "cols": ["benchmark", "subject", "mean", "diff"]
+        }
+    }
+}
