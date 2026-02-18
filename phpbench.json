@@ -4,10 +4,10 @@
     "runner.path": "benchmarks/AuditBench.php",
     "storage.driver": "xml",
     "storage.xml_storage_path": ".phpbench",
-    "report.generators": {
-        "bench_compare": {
-            "extends": "aggregate",
-            "cols": ["benchmark", "subject", "mean", "diff"]
+    "report.outputs": {
+        "html_file": {
+            "extends": "html",
+            "path": "benchmark-report.html"
         }
     }
 }
