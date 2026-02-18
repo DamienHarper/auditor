@@ -56,6 +56,11 @@
       "@cs-fix",
       "@phpstan"
     ],
+    "bench": "vendor/bin/phpbench run benchmarks/AuditBench.php --report=aggregate",
+    "bench:baseline": "vendor/bin/phpbench run benchmarks/AuditBench.php --report=aggregate --tag=before --store",
+    "bench:compare": "vendor/bin/phpbench run benchmarks/AuditBench.php --report=aggregate --ref=before --progress=plain",
+    "bench:html": "vendor/bin/phpbench run benchmarks/AuditBench.php --report=aggregate --ref=before --output=html_file",
+    "profile": "php benchmarks/profile.php",
     "update-tools": "composer update --working-dir=tools/php-cs-fixer ; composer update --working-dir=tools/phpstan ; composer update --working-dir=tools/rector",
     "setup": "SYMFONY_REQUIRE='8.0.*' composer update --prefer-stable"
   },
