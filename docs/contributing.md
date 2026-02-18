@@ -160,47 +160,111 @@ benchmarks/
 └── profile.php      # Standalone Blackfire profiling script
 ```
 
-#### Running Benchmarks Locally
+#### Composer Scripts (Recommended)
+
+The quickest way to run benchmarks locally. All scripts honour the `BENCH_N` environment variable (default: `50`) to control the number of entities per flush.
+
+| Script | Description |
+|--------|-------------|
+| `composer bench` | Run all benchmarks (aggregate report) |
+| `composer bench:baseline` | Store a baseline tagged `before` |
+| `composer bench:compare` | Compare current code against the `before` baseline |
+| `composer bench:html` | Generate `benchmark-report.html` vs baseline |
+| `composer profile` | Run the Blackfire profiling script (dry run without the CLI) |
 
 ```bash
-# Run all benchmarks (N=50 entities, 5 iterations each)
-vendor/bin/phpbench run benchmarks/AuditBench.php --report=default
+# Simple run
+BENCH_N=1000 composer bench
 
-# Increase entity count for more representative results
-BENCH_N=200 vendor/bin/phpbench run benchmarks/AuditBench.php --report=default
+# Take a baseline (on master)
+BENCH_N=1000 XDEBUG_MODE=off composer bench:baseline
+
+# Compare (on your branch)
+BENCH_N=1000 XDEBUG_MODE=off composer bench:compare
+
+# Generate HTML artifact
+BENCH_N=1000 XDEBUG_MODE=off composer bench:html
+# → benchmark-report.html
 ```
 
-#### Running Benchmarks via Docker (Recommended)
+> [!TIP]
+> Pass `XDEBUG_MODE=off` to disable the xdebug overhead and get production-representative timings.
+
+Extra PHPBench arguments can be appended after `--`:
 
 ```bash
-# Run with defaults (N=50)
+# Custom tag
+BENCH_N=1000 composer bench -- --tag=my_tag --store
+BENCH_N=1000 composer bench -- --ref=my_tag --progress=plain
+
+# Run a single scenario
+BENCH_N=1000 composer bench -- --filter=benchInsert
+```
+
+#### Running Benchmarks via Docker
+
+Use `make bench` to run against a specific PHP version inside the same containerised environment used for the test suite. Results are comparable across machines and CI runs.
+
+```bash
+# Run with defaults (N=50, PHP 8.4)
 make bench
 
-# Run with 200 entities
-BENCH_N=200 make bench
+# Run with 1 000 entities, xdebug disabled
+BENCH_N=1000 XDEBUG_MODE=off make bench
 
 # Run on PHP 8.5
-make bench php=8.5
+BENCH_N=1000 make bench php=8.5
 
 # Pass extra PHPBench arguments
-make bench args='--filter=benchInsert --report=default'
+make bench args='--filter=benchInsert'
 ```
 
 #### Before/After Comparison
 
-This workflow is used to **quantify the performance impact** of a branch against `master`:
+This workflow quantifies the **performance impact** of a branch against `master`.
+
+PHPBench stores runs as XML files in `.phpbench/` (gitignored). `--tag` names a stored run; `--ref` replays it alongside the current run. Both branches must use the **same `BENCH_N`** and the **same environment** (same PHP version, same xdebug mode) for a valid comparison.
+
+**Via Composer (local PHP, recommended):**
 
 ```bash
-# 1. On master (or a dedicated baseline branch), store a reference run
+# 1. On master — store the baseline
 git checkout master
-vendor/bin/phpbench run benchmarks/AuditBench.php --report=default --tag=before
+BENCH_N=1000 XDEBUG_MODE=off composer bench:baseline
 
-# 2. Switch to your branch and compare
+# 2. On your branch — compare
 git checkout my-branch
-vendor/bin/phpbench run benchmarks/AuditBench.php --report=default --ref=before
+BENCH_N=1000 XDEBUG_MODE=off composer bench:compare
 ```
 
-PHPBench stores runs in `.phpbench/` (XML, gitignored). The `--ref=before` flag adds a `diff` column showing the percentage change per subject.
+**Via Docker (reproducible environment):**
+
+```bash
+git checkout master
+BENCH_N=1000 XDEBUG_MODE=off make bench php=8.4 args='--tag=before --store'
+
+git checkout my-branch
+BENCH_N=1000 XDEBUG_MODE=off make bench php=8.4 args='--ref=before --progress=plain'
+```
+
+With `--ref=before`, each subject line in the progress output shows the inline comparison:
+
+```
+benchInsert    I5 [Mo850μs (actual) vs. Mo1.2ms (before)] -29.17% (±1.8%)
+benchUpdate    I5 [Mo9.2ms (actual) vs. Mo12.1ms (before)] -23.97% (±2.1%)
+...
+```
+
+A **negative percentage** means the current branch is faster. The result is statistically meaningful when `|gain| > rstdev`.
+
+#### Capturing Results for a PR Description
+
+```bash
+BENCH_N=1000 XDEBUG_MODE=off composer bench:compare 2>&1 \
+    | grep -E "bench[A-Z]" > benchmark-summary.txt
+```
+
+Paste the content of `benchmark-summary.txt` into the PR body inside a fenced code block.
 
 #### Blackfire Profiling (Flame Graphs)
 
@@ -218,8 +282,7 @@ export BLACKFIRE_CLIENT_TOKEN=<your-client-token>
 **Dry run (no Blackfire account needed):**
 
 ```bash
-# Runs all 5 phases (INSERT / UPDATE / ASSOCIATE / DISSOCIATE / REMOVE) without profiling
-BENCH_N=100 php benchmarks/profile.php
+BENCH_N=100 composer profile
 ```
 
 **Full Blackfire profile:**
@@ -238,12 +301,12 @@ The `make profile` target spins up a Blackfire agent container alongside php-cli
 
 | Subject | What is measured |
 |---------|-----------------|
-| `benchInsert` | N entity inserts → N audit `INSERT` entries |
-| `benchUpdate` | N entity updates → N audit `UPDATE` entries |
-| `benchRemove` | N entity deletions → N audit `REMOVE` entries |
-| `benchAssociate` | N ManyToMany links → N audit `ASSOCIATE` entries |
-| `benchDissociate` | N ManyToMany unlinks → N audit `DISSOCIATE` entries |
-| `benchMixed` | Realistic flush: N/2 inserts + N/4 updates + N/4 removes |
+| `benchInsert` | N Author inserts → N audit `INSERT` entries |
+| `benchUpdate` | N Post updates (title + body + created_at) → N audit `UPDATE` entries |
+| `benchRemove` | N Author removals → N audit `REMOVE` entries |
+| `benchAssociate` | N Post→Tag ManyToMany links → N audit `ASSOCIATE` entries |
+| `benchDissociate` | N Post→Tag ManyToMany unlinks → N audit `DISSOCIATE` entries |
+| `benchMixed` | Realistic flush: N/2 inserts + N/4 updates (2 fields) + N/4 removes |
 
 All scenarios use an **in-memory SQLite database** so results are environment-independent. The `BENCH_N` env var (default `50`) controls the number of entities per flush.
 
