@@ -83,13 +83,13 @@ class AuditBench
     }
 
     // -------------------------------------------------------------------------
-    //  benchUpdate — N Author updates audited in a single flush
+    //  benchUpdate — N Post updates (3 fields: title, body, created_at) in a single flush
     // -------------------------------------------------------------------------
 
     public function setUpUpdate(): void
     {
         $this->setUpBase();
-        $this->seedAuthors();
+        $this->seedPosts();
         $this->em->flush();
     }
 
@@ -97,8 +97,11 @@ class AuditBench
     #[Bench\AfterMethods(['tearDownBase'])]
     public function benchUpdate(): void
     {
-        foreach ($this->authors as $i => $author) {
-            $author->setFullname("Author {$i} Updated");
+        $now = new \DateTimeImmutable();
+        foreach ($this->posts as $i => $post) {
+            $post->setTitle("Updated Post {$i}")
+                 ->setBody("Updated body content for post number {$i}")
+                 ->setCreatedAt($now);
         }
         $this->em->flush();
     }
@@ -110,7 +113,7 @@ class AuditBench
     public function setUpRemove(): void
     {
         $this->setUpBase();
-        $this->seedAuthors();
+        $this->seedAuthors();   // Authors, not Posts — keep remove independent of update
         $this->em->flush();
     }
 
@@ -208,9 +211,9 @@ class AuditBench
             $this->em->persist($author);
         }
 
-        // Update the first N/4 existing authors
+        // Update the first N/4 existing authors (2 fields)
         foreach (\array_slice($this->authors, 0, $quarter) as $i => $author) {
-            $author->setFullname("Updated {$i}");
+            $author->setFullname("Updated {$i}")->setEmail("updated{$i}@bench.test");
         }
 
         // Remove the next N/4 existing authors
@@ -256,6 +259,16 @@ class AuditBench
             $author->setFullname("Author {$i}")->setEmail("author{$i}@bench.test");
             $this->em->persist($author);
             $this->authors[] = $author;
+        }
+    }
+
+    private function seedPosts(): void
+    {
+        for ($i = 0; $i < $this->n; ++$i) {
+            $post = new Post();
+            $post->setTitle("Post {$i}")->setBody("Initial body for post {$i}")->setCreatedAt(new \DateTimeImmutable('2020-01-01'));
+            $this->em->persist($post);
+            $this->posts[] = $post;
         }
     }
 
