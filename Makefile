@@ -15,6 +15,9 @@ current_combination = $(php);$(sf)
 # list of config files to provide to docker compose
 compose_files = -f tools/docker/compose.yaml
 
+# Blackfire compose override (added via -f in the profile target)
+compose_blackfire = -f tools/docker/compose.blackfire.yaml
+
 # Set the DATABASE_URL and dedicated compose file based on the selected database
 ifeq ($(db),mysql)
   DATABASE_URL = "mysql://auditor:password@mysql/auditor?serverVersion=8&charset=utf8mb4"
@@ -34,12 +37,14 @@ endif
 # Help target
 .PHONY: help
 help:
-	@echo "Usage: make <target> [php=<php_version>] [sf=<symfony_version>] [db=<database>] [args=<phpunit_args>]"
+	@echo "Usage: make <target> [php=<php_version>] [sf=<symfony_version>] [db=<database>] [args=<args>]"
 	@echo ""
 	@echo "Targets:"
 	@echo "  tests    - Run the test suite using PHPUnit."
 	@echo "  cs-fix   - Run PHP-CS-Fixer to fix coding standards issues."
 	@echo "  phpstan  - Run PHPStan for static code analysis."
+	@echo "  bench    - Run PHPBench benchmarks (statistical, reproducible)."
+	@echo "  profile  - Profile with Blackfire (requires BLACKFIRE_* env vars)."
 	@echo ""
 	@echo "Options:"
 	@echo "  php      - PHP version to use (default: $(php)). Supported: 8.4, 8.5"
@@ -52,6 +57,18 @@ help:
 	@echo "             Defaults for 'phpstan' target:  $(args)"
 	$(eval $(call set_args,cs-fix))
 	@echo "             Defaults for 'cs-fix' target:   $(args)"
+	$(eval $(call set_args,bench))
+	@echo "             Defaults for 'bench' target:    $(args)"
+	@echo ""
+	@echo "Benchmark examples:"
+	@echo "  make bench                              # run all benchmarks"
+	@echo "  make bench args='--tag=before'          # store a baseline"
+	@echo "  make bench args='--ref=before'          # compare against baseline"
+	@echo "  BENCH_N=200 make bench                  # run with 200 entities"
+	@echo ""
+	@echo "Blackfire examples (set BLACKFIRE_* env vars first):"
+	@echo "  make profile                            # profile default N=100"
+	@echo "  BENCH_N=200 make profile                # profile with 200 entities"
 	@echo ""
 	@echo "Examples:"
 	@echo "  make tests php=8.4 sf=8.0 db=mysql"
@@ -101,6 +118,22 @@ cs-fix: validate_matrix
 	PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) \
 	sh -c "docker compose $(compose_files) run --rm --remove-orphans php-cli tools/php-cs-fixer/vendor/bin/php-cs-fixer $(args)"
 
+# Run PHPBench benchmarks
+.PHONY: bench
+bench: validate_matrix
+	$(eval $(call set_args,bench))
+	$(call common_setup)
+	BENCH_N=$(or $(BENCH_N),50) PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) DATABASE_URL=$(DATABASE_URL) \
+	sh -c "docker compose $(compose_files) run --rm --remove-orphans -e BENCH_N=$(or $(BENCH_N),50) php-cli vendor/bin/phpbench run $(args)"
+
+# Run Blackfire profiling
+# Requires BLACKFIRE_SERVER_ID, BLACKFIRE_SERVER_TOKEN, BLACKFIRE_CLIENT_ID, BLACKFIRE_CLIENT_TOKEN
+.PHONY: profile
+profile: validate_matrix
+	$(call common_setup)
+	BENCH_N=$(or $(BENCH_N),100) PHP_VERSION=$(php) SYMFONY_VERSION=$(sf) DATABASE_URL=$(DATABASE_URL) \
+	sh -c "docker compose $(compose_files) $(compose_blackfire) run --rm --remove-orphans -e BENCH_N=$(or $(BENCH_N),100) php-cli blackfire run php benchmarks/profile.php"
+
 # Validate PHP and Symfony version matrix
 validate_matrix:
 	@if ! echo "$(valid_combinations)" | grep -q "$(current_combination)"; then \
@@ -119,5 +152,7 @@ define set_args
     args := analyse src --memory-limit=1G --ansi
   else ifeq ($(1),cs-fix)
     args := fix --using-cache=no --verbose --ansi
+  else ifeq ($(1),bench)
+    args := --report=default
   endif
 endef

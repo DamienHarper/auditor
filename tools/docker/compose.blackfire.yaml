@@ -1,0 +1,21 @@
+name: auditor-tester
+services:
+  # Override php-cli to use the Blackfire-enabled image
+  php-cli:
+    image: auditor-blackfire:${PHP_VERSION}
+    build:
+      context: .
+      target: auditor-blackfire
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    environment:
+      BLACKFIRE_AGENT_SOCKET: tcp://blackfire:8307
+
+  # Blackfire agent sidecar
+  blackfire:
+    image: blackfire/blackfire:2
+    environment:
+      BLACKFIRE_SERVER_ID: ${BLACKFIRE_SERVER_ID}
+      BLACKFIRE_SERVER_TOKEN: ${BLACKFIRE_SERVER_TOKEN}
+      BLACKFIRE_CLIENT_ID: ${BLACKFIRE_CLIENT_ID}
+      BLACKFIRE_CLIENT_TOKEN: ${BLACKFIRE_CLIENT_TOKEN}
