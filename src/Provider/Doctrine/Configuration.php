@@ -34,6 +34,8 @@ final class Configuration implements ConfigurationInterface
 
     private int $viewerPageSize;
 
+    private readonly bool $utf8Convert;
+
     private bool $initialized = false;
 
     /**
@@ -62,6 +64,7 @@ final class Configuration implements ConfigurationInterface
 
         $this->isViewerEnabled = self::isViewerEnabledInConfig($config['viewer']);
         $this->viewerPageSize = self::getViewerPageSizeFromConfig($config['viewer']);
+        $this->utf8Convert = $config['utf8_convert'];
         $this->storageMapper = $config['storage_mapper'];
     }
 
@@ -150,6 +153,11 @@ final class Configuration implements ConfigurationInterface
     public function isViewerEnabled(): bool
     {
         return $this->isViewerEnabled;
+    }
+
+    public function isUtf8ConvertEnabled(): bool
+    {
+        return $this->utf8Convert;
     }
 
     /**
@@ -300,6 +308,7 @@ final class Configuration implements ConfigurationInterface
                 'auditing_services' => [],
                 'viewer' => true,
                 'storage_mapper' => null,
+                'utf8_convert' => false,
             ])
             ->setAllowedTypes('table_prefix', 'string')
             ->setAllowedTypes('table_suffix', 'string')
@@ -309,6 +318,7 @@ final class Configuration implements ConfigurationInterface
             ->setAllowedTypes('auditing_services', 'array')
             ->setAllowedTypes('viewer', ['bool', 'array'])
             ->setAllowedTypes('storage_mapper', ['null', 'string', 'callable'])
+            ->setAllowedTypes('utf8_convert', 'bool')
         ;
     }
 }

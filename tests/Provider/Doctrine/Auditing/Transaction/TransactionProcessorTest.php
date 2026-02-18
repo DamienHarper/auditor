@@ -43,6 +43,7 @@ final class TransactionProcessorTest extends TestCase
         /** @var StorageService $storageService */
         $storageService = $this->provider->getStorageServiceForEntity(Author::class);
         $entityManager = $storageService->getEntityManager();
+        $blame = $this->reflectMethod(TransactionProcessor::class, 'blame')->invoke($processor);
         $method->invokeArgs($processor, [
             $entityManager,
             $author,
@@ -51,6 +52,7 @@ final class TransactionProcessorTest extends TestCase
                 'email' => [null, 'john.doe@gmail.com'],
             ],
             'what-a-nice-transaction-hash',
+            $blame,
         ]);
 
         $audits = $reader->createQuery(Author::class)->execute();
@@ -88,6 +90,7 @@ final class TransactionProcessorTest extends TestCase
         /** @var StorageService $storageService */
         $storageService = $this->provider->getStorageServiceForEntity(Author::class);
         $entityManager = $storageService->getEntityManager();
+        $blame = $this->reflectMethod(TransactionProcessor::class, 'blame')->invoke($processor);
         $method->invokeArgs($processor, [
             $entityManager,
             $author,
@@ -96,6 +99,7 @@ final class TransactionProcessorTest extends TestCase
                 'email' => ['john.doe@gmail.com', 'dark.vador@gmail.com'],
             ],
             'what-a-nice-transaction-hash',
+            $blame,
         ]);
 
         $audits = $reader->createQuery(Author::class)->execute();
@@ -136,7 +140,8 @@ final class TransactionProcessorTest extends TestCase
             ->setEmail('john.doe@gmail.com')
         ;
 
-        $method->invokeArgs($processor, [$entityManager, $author, 1, 'what-a-nice-transaction-hash']);
+        $blame = $this->reflectMethod(TransactionProcessor::class, 'blame')->invoke($processor);
+        $method->invokeArgs($processor, [$entityManager, $author, 1, 'what-a-nice-transaction-hash', $blame]);
 
         $audits = $reader->createQuery(Author::class)->execute();
         $this->assertCount(1, $audits, 'TransactionProcessor::remove() creates an audit entry.');
@@ -173,7 +178,8 @@ final class TransactionProcessorTest extends TestCase
             ->setCreatedAt(new \DateTimeImmutable('now'))
         ;
 
-        $method->invokeArgs($processor, [$entityManager, $post, 1, 'what-a-nice-transaction-hash']);
+        $blame = $this->reflectMethod(TransactionProcessor::class, 'blame')->invoke($processor);
+        $method->invokeArgs($processor, [$entityManager, $post, 1, 'what-a-nice-transaction-hash', $blame]);
 
         // 1 "remove" audit entry added => count is 1
         $audits = $reader->createQuery(Post::class)->execute();
@@ -261,7 +267,8 @@ final class TransactionProcessorTest extends TestCase
             'isCascadeDetach' => false,
         ];
 
-        $method->invokeArgs($processor, [$entityManager, $author, $post, $mapping, 'what-a-nice-transaction-hash']);
+        $blame = $this->reflectMethod(TransactionProcessor::class, 'blame')->invoke($processor);
+        $method->invokeArgs($processor, [$entityManager, $author, $post, $mapping, 'what-a-nice-transaction-hash', $blame]);
 
         $audits = $reader->createQuery(Author::class)->execute();
         $this->assertCount(1, $audits, 'TransactionProcessor::associate() creates an audit entry.');
@@ -335,7 +342,8 @@ final class TransactionProcessorTest extends TestCase
             'isCascadeDetach' => false,
         ];
 
-        $method->invokeArgs($processor, [$entityManager, $author, $post, $mapping, 'what-a-nice-transaction-hash']);
+        $blame = $this->reflectMethod(TransactionProcessor::class, 'blame')->invoke($processor);
+        $method->invokeArgs($processor, [$entityManager, $author, $post, $mapping, 'what-a-nice-transaction-hash', $blame]);
 
         $audits = $reader->createQuery(Author::class)->execute();
         $this->assertCount(1, $audits, 'TransactionProcessor::dissociate() creates an audit entry.');
@@ -455,8 +463,9 @@ final class TransactionProcessorTest extends TestCase
             ],
         ];
 
-        $method->invokeArgs($processor, [$entityManager, $post, $tag1, $mapping, 'what-a-nice-transaction-hash']);
-        $method->invokeArgs($processor, [$entityManager, $post, $tag2, $mapping, 'what-a-nice-transaction-hash']);
+        $blame = $this->reflectMethod(TransactionProcessor::class, 'blame')->invoke($processor);
+        $method->invokeArgs($processor, [$entityManager, $post, $tag1, $mapping, 'what-a-nice-transaction-hash', $blame]);
+        $method->invokeArgs($processor, [$entityManager, $post, $tag2, $mapping, 'what-a-nice-transaction-hash', $blame]);
 
         $audits = $reader->createQuery(Post::class)->execute();
         $this->assertCount(2, $audits, 'TransactionProcessor::associate() creates an audit entry per association.');
@@ -603,10 +612,11 @@ final class TransactionProcessorTest extends TestCase
             ],
         ];
 
-        $associateMethod->invokeArgs($processor, [$entityManager, $post, $tag1, $mapping, 'what-a-nice-transaction-hash']);
-        $associateMethod->invokeArgs($processor, [$entityManager, $post, $tag2, $mapping, 'what-a-nice-transaction-hash']);
+        $blame = $this->reflectMethod(TransactionProcessor::class, 'blame')->invoke($processor);
+        $associateMethod->invokeArgs($processor, [$entityManager, $post, $tag1, $mapping, 'what-a-nice-transaction-hash', $blame]);
+        $associateMethod->invokeArgs($processor, [$entityManager, $post, $tag2, $mapping, 'what-a-nice-transaction-hash', $blame]);
 
-        $dissociateMethod->invokeArgs($processor, [$entityManager, $post, $tag2, $mapping, 'what-a-nice-transaction-hash']);
+        $dissociateMethod->invokeArgs($processor, [$entityManager, $post, $tag2, $mapping, 'what-a-nice-transaction-hash', $blame]);
 
         $audits = $reader->createQuery(Post::class)->execute();
         $this->assertCount(3, $audits, 'TransactionProcessor::dissociate() creates an audit entry.');
