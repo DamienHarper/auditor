@@ -4,7 +4,12 @@ The `extra_data` column allows you to store arbitrary supplementary information 
 
 ## How It Works
 
-Each audit entry has a nullable JSON `extra_data` column. By default, it is `NULL` (zero overhead when not used). To populate it, you create an event listener on `LifecycleEvent` that sets the `extra_data` key in the payload before the entry is persisted.
+Each audit entry has a nullable JSON `extra_data` column. By default, it is `NULL` (zero overhead when not used).
+
+There are two complementary ways to populate it — you can use either or both:
+
+1. **`extra_data_provider` callable** (global): configured once on `Configuration`, automatically applied to every audit entry. Ideal for request-level context such as the current route name, request ID, or tenant identifier.
+2. **`LifecycleEvent` listener** (per-entity): an event listener that intercepts each audit entry just before it is persisted and sets (or enriches) `extra_data` based on the entity class or its properties.
 
 ### Data Flow
 
@@ -14,8 +19,9 @@ flowchart TD
     persist / update / remove + flush"] --> B
 
     B["TransactionProcessor
-    Builds payload: diffs, blame, extra_data = null
-    Attaches the entity object to the event"] --> C
+    Builds payload: diffs, blame
+    Calls extra_data_provider (if set)
+    → extra_data = JSON string or null"] --> C
 
     C["LifecycleEvent dispatched"]
     C --- D["payload
@@ -25,8 +31,7 @@ flowchart TD
     C --> F
 
     F["Your Listener — optional
-    Reads $event->entity
-    Sets payload extra_data via json_encode
+    Can read/override/merge extra_data
     Calls $event->setPayload()"]:::optional --> G
 
     G[("Audit Table
@@ -36,7 +41,35 @@ flowchart TD
     classDef optional stroke-dasharray: 5 5
 ```
 
-## Setting Up a Listener
+> [!NOTE]
+> When both a provider and a listener are configured, the listener **takes precedence** because it fires after the provider. You can use the listener to enrich or override data set by the provider.
+
+---
+
+## Approach 1: `extra_data_provider` Callable
+
+Register a callable on the `Configuration` object. It is invoked for every audit entry in every transaction. The callable must return `?array` — return `null` to leave `extra_data` empty.
+
+```php
+$auditor->getConfiguration()->setExtraDataProvider(
+    static fn (): ?array => ['route' => 'app_order_edit', 'env' => 'prod']
+);
+```
+
+The returned array is automatically JSON-encoded and stored in `extra_data`. If the callable returns `null`, `extra_data` is stored as `NULL`.
+
+### When to use this approach
+
+| Use case | Suitable? |
+|----------|-----------|
+| Capture the current route name for every entry | ✅ |
+| Attach a request ID / correlation ID | ✅ |
+| Attach tenant / organisation context | ✅ |
+| Attach entity-specific data (e.g. `$entity->getDepartment()`) | ❌ Use a listener instead |
+
+---
+
+## Approach 2: `LifecycleEvent` Listener
 
 Create an event listener that listens to `LifecycleEvent`. The event provides access to both the payload and the original entity object.
 
@@ -116,6 +149,45 @@ final class OrderAuditExtraDataListener
 }
 ```
 
+### Merging Provider and Listener Data
+
+When both a provider and a listener are active, you can merge their contributions in the listener:
+
+```php
+public function __invoke(LifecycleEvent $event): void
+{
+    $payload = $event->getPayload();
+
+    if ($payload['entity'] !== User::class) {
+        return;
+    }
+
+    // Decode what the provider already set (if anything)
+    $existing = null !== $payload['extra_data']
+        ? json_decode($payload['extra_data'], true, 512, JSON_THROW_ON_ERROR)
+        : [];
+
+    // Merge entity-specific data
+    $merged = array_merge($existing, [
+        'department' => $event->entity->getDepartment(),
+    ]);
+
+    $payload['extra_data'] = json_encode($merged, JSON_THROW_ON_ERROR);
+    $event->setPayload($payload);
+}
+```
+
+### When to use this approach
+
+| Use case | Suitable? |
+|----------|-----------|
+| Attach entity-specific data (e.g. `$entity->getDepartment()`) | ✅ |
+| Filter by entity class | ✅ |
+| Conditionally skip `extra_data` for certain entities | ✅ |
+| Apply the same data to every entity without conditions | ❌ Use a provider instead |
+
+---
+
 ## Reading Extra Data
 
 The `Entry` model provides access via the `extraData` property or the `getExtraData()` method:
@@ -142,6 +214,8 @@ Both `$entry->extraData` and `$entry->getExtraData()` return:
 - `null` if no extra data was set
 - An associative array (decoded from JSON) otherwise
 
+---
+
 ## Schema Update
 
 The `extra_data` column is added automatically when you run the schema update command:
@@ -156,6 +230,8 @@ php bin/console audit:schema:update --force
 
 > [!TIP]
 > No manual migration is needed. The column uses the same JSON type as `diffs` (with automatic TEXT fallback on platforms that don't support native JSON).
+
+---
 
 ## Important Caveats
 
@@ -183,7 +259,7 @@ php bin/console audit:schema:update --force
 ### JSON Encoding
 
 > [!WARNING]
-> The `extra_data` value in the payload must be either `null` or a **JSON-encoded string** (not an array). Always use `json_encode()` when setting it:
+> The `extra_data` value in the payload must be either `null` or a **JSON-encoded string** (not an array). Always use `json_encode()` when setting it in a listener:
 >
 > ```php
 > // Correct
@@ -192,6 +268,8 @@ php bin/console audit:schema:update --force
 > // Incorrect - will not be stored properly
 > $payload['extra_data'] = ['key' => 'value'];
 > ```
+>
+> The `extra_data_provider` callable is exempt from this — it must return `?array` and the encoding is done automatically.
 
 ### Performance
 
@@ -199,7 +277,9 @@ php bin/console audit:schema:update --force
 |--------|--------|
 | Write | Negligible (+1 column in INSERT) |
 | Read | Negligible (+1 column in SELECT, lazy decoding) |
-| Storage | `NULL` when no listener is active (zero overhead) |
+| Storage | `NULL` when neither provider nor listener is active (zero overhead) |
+
+---
 
 ## Filtering by Extra Data
 
@@ -282,6 +362,8 @@ new JsonFilter('extra_data', 'user.role', 'admin');
 // new JsonFilter('extra_data', 'tags', ['php', 'symfony'], 'CONTAINS');
 ```
 
+---
+
 ## JSON Indexing for Performance
 
 For frequently queried JSON paths, consider adding database indexes to improve performance.
@@ -290,13 +372,13 @@ For frequently queried JSON paths, consider adding database indexes to improve p
 
 ```sql
 -- Functional index on a JSON path
-ALTER TABLE user_audit 
+ALTER TABLE user_audit
 ADD INDEX idx_extra_department ((
     CAST(extra_data->>'$.department' AS CHAR(50) COLLATE utf8mb4_bin)
 ));
 
 -- For nested paths
-ALTER TABLE user_audit 
+ALTER TABLE user_audit
 ADD INDEX idx_extra_user_role ((
     CAST(extra_data->>'$.user.role' AS CHAR(50) COLLATE utf8mb4_bin)
 ));
@@ -306,7 +388,7 @@ ADD INDEX idx_extra_user_role ((
 
 ```sql
 -- Virtual column with index
-ALTER TABLE user_audit 
+ALTER TABLE user_audit
 ADD COLUMN extra_department VARCHAR(50) AS (JSON_VALUE(extra_data, '$.department')) VIRTUAL,
 ADD INDEX idx_extra_department (extra_department);
 ```
@@ -325,6 +407,8 @@ CREATE INDEX idx_extra_department ON user_audit ((extra_data->>'department'));
 
 > [!WARNING]
 > SQLite does not support indexes on JSON expressions. For high-volume audit tables, consider using a different database or denormalizing frequently queried values into separate columns.
+
+---
 
 ## Next Steps
 
