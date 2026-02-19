@@ -4,14 +4,9 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Event;
 
-use DH\Auditor\Provider\Doctrine\DoctrineProvider;
-use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
-
 final readonly class TableSchemaListener
 {
-    public function __construct(private DoctrineProvider $provider) {}
-
-    public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs): void
+    public function loadClassMetadata(): void
     {
         // Intentionally left empty.
         //

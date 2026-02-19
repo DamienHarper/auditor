@@ -39,7 +39,7 @@ final class Issue236Test extends TestCase
      * resolveTableName() must always use the dot separator, even on platforms where
      * supportsSchemas() returns false (MySQL, MariaDB).
      */
-    #[DataProvider('provideResolveTableNameCases')]
+    #[DataProvider('provideResolveTableNameAlwaysUsesDotSeparatorCases')]
     public function testResolveTableNameAlwaysUsesDotSeparator(
         object $platform,
         string $tableName,
@@ -48,7 +48,7 @@ final class Issue236Test extends TestCase
     ): void {
         $manager = new SchemaManager($this->provider);
 
-        $result = $manager->resolveTableName($tableName, $namespaceName, $platform);
+        $result = $manager->resolveTableName($tableName, $namespaceName);
 
         $this->assertSame($expected, $result);
         $this->assertStringNotContainsString('__', $result, 'Table name must not use __ separator.');
@@ -57,7 +57,7 @@ final class Issue236Test extends TestCase
     /**
      * @return iterable<string, array{object, string, string, string}>
      */
-    public static function provideResolveTableNameCases(): iterable
+    public static function provideResolveTableNameAlwaysUsesDotSeparatorCases(): iterable
     {
         // MySQL/MariaDB: supportsSchemas() === false, but dot notation must still be used
         yield 'MySQL with schema' => [new MySQLPlatform(), 'user', 'mydb', 'mydb.user'];
