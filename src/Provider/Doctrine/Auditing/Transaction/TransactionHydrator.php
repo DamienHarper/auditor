@@ -89,26 +89,29 @@ final class TransactionHydrator implements TransactionHydratorInterface
             if (null !== $owner && $this->provider->isAudited($owner)) {
                 $mapping = $collection->getMapping()->toArray();
 
+                // The audit entry is written to the owner's audit table, so we only require
+                // the owner to be audited. Requiring the target to also be audited silently
+                // dropped associations involving non-audited target entities, breaking
+                // unidirectional ManyToMany relations where only the owning side has
+                // the #[Auditable] attribute.
+                // @see https://github.com/DamienHarper/auditor/issues/234
+
                 /** @var object $entity */
                 foreach ($collection->getInsertDiff() as $entity) {
-                    if ($this->provider->isAudited($entity)) {
-                        $transaction->associate(
-                            $owner,
-                            $entity,
-                            $mapping,
-                        );
-                    }
+                    $transaction->associate(
+                        $owner,
+                        $entity,
+                        $mapping,
+                    );
                 }
 
                 /** @var object $entity */
                 foreach ($collection->getDeleteDiff() as $entity) {
-                    if ($this->provider->isAudited($entity)) {
-                        $transaction->dissociate(
-                            $owner,
-                            $entity,
-                            $mapping,
-                        );
-                    }
+                    $transaction->dissociate(
+                        $owner,
+                        $entity,
+                        $mapping,
+                    );
                 }
             }
         }
@@ -129,13 +132,11 @@ final class TransactionHydrator implements TransactionHydratorInterface
 
                 /** @var object $entity */
                 foreach ($collection->toArray() as $entity) {
-                    if ($this->provider->isAudited($entity)) {
-                        $transaction->dissociate(
-                            $owner,
-                            $entity,
-                            $mapping,
-                        );
-                    }
+                    $transaction->dissociate(
+                        $owner,
+                        $entity,
+                        $mapping,
+                    );
                 }
             }
         }
