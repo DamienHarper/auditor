@@ -182,7 +182,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
             'blame' => $blame,
             'diff' => [
                 'source' => $this->summarize($entityManager, $source, ['field' => $mapping['fieldName']], $meta),
-                'target' => $this->summarize($entityManager, $target, ['field' => $mapping['isOwningSide'] ? $mapping['inversedBy'] : $mapping['mappedBy']]),
+                'target' => $this->summarize($entityManager, $target, ['field' => $mapping['isOwningSide'] ? ($mapping['inversedBy'] ?? null) : ($mapping['mappedBy'] ?? null)]),
                 'is_owning_side' => $mapping['isOwningSide'],
             ],
             'table' => $meta->getTableName(),
