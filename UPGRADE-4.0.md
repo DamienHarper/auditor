@@ -64,8 +64,15 @@ $configuration = new Configuration([
 
 A nullable JSON `extra_data` column has been added to audit tables. After upgrading, run `audit:schema:update --force`.
 
+Two ways to populate it:
 
-`LifecycleEvent` now accepts an optional `?object $entity` parameter to allow listeners to populate extra data. See [Extra Data guide](docs/extra-data.md).
+- **Global provider** (new in 4.0) — set a callable on `Configuration` once and it runs automatically for every audit entry:
+  ```php
+  $configuration->setExtraDataProvider(fn () => ['ip' => $request->getClientIp()]);
+  ```
+- **Per-entity listener** — listen to `LifecycleEvent` (which now exposes `$event->entity`) to add context for specific entities.
+
+See the [Extra Data guide](docs/extra-data.md) for precedence rules and merging behaviour.
 
 ### Composer Scripts
 
