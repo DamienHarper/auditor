@@ -1,6 +1,7 @@
 .idea/
 vendor/
 tests/coverage/
+docs/changelogs/
 .DS_Store
 .php_cs.cache
 .php-cs-fixer.cache
