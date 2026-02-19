@@ -100,6 +100,17 @@ trait AuditTrait
                 break;
 
             case Types::DECIMAL:
+                $convertedValue = $type->convertToPHPValue($value, $platform);
+                // Normalize decimal strings to avoid false positives when comparing
+                // numerically equal values with different string representations
+                // e.g. "60.00" (from DB) vs "60" (from a form like MoneyType)
+                // @see https://github.com/DamienHarper/auditor/issues/278
+                if (\is_string($convertedValue) && str_contains($convertedValue, '.')) {
+                    $convertedValue = mb_rtrim(mb_rtrim($convertedValue, '0'), '.');
+                }
+
+                break;
+
             case Types::FLOAT:
             case Types::BOOLEAN:
                 $convertedValue = $type->convertToPHPValue($value, $platform);
