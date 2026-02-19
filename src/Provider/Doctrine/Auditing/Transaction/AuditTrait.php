@@ -355,6 +355,24 @@ trait AuditTrait
         ];
     }
 
+    /**
+     * Returns a JSON-encoded string of extra data to attach to every audit entry,
+     * or null when no extra_data provider is configured or the provider returns null.
+     *
+     * @see https://github.com/DamienHarper/auditor-bundle/issues/594
+     */
+    private function extraData(): ?string
+    {
+        $extraDataProvider = $this->provider->getAuditor()->getConfiguration()->getExtraDataProvider();
+        if (null === $extraDataProvider) {
+            return null;
+        }
+
+        $data = $extraDataProvider();
+
+        return null === $data ? null : json_encode($data, JSON_THROW_ON_ERROR);
+    }
+
     private function deepDiff(?array $old, ?array $new): array
     {
         $diff = [];

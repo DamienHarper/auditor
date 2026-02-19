@@ -233,7 +233,7 @@ final class TransactionProcessor implements TransactionProcessorInterface
             'discriminator' => $data['discriminator'],
             'transaction_hash' => (string) $data['transaction_hash'],
             'diffs' => json_encode($diff, JSON_THROW_ON_ERROR),
-            'extra_data' => null,
+            'extra_data' => $this->extraData(),
             'blame_id' => $data['blame']['user_id'],
             'blame_user' => $data['blame']['username'],
             'blame_user_fqdn' => $data['blame']['user_fqdn'],

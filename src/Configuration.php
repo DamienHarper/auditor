@@ -30,6 +30,11 @@ final class Configuration
      */
     private mixed $securityProvider = null;
 
+    /**
+     * @var null|callable
+     */
+    private mixed $extraDataProvider = null;
+
     public function __construct(array $options)
     {
         $resolver = new OptionsResolver();
@@ -41,6 +46,7 @@ final class Configuration
         $this->userProvider = $config['user_provider'];
         $this->securityProvider = $config['security_provider'];
         $this->roleChecker = $config['role_checker'];
+        $this->extraDataProvider = $config['extra_data_provider'];
     }
 
     /**
@@ -108,6 +114,21 @@ final class Configuration
         return $this->roleChecker;
     }
 
+    public function setExtraDataProvider(callable $extraDataProvider): self
+    {
+        $this->extraDataProvider = $extraDataProvider;
+
+        return $this;
+    }
+
+    /**
+     * @return null|callable
+     */
+    public function getExtraDataProvider(): mixed
+    {
+        return $this->extraDataProvider;
+    }
+
     private function configureOptions(OptionsResolver $resolver): void
     {
         // https://symfony.com/doc/current/components/options_resolver.html
@@ -118,12 +139,14 @@ final class Configuration
                 'role_checker' => null,
                 'user_provider' => null,
                 'security_provider' => null,
+                'extra_data_provider' => null,
             ])
             ->setAllowedTypes('enabled', 'bool')
             ->setAllowedTypes('timezone', 'string')
             ->setAllowedTypes('role_checker', ['null', 'string', 'callable'])
             ->setAllowedTypes('user_provider', ['null', 'string', 'callable'])
             ->setAllowedTypes('security_provider', ['null', 'string', 'callable'])
+            ->setAllowedTypes('extra_data_provider', ['null', 'string', 'callable'])
         ;
     }
 }
