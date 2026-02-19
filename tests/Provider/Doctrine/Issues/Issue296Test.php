@@ -73,18 +73,7 @@ final class Issue296Test extends TestCase
     {
         $em = $this->provider->getStorageServiceForEntity(Post::class)->getEntityManager();
         $evm = $em->getEventManager();
-
-        // Swap listener order so that the auditor's DoctrineSubscriber fires *before*
-        // Gedmo's SoftDeleteableListener on the onFlush event.
-        // Currently: [SoftDeleteableListener, DoctrineSubscriber]
-        // After swap: [DoctrineSubscriber, SoftDeleteableListener]
-        $softDeleteListener = null;
-        foreach ($evm->getListeners(Events::onFlush) as $listener) {
-            if ($listener instanceof SoftDeleteableListener) {
-                $softDeleteListener = $listener;
-                break;
-            }
-        }
+        $softDeleteListener = array_find($evm->getListeners(Events::onFlush), static fn ($listener): bool => $listener instanceof SoftDeleteableListener);
 
         if (null !== $softDeleteListener) {
             $evm->removeEventListener([Events::onFlush], $softDeleteListener);
