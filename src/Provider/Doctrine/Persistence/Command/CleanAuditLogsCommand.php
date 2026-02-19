@@ -158,7 +158,7 @@ final class CleanAuditLogsCommand extends Command
                     $connection = $storageServices[$name]->getEntityManager()->getConnection();
 
                     /** @var string $auditTable */
-                    $auditTable = $schemaManager->resolveAuditTableName($entity, $configuration, $connection->getDatabasePlatform());
+                    $auditTable = $schemaManager->resolveAuditTableName($entity, $configuration);
 
                     $queryBuilder = $connection->createQueryBuilder();
                     $queryBuilder

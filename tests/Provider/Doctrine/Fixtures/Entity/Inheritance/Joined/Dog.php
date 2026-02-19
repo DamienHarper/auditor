@@ -7,5 +7,5 @@ namespace DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Inheritance\Joined;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'dog', schema: 'auditor')]
+#[ORM\Table(name: 'dog')]
 class Dog extends Animal {}

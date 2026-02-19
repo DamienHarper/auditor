@@ -4,30 +4,21 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Event;
 
-use DH\Auditor\Provider\Doctrine\DoctrineProvider;
-use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
-use DH\Auditor\Provider\Doctrine\Service\StorageService;
-use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
-
 final readonly class TableSchemaListener
 {
-    public function __construct(private DoctrineProvider $provider) {}
-
-    public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs): void
+    public function loadClassMetadata(): void
     {
-        $classMetadata = $eventArgs->getClassMetadata();
-        if (!$classMetadata->isEmbeddedClass && (!$classMetadata->isInheritanceTypeSingleTable() || $classMetadata->getName() === $classMetadata->rootEntityName)) {
-            $schemaManager = new SchemaManager($this->provider);
-            $storageService = $this->provider->getStorageServiceForEntity($classMetadata->getName());
-
-            \assert($storageService instanceof StorageService);
-            $platform = $storageService->getEntityManager()->getConnection()->getDatabasePlatform();
-            if (!$platform->supportsSchemas()) {
-                $classMetadata->setPrimaryTable([
-                    'name' => $schemaManager->resolveTableName($classMetadata->getTableName(), $classMetadata->getSchemaName() ?? '', $platform),
-                    'schema' => '',
-                ]);
-            }
-        }
+        // Intentionally left empty.
+        //
+        // This listener was previously flattening schema-qualified table names
+        // (e.g. `mydb.user`) to `mydb__user` for platforms that return false for
+        // supportsSchemas() (MySQL/MariaDB). That was incorrect: MySQL and MariaDB
+        // support cross-database access via `database.table` dot notation, and
+        // Doctrine ORM already handles this correctly out of the box.
+        // Modifying the class metadata here caused Doctrine to look for a table
+        // named `mydb__user` in the current database instead of `mydb.user`,
+        // breaking all entity queries when a schema is configured.
+        //
+        // @see https://github.com/DamienHarper/auditor/issues/236
     }
 }
