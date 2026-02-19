@@ -16,6 +16,27 @@ abstract class PlatformHelper
      *
      * @see https://github.com/doctrine/dbal/issues/3419
      */
+    /**
+     * Returns column-level platform options (e.g. charset/collation) that should be applied
+     * to STRING columns in audit tables.
+     *
+     * PostgreSQL does not use per-column charset/collation, so passing defaultTableOptions
+     * as platformOptions on PostgreSQL columns causes the schema comparator to detect false
+     * differences (the introspected column has no platformOptions, but the new definition
+     * would have them). We therefore only propagate defaultTableOptions on MySQL/MariaDB.
+     *
+     * @see https://github.com/DamienHarper/auditor/issues/241
+     */
+    public static function getColumnPlatformOptions(Connection $connection): array
+    {
+        $platform = $connection->getDatabasePlatform();
+        if ($platform instanceof MySQLPlatform || $platform instanceof MariaDBPlatform) {
+            return $connection->getParams()['defaultTableOptions'] ?? [];
+        }
+
+        return [];
+    }
+
     public static function isIndexLengthLimited(string $name, Connection $connection): bool
     {
         $columns = SchemaHelper::getAuditTableColumns();
