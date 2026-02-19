@@ -240,18 +240,24 @@ final readonly class SchemaManager
 
     /**
      * Resolves table name, including namespace/schema.
+     *
+     * The dot (.) separator is always used regardless of whether the platform
+     * "supports schemas" in the Doctrine DBAL sense. Platforms such as MySQL/MariaDB
+     * do not support PostgreSQL-style schemas ($platform->supportsSchemas() === false),
+     * but they do support cross-database access via the `database.table` dot notation.
+     * Using `__` instead of `.` (as Doctrine does internally for schema emulation)
+     * produces table names that do not exist, breaking both regular entity queries and
+     * audit table lookups.
+     *
+     * @see https://github.com/DamienHarper/auditor/issues/236
      */
     public function resolveTableName(string $tableName, string $namespaceName, AbstractPlatform $platform): string
     {
         if ('' === $namespaceName || '0' === $namespaceName) {
-            $prefix = '';
-        } elseif (!$platform->supportsSchemas()) {
-            $prefix = $namespaceName.'__';
-        } else {
-            $prefix = $namespaceName.'.';
+            return $tableName;
         }
 
-        return $prefix.$tableName;
+        return $namespaceName.'.'.$tableName;
     }
 
     /**
