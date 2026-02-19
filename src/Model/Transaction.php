@@ -117,6 +117,16 @@ class Transaction implements TransactionInterface
 
     public function remove(object $source, mixed $id): void
     {
+        // Deduplicate: a soft-delete (Gedmo) can cause the same entity to be added
+        // both from TransactionHydrator::hydrateWithScheduledDeletions() and from
+        // DoctrineSubscriber::postSoftDelete(), depending on listener registration order.
+        // @see https://github.com/DamienHarper/auditor/issues/296
+        foreach ($this->removed as $dto) {
+            if ($dto->source === $source) {
+                return;
+            }
+        }
+
         $this->removed[] = new RemoveEventDto($source, $id);
     }
 
