@@ -329,7 +329,18 @@ final readonly class SchemaManager
                     $type = $expectedColumns[$column->getName()]['type'];
                 }
 
-                $table->addColumn($column->getName(), $type, $expectedColumns[$column->getName()]['options']);
+                $columnOptions = $expectedColumns[$column->getName()]['options'];
+
+                // Preserve the column's existing platformOptions (e.g. MySQL charset/collation)
+                // when the expected definition does not configure any. Without this, re-adding
+                // the column with platformOptions: [] produces a schema that differs from the
+                // introspected one, causing a false-positive ALTER TABLE on every run.
+                // @see https://github.com/DamienHarper/auditor/issues/276
+                if (isset($columnOptions['platformOptions']) && [] === $columnOptions['platformOptions']) {
+                    $columnOptions['platformOptions'] = $column->getPlatformOptions();
+                }
+
+                $table->addColumn($column->getName(), $type, $columnOptions);
             } else {
                 // column is not part of expected columns so it has to be removed
                 $table->dropColumn($column->getName());
