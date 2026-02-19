@@ -106,7 +106,7 @@ trait AuditTrait
                 // e.g. "60.00" (from DB) vs "60" (from a form like MoneyType)
                 // @see https://github.com/DamienHarper/auditor/issues/278
                 if (\is_string($convertedValue) && str_contains($convertedValue, '.')) {
-                    $convertedValue = rtrim(rtrim($convertedValue, '0'), '.');
+                    $convertedValue = mb_rtrim(mb_rtrim($convertedValue, '0'), '.');
                 }
 
                 break;
