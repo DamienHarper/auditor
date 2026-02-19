@@ -15,4 +15,4 @@ CMD [ "php" ]
 
 # Blackfire CLI stage — adds the `blackfire` CLI tool on top of the auditor image
 FROM auditor AS auditor-blackfire
-COPY --from=blackfire/blackfire:2 /usr/bin/blackfire /usr/bin/blackfire
+COPY --from=blackfire/blackfire:2 /usr/local/bin/blackfire /usr/local/bin/blackfire

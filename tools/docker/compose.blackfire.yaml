@@ -10,6 +10,8 @@ services:
         PHP_VERSION: ${PHP_VERSION}
     environment:
       BLACKFIRE_AGENT_SOCKET: tcp://blackfire:8307
+      BLACKFIRE_CLIENT_ID: ${BLACKFIRE_CLIENT_ID}
+      BLACKFIRE_CLIENT_TOKEN: ${BLACKFIRE_CLIENT_TOKEN}
 
   # Blackfire agent sidecar
   blackfire:
