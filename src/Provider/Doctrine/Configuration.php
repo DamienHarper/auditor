@@ -10,6 +10,7 @@ use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
 use DH\Auditor\Provider\Doctrine\Service\AuditingService;
 use DH\Auditor\Tests\Provider\Doctrine\ConfigurationTest;
+use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -211,8 +212,32 @@ final class Configuration implements ConfigurationInterface
                 }
 
                 \assert(null !== $this->entities);
+
+                /**
+                 * In multi-EM setups (e.g. Symfony with MappingDriverChain), each EM's
+                 * metadata driver only handles its own namespace. Calling getClassMetadata()
+                 * for an entity that belongs to a different EM's namespace causes Doctrine
+                 * to throw a MappingException ("not found in the chain configured namespaces").
+                 * isTransient() returns true (without throwing) for classes not handled by
+                 * the current EM's driver, so we use it as a lightweight guard.
+                 * Unlike getAllMetadata()-based filtering, isTransient() works via reflection
+                 * for AttributeDriver and via namespace prefix for MappingDriverChain, so it
+                 * correctly handles entities that are not in the EM's scan paths but are still
+                 * manageable (e.g. entities in custom fixture directories).
+                 *
+                 * @see https://github.com/DamienHarper/auditor/issues/281
+                 */
+                $metadataDriver = $entityManager->getConfiguration()->getMetadataDriverImpl();
+
                 foreach (array_keys($this->entities) as $entity) {
-                    $meta = $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
+                    $realClass = DoctrineHelper::getRealClassName($entity);
+
+                    // Skip entities not mapped in this entity manager.
+                    if ($metadataDriver instanceof MappingDriver && $metadataDriver->isTransient($realClass)) {
+                        continue;
+                    }
+
+                    $meta = $entityManager->getClassMetadata($realClass);
                     $entityTableName = $meta->getTableName();
                     $namespaceName = $meta->getSchemaName() ?? '';
 
