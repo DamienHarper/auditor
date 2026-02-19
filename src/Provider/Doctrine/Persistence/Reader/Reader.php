@@ -159,21 +159,11 @@ final readonly class Reader implements ReaderInterface
         /** @var Configuration $configuration */
         $configuration = $this->provider->getConfiguration();
 
-        /** @var AuditingService $auditingService */
-        $auditingService = $this->provider->getAuditingServiceForEntity($entity);
-        $entityManager = $auditingService->getEntityManager();
-        $schema = '';
-        if ($entityManager->getClassMetadata($entity)->getSchemaName()) {
-            $schema = $entityManager->getClassMetadata($entity)->getSchemaName().'.';
-        }
-
-        return \sprintf(
-            '%s%s%s%s',
-            $schema,
-            $configuration->getTablePrefix(),
-            $this->getEntityTableName($entity),
-            $configuration->getTableSuffix()
-        );
+        // Use the pre-computed audit table name from configuration, which correctly handles
+        // quoted identifiers (e.g. PostgreSQL reserved words like "user").
+        // Direct string concatenation of prefix + tableName + suffix breaks when tableName
+        // contains quotes, producing e.g. `"user"_audit` instead of `"user_audit"`.
+        return $configuration->getEntities()[$entity]['computed_audit_table_name'];
     }
 
     private function configureOptions(OptionsResolver $resolver): void

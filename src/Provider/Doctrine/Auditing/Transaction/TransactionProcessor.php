@@ -212,8 +212,11 @@ final class TransactionProcessor implements TransactionProcessorInterface
 
         /** @var Configuration $configuration */
         $configuration = $this->provider->getConfiguration();
-        $schema = $data['schema'] ? $data['schema'].'.' : '';
-        $auditTable = $schema.$configuration->getTablePrefix().$data['table'].$configuration->getTableSuffix();
+        // Use the pre-computed audit table name from configuration, which correctly handles
+        // quoted identifiers (e.g. PostgreSQL reserved words like "user").
+        // Direct string concatenation of schema + prefix + table + suffix breaks when the
+        // table name contains quotes, producing e.g. `"user"_audit` instead of `"user_audit"`.
+        $auditTable = $configuration->getEntities()[$data['entity']]['computed_audit_table_name'];
         $tz = $this->dateTimeZone ??= new \DateTimeZone($this->provider->getAuditor()->getConfiguration()->timezone);
         $dt = new \DateTimeImmutable('now', $tz);
         $diff = $data['diff'];
