@@ -259,7 +259,40 @@ trait AuditTrait
             return null;
         }
 
-        $entityManager->getUnitOfWork()->initializeObject($entity); // ensure that proxies are initialized
+        try {
+            $entityManager->getUnitOfWork()->initializeObject($entity); // ensure that proxies are initialized
+        } catch (\Throwable) {
+            /**
+             * Proxy initialization failed — the entity row is inaccessible (e.g. hidden by a
+             * Doctrine filter such as SoftDeleteable, or hard-deleted between two flushes).
+             * Fall back to the identifier stored in the UoW identity map, which is available
+             * without accessing any property on the (possibly uninitialized) proxy object.
+             *
+             * @see https://github.com/DamienHarper/auditor/issues/285
+             */
+            $meta ??= $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
+
+            try {
+                $pkName = $meta->getSingleIdentifierFieldName();
+            } catch (\Throwable) {
+                $pkName = 'id';
+            }
+
+            $identifiers = $entityManager->getUnitOfWork()->getEntityIdentifier($entity);
+            $pkValue = $extra['id'] ?? ($identifiers[$pkName] ?? null);
+            $label = DoctrineHelper::getRealClassName($entity).(null === $pkValue ? '' : '#'.$pkValue);
+            if ('id' !== $pkName) {
+                $extra['pkName'] = $pkName;
+            }
+
+            return [
+                $pkName => $pkValue,
+                'class' => $meta->name,
+                'label' => $label,
+                'table' => $meta->getTableName(),
+            ] + $extra;
+        }
+
         $meta ??= $entityManager->getClassMetadata(DoctrineHelper::getRealClassName($entity));
 
         $pkValue = $extra['id'] ?? $this->id($entityManager, $entity);
