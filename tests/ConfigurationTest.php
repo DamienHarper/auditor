@@ -55,4 +55,20 @@ final class ConfigurationTest extends TestCase
 
         $this->assertSame('Europe/Paris', $configuration->timezone, 'Custom timezone is "Europe/Paris".');
     }
+
+    public function testExtraDataProviderIsNullByDefault(): void
+    {
+        $configuration = $this->createAuditorConfiguration();
+
+        $this->assertNull($configuration->getExtraDataProvider(), 'ExtraDataProvider is null by default.');
+    }
+
+    public function testSetExtraDataProvider(): void
+    {
+        $configuration = $this->createAuditorConfiguration();
+        $provider = static fn (): array => ['route' => 'app_home'];
+        $configuration->setExtraDataProvider($provider);
+
+        $this->assertSame($provider, $configuration->getExtraDataProvider(), 'ExtraDataProvider is set correctly.');
+    }
 }
