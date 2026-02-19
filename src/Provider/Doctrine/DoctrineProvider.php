@@ -80,7 +80,7 @@ final class DoctrineProvider extends AbstractProvider
         $evm = $entityManager->getEventManager();
 
         // Register audit listeners
-        $evm->addEventListener([Events::loadClassMetadata], new TableSchemaListener($this));
+        $evm->addEventListener([Events::loadClassMetadata], new TableSchemaListener());
         $evm->addEventListener([ToolEvents::postGenerateSchemaTable], new CreateSchemaListener($this));
 
         $doctrineSubscriber = new DoctrineSubscriber($this, $entityManager);

@@ -15,7 +15,6 @@ use DH\Auditor\Provider\Doctrine\Service\StorageService;
 use DH\Auditor\Tests\Provider\Doctrine\Persistence\Schema\SchemaManagerTest;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
@@ -127,7 +126,7 @@ final readonly class SchemaManager
             foreach ($classes as $entityFQCN => $tableName) {
                 if (!\in_array($entityFQCN, $processed, true)) {
                     /** @var string $auditTablename */
-                    $auditTablename = $this->resolveAuditTableName($entityFQCN, $configuration, $storageConnection->getDatabasePlatform());
+                    $auditTablename = $this->resolveAuditTableName($entityFQCN, $configuration);
 
                     if ($storageSchema->hasTable($auditTablename)) {
                         // Audit table exists, let's update it if needed
@@ -167,7 +166,7 @@ final readonly class SchemaManager
 
         /** @var Configuration $configuration */
         $configuration = $this->provider->getConfiguration();
-        $auditTablename = $this->resolveAuditTableName($entity, $configuration, $connection->getDatabasePlatform());
+        $auditTablename = $this->resolveAuditTableName($entity, $configuration);
 
         if (null !== $auditTablename && !$schema->hasTable($auditTablename)) {
             $auditTable = $schema->createTable($auditTablename);
@@ -225,7 +224,7 @@ final readonly class SchemaManager
         /** @var Configuration $configuration */
         $configuration = $this->provider->getConfiguration();
 
-        $auditTablename = $this->resolveAuditTableName($entity, $configuration, $connection->getDatabasePlatform());
+        $auditTablename = $this->resolveAuditTableName($entity, $configuration);
         \assert(\is_string($auditTablename));
         $table = $schema->getTable($auditTablename);
 
@@ -251,7 +250,7 @@ final readonly class SchemaManager
      *
      * @see https://github.com/DamienHarper/auditor/issues/236
      */
-    public function resolveTableName(string $tableName, string $namespaceName, AbstractPlatform $platform): string
+    public function resolveTableName(string $tableName, string $namespaceName): string
     {
         if ('' === $namespaceName || '0' === $namespaceName) {
             return $tableName;
@@ -263,11 +262,11 @@ final readonly class SchemaManager
     /**
      * Resolves audit table name, including namespace/schema.
      */
-    public function resolveAuditTableName(string $entity, Configuration $configuration, AbstractPlatform $platform): ?string
+    public function resolveAuditTableName(string $entity, Configuration $configuration): ?string
     {
         $entities = $configuration->getEntities();
         $entityOptions = $entities[$entity];
-        $tablename = $this->resolveTableName($entityOptions['table_name'], $entityOptions['audit_table_schema'], $platform);
+        $tablename = $this->resolveTableName($entityOptions['table_name'], $entityOptions['audit_table_schema']);
 
         return $this->computeAuditTablename($tablename, $configuration);
     }

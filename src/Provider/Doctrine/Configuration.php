@@ -216,7 +216,7 @@ final class Configuration implements ConfigurationInterface
                     $entityTableName = $meta->getTableName();
                     $namespaceName = $meta->getSchemaName() ?? '';
 
-                    $computedTableName = $schemaManager->resolveTableName($entityTableName, $namespaceName, $platform);
+                    $computedTableName = $schemaManager->resolveTableName($entityTableName, $namespaceName);
                     $this->entities[$entity]['table_schema'] = $namespaceName;
                     $this->entities[$entity]['table_name'] = $entityTableName;
                     // $this->entities[$entity]['computed_table_name'] = $entityTableName;
