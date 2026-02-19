@@ -28,7 +28,7 @@ final class Issue238Test extends TestCase
 {
     use DefaultSchemaSetupTrait;
 
-    #[DataProvider('provideQuotedTableNameCases')]
+    #[DataProvider('provideComputeAuditTablenameHandlesQuotedIdentifiersCases')]
     public function testComputeAuditTablenameHandlesQuotedIdentifiers(
         string $tableName,
         string $prefix,
@@ -46,7 +46,7 @@ final class Issue238Test extends TestCase
     /**
      * @return iterable<string, array{string, string, string, string}>
      */
-    public static function provideQuotedTableNameCases(): iterable
+    public static function provideComputeAuditTablenameHandlesQuotedIdentifiersCases(): iterable
     {
         // Suffix appended INSIDE the closing quote, not after it
         yield 'double-quoted reserved word, default suffix' => ['"user"', '', '_audit', '"user_audit"'];
