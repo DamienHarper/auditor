@@ -1,3 +1,9 @@
+---
+id: intro
+title: Introduction
+slug: /intro
+---
+
 # auditor
 
 > **The missing audit log library for PHP**

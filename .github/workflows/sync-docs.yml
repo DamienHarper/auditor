@@ -70,6 +70,14 @@ jobs:
           rm -rf auditor-docs/docs/auditor
           cp -r docs/ auditor-docs/docs/auditor
 
+      - name: Inject Docusaurus front matter into index.md
+        run: |
+          INDEX="auditor-docs/docs/auditor/index.md"
+          if ! head -1 "$INDEX" | grep -q '^---'; then
+            CONTENT=$(cat "$INDEX")
+            printf -- '---\nid: intro\ntitle: Introduction\nslug: /intro\n---\n\n%s' "$CONTENT" > "$INDEX"
+          fi
+
       - name: Commit and push
         run: |
           cd auditor-docs
