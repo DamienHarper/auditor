@@ -75,7 +75,7 @@ jobs:
           INDEX="auditor-docs/docs/auditor/index.md"
           if ! head -1 "$INDEX" | grep -q '^---'; then
             CONTENT=$(cat "$INDEX")
-            printf -- '---\nid: intro\ntitle: Introduction\nslug: /intro\n---\n\n%s' "$CONTENT" > "$INDEX"
+            printf -- '---\nid: index\ntitle: Introduction\nslug: /\n---\n\n%s' "$CONTENT" > "$INDEX"
           fi
 
       - name: Commit and push

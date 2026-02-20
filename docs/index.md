@@ -1,7 +1,7 @@
 ---
-id: intro
+id: index
 title: Introduction
-slug: /intro
+slug: /
 ---
 
 # auditor
