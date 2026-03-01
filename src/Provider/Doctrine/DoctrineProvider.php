@@ -27,12 +27,13 @@ use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ToolEvents;
 use Gedmo\SoftDeleteable\SoftDeleteableListener;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
  * @see DoctrineProviderTest
  */
-final class DoctrineProvider extends AbstractProvider
+final class DoctrineProvider extends AbstractProvider implements ResetInterface
 {
     /**
      * @var array<string, string>
@@ -56,6 +57,9 @@ final class DoctrineProvider extends AbstractProvider
 
     /** @var array<string, Statement> */
     private array $preparedStatements = [];
+
+    /** @var DoctrineSubscriber[] */
+    private array $subscribers = [];
 
     public function __construct(ConfigurationInterface $configuration)
     {
@@ -84,7 +88,7 @@ final class DoctrineProvider extends AbstractProvider
         $evm->addEventListener([Events::loadClassMetadata], new TableSchemaListener());
         $evm->addEventListener([ToolEvents::postGenerateSchemaTable], new CreateSchemaListener($this));
 
-        $doctrineSubscriber = new DoctrineSubscriber($this, $entityManager);
+        $doctrineSubscriber = new DoctrineSubscriber($this);
         $evm->addEventListener([Events::onFlush], $doctrineSubscriber);
 
         // Register soft delete listener if Gedmo SoftDeleteable is available
@@ -92,7 +96,24 @@ final class DoctrineProvider extends AbstractProvider
             $evm->addEventListener([SoftDeleteableListener::POST_SOFT_DELETE], $doctrineSubscriber);
         }
 
+        $this->subscribers[] = $doctrineSubscriber;
+
         return $this;
+    }
+
+    /**
+     * Resets the provider state for long-running processes (e.g. Symfony Messenger workers).
+     *
+     * Clears cached prepared statements that may reference stale database connections
+     * after a connection reset, and resets all subscriber transaction caches.
+     */
+    public function reset(): void
+    {
+        $this->preparedStatements = [];
+
+        foreach ($this->subscribers as $subscriber) {
+            $subscriber->reset();
+        }
     }
 
     public function isStorageMapperRequired(): bool

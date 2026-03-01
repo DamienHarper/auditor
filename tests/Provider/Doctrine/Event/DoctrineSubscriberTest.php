@@ -16,6 +16,7 @@ use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\ServerVersionProvider;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Event\OnFlushEventArgs;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -51,8 +52,8 @@ final class DoctrineSubscriberTest extends TestCase
             'entities' => [],
         ]));
 
-        $target = new DoctrineSubscriber($provider, $objectManager);
-        $target->onFlush();
+        $target = new DoctrineSubscriber($provider);
+        $target->onFlush(new OnFlushEventArgs($objectManager));
 
         foreach ($dhDriver->getFlusherList() as $item) {
             ($item)();
@@ -100,14 +101,43 @@ final class DoctrineSubscriberTest extends TestCase
             'entities' => [],
         ]));
 
-        $target = new DoctrineSubscriber($provider, $objectManager);
-        $target->onFlush();
+        $target = new DoctrineSubscriber($provider);
+        $target->onFlush(new OnFlushEventArgs($objectManager));
 
         foreach ($auditorDriver->getFlusherList() as $item) {
             ($item)();
         }
 
         $this->assertTrue(true);
+    }
+
+    public function testOnFlushUsesEntityManagerFromEventArgs(): void
+    {
+        // onFlush must use the EM from OnFlushEventArgs so it works after
+        // EntityManager resets in long-running processes.
+        $eventArgsEm = $this->createMock(EntityManagerInterface::class);
+
+        $nativeDriver = $this->createStub(Driver::class);
+        $auditorDriver = new AuditorDriver($nativeDriver);
+
+        $eventArgsEm
+            ->method('getConnection')
+            ->willReturn($connection = $this->createMock(ConnectionDbal::class))
+        ;
+
+        $connection
+            ->method('getDriver')
+            ->willReturn($auditorDriver)
+        ;
+
+        $provider = $this->createDoctrineProvider($this->createProviderConfiguration([
+            'entities' => [],
+        ]));
+
+        $target = new DoctrineSubscriber($provider);
+        $target->onFlush(new OnFlushEventArgs($eventArgsEm));
+
+        $this->assertCount(1, $auditorDriver->getFlusherList());
     }
 
     public function testIssue184Unexpected(): void
@@ -154,8 +184,8 @@ final class DoctrineSubscriberTest extends TestCase
             'entities' => [],
         ]));
 
-        $target = new DoctrineSubscriber($provider, $objectManager);
-        $target->onFlush();
+        $target = new DoctrineSubscriber($provider);
+        $target->onFlush(new OnFlushEventArgs($objectManager));
 
         $this->assertTrue(true);
     }
