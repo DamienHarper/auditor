@@ -95,9 +95,9 @@ $auditor->registerProvider($provider);
 
 namespace App\Entity;
 
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Auditable;
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Ignore;
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
+use DH\Auditor\Attribute\Auditable;
+use DH\Auditor\Attribute\Ignore;
+use DH\Auditor\Attribute\Security;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
