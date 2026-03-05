@@ -345,10 +345,10 @@ class User implements UserInterface
 ### Auditable
 
 ```php
-namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
+namespace DH\Auditor\Attribute;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
-final class Auditable
+class Auditable
 {
     public function __construct(public bool $enabled = true);
 }
@@ -357,22 +357,22 @@ final class Auditable
 ### Ignore
 
 ```php
-namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
+namespace DH\Auditor\Attribute;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class Ignore {}
+class Ignore {}
 ```
 
 ### Security
 
 ```php
-namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
+namespace DH\Auditor\Attribute;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
-final class Security
+class Security
 {
     public const string VIEW_SCOPE = 'view';
-    
+
     public function __construct(public array $view);
 }
 ```

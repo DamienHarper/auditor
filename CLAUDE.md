@@ -94,10 +94,12 @@ Default: `{table_prefix}{entity_table}_audit{table_suffix}`. Configured via `tab
 
 ### PHP Attributes for entity configuration
 
-Three attributes live in `src/Provider/Doctrine/Auditing/Attribute/`:
+Three attributes live in `src/Attribute/` (canonical namespace since 4.x):
 - `#[Auditable]` — marks an entity class as auditable
 - `#[Ignore]` — marks a field to skip
 - `#[Security]` — restricts who can view audit entries for an entity
+
+The old `src/Provider/Doctrine/Auditing/Attribute/` classes still exist but are **deprecated** — they simply extend the core ones.
 
 Entities can also be configured programmatically via `Configuration::setEntities()`.
 
