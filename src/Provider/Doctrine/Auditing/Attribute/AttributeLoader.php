@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
 
+use DH\Auditor\Attribute\Auditable;
+use DH\Auditor\Attribute\Ignore;
+use DH\Auditor\Attribute\Security;
 use DH\Auditor\Tests\Provider\Doctrine\Auditing\Attribute\AttributeLoaderTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Entity;
@@ -48,8 +51,8 @@ final readonly class AttributeLoader
             return null;
         }
 
-        // Check that we have an Auditable attribute
-        $attributes = $reflection->getAttributes(Auditable::class);
+        // Check that we have an Auditable attribute (accepts both core and legacy Doctrine namespace)
+        $attributes = $reflection->getAttributes(Auditable::class, \ReflectionAttribute::IS_INSTANCEOF);
         if ([] !== $attributes) {
             $auditableAttribute = $attributes[0]->newInstance();
         }
@@ -58,8 +61,8 @@ final readonly class AttributeLoader
             return null;
         }
 
-        // Check that we have a Security attribute
-        $attributes = $reflection->getAttributes(Security::class);
+        // Check that we have a Security attribute (accepts both core and legacy Doctrine namespace)
+        $attributes = $reflection->getAttributes(Security::class, \ReflectionAttribute::IS_INSTANCEOF);
         if ([] !== $attributes) {
             $securityAttribute = $attributes[0]->newInstance();
         }
@@ -82,7 +85,7 @@ final readonly class AttributeLoader
 
         foreach ($reflection->getProperties() as $property) {
             $ignoreAttribute = null;
-            $attributes = $property->getAttributes(Ignore::class);
+            $attributes = $property->getAttributes(Ignore::class, \ReflectionAttribute::IS_INSTANCEOF);
             if (\is_array($attributes) && [] !== $attributes) {
                 $ignoreAttribute = $attributes[0]->newInstance();
             }

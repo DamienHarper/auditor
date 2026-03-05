@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
 
+use DH\Auditor\Attribute\Security;
 use DH\Auditor\Exception\AccessDeniedException;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Model\Entry;
-use DH\Auditor\Provider\Doctrine\Auditing\Attribute\Security;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter\SimpleFilter;
