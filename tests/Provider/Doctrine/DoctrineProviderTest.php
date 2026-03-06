@@ -545,6 +545,50 @@ final class DoctrineProviderTest extends TestCase
 
         $this->assertIsBool($after('', ''), 'RoleChecker returns a bool.');
     }
+
+    public function testResetClearsPreparedStatements(): void
+    {
+        $provider = $this->createDoctrineProvider();
+
+        // Access private preparedStatements via reflection to seed the cache
+        $reflection = new \ReflectionProperty($provider, 'preparedStatements');
+        $reflection->setValue($provider, ['some_key' => 'some_statement']);
+
+        $this->assertNotEmpty($reflection->getValue($provider));
+
+        $provider->reset();
+
+        $this->assertEmpty($reflection->getValue($provider), 'reset() clears preparedStatements cache.');
+    }
+
+    public function testResetIsCalledOnSubscribers(): void
+    {
+        $provider = $this->createDoctrineProvider();
+
+        // Access private subscribers via reflection
+        $subscribersReflection = new \ReflectionProperty($provider, 'subscribers');
+        $subscribers = $subscribersReflection->getValue($provider);
+
+        $this->assertNotEmpty($subscribers, 'registerAuditingService() stores subscribers.');
+
+        // Seed a subscriber's transaction cache via reflection
+        $subscriber = $subscribers[0];
+        $transactionsReflection = new \ReflectionProperty($subscriber, 'transactions');
+        $transactionsReflection->setValue($subscriber, [42 => 'stale_transaction']);
+
+        $this->assertNotEmpty($transactionsReflection->getValue($subscriber));
+
+        $provider->reset();
+
+        $this->assertEmpty($transactionsReflection->getValue($subscriber), 'reset() clears subscriber transaction caches.');
+    }
+
+    public function testImplementsResetInterface(): void
+    {
+        $provider = $this->createDoctrineProvider();
+
+        $this->assertInstanceOf(\Symfony\Contracts\Service\ResetInterface::class, $provider);
+    }
 }
 
 final class FakeStorageMapper
