@@ -7,6 +7,7 @@ namespace DH\Auditor\Provider\Doctrine\Auditing\Transaction;
 use DH\Auditor\Exception\MappingException;
 use DH\Auditor\Provider\Doctrine\Configuration;
 use DH\Auditor\Provider\Doctrine\Persistence\Helper\DoctrineHelper;
+use DH\Auditor\Transaction\NeedsConversionToAuditableType;
 use DH\Auditor\User\UserInterface;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -126,7 +127,9 @@ trait AuditTrait
                     // let's replace resources with a "simple" representation: resourceType#resourceId
                     $convertedValue = get_resource_type($value).'#'.get_resource_id($value);
                 } else {
-                    $convertedValue = $type->convertToDatabaseValue($value, $platform);
+                    $convertedValue = $type instanceof NeedsConversionToAuditableType
+                        ? $type->convertToAuditableValue($value, $platform)
+                        : $type->convertToDatabaseValue($value, $platform);
                 }
 
                 break;
@@ -136,7 +139,9 @@ trait AuditTrait
                 return $value;
 
             default:
-                $convertedValue = $type->convertToDatabaseValue($value, $platform);
+                $convertedValue = $type instanceof NeedsConversionToAuditableType
+                    ? $type->convertToAuditableValue($value, $platform)
+                    : $type->convertToDatabaseValue($value, $platform);
         }
 
         return $convertedValue;
