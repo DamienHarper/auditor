@@ -24,6 +24,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: 'audit:schema:update',
     description: 'Update audit tables structure',
 )]
+/**
+ * @deprecated since auditor 4.x, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
+ */
 final class UpdateSchemaCommand extends Command
 {
     use LockableTrait;

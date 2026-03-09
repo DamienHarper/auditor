@@ -6,6 +6,9 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter;
 
 use DH\Auditor\Exception\InvalidArgumentException;
 
+/**
+ * @deprecated since auditor 4.x, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
+ */
 final readonly class DateRangeFilter implements FilterInterface
 {
     private ?\DateTimeInterface $minValue;

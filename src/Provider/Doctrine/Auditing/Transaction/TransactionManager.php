@@ -10,6 +10,9 @@ use DH\Auditor\Transaction\TransactionHydratorInterface;
 use DH\Auditor\Transaction\TransactionManagerInterface;
 use DH\Auditor\Transaction\TransactionProcessorInterface;
 
+/**
+ * @deprecated since auditor 4.x, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
+ */
 final readonly class TransactionManager implements TransactionManagerInterface
 {
     private TransactionProcessorInterface $processor;

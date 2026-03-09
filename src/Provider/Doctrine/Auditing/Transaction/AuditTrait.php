@@ -18,6 +18,9 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\FieldMapping;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 
+/**
+ * @deprecated since auditor 4.x, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
+ */
 trait AuditTrait
 {
     private static array $typeNameCache = [];
