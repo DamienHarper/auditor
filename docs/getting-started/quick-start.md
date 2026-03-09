@@ -7,8 +7,8 @@ dispatching, user attribution, security — while **providers** handle storage a
 
 ```mermaid
 flowchart LR
-    A["1️⃣ Configure\nAuditor"] --> B["2️⃣ Register\na Provider"]
-    B --> C["3️⃣ Mark entities\nas Auditable"]
+    A["1️⃣ Configure<br/>Auditor"] --> B["2️⃣ Register<br/>a Provider"]
+    B --> C["3️⃣ Mark entities<br/>as Auditable"]
     C --> D["🎉 Done!"]
 ```
 
