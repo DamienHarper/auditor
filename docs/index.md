@@ -33,7 +33,17 @@ The library is architected around two core concepts:
 1. **Auditing Services** - Responsible for collecting audit events when changes occur
 2. **Storage Services** - Responsible for persisting audit traces to the database
 
-These services are provided by **Providers**. The library ships with a default provider for Doctrine ORM.
+These services are provided by **Providers**.
+
+### Available Providers
+
+| Package | ORM |
+|---------|-----|
+| [`damienharper/auditor-doctrine-provider`](https://github.com/DamienHarper/auditor-doctrine-provider) | Doctrine ORM |
+| [`damienharper/auditor-eloquent-provider`](https://github.com/DamienHarper/auditor-eloquent-provider) | Eloquent ORM |
+
+> [!NOTE]
+> The `DoctrineProvider` was previously bundled with `damienharper/auditor` and has been extracted into `damienharper/auditor-doctrine-provider` as of 4.x. The namespace (`DH\Auditor\Provider\Doctrine\`) is unchanged — migration is seamless.
 
 ```mermaid
 flowchart TD

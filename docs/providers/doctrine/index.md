@@ -1,3 +1,15 @@
+> [!WARNING]
+> **Deprecation notice — auditor 4.x**
+>
+> The `DoctrineProvider` and all classes under `DH\Auditor\Provider\Doctrine\` are now **deprecated** in `damienharper/auditor` and will be **removed in v5.0**.
+>
+> They have been extracted into the standalone package [`damienharper/auditor-doctrine-provider`](https://github.com/DamienHarper/auditor-doctrine-provider):
+> ```bash
+> composer require damienharper/auditor-doctrine-provider
+> ```
+> The namespace (`DH\Auditor\Provider\Doctrine\`) is **unchanged** — migration is seamless.
+> If you use `auditor-bundle`, it already pulls this package in automatically.
+
 # DoctrineProvider
 
 > **The default provider for auditing Doctrine ORM entities**

@@ -225,6 +225,6 @@ $configuration = new Configuration([
 
 ## Related
 
-- 🏷️ [Security Attribute](../providers/doctrine/attributes.md#security)
+- 🏷️ [Security Attribute](../providers/doctrine/attributes.md#-security)
 - 👤 [User Provider Configuration](user-provider.md)
 - 🔐 [Security Provider Configuration](security-provider.md)

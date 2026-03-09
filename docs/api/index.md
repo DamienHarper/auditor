@@ -106,6 +106,10 @@ interface ConfigurationInterface
 
 ## 🗄️ DoctrineProvider
 
+> [!WARNING]
+> The built-in `DoctrineProvider` is **deprecated** since auditor 4.x and will be removed in v5.0.
+> Use the standalone [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/) package instead.
+
 ### 🗄️ DoctrineProvider
 
 ```php
@@ -173,6 +177,10 @@ final class Configuration implements ConfigurationInterface
 
 ## 🔍 Reader & Query
 
+> [!WARNING]
+> `Reader`, `Query` and all filter classes belong to the DoctrineProvider and are **deprecated** in auditor core.
+> See [auditor-doctrine-provider › Querying](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/querying/) for the current API reference.
+
 ### Reader
 
 ```php
@@ -230,6 +238,10 @@ final class Query implements QueryInterface
 ```
 
 ## 🎯 Filters
+
+> [!WARNING]
+> Filter classes (`FilterInterface`, `SimpleFilter`, `DateRangeFilter`, `RangeFilter`, `NullFilter`, `JsonFilter`) are part of the DoctrineProvider and are **deprecated** in auditor core.
+> See [auditor-doctrine-provider › Filters](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/querying/filters) for the current API reference.
 
 ### FilterInterface
 
@@ -345,10 +357,10 @@ class User implements UserInterface
 ### Auditable
 
 ```php
-namespace DH\Auditor\Attribute;
+namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class Auditable
+final class Auditable
 {
     public function __construct(public bool $enabled = true);
 }
@@ -357,27 +369,31 @@ class Auditable
 ### Ignore
 
 ```php
-namespace DH\Auditor\Attribute;
+namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-class Ignore {}
+final class Ignore {}
 ```
 
 ### Security
 
 ```php
-namespace DH\Auditor\Attribute;
+namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class Security
+final class Security
 {
     public const string VIEW_SCOPE = 'view';
-
+    
     public function __construct(public array $view);
 }
 ```
 
 ## 🛠️ Schema Management
+
+> [!WARNING]
+> `SchemaManager` is part of the DoctrineProvider and is **deprecated** in auditor core.
+> See [auditor-doctrine-provider › Schema](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/schema) for the current reference.
 
 ### SchemaManager
 
@@ -433,6 +449,10 @@ class ProviderException extends \Exception {}
 ```
 
 ## ⚙️ Services
+
+> [!WARNING]
+> `AuditingService` and `StorageService` are part of the DoctrineProvider and are **deprecated** in auditor core.
+> See [auditor-doctrine-provider › Services](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/services) for the current reference.
 
 ### AuditingService
 
