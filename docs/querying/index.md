@@ -1,23 +1,37 @@
 # Querying Audits
 
-> **This section covers provider-specific querying APIs.**
+Querying audit entries is **provider-specific**: each provider implements its own reader and
+filter system adapted to its underlying storage technology.
 
-Querying audit logs is handled by each provider independently. The `auditor` core library
-does not provide a query API — it only defines the audit flow and storage contracts.
+The `auditor` core does not define a query API — it only orchestrates providers and dispatches
+audit events.
+
+## What providers typically offer
+
+Providers that implement a reader expose at minimum:
+
+- A **Reader** — factory for queries, pagination, cross-entity transaction lookups
+- A **Query** builder — filters, ordering, limit/offset
+- A set of **Filters** — narrow results by field value, date range, numeric range, JSON content, etc.
 
 ## DoctrineProvider
 
-If you are using **DoctrineProvider** (whether the built-in deprecated version or the
-standalone `auditor-doctrine-provider` package), the full Reader and Query API documentation
-is available in the provider's dedicated docs:
+The **auditor-doctrine-provider** package ships a full Reader and filter system backed by
+Doctrine DBAL.
 
-- [Querying Audits →](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/querying/)
+→ **[Querying Audits (auditor-doctrine-provider)](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/querying/)**
 
-The DoctrineProvider exposes a powerful `Reader` class with:
-- `createQuery(Entity::class, $options)` — paginated queries with filters
-- `DateRangeFilter`, `RangeFilter`, `SimpleFilter`, `NullFilter` — composable filter system
-- `paginate()` — structured pagination result
-- `getAuditsByTransactionHash()` — cross-entity transaction lookup
+Highlights:
+
+| Feature | Class |
+|---------|-------|
+| Reader factory + pagination | `Reader` |
+| Query builder | `Query` |
+| Exact value match | `SimpleFilter` |
+| Date range | `DateRangeFilter` |
+| Numeric range | `RangeFilter` |
+| NULL check | `NullFilter` |
+| JSON column content | `JsonFilter` |
 
 ## Other providers
 

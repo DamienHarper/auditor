@@ -190,7 +190,11 @@ public function __invoke(LifecycleEvent $event): void
 
 ## Reading Extra Data
 
-The `Entry` model provides access via the `extraData` property or the `getExtraData()` method:
+> [!NOTE]
+> Reading and filtering audit entries (including by `extra_data` content) is **provider-specific**.
+> For DoctrineProvider, see [Extra Data — Filtering](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/extra-data#filtering-by-extra-data).
+
+The `Entry` model provides access to `extra_data` via the `extraData` property or the `getExtraData()` method:
 
 ```php
 $reader = new Reader($provider);
