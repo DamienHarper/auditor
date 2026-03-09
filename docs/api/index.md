@@ -104,207 +104,13 @@ interface ConfigurationInterface
 }
 ```
 
-## 🗄️ DoctrineProvider
+## 🔌 DoctrineProvider
 
 > [!WARNING]
-> The built-in `DoctrineProvider` is **deprecated** since auditor 4.x and will be removed in v5.0.
-> Use the standalone [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/) package instead.
-
-### 🗄️ DoctrineProvider
-
-```php
-namespace DH\Auditor\Provider\Doctrine;
-
-final class DoctrineProvider extends AbstractProvider
-{
-    public function __construct(ConfigurationInterface $configuration);
-    
-    public function getTransactionManager(): TransactionManager;
-    
-    public function isStorageMapperRequired(): bool;
-    
-    public function getAuditingServiceForEntity(string $entity): AuditingService;
-    public function getStorageServiceForEntity(string $entity): StorageService;
-    
-    public function isAuditable(object|string $entity): bool;
-    public function isAudited(object|string $entity): bool;
-    public function isAuditedField(object|string $entity, string $field): bool;
-    
-    public function setStorageMapper(callable $storageMapper): void;
-    
-    public function loadAnnotations(EntityManagerInterface $em, array $entities): self;
-}
-```
-
-### 🗄️ DoctrineProvider Configuration
-
-```php
-namespace DH\Auditor\Provider\Doctrine;
-
-final class Configuration implements ConfigurationInterface
-{
-    public function __construct(array $options);
-    
-    // Entities
-    public function setEntities(array $entities): self;
-    public function getEntities(): array;
-    public function enableAuditFor(string $entity): self;
-    public function disableAuditFor(string $entity): self;
-    
-    // Viewer
-    public function enableViewer(): self;
-    public function disableViewer(): self;
-    public function isViewerEnabled(): bool;
-    public function setViewerPageSize(int $pageSize): self;
-    public function getViewerPageSize(): int;
-    
-    // Table naming
-    public function getTablePrefix(): string;
-    public function getTableSuffix(): string;
-    
-    // Ignored columns
-    public function getIgnoredColumns(): array;
-    
-    // Storage mapper
-    public function setStorageMapper(callable $mapper): self;
-    public function getStorageMapper(): mixed;
-    
-    // Provider reference
-    public function getProvider(): ?DoctrineProvider;
-    public function setProvider(DoctrineProvider $provider): void;
-}
-```
-
-## 🔍 Reader & Query
-
-> [!WARNING]
-> `Reader`, `Query` and all filter classes belong to the DoctrineProvider and are **deprecated** in auditor core.
-> See [auditor-doctrine-provider › Querying](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/querying/) for the current API reference.
-
-### Reader
-
-```php
-namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
-
-final readonly class Reader implements ReaderInterface
-{
-    public const int PAGE_SIZE = 50;
-    
-    public function __construct(DoctrineProvider $provider);
-    
-    public function getProvider(): DoctrineProvider;
-    
-    public function createQuery(string $entity, array $options = []): Query;
-    
-    public function getAuditsByTransactionHash(string $transactionHash): array;
-    
-    public function paginate(Query $query, int $page = 1, ?int $pageSize = null): array;
-    
-    public function getEntityTableName(string $entity): string;
-    public function getEntityAuditTableName(string $entity): string;
-}
-```
-
-### Query
-
-```php
-namespace DH\Auditor\Provider\Doctrine\Persistence\Reader;
-
-final class Query implements QueryInterface
-{
-    public const string TYPE = 'type';
-    public const string CREATED_AT = 'created_at';
-    public const string TRANSACTION_HASH = 'transaction_hash';
-    public const string OBJECT_ID = 'object_id';
-    public const string USER_ID = 'blame_id';
-    public const string ID = 'id';
-    public const string DISCRIMINATOR = 'discriminator';
-    
-    public function __construct(string $table, Connection $connection, string $timezone);
-    
-    public function execute(): array;
-    public function count(): int;
-    
-    public function addFilter(FilterInterface $filter): self;
-    public function addOrderBy(string $field, string $direction = 'DESC'): self;
-    public function resetOrderBy(): self;
-    public function limit(int $limit, int $offset = 0): self;
-    
-    public function getSupportedFilters(): array;
-    public function getFilters(): array;
-    public function getOrderBy(): array;
-    public function getLimit(): array;
-}
-```
-
-## 🎯 Filters
-
-> [!WARNING]
-> Filter classes (`FilterInterface`, `SimpleFilter`, `DateRangeFilter`, `RangeFilter`, `NullFilter`, `JsonFilter`) are part of the DoctrineProvider and are **deprecated** in auditor core.
-> See [auditor-doctrine-provider › Filters](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/querying/filters) for the current API reference.
-
-### FilterInterface
-
-```php
-namespace DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter;
-
-interface FilterInterface
-{
-    public function getName(): string;
-    public function getSQL(): array;
-}
-```
-
-### SimpleFilter
-
-```php
-namespace DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter;
-
-final class SimpleFilter implements FilterInterface
-{
-    public function __construct(string $name, mixed $value);
-    
-    public function getName(): string;
-    public function getValue(): mixed;
-    public function getSQL(): array;
-}
-```
-
-### DateRangeFilter
-
-```php
-namespace DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter;
-
-final readonly class DateRangeFilter implements FilterInterface
-{
-    public function __construct(
-        string $name,
-        ?\DateTimeInterface $minValue,
-        ?\DateTimeInterface $maxValue = null
-    );
-    
-    public function getName(): string;
-    public function getMinValue(): ?\DateTimeInterface;
-    public function getMaxValue(): ?\DateTimeInterface;
-    public function getSQL(): array;
-}
-```
-
-### RangeFilter
-
-```php
-namespace DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter;
-
-final readonly class RangeFilter implements FilterInterface
-{
-    public function __construct(string $name, mixed $minValue, mixed $maxValue = null);
-    
-    public function getName(): string;
-    public function getMinValue(): mixed;
-    public function getMaxValue(): mixed;
-    public function getSQL(): array;
-}
-```
+> All DoctrineProvider classes (`DoctrineProvider`, `Configuration`, `Reader`, `Query`, filters,
+> `SchemaManager`, `AuditingService`, `StorageService`) are **deprecated** in auditor core
+> (removed in v5.0). See the [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/)
+> documentation for the current API reference.
 
 ## 📦 Models
 
@@ -357,7 +163,7 @@ class User implements UserInterface
 ### Auditable
 
 ```php
-namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
+namespace DH\Auditor\Attribute;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class Auditable
@@ -369,7 +175,7 @@ final class Auditable
 ### Ignore
 
 ```php
-namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
+namespace DH\Auditor\Attribute;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class Ignore {}
@@ -378,7 +184,7 @@ final class Ignore {}
 ### Security
 
 ```php
-namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
+namespace DH\Auditor\Attribute;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class Security
@@ -386,36 +192,6 @@ final class Security
     public const string VIEW_SCOPE = 'view';
     
     public function __construct(public array $view);
-}
-```
-
-## 🛠️ Schema Management
-
-> [!WARNING]
-> `SchemaManager` is part of the DoctrineProvider and is **deprecated** in auditor core.
-> See [auditor-doctrine-provider › Schema](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/schema) for the current reference.
-
-### SchemaManager
-
-```php
-namespace DH\Auditor\Provider\Doctrine\Persistence\Schema;
-
-final readonly class SchemaManager
-{
-    public function __construct(DoctrineProvider $provider);
-    
-    public function updateAuditSchema(?array $sqls = null, ?callable $callback = null): void;
-    
-    public function getAuditableTableNames(EntityManagerInterface $em): array;
-    public function collectAuditableEntities(): array;
-    public function getUpdateAuditSchemaSql(): array;
-    
-    public function createAuditTable(string $entity, ?Schema $schema = null): Schema;
-    public function updateAuditTable(string $entity, ?Schema $schema = null): Schema;
-    
-    public function resolveTableName(string $tableName, string $namespaceName, AbstractPlatform $platform): string;
-    public function resolveAuditTableName(string $entity, Configuration $config, AbstractPlatform $platform): ?string;
-    public function computeAuditTablename(string $entityTableName, Configuration $config): ?string;
 }
 ```
 
@@ -448,44 +224,10 @@ class MappingException extends \Exception {}
 class ProviderException extends \Exception {}
 ```
 
-## ⚙️ Services
-
-> [!WARNING]
-> `AuditingService` and `StorageService` are part of the DoctrineProvider and are **deprecated** in auditor core.
-> See [auditor-doctrine-provider › Services](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/services) for the current reference.
-
-### AuditingService
-
-```php
-namespace DH\Auditor\Provider\Doctrine\Service;
-
-final class AuditingService extends DoctrineService implements AuditingServiceInterface
-{
-    public function __construct(string $name, EntityManagerInterface $entityManager);
-    
-    public function getName(): string;
-    public function getEntityManager(): EntityManagerInterface;
-}
-```
-
-### StorageService
-
-```php
-namespace DH\Auditor\Provider\Doctrine\Service;
-
-final class StorageService extends DoctrineService implements StorageServiceInterface
-{
-    public function __construct(string $name, EntityManagerInterface $entityManager);
-    
-    public function getName(): string;
-    public function getEntityManager(): EntityManagerInterface;
-}
-```
-
 ---
 
 ## Next Steps
 
 - 🚀 [Getting Started Guide](../getting-started/quick-start.md)
-- 🗄️ [DoctrineProvider Reference](../providers/doctrine/index.md)
+- 🗄️ [DoctrineProvider](../providers/doctrine/index.md)
 - 🔍 [Querying Audits](../querying/index.md)

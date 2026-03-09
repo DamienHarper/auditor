@@ -2,7 +2,11 @@
 
 > **Manage audit data via the command line**
 
-When using the auditor-bundle or standalone, the library provides console commands for managing audit data.
+> [!NOTE]
+> These commands are provided by **DoctrineProvider**. For programmatic usage and standalone
+> registration, see [Schema Management](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/schema).
+
+When using auditor-bundle or the standalone DoctrineProvider, two console commands are available:
 
 ## 📋 Available Commands
 
@@ -196,47 +200,6 @@ For automated cleanup, add to your crontab:
 | 0    | Success or cancelled by user   |
 | 1    | Error                          |
 
-## 💻 Programmatic Usage
-
-Both commands can be used programmatically:
-
-### Schema Update
-
-```php
-use DH\Auditor\Provider\Doctrine\Persistence\Schema\SchemaManager;
-
-$schemaManager = new SchemaManager($provider);
-
-// Get SQL
-$sqls = $schemaManager->getUpdateAuditSchemaSql();
-
-// Execute
-$schemaManager->updateAuditSchema();
-
-// With progress callback
-$schemaManager->updateAuditSchema(null, function (array $progress) {
-    // Handle progress
-});
-```
-
-### Cleaning Audits
-
-```php
-use Doctrine\DBAL\Connection;
-
-/** @var Connection $connection */
-$connection = $storageService->getEntityManager()->getConnection();
-
-$queryBuilder = $connection->createQueryBuilder();
-$queryBuilder
-    ->delete('users_audit')
-    ->where('created_at < :until')
-    ->setParameter('until', (new \DateTime('-12 months'))->format('Y-m-d H:i:s'))
-;
-
-$deleted = $queryBuilder->executeStatement();
-```
-
 ## 🔒 Command Locking
 
 Both commands use Symfony's Lock component to prevent concurrent execution:
@@ -247,30 +210,6 @@ The command is already running in another process.
 
 > [!NOTE]
 > This ensures data integrity when running commands in parallel or from cron jobs.
-
-## 📦 Registering Commands (Standalone)
-
-When not using auditor-bundle, register commands manually:
-
-```php
-use DH\Auditor\Provider\Doctrine\Persistence\Command\CleanAuditLogsCommand;
-use DH\Auditor\Provider\Doctrine\Persistence\Command\UpdateSchemaCommand;
-use Symfony\Component\Console\Application;
-
-$application = new Application();
-
-// Schema update command
-$updateCommand = new UpdateSchemaCommand();
-$updateCommand->setAuditor($auditor);
-$application->add($updateCommand);
-
-// Clean command
-$cleanCommand = new CleanAuditLogsCommand();
-$cleanCommand->setAuditor($auditor);
-$application->add($cleanCommand);
-
-$application->run();
-```
 
 ## ✅ Best Practices
 
