@@ -96,6 +96,6 @@ Refer to your provider's quick start for schema setup and reading audit entries 
 ## What's Next?
 
 - ⚙️ [Configuration Reference](../configuration/index.md) — Global options (user provider, security, role checker)
-- 🏷️ [Attributes Reference](../providers/doctrine/attributes.md) — `#[Auditable]`, `#[Ignore]`, `#[Security]`
+- 🏷️ [Attributes Reference](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/attributes) — `#[Auditable]`, `#[Ignore]`, `#[Security]`
 - 🔌 [Providers](../providers/doctrine/index.md) — Available providers
 - 🔍 [Querying Audits](../querying/index.md) — Reading audit entries

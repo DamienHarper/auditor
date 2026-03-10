@@ -130,7 +130,7 @@ See [Role Checker Configuration](role-checker.md) for more details.
 
 ## 🗄️ DoctrineProvider Configuration
 
-The DoctrineProvider has its own configuration. See [DoctrineProvider Configuration](../providers/doctrine/configuration.md) for details.
+The DoctrineProvider has its own configuration. See [DoctrineProvider Configuration](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/configuration) for details.
 
 ## 📝 Configuration Summary
 
@@ -178,4 +178,4 @@ $auditor = new Auditor($configuration, new EventDispatcher());
 - 👤 [User Provider Configuration](user-provider.md)
 - 🔐 [Security Provider Configuration](security-provider.md)
 - 🛡️ [Role Checker Configuration](role-checker.md)
-- 🗄️ [DoctrineProvider Configuration](../providers/doctrine/configuration.md)
+- 🗄️ [DoctrineProvider Configuration](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/configuration)
