@@ -19,6 +19,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 
 /**
+ * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
  * @see QueryTest
  */
 final class Query implements QueryInterface

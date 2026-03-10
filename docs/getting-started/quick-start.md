@@ -1,94 +1,64 @@
 # Quick Start Guide
 
-> **Set up auditing for your Doctrine entities in minutes**
+> **Set up the auditor core and connect a provider**
 
-This guide will help you set up auditing for your Doctrine entities in minutes.
-
-## 🔍 Overview
-
-Setting up auditor involves three main steps:
+`auditor` is a framework-agnostic audit library. It handles orchestration — event
+dispatching, user attribution, security — while **providers** handle storage and querying.
 
 ```mermaid
 flowchart LR
-    A["1️⃣ Configure<br>Auditor"] --> B["2️⃣ Configure<br>DoctrineProvider"]
-    B --> C["3️⃣ Mark Entities<br>as Auditable"]
+    A["1️⃣ Configure<br/>Auditor"] --> B["2️⃣ Register<br/>a Provider"]
+    B --> C["3️⃣ Mark entities<br/>as Auditable"]
     C --> D["🎉 Done!"]
 ```
 
-1. **Configure the Auditor** - Set up global options
-2. **Configure the DoctrineProvider** - Define which entities to audit
-3. **Mark entities as auditable** - Use attributes or configuration
+## 1️⃣ Configure the Auditor
 
-## 1️⃣ Step 1: Create the Auditor
+The `Auditor` class is the central registry. Configure it once at bootstrap time.
 
 ```php
 <?php
 
 use DH\Auditor\Auditor;
 use DH\Auditor\Configuration;
+use DH\Auditor\User\User;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-// Create the event dispatcher
-$eventDispatcher = new EventDispatcher();
-
-// Create the auditor configuration
 $configuration = new Configuration([
-    'enabled' => true,
+    'enabled'  => true,
     'timezone' => 'UTC',
-    'user_provider' => null,      // Optional: callable to get current user
-    'security_provider' => null,  // Optional: callable for security context
-    'role_checker' => null,       // Optional: callable to check viewing permissions
 ]);
 
-// Create the Auditor instance
-$auditor = new Auditor($configuration, $eventDispatcher);
+// Optional: tell auditor who is making changes
+$configuration->setUserProvider(function (): ?User {
+    return new User((string) $currentUser->getId(), $currentUser->getUsername());
+});
+
+// Optional: provide IP + firewall context
+$configuration->setSecurityProvider(function (): array {
+    return [$request->getClientIp(), 'main'];
+});
+
+$auditor = new Auditor($configuration, new EventDispatcher());
 ```
 
-## 2️⃣ Step 2: Configure the DoctrineProvider
+## 2️⃣ Register a Provider
+
+A provider connects auditor to a specific storage technology. Each provider has its own
+setup (services, schema, etc.) — refer to your provider's documentation.
 
 ```php
-<?php
-
-use DH\Auditor\Provider\Doctrine\Configuration as DoctrineConfiguration;
-use DH\Auditor\Provider\Doctrine\DoctrineProvider;
-use DH\Auditor\Provider\Doctrine\Service\AuditingService;
-use DH\Auditor\Provider\Doctrine\Service\StorageService;
-
-// Create provider configuration
-$providerConfiguration = new DoctrineConfiguration([
-    'table_prefix' => '',
-    'table_suffix' => '_audit',
-    'ignored_columns' => [],       // Columns to ignore globally
-    'entities' => [
-        // Entities configuration (alternative to attributes)
-        App\Entity\User::class => [
-            'enabled' => true,
-            'ignored_columns' => ['password'],  // Entity-specific ignored columns
-        ],
-        App\Entity\Post::class => [
-            'enabled' => true,
-        ],
-    ],
-]);
-
-// Create the DoctrineProvider
-$provider = new DoctrineProvider($providerConfiguration);
-
-// Register auditing and storage services
-// (typically you use the same EntityManager for both)
-$auditingService = new AuditingService('default', $entityManager);
-$storageService = new StorageService('default', $entityManager);
-
-$provider->registerAuditingService($auditingService);
-$provider->registerStorageService($storageService);
-
-// Register the provider with the Auditor
 $auditor->registerProvider($provider);
 ```
 
-## 3️⃣ Step 3: Mark Entities as Auditable
+| Provider | Package | Storage |
+|----------|---------|---------|
+| DoctrineProvider | [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/) | Doctrine ORM / DBAL |
 
-### Using PHP Attributes (Recommended)
+## 3️⃣ Mark Entities as Auditable
+
+Use the `#[Auditable]` attribute on any class you want tracked. `#[Ignore]` excludes
+individual fields; `#[Security]` restricts who can view the audit entries.
 
 ```php
 <?php
@@ -98,115 +68,34 @@ namespace App\Entity;
 use DH\Auditor\Attribute\Auditable;
 use DH\Auditor\Attribute\Ignore;
 use DH\Auditor\Attribute\Security;
-use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
 #[Auditable]
-#[Security(view: ['ROLE_ADMIN'])]  // Optional: restrict who can view audits
+#[Security(view: ['ROLE_ADMIN'])]
 class User
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
-    #[ORM\Column(length: 255)]
     private string $email;
 
-    #[ORM\Column(length: 255)]
-    #[Ignore]  // This field won't be audited
-    private string $password;
-
-    #[ORM\Column(length: 100)]
-    private string $name;
-
-    // ... getters and setters
+    #[Ignore]
+    private string $password;  // this field will never appear in audit diffs
 }
 ```
 
-### Available Attributes
+The attributes are part of `auditor` core (`DH\Auditor\Attribute\`) and work with any
+provider. How a provider discovers and registers auditable entities is provider-specific —
+see your provider's documentation for details.
 
-| Attribute    | Target   | Purpose                                    |
-|--------------|----------|--------------------------------------------|
-| `#[Auditable]` | Class    | Marks an entity as auditable             |
-| `#[Ignore]`    | Property | Excludes a field from audit tracking     |
-| `#[Security]`  | Class    | Defines roles allowed to view audits     |
+## 🎉 Done!
 
-## 4️⃣ Step 4: Create Audit Tables
+From this point, every flush that touches an auditable entity will produce an audit entry.
+Refer to your provider's quick start for schema setup and reading audit entries back:
 
-> [!IMPORTANT]
-> Before auditing can work, you need to create the audit tables in your database.
-
-```bash
-# Using the provided command (with auditor-bundle)
-php bin/console audit:schema:update --force
-
-# Or programmatically
-$schemaManager = new SchemaManager($provider);
-$schemaManager->updateAuditSchema();
-```
-
-## 5️⃣ Step 5: Start Auditing
-
-Once configured, the library automatically tracks changes when you persist entities:
-
-> [!NOTE]
-> Audit entries are created automatically on `EntityManager::flush()`.
-
-```php
-<?php
-
-// Create a new user
-$user = new User();
-$user->setEmail('john@example.com');
-$user->setName('John Doe');
-
-$entityManager->persist($user);
-$entityManager->flush();  // ← Audit entry is created here
-
-// Update the user
-$user->setName('Jane Doe');
-$entityManager->flush();  // ← Update audit entry is created
-
-// Delete the user
-$entityManager->remove($user);
-$entityManager->flush();  // ← Delete audit entry is created
-```
-
-## 📖 Reading Audit Logs
-
-Use the `Reader` class to query audit entries:
-
-```php
-<?php
-
-use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
-
-$reader = new Reader($provider);
-
-// Get all audits for the User entity
-$query = $reader->createQuery(User::class);
-$audits = $query->execute();
-
-// Get audits for a specific user ID
-$query = $reader->createQuery(User::class, [
-    'object_id' => 123,
-]);
-$audits = $query->execute();
-
-// Get audits with pagination
-$query = $reader->createQuery(User::class, [
-    'page' => 1,
-    'page_size' => 20,
-]);
-$result = $reader->paginate($query);
-```
+→ **[DoctrineProvider Quick Start](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/getting-started/quick-start)**
 
 ---
 
 ## What's Next?
 
-- ⚙️ [Configuration Reference](../configuration/index.md) - Detailed configuration options
-- 🏷️ [Attributes Reference](../providers/doctrine/attributes.md) - Complete attributes documentation
-- 🔍 [Querying Audits](../querying/index.md) - Advanced query techniques
-- 👤 [User Attribution](../configuration/user-provider.md) - Track who made changes
+- ⚙️ [Configuration Reference](../configuration/index.md) — Global options (user provider, security, role checker)
+- 🏷️ [Attributes Reference](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/attributes) — `#[Auditable]`, `#[Ignore]`, `#[Security]`
+- 🔌 [Providers](../providers/doctrine/index.md) — Available providers
+- 🔍 [Querying Audits](../querying/index.md) — Reading audit entries

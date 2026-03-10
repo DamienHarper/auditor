@@ -11,6 +11,7 @@ use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 
 /**
+ * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
  * Helper class for JSON-related SQL generation across different database platforms.
  *
  * Supports:

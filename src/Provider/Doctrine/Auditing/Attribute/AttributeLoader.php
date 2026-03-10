@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 
 /**
+ * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
  * @see AttributeLoaderTest
  */
 final readonly class AttributeLoader

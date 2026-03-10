@@ -84,8 +84,8 @@ You can also define view permissions directly on entities using the `#[Security]
 ```php
 <?php
 
-use DH\Auditor\Attribute\Auditable;
-use DH\Auditor\Attribute\Security;
+use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Auditable;
+use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -225,6 +225,6 @@ $configuration = new Configuration([
 
 ## Related
 
-- 🏷️ [Security Attribute](../providers/doctrine/attributes.md#security)
+- 🏷️ [Security Attribute](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/attributes#-security)
 - 👤 [User Provider Configuration](user-provider.md)
 - 🔐 [Security Provider Configuration](security-provider.md)

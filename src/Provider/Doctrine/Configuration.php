@@ -14,6 +14,7 @@ use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
+ * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
  * @see ConfigurationTest
  */
 final class Configuration implements ConfigurationInterface

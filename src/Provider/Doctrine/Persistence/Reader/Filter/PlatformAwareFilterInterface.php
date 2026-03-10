@@ -7,6 +7,7 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter;
 use Doctrine\DBAL\Connection;
 
 /**
+ * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
  * Interface for filters that require database platform detection.
  *
  * Filters implementing this interface receive the database connection

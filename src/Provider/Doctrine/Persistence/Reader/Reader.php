@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping\ClassMetadata as ORMMetadata;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
+ * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
  * @see ReaderTest
  */
 final readonly class Reader implements ReaderInterface

@@ -15,6 +15,14 @@ parameters:
     ignoreErrors:
         - identifier: missingType.iterableValue
         - identifier: missingType.generics
+        # Deprecated classes in src/Provider/Doctrine/ may reference other deprecated classes in the same package.
+        # These are intentional — the entire Provider/Doctrine subtree is deprecated together (removed in v5.0).
+        - path: src/Provider/Doctrine/*
+          identifier: method.deprecatedClass
+        - path: src/Provider/Doctrine/*
+          identifier: new.deprecatedClass
+        - path: src/Provider/Doctrine/*
+          identifier: classConstant.deprecatedClass
         # false positives
         - '~Dead catch - Throwable is never thrown in the try block~'
         - '~Parameter \#1 \$className of method Doctrine\\ORM\\EntityManagerInterface\:\:getClassMetadata\(\) expects class-string<object>, string given\.~'

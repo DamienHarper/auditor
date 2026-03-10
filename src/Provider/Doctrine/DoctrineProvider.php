@@ -29,6 +29,7 @@ use Gedmo\SoftDeleteable\SoftDeleteableListener;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
+ * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
  * @see DoctrineProviderTest
  */
 final class DoctrineProvider extends AbstractProvider

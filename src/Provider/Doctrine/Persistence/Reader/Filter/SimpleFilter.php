@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Reader\Filter;
 
+/**
+ * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
+ */
 final class SimpleFilter implements FilterInterface
 {
     public function __construct(private readonly string $name, private mixed $value) {}

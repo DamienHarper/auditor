@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Provider\Doctrine\Persistence\Event;
 
+/**
+ * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
+ */
 final readonly class TableSchemaListener
 {
     public function loadClassMetadata(): void

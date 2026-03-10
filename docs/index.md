@@ -3,7 +3,6 @@ id: index
 title: Introduction
 slug: /
 ---
-
 # auditor
 
 > **The missing audit log library for PHP**
@@ -18,22 +17,21 @@ slug: /
 
 ### Key Features
 
-- 📝 **Automatic change tracking** - Captures inserts, updates, and deletes automatically
-- 🔗 **Relationship tracking** - Records many-to-many associations and dissociations
-- 👤 **User attribution** - Records who made the changes and their IP address
-- 🔒 **Transactional integrity** - Audit entries are inserted within the same database transaction
-- 🎯 **Flexible configuration** - Choose which entities and fields to audit
-- 🔐 **Security controls** - Define who can view audit logs
-- 🗄️ **Multi-database support** - Store audits in separate databases if needed
+- 📝 **Automatic change tracking** — Captures inserts, updates, and deletes automatically
+- 👤 **User attribution** — Records who made the changes and their IP address
+- 🎯 **Flexible configuration** — Choose which entities and fields to audit
+- 🔐 **Security controls** — Define who can view audit logs
+- 🔌 **Provider-based architecture** — Storage and query layer are fully delegated to providers
 
 ## Architecture Overview
 
 The library is architected around two core concepts:
 
-1. **Auditing Services** - Responsible for collecting audit events when changes occur
-2. **Storage Services** - Responsible for persisting audit traces to the database
+1. **Auditing Services** — Responsible for collecting audit events when changes occur
+2. **Storage Services** — Responsible for persisting audit traces to the database
 
-These services are provided by **Providers**. The library ships with a default provider for Doctrine ORM.
+These services are implemented by **Providers**. Each provider handles a specific storage
+technology (Doctrine ORM, Eloquent, etc.).
 
 ```mermaid
 flowchart TD
@@ -51,7 +49,7 @@ flowchart TD
             roleChecker
         end
 
-        subgraph PROVIDER["DoctrineProvider"]
+        subgraph PROVIDER["Provider (e.g. DoctrineProvider)"]
             direction TB
 
             subgraph AUDITING["AuditingService(s)"]
@@ -105,9 +103,15 @@ flowchart TD
 5. **Enrichment** *(optional)* → Your listener(s) inspect the entity and populate `extra_data` in the payload
 6. **Persistence** → `StorageService` persists the audit entry to the database
 
-## Supported Databases
+## Available Providers
 
-The DoctrineProvider supports the following RDBMS:
+| Provider | Package | Storage technology |
+|----------|---------|-------------------|
+| DoctrineProvider | [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/) | Doctrine ORM / DBAL |
+
+## Database Support
+
+Database support depends on the provider used. Via **DoctrineProvider**:
 
 | Database   | Support Level |
 |------------|---------------|
@@ -117,13 +121,13 @@ The DoctrineProvider supports the following RDBMS:
 | SQLite     | ✅ Full       |
 
 > [!NOTE]
-> The DoctrineProvider should work with any database supported by Doctrine, though only the above are actively tested.
+> DoctrineProvider should work with any database supported by Doctrine DBAL, though only the above are actively tested.
 
 ## Version Compatibility
 
 | Version | Status                     | Requirements                                                          |
 |---------|----------------------------|-----------------------------------------------------------------------|
-| 4.x     | Active development 🚀      | PHP >= 8.4, Symfony >= 8.0, Doctrine DBAL >= 4.0, Doctrine ORM >= 3.2 |
+| 4.x     | Active development 🚀      | PHP >= 8.4, Symfony >= 8.0 |
 | 3.x     | Active support             | PHP >= 8.2, Symfony >= 5.4                                            |
 | 2.x     | End of Life                | PHP >= 7.4, Symfony >= 4.4                                            |
 | 1.x     | End of Life                | PHP >= 7.2, Symfony >= 3.4                                            |

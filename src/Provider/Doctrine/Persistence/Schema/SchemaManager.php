@@ -24,6 +24,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 
 /**
+ * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
  * @see SchemaManagerTest
  */
 final readonly class SchemaManager

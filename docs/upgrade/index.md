@@ -6,6 +6,7 @@ This guide helps you upgrade between major versions of auditor.
 
 ## 📚 Upgrade Paths
 
+- [⬆️ Upgrading to 5.x from 4.x](v5.md)
 - [⬆️ Upgrading to 4.x from 3.x](v4.md)
 - [⬆️ Upgrading to 3.x from 2.x](v3.md)
 

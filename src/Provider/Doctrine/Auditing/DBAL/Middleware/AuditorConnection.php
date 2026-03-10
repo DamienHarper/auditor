@@ -8,6 +8,8 @@ use Doctrine\DBAL\Driver\Connection as ConnectionInterface;
 use Doctrine\DBAL\Driver\Middleware\AbstractConnectionMiddleware;
 
 /**
+ * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
+ *
  * @interal
  */
 final class AuditorConnection extends AbstractConnectionMiddleware
