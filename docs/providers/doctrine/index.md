@@ -9,7 +9,7 @@ application.
 
 > [!WARNING]
 > The built-in `DoctrineProvider` (namespace `DH\Auditor\Provider\Doctrine\`) is **deprecated**
-> since auditor 4.x and will be removed in v5.0.
+> since auditor 4.1 and will be removed in v5.0.
 >
 > Use the standalone **[auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/)** package instead — it is a drop-in replacement
 > with the same namespace and feature set.

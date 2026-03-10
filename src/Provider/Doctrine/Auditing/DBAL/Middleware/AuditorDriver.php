@@ -7,7 +7,7 @@ namespace DH\Auditor\Provider\Doctrine\Auditing\DBAL\Middleware;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 
 /**
- * @deprecated since auditor 4.x, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
+ * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
  *
  * @interal
  */

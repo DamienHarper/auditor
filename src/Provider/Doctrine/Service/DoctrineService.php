@@ -8,7 +8,7 @@ use DH\Auditor\Provider\Service\AbstractService;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * @deprecated since auditor 4.x, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
+ * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
  */
 abstract class DoctrineService extends AbstractService
 {

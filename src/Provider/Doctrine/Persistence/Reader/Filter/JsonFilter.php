@@ -9,7 +9,7 @@ use DH\Auditor\Provider\Doctrine\Persistence\Helper\JsonPlatformHelper;
 use Doctrine\DBAL\Connection;
 
 /**
- * @deprecated since auditor 4.x, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
+ * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
  * Filter for querying JSON column content.
  *
  * Supports extraction of scalar values from JSON columns with platform-specific SQL generation.

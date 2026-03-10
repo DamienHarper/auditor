@@ -28,7 +28,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     description: 'Cleans audit tables',
 )]
 /**
- * @deprecated since auditor 4.x, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
+ * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
  */
 final class CleanAuditLogsCommand extends Command
 {

@@ -7,7 +7,7 @@ namespace DH\Auditor\Provider\Doctrine\Persistence\Helper;
 use Doctrine\DBAL\Types\Types;
 
 /**
- * @deprecated since auditor 4.x, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
+ * @deprecated since auditor 4.1, to be removed in v5.0. Use damienharper/auditor-doctrine-provider instead.
  */
 abstract class SchemaHelper
 {
