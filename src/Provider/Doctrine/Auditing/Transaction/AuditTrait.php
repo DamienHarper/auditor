@@ -87,6 +87,10 @@ trait AuditTrait
             $value = $value->value;
         }
 
+        if ($type instanceof NeedsConversionToAuditableType) {
+            return $type->convertToAuditableValue($value, $platform);
+        }
+
         switch ($this->getTypeName($type)) {
             case Types::BIGINT:
             case 'uuid_binary':
@@ -127,9 +131,7 @@ trait AuditTrait
                     // let's replace resources with a "simple" representation: resourceType#resourceId
                     $convertedValue = get_resource_type($value).'#'.get_resource_id($value);
                 } else {
-                    $convertedValue = $type instanceof NeedsConversionToAuditableType
-                        ? $type->convertToAuditableValue($value, $platform)
-                        : $type->convertToDatabaseValue($value, $platform);
+                    $convertedValue = $type->convertToDatabaseValue($value, $platform);
                 }
 
                 break;
@@ -139,9 +141,7 @@ trait AuditTrait
                 return $value;
 
             default:
-                $convertedValue = $type instanceof NeedsConversionToAuditableType
-                    ? $type->convertToAuditableValue($value, $platform)
-                    : $type->convertToDatabaseValue($value, $platform);
+                $convertedValue = $type->convertToDatabaseValue($value, $platform);
         }
 
         return $convertedValue;

@@ -913,6 +913,97 @@ final class TransactionProcessorTest extends TestCase
         );
     }
 
+    public function testInsertWithMaskedPhoneType(): void
+    {
+        $processor = new TransactionProcessor($this->provider);
+        $reader = new Reader($this->provider);
+        $method = $this->reflectMethod(TransactionProcessor::class, 'insert');
+
+        $author = new Author();
+        $author
+            ->setId(1)
+            ->setFullname('John Doe')
+            ->setEmail('john.doe@gmail.com')
+            ->setPhone('+33612345678')
+        ;
+
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $entityManager = $storageService->getEntityManager();
+        $blame = $this->reflectMethod(TransactionProcessor::class, 'blame')->invoke($processor);
+        $method->invokeArgs($processor, [
+            $entityManager,
+            $author,
+            [
+                'fullname' => [null, 'John Doe'],
+                'email' => [null, 'john.doe@gmail.com'],
+                'phone' => [null, '+33612345678'],
+            ],
+            'what-a-nice-transaction-hash',
+            $blame,
+        ]);
+
+        $audits = $reader->createQuery(Author::class)->execute();
+        $this->assertCount(1, $audits, 'TransactionProcessor::insert() creates an audit entry.');
+
+        $entry = array_shift($audits);
+        $this->assertSame(1, $entry->id, 'audit entry ID is ok.');
+        $this->assertSame(TransactionType::INSERT, $entry->type, 'audit entry type is ok.');
+        $this->assertSame([
+            'email' => [
+                'new' => 'john.doe@gmail.com',
+            ],
+            'fullname' => [
+                'new' => 'John Doe',
+            ],
+            'phone' => [
+                'new' => '********5678',
+            ],
+        ], $entry->getDiffs(), 'audit entry diffs is ok.');
+    }
+
+    public function testUpdateWithMaskedPhoneType(): void
+    {
+        $processor = new TransactionProcessor($this->provider);
+        $reader = new Reader($this->provider);
+        $method = $this->reflectMethod(TransactionProcessor::class, 'update');
+
+        $author = new Author();
+        $author
+            ->setId(1)
+            ->setFullname('John Doe')
+            ->setEmail('john.doe@gmail.com')
+            ->setPhone('+33698765432')
+        ;
+
+        /** @var StorageService $storageService */
+        $storageService = $this->provider->getStorageServiceForEntity(Author::class);
+        $entityManager = $storageService->getEntityManager();
+        $blame = $this->reflectMethod(TransactionProcessor::class, 'blame')->invoke($processor);
+        $method->invokeArgs($processor, [
+            $entityManager,
+            $author,
+            [
+                'phone' => ['+33612345678', '+33698765432'],
+            ],
+            'what-a-nice-transaction-hash',
+            $blame,
+        ]);
+
+        $audits = $reader->createQuery(Author::class)->execute();
+        $this->assertCount(1, $audits, 'TransactionProcessor::update() creates an audit entry.');
+
+        $entry = array_shift($audits);
+        $this->assertSame(1, $entry->id, 'audit entry ID is ok.');
+        $this->assertSame(TransactionType::UPDATE, $entry->type, 'audit entry type is ok.');
+        $this->assertSame([
+            'phone' => [
+                'new' => '********5432',
+                'old' => '********5678',
+            ],
+        ], $entry->getDiffs(), 'audit entry diffs is ok.');
+    }
+
     private function configureEntities(): void
     {
         $this->provider->getConfiguration()->setEntities([
