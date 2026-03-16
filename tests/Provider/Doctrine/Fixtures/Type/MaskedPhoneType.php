@@ -10,7 +10,7 @@ use Doctrine\DBAL\Types\StringType;
 
 class MaskedPhoneType extends StringType implements NeedsConversionToAuditableType
 {
-    public function convertToAuditableValue(mixed $value, AbstractPlatform $platform): string|int|float|bool|array|null
+    public function convertToAuditableValue(mixed $value, AbstractPlatform $platform): array|bool|float|int|string|null
     {
         if (!\is_string($value)) {
             return $value;
