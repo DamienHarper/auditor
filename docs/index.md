@@ -109,6 +109,8 @@ flowchart TD
 |----------|---------|-------------------|
 | DoctrineProvider | [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/) | Doctrine ORM / DBAL |
 
+> Need a different backend? See [Building a Custom Provider](providers/custom-provider.md).
+
 ## Database Support
 
 Database support depends on the provider used. Via **DoctrineProvider**:
@@ -138,6 +140,7 @@ Database support depends on the provider used. Via **DoctrineProvider**:
 - [Quick Start](getting-started/quick-start.md)
 - [Configuration Reference](configuration/index.md)
 - [DoctrineProvider](providers/doctrine/index.md)
+- [Building a Custom Provider](providers/custom-provider.md)
 - [Querying Audits](querying/index.md)
 - [Extra Data](extra-data.md)
 - [API Reference](api/index.md)
