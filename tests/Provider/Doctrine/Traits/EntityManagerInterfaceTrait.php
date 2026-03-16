@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Provider\Doctrine\Traits;
 
+use DH\Auditor\Tests\Provider\Doctrine\Fixtures\Type\MaskedPhoneType;
 use Doctrine\Common\EventManager;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
@@ -23,6 +25,10 @@ trait EntityManagerInterfaceTrait
 
     private function createEntityManager(?array $paths = null, string $connectionName = 'default', ?array $params = null): EntityManagerInterface
     {
+        if (!Type::hasType('masked_phone')) {
+            Type::addType('masked_phone', MaskedPhoneType::class);
+        }
+
         $configuration = ORMSetup::createAttributeMetadataConfiguration($paths ?? $this->fixturesPath, true);
         $configuration->setNamingStrategy(new UnderscoreNamingStrategy(CASE_LOWER));
 

@@ -24,6 +24,9 @@ class Author implements \Stringable
     #[ORM\Column(type: Types::STRING, length: 255)]
     protected ?string $email = null;
 
+    #[ORM\Column(type: 'masked_phone', length: 20, nullable: true)]
+    protected ?string $phone = null;
+
     #[ORM\OneToMany(targetEntity: 'Post', mappedBy: 'author', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'id', referencedColumnName: 'author_id', nullable: false)]
     protected Collection $posts;
@@ -95,6 +98,24 @@ class Author implements \Stringable
     public function getEmail(): ?string
     {
         return $this->email;
+    }
+
+    /**
+     * Set the value of phone.
+     */
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of phone.
+     */
+    public function getPhone(): ?string
+    {
+        return $this->phone;
     }
 
     /**
