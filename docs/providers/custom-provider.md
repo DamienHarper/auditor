@@ -362,12 +362,12 @@ final class AcmeAuditExtension extends Extension
 
         $container->register(AcmeProvider::class)
             ->setArguments([new Reference('acme.audit.configuration')])
-            ->addTag('auditor.provider');
+            ->addTag('dh_auditor.provider');
     }
 }
 ```
 
-The `auditor.provider` tag tells `auditor-bundle` to call
+The `dh_auditor.provider` tag tells `auditor-bundle` to call
 `$auditor->registerProvider($provider)` automatically.
 
 ---
