@@ -21,3 +21,7 @@ benchmark-summary.txt
 /phpunit.xml
 /.phpunit.cache/
 ###< phpunit/phpunit ###
+
+# Local Claude Code customizations (machine-specific)
+.claude/agents/
+.claude/hooks/
