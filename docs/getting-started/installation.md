@@ -6,19 +6,20 @@ This guide covers the installation of the auditor library using Composer.
 
 ## 📋 Requirements
 
-### Version 4.x (Current)
+### Version 5.x (Current)
 
 | Requirement    | Version  |
 |----------------|----------|
 | PHP            | >= 8.4   |
 | Symfony        | >= 8.0   |
-| Doctrine DBAL  | >= 4.0   |
-| Doctrine ORM   | >= 3.2   |
+
+Doctrine ORM support requires the separate [`auditor-doctrine-provider`](https://github.com/DamienHarper/auditor-doctrine-provider) package.
 
 ### Previous Versions
 
 | Version | PHP     | Symfony   | Doctrine DBAL | Doctrine ORM |
 |---------|---------|-----------|---------------|--------------|
+| 4.x     | >= 8.4  | >= 8.0    | >= 4.0        | >= 3.2       |
 | 3.x     | >= 8.2  | >= 5.4    | >= 3.2        | >= 2.13      |
 | 2.x     | >= 7.4  | >= 4.4    | -             | -            |
 | 1.x     | >= 7.2  | >= 3.4    | -             | -            |
@@ -38,11 +39,17 @@ This will install the latest stable version compatible with your PHP and depende
 To install a specific version:
 
 ```bash
+# Install the latest 5.x version
+composer require damienharper/auditor:^5.0
+
 # Install the latest 4.x version
 composer require damienharper/auditor:^4.0
+```
 
-# Install the latest 3.x version
-composer require damienharper/auditor:^3.0
+### Installing with Doctrine ORM support
+
+```bash
+composer require damienharper/auditor damienharper/auditor-doctrine-provider
 ```
 
 ## 🎵 Symfony Integration
@@ -69,14 +76,19 @@ See the [Quick Start Guide](quick-start.md) for a complete setup example.
 
 ## 📚 Dependencies
 
-The library automatically installs the following dependencies:
+The `auditor` core library automatically installs the following dependencies:
+
+| Package                      | Purpose                        |
+|------------------------------|--------------------------------|
+| `symfony/event-dispatcher`   | Event handling                 |
+| `symfony/options-resolver`   | Configuration handling         |
+
+Provider packages bring their own additional dependencies. For example, `auditor-doctrine-provider` adds:
 
 | Package                      | Purpose                        |
 |------------------------------|--------------------------------|
 | `doctrine/dbal`              | Database abstraction layer     |
 | `doctrine/orm`               | Object-Relational Mapping      |
-| `symfony/event-dispatcher`   | Event handling                 |
-| `symfony/options-resolver`   | Configuration handling         |
 | `symfony/cache`              | Metadata caching               |
 | `symfony/lock`               | Command locking                |
 

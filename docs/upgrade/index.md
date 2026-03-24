@@ -14,8 +14,9 @@ This guide helps you upgrade between major versions of auditor.
 
 | Version | Status                      | PHP       | Symfony   |
 |:--------|:----------------------------|:----------|:----------|
-| 4.x     | Active development 🚀       | >= 8.4    | >= 8.0    |
-| 3.x     | Active support              | >= 8.2    | >= 5.4    |
+| 5.x     | Active development 🚀       | >= 8.4    | >= 8.0    |
+| 4.x     | Active support              | >= 8.4    | >= 8.0    |
+| 3.x     | End of Life                 | >= 8.2    | >= 5.4    |
 | 2.x     | End of Life                 | >= 7.4    | >= 4.4    |
 | 1.x     | End of Life                 | >= 7.2    | >= 3.4    |
 
@@ -40,9 +41,9 @@ composer show damienharper/auditor
 ## 📦 Updating
 
 ```bash
-# Update to latest 4.x
-composer require damienharper/auditor:^4.0
+# Update to latest 5.x
+composer require damienharper/auditor:^5.0
 
-# Update to latest 3.x (if on 3.x)
-composer require damienharper/auditor:^3.0
+# Update to latest 4.x (if on 4.x)
+composer require damienharper/auditor:^4.0
 ```
