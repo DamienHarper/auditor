@@ -196,6 +196,8 @@ trait AuditTrait
         $configuration = $this->provider->getConfiguration();
         $globalIgnoredColumns = $configuration->getIgnoredColumns();
         $entityIgnoredColumns = $configuration->getEntities()[$meta->name]['ignored_columns'] ?? [];
+        $diffLabelResolvers = $configuration->getEntities()[$meta->name]['diff_label_resolvers'] ?? [];
+        $resolverLocator = $this->provider->getDiffLabelResolverLocator();
         $jsonTypes = DoctrineHelper::jsonTypes();
         foreach ($changeset as $fieldName => [$old, $new]) {
             $o = null;
@@ -219,6 +221,26 @@ trait AuditTrait
                 \assert(\is_object($type));
                 $o = $this->value($platform, $type, $old);
                 $n = $this->value($platform, $type, $new);
+
+                // Apply DiffLabel resolver if configured for this field
+                if ([] !== $diffLabelResolvers && isset($diffLabelResolvers[$fieldName]) && null !== $resolverLocator) {
+                    $resolverFqcn = $diffLabelResolvers[$fieldName];
+                    if ($resolverLocator->has($resolverFqcn)) {
+                        $resolver = $resolverLocator->get($resolverFqcn);
+                        if (null !== $o) {
+                            $oLabel = $resolver($o);
+                            if (null !== $oLabel) {
+                                $o = ['value' => $o, 'label' => $oLabel];
+                            }
+                        }
+                        if (null !== $n) {
+                            $nLabel = $resolver($n);
+                            if (null !== $nLabel) {
+                                $n = ['value' => $n, 'label' => $nLabel];
+                            }
+                        }
+                    }
+                }
             } elseif (
                 $isAuditedField
                 && $meta->hasAssociation($fieldName)

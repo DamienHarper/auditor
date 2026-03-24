@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DH\Auditor\Provider\Doctrine\Auditing\Attribute;
 
 use DH\Auditor\Attribute\Auditable;
+use DH\Auditor\Attribute\DiffLabel;
 use DH\Auditor\Attribute\Ignore;
 use DH\Auditor\Attribute\Security;
 use DH\Auditor\Tests\Provider\Doctrine\Auditing\Attribute\AttributeLoaderTest;
@@ -73,10 +74,14 @@ final readonly class AttributeLoader
         // Are there any Ignore attributes?
         $ignoredColumns = $this->getAllProperties($reflection);
 
+        // Are there any DiffLabel attributes?
+        $diffLabelResolvers = $this->getDiffLabelResolvers($reflection);
+
         return [
             'ignored_columns' => $ignoredColumns,
             'enabled' => $auditableAttribute->enabled,
             'roles' => $roles,
+            'diff_label_resolvers' => $diffLabelResolvers,
         ];
     }
 
@@ -101,5 +106,28 @@ final readonly class AttributeLoader
         }
 
         return $properties;
+    }
+
+    /**
+     * Collects DiffLabel resolvers defined on entity properties.
+     *
+     * @return array<string, string> Map of property name => resolver FQCN
+     */
+    private function getDiffLabelResolvers(\ReflectionClass $reflection): array
+    {
+        $resolvers = [];
+
+        foreach ($reflection->getProperties() as $property) {
+            $attributes = $property->getAttributes(DiffLabel::class, \ReflectionAttribute::IS_INSTANCEOF);
+            if (\is_array($attributes) && [] !== $attributes) {
+                $resolvers[$property->getName()] = $attributes[0]->newInstance()->resolver;
+            }
+        }
+
+        if (false !== $reflection->getParentClass()) {
+            return array_merge($this->getDiffLabelResolvers($reflection->getParentClass()), $resolvers);
+        }
+
+        return $resolvers;
     }
 }
