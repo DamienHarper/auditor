@@ -14,19 +14,13 @@ use Psr\Container\ContainerInterface;
  */
 final class SimpleServiceLocator implements ContainerInterface
 {
-    /** @var array<string, callable> */
-    private array $factories;
-
     /** @var array<string, object> */
     private array $instances = [];
 
     /**
      * @param array<string, callable> $factories Map of service ID => factory callable
      */
-    public function __construct(array $factories)
-    {
-        $this->factories = $factories;
-    }
+    public function __construct(private array $factories) {}
 
     public function get(string $id): object
     {

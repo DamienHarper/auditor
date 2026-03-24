@@ -82,8 +82,8 @@ final class AttributeLoaderTest extends TestCase
 
         foreach ($loaded as $entityClass => $config) {
             if (DiffLabelEntity::class !== $entityClass) {
-                $this->assertArrayHasKey('diff_label_resolvers', $config, "{$entityClass} must have diff_label_resolvers key");
-                $this->assertSame([], $config['diff_label_resolvers'], "{$entityClass} must have empty diff_label_resolvers");
+                $this->assertArrayHasKey('diff_label_resolvers', $config, $entityClass.' must have diff_label_resolvers key');
+                $this->assertSame([], $config['diff_label_resolvers'], $entityClass.' must have empty diff_label_resolvers');
             }
         }
     }

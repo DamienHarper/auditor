@@ -32,7 +32,7 @@ final class DiffLabelTest extends TestCase
     public function testDiffLabelIsStoredAsValueLabelPair(): void
     {
         $this->provider->setDiffLabelResolverLocator(new SimpleServiceLocator([
-            DummyCategoryResolver::class => static fn () => new DummyCategoryResolver(),
+            DummyCategoryResolver::class => static fn (): DummyCategoryResolver => new DummyCategoryResolver(),
         ]));
 
         $storageServices = [
@@ -44,6 +44,7 @@ final class DiffLabelTest extends TestCase
         $entity = new DiffLabelEntity();
         $entity->name = 'test';
         $entity->categoryId = 1;
+
         $entityManager->persist($entity);
         $this->flushAll($storageServices);
 
@@ -75,7 +76,7 @@ final class DiffLabelTest extends TestCase
     public function testDiffLabelIsOmittedWhenResolverReturnsNull(): void
     {
         $this->provider->setDiffLabelResolverLocator(new SimpleServiceLocator([
-            DummyCategoryResolver::class => static fn () => new DummyCategoryResolver(),
+            DummyCategoryResolver::class => static fn (): DummyCategoryResolver => new DummyCategoryResolver(),
         ]));
 
         $storageServices = [
@@ -88,6 +89,7 @@ final class DiffLabelTest extends TestCase
         $entity = new DiffLabelEntity();
         $entity->name = 'test';
         $entity->categoryId = 99;
+
         $entityManager->persist($entity);
         $this->flushAll($storageServices);
 
@@ -106,7 +108,7 @@ final class DiffLabelTest extends TestCase
     public function testUnlabeledFieldIsUnaffected(): void
     {
         $this->provider->setDiffLabelResolverLocator(new SimpleServiceLocator([
-            DummyCategoryResolver::class => static fn () => new DummyCategoryResolver(),
+            DummyCategoryResolver::class => static fn (): DummyCategoryResolver => new DummyCategoryResolver(),
         ]));
 
         $storageServices = [
@@ -118,6 +120,7 @@ final class DiffLabelTest extends TestCase
         $entity = new DiffLabelEntity();
         $entity->name = 'hello';
         $entity->categoryId = 1;
+
         $entityManager->persist($entity);
         $this->flushAll($storageServices);
 
@@ -145,6 +148,7 @@ final class DiffLabelTest extends TestCase
         $entity = new DiffLabelEntity();
         $entity->name = 'test';
         $entity->categoryId = 1;
+
         $entityManager->persist($entity);
         $this->flushAll($storageServices);
 
