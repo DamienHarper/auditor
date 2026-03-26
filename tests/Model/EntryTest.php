@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Model;
 
+use DH\Auditor\Model\AuditDiffCollection;
 use DH\Auditor\Model\Entry;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -34,7 +35,8 @@ final class EntryTest extends TestCase
         $this->assertSame(1, $entry->id, 'Entry::id is ok.');
         $this->assertSame('type', $entry->type, 'Entry::type is ok.');
         $this->assertSame('1', $entry->objectId, 'Entry::objectId is ok.');
-        $this->assertSame([], $entry->getDiffs(), 'Entry::getDiffs() is ok.');
+        $this->assertInstanceOf(AuditDiffCollection::class, $entry->getDiffs(), 'Entry::getDiffs() is ok.');
+        $this->assertCount(0, $entry->getDiffs(), 'Entry::getDiffs() returns empty collection for empty diffs.');
         $this->assertSame(1, $entry->userId, 'Entry::userId is ok.');
         $this->assertSame('John Doe', $entry->username, 'Entry::username is ok.');
         $this->assertSame('Acme\User', $entry->userFqdn, 'Entry::userFqdn is ok.');
@@ -55,7 +57,7 @@ final class EntryTest extends TestCase
     {
         $entry = Entry::fromArray(['diffs' => '{}']);
 
-        $this->assertIsArray($entry->getDiffs(), 'Entry::getDiffs() returns an array.');
+        $this->assertInstanceOf(AuditDiffCollection::class, $entry->getDiffs(), 'Entry::getDiffs() returns an AuditDiffCollection.');
     }
 
     public function testGetExtraDataReturnsNullWhenEmpty(): void

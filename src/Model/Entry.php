@@ -70,16 +70,20 @@ final class Entry
     private ?\DateTimeImmutable $created_at = null;
 
     /**
-     * Get diff values.
+     * Returns a typed collection of field-level diffs for this audit entry.
+     *
+     * For INSERT and UPDATE entries, iterate the collection to access individual {@see AuditDiff} objects.
+     * For REMOVE entries, the collection is empty — access {@see AuditDiffCollection::$entitySnapshot} instead.
+     * For ASSOCIATE/DISSOCIATE entries, the collection is empty — access {@see AuditDiffCollection::$relationDescriptor} instead.
      */
-    public function getDiffs(bool $includeMetadata = false): array
+    public function getDiffs(bool $includeMetadata = false): AuditDiffCollection
     {
         $diffs = $this->sort(json_decode($this->diffs, true, 512, JSON_THROW_ON_ERROR));  // @phpstan-ignore-line
         if (!$includeMetadata) {
             unset($diffs['@source']);
         }
 
-        return $diffs;
+        return AuditDiffCollection::fromRawDiffs($diffs, TransactionType::tryFrom($this->type) ?? TransactionType::Insert);
     }
 
     public function getExtraData(): ?array
