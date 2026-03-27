@@ -28,7 +28,14 @@ final readonly class RelationEndpoint
         $table = $raw['table'] ?? '';
 
         $pkName = \is_string($raw['pkName'] ?? null) ? $raw['pkName'] : null;
-        $rawId = null !== $pkName ? ($raw[$pkName] ?? $raw['id'] ?? '') : ($raw['id'] ?? '');
+
+        if (null !== $pkName && !\array_key_exists($pkName, $raw)) {
+            throw new \UnexpectedValueException(
+                \sprintf('RelationEndpoint: pkName "%s" declared but the corresponding key is absent from raw data.', $pkName)
+            );
+        }
+
+        $rawId = null !== $pkName ? $raw[$pkName] : ($raw['id'] ?? '');
         $id = \is_int($rawId) || \is_string($rawId) ? $rawId : '';
 
         return new self(

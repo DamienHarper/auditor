@@ -46,6 +46,24 @@ final class RelationDescriptorTest extends TestCase
         $this->assertSame('post__tag', $descriptor->pivotTable);
     }
 
+    public function testFromRawThrowsWhenSourceIsMissing(): void
+    {
+        $this->expectException(\UnexpectedValueException::class);
+        RelationDescriptor::fromRaw([
+            'is_owning_side' => true,
+            'target' => ['class' => 'App\Entity\Tag', 'field' => 'posts', 'id' => 2, 'label' => 'Tag', 'table' => 'tag'],
+        ]);
+    }
+
+    public function testFromRawThrowsWhenTargetIsMissing(): void
+    {
+        $this->expectException(\UnexpectedValueException::class);
+        RelationDescriptor::fromRaw([
+            'is_owning_side' => true,
+            'source' => ['class' => 'App\Entity\Post', 'field' => 'tags', 'id' => 1, 'label' => 'Post', 'table' => 'post'],
+        ]);
+    }
+
     public function testConstructorPropertiesAreReadonly(): void
     {
         $source = new RelationEndpoint('App\Entity\Post', 'tags', 1, 'Post', 'post');

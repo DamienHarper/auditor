@@ -20,13 +20,17 @@ final readonly class RelationDescriptor
 
     public static function fromRaw(array $raw): self
     {
-        $source = \is_array($raw['source'] ?? null) ? $raw['source'] : [];
-        $target = \is_array($raw['target'] ?? null) ? $raw['target'] : [];
+        if (!\is_array($raw['source'] ?? null) || !\is_array($raw['target'] ?? null)) {
+            throw new \UnexpectedValueException(
+                'RelationDescriptor: raw data must contain "source" and "target" arrays.'
+            );
+        }
+
         $pivotTable = \is_string($raw['table'] ?? null) ? $raw['table'] : null;
 
         return new self(
-            source: RelationEndpoint::fromRaw($source),
-            target: RelationEndpoint::fromRaw($target),
+            source: RelationEndpoint::fromRaw($raw['source']),
+            target: RelationEndpoint::fromRaw($raw['target']),
             isOwningSide: (bool) ($raw['is_owning_side'] ?? false),
             pivotTable: $pivotTable,
         );

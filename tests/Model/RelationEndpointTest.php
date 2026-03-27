@@ -49,9 +49,8 @@ final class RelationEndpointTest extends TestCase
         $this->assertSame('uuid', $endpoint->pkName);
     }
 
-    public function testFromRawWithPkNameFallsBackToIdWhenCustomKeyMissing(): void
+    public function testFromRawThrowsWhenPkNameKeyIsAbsent(): void
     {
-        // pkName is declared but the named key is absent — falls back to id
         $raw = [
             'class' => 'App\Entity\Post',
             'field' => 'tags',
@@ -60,9 +59,10 @@ final class RelationEndpointTest extends TestCase
             'table' => 'post',
             'pkName' => 'nonexistent_key',
         ];
-        $endpoint = RelationEndpoint::fromRaw($raw);
 
-        $this->assertSame(42, $endpoint->id);
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('nonexistent_key');
+        RelationEndpoint::fromRaw($raw);
     }
 
     public function testConstructorPropertiesAreReadonly(): void
