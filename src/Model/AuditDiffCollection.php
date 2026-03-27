@@ -37,20 +37,18 @@ final class AuditDiffCollection implements \Countable, \IteratorAggregate
         get => [] === $this->diffs;
     }
 
-    /** @var array<string, AuditDiff> */
-    private readonly array $diffs;
-
     private function __construct(
         public readonly DiffKind $kind,
-        array $diffs,
+        /** @var array<string, AuditDiff> */
+        private readonly array $diffs,
         public readonly ?EntitySnapshot $entitySnapshot,
-        public readonly ?RelationDescriptor $relationDescriptor,
-    ) {
-        $this->diffs = $diffs;
-    }
+        public readonly ?RelationDescriptor $relationDescriptor
+    ) {}
 
     /**
      * Builds an AuditDiffCollection from a decoded (and already ksorted) raw diffs array.
+     *
+     * @param array<string, mixed> $raw
      */
     public static function fromRawDiffs(array $raw, TransactionType $transactionType): self
     {
@@ -77,6 +75,7 @@ final class AuditDiffCollection implements \Countable, \IteratorAggregate
             if (str_starts_with((string) $field, '@')) {
                 continue;
             }
+
             if (\is_array($change) && \array_key_exists('new', $change)) {
                 $diffs[$field] = AuditDiff::fromRaw($field, $change);
             }

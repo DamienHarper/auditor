@@ -7,6 +7,8 @@ namespace DH\Auditor\Tests\Model;
 use DH\Auditor\Model\AuditDiff;
 use DH\Auditor\Model\AuditDiffCollection;
 use DH\Auditor\Model\DiffKind;
+use DH\Auditor\Model\EntitySnapshot;
+use DH\Auditor\Model\RelationDescriptor;
 use DH\Auditor\Model\TransactionType;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -27,8 +29,8 @@ final class AuditDiffCollectionTest extends TestCase
         $this->assertTrue($collection->kind->hasFieldDiffs());
         $this->assertCount(0, $collection);
         $this->assertTrue($collection->isEmpty);
-        $this->assertNull($collection->entitySnapshot);
-        $this->assertNull($collection->relationDescriptor);
+        $this->assertNotInstanceOf(EntitySnapshot::class, $collection->entitySnapshot);
+        $this->assertNotInstanceOf(RelationDescriptor::class, $collection->relationDescriptor);
         $this->assertSame([], $collection->fields());
     }
 
@@ -64,7 +66,7 @@ final class AuditDiffCollectionTest extends TestCase
         $this->assertCount(1, $collection);
 
         $email = $collection->get('email');
-        $this->assertNotNull($email);
+        $this->assertInstanceOf(AuditDiff::class, $email);
         $this->assertTrue($email->hasOld);
         $this->assertSame('old@example.com', $email->old);
         $this->assertSame('new@example.com', $email->new);
@@ -102,7 +104,7 @@ final class AuditDiffCollectionTest extends TestCase
     {
         $collection = AuditDiffCollection::fromRawDiffs(['email' => ['new' => 'x']], TransactionType::Insert);
 
-        $this->assertNull($collection->get('unknown'));
+        $this->assertNotInstanceOf(AuditDiff::class, $collection->get('unknown'));
         $this->assertFalse($collection->has('unknown'));
     }
 
@@ -122,7 +124,7 @@ final class AuditDiffCollectionTest extends TestCase
         $this->assertTrue($collection->kind->isRemoval());
         $this->assertCount(0, $collection);
         $this->assertTrue($collection->isEmpty);
-        $this->assertNull($collection->relationDescriptor);
+        $this->assertNotInstanceOf(RelationDescriptor::class, $collection->relationDescriptor);
 
         $snapshot = $collection->requireEntitySnapshot();
         $this->assertSame('App\Entity\Author', $snapshot->class);
@@ -166,7 +168,7 @@ final class AuditDiffCollectionTest extends TestCase
         $this->assertTrue($collection->kind->isRelation());
         $this->assertCount(0, $collection);
         $this->assertTrue($collection->isEmpty);
-        $this->assertNull($collection->entitySnapshot);
+        $this->assertNotInstanceOf(EntitySnapshot::class, $collection->entitySnapshot);
 
         $rel = $collection->requireRelationDescriptor();
         $this->assertFalse($rel->isOwningSide);

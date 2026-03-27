@@ -108,6 +108,11 @@ final class Entry
         return $entry;
     }
 
+    /**
+     * @param array<mixed, mixed> $array
+     *
+     * @return array<string, mixed>
+     */
     private function sort(array $array): array
     {
         ksort($array);
