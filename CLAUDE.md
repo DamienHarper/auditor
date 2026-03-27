@@ -26,6 +26,17 @@ composer phpstan     # static analysis (level max)
 composer qa          # rector + cs-fix + phpstan
 ```
 
+### Agent commands (token-efficient, silent output)
+When running as an AI agent, use these variants instead — they suppress progress bars and
+verbose output while still surfacing errors:
+```bash
+composer agent-cs-fix      # php-cs-fixer --quiet
+composer agent-phpstan     # phpstan --no-progress
+composer agent-rector      # rector --no-progress-bar
+composer agent-test        # phpunit --no-progress
+composer agent-qa          # agent-rector + agent-cs-fix + agent-phpstan
+```
+
 ### Tool dependency updates
 ```bash
 composer update-tools  # updates php-cs-fixer, phpstan, rector independently
