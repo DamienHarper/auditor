@@ -16,14 +16,12 @@ abstract class AuditEvent extends Event
         'type',
         'object_id',
         'discriminator',
-        'transaction_hash',
+        'schema_version',
+        'transaction_id',
         'diffs',
         'extra_data',
         'blame_id',
-        'blame_user',
-        'blame_user_fqdn',
-        'blame_user_firewall',
-        'ip',
+        'blame',
         'created_at',
     ];
 
@@ -68,9 +66,19 @@ abstract class AuditEvent extends Event
      */
     private function normalizePayload(array $payload): array
     {
-        // extra_data is optional - default to null if not provided
+        // extra_data is optional — default to null if not provided
         if (!\array_key_exists('extra_data', $payload)) {
             $payload['extra_data'] = null;
+        }
+
+        // blame is optional — default to null if not provided (unauthenticated contexts)
+        if (!\array_key_exists('blame', $payload)) {
+            $payload['blame'] = null;
+        }
+
+        // schema_version defaults to 2 (new format) if not explicitly set
+        if (!\array_key_exists('schema_version', $payload)) {
+            $payload['schema_version'] = 2;
         }
 
         return $payload;

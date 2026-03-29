@@ -24,17 +24,15 @@ final class AuditEventSubscriberTest extends TestCase
         $payload = [
             'entity' => AuditEventSubscriber::class,
             'table' => '',
+            'schema_version' => 2,
             'type' => '',
             'object_id' => '',
             'discriminator' => '',
-            'transaction_hash' => '',
+            'transaction_id' => '',
             'diffs' => '',
             'extra_data' => '',
             'blame_id' => '',
-            'blame_user' => '',
-            'blame_user_fqdn' => '',
-            'blame_user_firewall' => '',
-            'ip' => '',
+            'blame' => '',
             'created_at' => '',
         ];
 
@@ -53,17 +51,15 @@ final class AuditEventSubscriberTest extends TestCase
         $payload = [
             'entity' => AuditEventSubscriber::class,
             'table' => '',
+            'schema_version' => 2,
             'type' => '',
             'object_id' => '',
             'discriminator' => '',
-            'transaction_hash' => '',
+            'transaction_id' => '',
             'diffs' => '',
             'extra_data' => '',
             'blame_id' => '',
-            'blame_user' => '',
-            'blame_user_fqdn' => '',
-            'blame_user_firewall' => '',
-            'ip' => '',
+            'blame' => '',
             'created_at' => '',
         ];
 
