@@ -10,13 +10,14 @@ use DH\Auditor\Event\Dto\InsertEventDto;
 use DH\Auditor\Event\Dto\RemoveEventDto;
 use DH\Auditor\Event\Dto\UpdateEventDto;
 use DH\Auditor\Tests\Model\TransactionTest;
+use Symfony\Component\Uid\Ulid;
 
 /**
  * @see TransactionTest
  */
 class Transaction implements TransactionInterface
 {
-    private ?string $transaction_hash = null;
+    private ?string $transaction_id = null;
 
     /**
      * @var InsertEventDto[]
@@ -44,15 +45,15 @@ class Transaction implements TransactionInterface
     private array $dissociated = [];
 
     /**
-     * Returns transaction hash.
+     * Returns transaction ID (ULID).
      */
-    public function getTransactionHash(): string
+    public function getTransactionId(): string
     {
-        if (null === $this->transaction_hash) {
-            $this->transaction_hash = sha1(uniqid('tid', true));
+        if (null === $this->transaction_id) {
+            $this->transaction_id = (string) new Ulid();
         }
 
-        return $this->transaction_hash;
+        return $this->transaction_id;
     }
 
     /**
@@ -97,7 +98,7 @@ class Transaction implements TransactionInterface
 
     public function reset(): void
     {
-        $this->transaction_hash = null;
+        $this->transaction_id = null;
         $this->inserted = [];
         $this->updated = [];
         $this->removed = [];
