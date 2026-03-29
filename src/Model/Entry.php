@@ -38,6 +38,26 @@ final class Entry
         get => $this->getBlame();
     }
 
+    /** Convenience accessor for $blame['username']. */
+    public ?string $username {
+        get => $this->getBlame()['username'] ?? null;
+    }
+
+    /** Convenience accessor for $blame['user_fqdn']. */
+    public ?string $userFqdn {
+        get => $this->getBlame()['user_fqdn'] ?? null;
+    }
+
+    /** Convenience accessor for $blame['user_firewall']. */
+    public ?string $userFirewall {
+        get => $this->getBlame()['user_firewall'] ?? null;
+    }
+
+    /** Convenience accessor for $blame['ip']. */
+    public ?string $ip {
+        get => $this->getBlame()['ip'] ?? null;
+    }
+
     public ?array $extraData {
         get => $this->getExtraData();
     }
@@ -77,7 +97,15 @@ final class Entry
         $diffs = $this->decodeJson($this->diffs);
 
         if ($this->schemaVersion >= 2) {
-            return \is_array($diffs['changes'] ?? null) ? $diffs['changes'] : [];
+            // Association/dissociation entries have no 'changes' key — return the full diff
+            // (source, target, is_owning_side, join_table) so consumers can inspect it uniformly.
+            if (!\array_key_exists('changes', $diffs)) {
+                return $this->sort($diffs);
+            }
+
+            $changes = \is_array($diffs['changes']) ? $diffs['changes'] : [];
+
+            return $this->sort($changes);
         }
 
         // Legacy format (schema_version = 1): return raw array, stripping @source metadata
@@ -101,7 +129,7 @@ final class Entry
         $diffs = $this->decodeJson($this->diffs);
         $source = $diffs['source'] ?? null;
 
-        return \is_array($source) ? $source : null;
+        return \is_array($source) ? $this->sort($source) : null;
     }
 
     /**
@@ -177,8 +205,26 @@ final class Entry
         return \is_array($decoded) ? $decoded : [];
     }
 
+    /**
+     * Recursively sorts an array by key, preserving the old-before-new insertion order for
+     * 'old'/'new' diff leaf pairs, but still recursively sorting any array values within them.
+     */
     private function sort(array $array): array
     {
+        // Leaf diff pairs: exactly two keys 'old' and 'new' — keep old before new,
+        // but still recurse into their array values (e.g. DiffLabel value objects).
+        if (2 === \count($array) && \array_key_exists('old', $array) && \array_key_exists('new', $array)) {
+            if (\is_array($array['old'])) {
+                $array['old'] = $this->sort($array['old']);
+            }
+
+            if (\is_array($array['new'])) {
+                $array['new'] = $this->sort($array['new']);
+            }
+
+            return $array;
+        }
+
         ksort($array);
         foreach ($array as $key => $value) {
             if (\is_array($value)) {

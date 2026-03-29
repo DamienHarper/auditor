@@ -99,14 +99,13 @@ final class EntryTest extends TestCase
 
     public function testGetDiffSource(): void
     {
-        $source = ['id' => '1', 'class' => 'App\Entity\Foo', 'label' => 'Foo', 'table' => 'foo'];
-
         $entry = Entry::fromArray([
             'schema_version' => 2,
-            'diffs' => json_encode(['source' => $source, 'changes' => []]),
+            'diffs' => json_encode(['source' => ['id' => '1', 'class' => 'App\Entity\Foo', 'label' => 'Foo', 'table' => 'foo'], 'changes' => []]),
         ]);
 
-        $this->assertSame($source, $entry->getDiffSource());
+        // getDiffSource() returns keys sorted alphabetically
+        $this->assertSame(['class' => 'App\Entity\Foo', 'id' => '1', 'label' => 'Foo', 'table' => 'foo'], $entry->getDiffSource());
     }
 
     public function testGetDiffSourceReturnsNullForLegacyEntry(): void
