@@ -171,6 +171,10 @@ final class Entry
     {
         $entry = new self();
 
+        // Collect v1 legacy blame columns so we can synthesize blame_raw if no
+        // v2 'blame' JSON column is present in the row (un-migrated v1 tables).
+        $legacyBlame = [];
+
         foreach ($row as $key => $value) {
             // The 'blame' DB column maps to the $blame_raw backing field (the $blame
             // virtual property uses that name, so we cannot set it directly via property_exists).
@@ -187,8 +191,36 @@ final class Entry
                 continue;
             }
 
+            // v1 legacy blame columns — absorbed into the blame JSON in schema v2.
+            // Collect them and synthesize blame_raw below; never assign to the
+            // read-only virtual $ip property or the non-existent $blame_user* properties.
+            if (\in_array($key, ['blame_user', 'blame_user_fqdn', 'blame_user_firewall', 'ip'], true)) {
+                $legacyBlame[$key] = $value;
+
+                continue;
+            }
+
+            // v1 legacy transaction_hash column — superseded by transaction_id in schema v2; ignore it.
+            if ('transaction_hash' === $key) {
+                continue;
+            }
+
             if (property_exists($entry, $key)) {
                 $entry->{$key} = 'id' === $key ? (int) $value : $value;
+            }
+        }
+
+        // If no v2 'blame' column was present but v1 individual columns were, synthesize blame_raw.
+        if (null === $entry->blame_raw && [] !== $legacyBlame) {
+            $blameData = array_filter([
+                'username'      => $legacyBlame['blame_user'] ?? null,
+                'user_fqdn'     => $legacyBlame['blame_user_fqdn'] ?? null,
+                'user_firewall' => $legacyBlame['blame_user_firewall'] ?? null,
+                'ip'            => $legacyBlame['ip'] ?? null,
+            ], static fn (mixed $v): bool => null !== $v);
+
+            if ([] !== $blameData) {
+                $entry->blame_raw = json_encode($blameData, JSON_THROW_ON_ERROR);
             }
         }
 

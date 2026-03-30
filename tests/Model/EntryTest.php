@@ -188,4 +188,35 @@ final class EntryTest extends TestCase
 
         $this->assertNull($entry->transactionId);
     }
+
+    public function testFromArrayWithLegacyV1Row(): void
+    {
+        // Simulate a SELECT * row from a v1 table (or a transitional table with both
+        // old and new columns present). fromArray() must not throw on read-only virtual
+        // properties like $ip, and must synthesize blame_raw from the individual columns.
+        $entry = Entry::fromArray([
+            'id' => 42,
+            'schema_version' => 1,
+            'type' => 'update',
+            'object_id' => '19',
+            'transaction_hash' => 'abc123',
+            'transaction_id' => null,
+            'blame_id' => 'user@example.com',
+            'blame_user' => 'John Doe',
+            'blame_user_fqdn' => 'App\\Entity\\User',
+            'blame_user_firewall' => 'main',
+            'ip' => '1.2.3.4',
+            'blame' => null,
+            'diffs' => '{}',
+            'created_at' => new \DateTimeImmutable(),
+        ]);
+
+        $this->assertSame(42, $entry->id);
+        $this->assertSame(1, $entry->schemaVersion);
+        $this->assertNull($entry->transactionId, 'Legacy transaction_hash is not mapped to transactionId.');
+        $this->assertSame('John Doe', $entry->username, 'username synthesized from blame_user.');
+        $this->assertSame('App\\Entity\\User', $entry->userFqdn, 'userFqdn synthesized from blame_user_fqdn.');
+        $this->assertSame('main', $entry->userFirewall, 'userFirewall synthesized from blame_user_firewall.');
+        $this->assertSame('1.2.3.4', $entry->ip, 'ip synthesized from legacy ip column.');
+    }
 }
