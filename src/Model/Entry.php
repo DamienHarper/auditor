@@ -213,10 +213,10 @@ final class Entry
         // If no v2 'blame' column was present but v1 individual columns were, synthesize blame_raw.
         if (null === $entry->blame_raw && [] !== $legacyBlame) {
             $blameData = array_filter([
-                'username'      => $legacyBlame['blame_user'] ?? null,
-                'user_fqdn'     => $legacyBlame['blame_user_fqdn'] ?? null,
+                'username' => $legacyBlame['blame_user'] ?? null,
+                'user_fqdn' => $legacyBlame['blame_user_fqdn'] ?? null,
                 'user_firewall' => $legacyBlame['blame_user_firewall'] ?? null,
-                'ip'            => $legacyBlame['ip'] ?? null,
+                'ip' => $legacyBlame['ip'] ?? null,
             ], static fn (mixed $v): bool => null !== $v);
 
             if ([] !== $blameData) {
