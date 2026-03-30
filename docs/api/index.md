@@ -195,6 +195,82 @@ final class Security
 }
 ```
 
+### DiffLabel
+
+```php
+namespace DH\Auditor\Attribute;
+
+#[\Attribute(\Attribute::TARGET_PROPERTY)]
+final class DiffLabel
+{
+    public function __construct(public string $resolver);
+}
+```
+
+Annotates a property with a resolver service that will translate the raw stored value into a
+human-readable label. The `resolver` argument must be the FQCN of a service that implements
+`DiffLabelResolverInterface`.
+
+The label is stored alongside the raw value in the JSON diff as `{"value": x, "label": "y"}`,
+consistent with how relation fields already store `{id, label, class, table}`.
+
+**Example:**
+
+```php
+use DH\Auditor\Attribute\Auditable;
+use DH\Auditor\Attribute\DiffLabel;
+
+#[Auditable]
+class Order
+{
+    #[DiffLabel(resolver: StatusLabelResolver::class)]
+    private int $status;
+}
+```
+
+## 📋 Contracts
+
+### DiffLabelResolverInterface
+
+```php
+namespace DH\Auditor\Contract;
+
+interface DiffLabelResolverInterface
+{
+    /**
+     * Resolves a raw audit diff value to a human-readable label.
+     *
+     * Called at write-time (during flush). Implementations MUST NOT flush the
+     * same EntityManager or rely on an open transaction. A separate read-only
+     * connection or a pure in-memory lookup is safe.
+     *
+     * Return null to fall back to storing the plain raw value without a label.
+     */
+    public function __invoke(mixed $value): ?string;
+}
+```
+
+**Example implementation:**
+
+```php
+use DH\Auditor\Contract\DiffLabelResolverInterface;
+
+final class StatusLabelResolver implements DiffLabelResolverInterface
+{
+    private const LABELS = [
+        1 => 'Pending',
+        2 => 'Processing',
+        3 => 'Shipped',
+        4 => 'Delivered',
+    ];
+
+    public function __invoke(mixed $value): ?string
+    {
+        return self::LABELS[(int) $value] ?? null;
+    }
+}
+```
+
 ## 📣 Events
 
 ### LifecycleEvent
