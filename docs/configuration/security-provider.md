@@ -8,9 +8,9 @@ The security provider captures additional contextual information about each audi
 
 When an audit entry is created, the security provider can supply:
 
-- **ip** - The client's IP address
-- **blame_user_fqdn** - The fully qualified class name of the user
-- **blame_user_firewall** - The Symfony firewall name (if applicable)
+- **ip** - The client's IP address (stored in the `blame` JSON column)
+- **user_fqdn** - The fully qualified class name of the user (stored in the `blame` JSON column)
+- **user_firewall** - The Symfony firewall name (stored in the `blame` JSON column)
 
 ## 🚀 Setting Up a Security Provider
 
