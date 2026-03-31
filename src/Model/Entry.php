@@ -200,8 +200,15 @@ final class Entry
                 continue;
             }
 
-            // v1 legacy transaction_hash column — superseded by transaction_id in schema v2; ignore it.
+            // v1 legacy transaction_hash column — superseded by transaction_id in schema v2.
+            // When no transaction_id has been set yet (un-migrated v1 table), fall back to
+            // transaction_hash so that $entry->transactionId is non-null and templates can
+            // display and link to the transaction stream.
             if ('transaction_hash' === $key) {
+                if (null === $entry->transaction_id && null !== $value && '' !== $value) {
+                    $entry->transaction_id = $value;
+                }
+
                 continue;
             }
 
