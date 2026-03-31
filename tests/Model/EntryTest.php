@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\Model;
 
+use DH\Auditor\Model\AuditDiffCollection;
 use DH\Auditor\Model\Entry;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -40,7 +41,8 @@ final class EntryTest extends TestCase
         $this->assertSame(2, $entry->schemaVersion, 'Entry::schemaVersion is ok.');
         $this->assertSame('type', $entry->type, 'Entry::type is ok.');
         $this->assertSame('1', $entry->objectId, 'Entry::objectId is ok.');
-        $this->assertSame([], $entry->getDiffs(), 'Entry::getDiffs() returns empty array for empty diffs.');
+        $this->assertInstanceOf(AuditDiffCollection::class, $entry->getDiffs(), 'Entry::getDiffs() returns AuditDiffCollection.');
+        $this->assertCount(0, $entry->getDiffs(), 'Entry::getDiffs() returns empty collection for empty diffs.');
         $this->assertSame(1, $entry->userId, 'Entry::userId is ok.');
         $this->assertSame('John Doe', $entry->blame['username'], 'Entry::blame[username] is ok.');
         $this->assertSame('Acme\User', $entry->blame['user_fqdn'], 'Entry::blame[user_fqdn] is ok.');
@@ -66,7 +68,7 @@ final class EntryTest extends TestCase
 
     public function testGetDiffsLegacyFormat(): void
     {
-        // schema_version = 1: old format, returns raw decoded array (minus @source)
+        // schema_version = 1: old format, collection built from raw diffs (minus @source)
         $entry = Entry::fromArray([
             'schema_version' => 1,
             'diffs' => json_encode([
@@ -76,13 +78,14 @@ final class EntryTest extends TestCase
         ]);
 
         $diffs = $entry->getDiffs();
-        $this->assertArrayNotHasKey('@source', $diffs, 'getDiffs() strips @source in legacy format.');
-        $this->assertArrayHasKey('name', $diffs, 'getDiffs() returns field diffs in legacy format.');
+        $this->assertInstanceOf(AuditDiffCollection::class, $diffs);
+        $this->assertCount(1, $diffs, 'getDiffs() strips @source in legacy format.');
+        $this->assertNotNull($diffs->getField('name'), 'getDiffs() includes field diffs in legacy format.');
     }
 
     public function testGetDiffsNewFormat(): void
     {
-        // schema_version = 2: unified envelope, returns 'changes' sub-array
+        // schema_version = 2: unified envelope, collection built from 'changes' sub-array
         $entry = Entry::fromArray([
             'schema_version' => 2,
             'diffs' => json_encode([
@@ -94,6 +97,60 @@ final class EntryTest extends TestCase
         ]);
 
         $diffs = $entry->getDiffs();
+        $this->assertInstanceOf(AuditDiffCollection::class, $diffs);
+        $this->assertCount(1, $diffs);
+        $diff = $diffs->getField('name');
+        $this->assertNotNull($diff);
+        $this->assertSame('Alice', $diff->getOldValue());
+        $this->assertSame('Bob', $diff->getNewValue());
+    }
+
+    public function testGetDiffsReturnsEmptyCollectionForAssociation(): void
+    {
+        // ASSOCIATE/DISSOCIATE (schema_version >= 2): no 'changes' key → empty collection
+        $entry = Entry::fromArray([
+            'schema_version' => 2,
+            'diffs' => json_encode([
+                'source' => ['id' => '1', 'class' => 'App\Entity\Post', 'label' => 'Post', 'table' => 'post', 'field' => 'tags'],
+                'target' => ['id' => '5', 'class' => 'App\Entity\Tag', 'label' => 'php', 'table' => 'tag', 'field' => 'posts'],
+                'is_owning_side' => true,
+            ]),
+        ]);
+
+        $diffs = $entry->getDiffs();
+        $this->assertInstanceOf(AuditDiffCollection::class, $diffs);
+        $this->assertCount(0, $diffs, 'ASSOCIATE/DISSOCIATE entries yield empty AuditDiffCollection.');
+    }
+
+    public function testGetDiffsAsArrayLegacyFormat(): void
+    {
+        $entry = Entry::fromArray([
+            'schema_version' => 1,
+            'diffs' => json_encode([
+                '@source' => ['id' => 1, 'class' => 'App\Entity\Foo', 'label' => 'Foo', 'table' => 'foo'],
+                'name' => ['new' => 'Alice'],
+            ]),
+        ]);
+
+        $diffs = $entry->getDiffsAsArray();
+        $this->assertIsArray($diffs);
+        $this->assertArrayNotHasKey('@source', $diffs, 'getDiffsAsArray() strips @source in legacy format.');
+        $this->assertArrayHasKey('name', $diffs);
+    }
+
+    public function testGetDiffsAsArrayNewFormat(): void
+    {
+        $entry = Entry::fromArray([
+            'schema_version' => 2,
+            'diffs' => json_encode([
+                'source' => ['id' => '1', 'class' => 'App\Entity\Foo', 'label' => 'Foo', 'table' => 'foo'],
+                'changes' => [
+                    'name' => ['old' => 'Alice', 'new' => 'Bob'],
+                ],
+            ]),
+        ]);
+
+        $diffs = $entry->getDiffsAsArray();
         $this->assertSame(['name' => ['old' => 'Alice', 'new' => 'Bob']], $diffs);
     }
 
@@ -144,11 +201,11 @@ final class EntryTest extends TestCase
         $this->assertNull($entry->getDiffTarget());
     }
 
-    public function testGetDiffsReturnsAnArray(): void
+    public function testGetDiffsReturnsCollection(): void
     {
         $entry = Entry::fromArray(['diffs' => '{}']);
 
-        $this->assertIsArray($entry->getDiffs(), 'Entry::getDiffs() returns an array.');
+        $this->assertInstanceOf(AuditDiffCollection::class, $entry->getDiffs(), 'Entry::getDiffs() returns AuditDiffCollection.');
     }
 
     public function testGetExtraDataReturnsNullWhenEmpty(): void

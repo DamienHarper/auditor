@@ -84,21 +84,56 @@ final class Entry
     private ?\DateTimeImmutable $created_at = null;
 
     /**
-     * Get diff changes for the current entry.
+     * Returns a typed collection of {@see AuditDiff} objects for this entry.
      *
-     * For entries written with schema_version >= 2 (new unified format), returns
-     * the 'changes' sub-array: ['field' => ['old' => x, 'new' => y], ...].
+     * For schema_version >= 2 entries, iterates over the unified 'changes' map
+     * (field => {old, new}). ASSOCIATE/DISSOCIATE entries have no 'changes' key
+     * and return an empty collection; use getDiffSource() / getDiffTarget() instead.
      *
-     * For legacy entries (schema_version = 1, old format), returns the raw decoded
-     * diffs array as-is so that existing consumers continue to work unchanged.
+     * For legacy entries (schema_version = 1), builds the collection from the raw
+     * decoded diffs array. Non-array values (legacy REMOVE flat shape) are silently
+     * skipped, yielding an empty collection for those entries.
+     *
+     * Use getDiffsAsArray() to retrieve the raw array in the legacy format.
      */
-    public function getDiffs(): array
+    public function getDiffs(): AuditDiffCollection
     {
         $diffs = $this->decodeJson($this->diffs);
 
         if ($this->schemaVersion >= 2) {
-            // Association/dissociation entries have no 'changes' key — return the full diff
-            // (source, target, is_owning_side, join_table) so consumers can inspect it uniformly.
+            // ASSOCIATE/DISSOCIATE: no 'changes' key — return empty collection.
+            // Use getDiffSource() / getDiffTarget() to inspect the relation descriptors.
+            if (!\array_key_exists('changes', $diffs)) {
+                return new AuditDiffCollection([]);
+            }
+
+            $changes = \is_array($diffs['changes']) ? $diffs['changes'] : [];
+
+            return new AuditDiffCollection($this->sort($changes));
+        }
+
+        // Legacy format (schema_version = 1): strip @source and build collection.
+        // Non-array values (legacy REMOVE shape) are skipped by AuditDiffCollection.
+        unset($diffs['@source']);
+
+        return new AuditDiffCollection($this->sort($diffs));
+    }
+
+    /**
+     * Returns the raw diff array, preserving the legacy array format.
+     *
+     * For schema_version >= 2: returns the 'changes' sub-array (field => {old, new}).
+     * For legacy entries (schema_version = 1): returns the raw decoded diffs array.
+     * For ASSOCIATE/DISSOCIATE (schema_version >= 2): returns the full diff envelope.
+     *
+     * Use this as an escape hatch when array access is required (e.g. Twig templates,
+     * serialization). Prefer getDiffs() for typed access in PHP code.
+     */
+    public function getDiffsAsArray(): array
+    {
+        $diffs = $this->decodeJson($this->diffs);
+
+        if ($this->schemaVersion >= 2) {
             if (!\array_key_exists('changes', $diffs)) {
                 return $this->sort($diffs);
             }
@@ -108,7 +143,6 @@ final class Entry
             return $this->sort($changes);
         }
 
-        // Legacy format (schema_version = 1): return raw array, stripping @source metadata
         unset($diffs['@source']);
 
         return $this->sort($diffs);
@@ -247,6 +281,10 @@ final class Entry
     /**
      * Recursively sorts an array by key, preserving the old-before-new insertion order for
      * 'old'/'new' diff leaf pairs, but still recursively sorting any array values within them.
+     *
+     * @param array<array-key, mixed> $array
+     *
+     * @return array<string, mixed>
      */
     private function sort(array $array): array
     {
