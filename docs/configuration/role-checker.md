@@ -84,8 +84,8 @@ You can also define view permissions directly on entities using the `#[Security]
 ```php
 <?php
 
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Auditable;
-use DH\Auditor\Provider\Doctrine\Auditing\Annotation\Security;
+use DH\Auditor\Attribute\Auditable;
+use DH\Auditor\Attribute\Security;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -188,7 +188,7 @@ When the role checker returns `false`, an `AccessDeniedException` is thrown:
 <?php
 
 use DH\Auditor\Exception\AccessDeniedException;
-use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader; // from auditor-doctrine-provider
 
 $reader = new Reader($provider);
 

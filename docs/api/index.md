@@ -108,8 +108,8 @@ interface ConfigurationInterface
 
 > [!WARNING]
 > All DoctrineProvider classes (`DoctrineProvider`, `Configuration`, `Reader`, `Query`, filters,
-> `SchemaManager`, `AuditingService`, `StorageService`) are **deprecated** in auditor core
-> (removed in v5.0). See the [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/)
+> `SchemaManager`, `AuditingService`, `StorageService`) were **removed** from auditor core in v5.0.
+> See the [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/)
 > documentation for the current API reference.
 
 ## 📦 Models
@@ -121,20 +121,31 @@ namespace DH\Auditor\Model;
 
 final class Entry
 {
+    // Factory
     public static function fromArray(array $row): self;
-    
-    public function getId(): ?int;
-    public function getType(): string;
-    public function getObjectId(): string;
-    public function getDiscriminator(): ?string;
-    public function getTransactionHash(): ?string;
-    public function getDiffs(bool $includeMetadata = false): array;
-    public function getUserId(): int|string|null;
-    public function getUsername(): ?string;
-    public function getUserFqdn(): ?string;
-    public function getUserFirewall(): ?string;
-    public function getIp(): ?string;
-    public function getCreatedAt(): ?\DateTimeImmutable;
+
+    // Read-only properties (PHP 8.4 property hooks)
+    public private(set) ?int $id;
+    public private(set) int $schemaVersion;   // 1 = legacy, 2 = current
+    public private(set) string $type;         // 'insert', 'update', 'remove', 'associate', 'dissociate'
+    public string $objectId;                  // virtual: maps to object_id column
+    public private(set) ?string $discriminator;
+    public ?string $transactionId;            // virtual: ULID (v2) or SHA-1 fallback (v1)
+    public int|string|null $userId;           // virtual: maps to blame_id column
+    public ?array $blame;                     // virtual: decoded blame JSON
+    public ?string $username;                 // virtual: blame['username']
+    public ?string $userFqdn;                 // virtual: blame['user_fqdn']
+    public ?string $userFirewall;             // virtual: blame['user_firewall']
+    public ?string $ip;                       // virtual: blame['ip']
+    public ?array $extraData;                 // virtual: decoded extra_data JSON
+    public ?\DateTimeImmutable $createdAt;    // virtual: maps to created_at column
+
+    // Methods
+    public function getDiffs(): array;             // field changes (schema v2: changes envelope)
+    public function getDiffSource(): ?array;       // entity metadata (schema v2 only)
+    public function getDiffTarget(): ?array;       // association target (schema v2 only)
+    public function getExtraData(): ?array;
+    public function getBlame(): ?array;
 }
 ```
 

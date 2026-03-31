@@ -197,6 +197,9 @@ public function __invoke(LifecycleEvent $event): void
 The `Entry` model provides access to `extra_data` via the `extraData` property or the `getExtraData()` method:
 
 ```php
+// Reader comes from damienharper/auditor-doctrine-provider
+use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
+
 $reader = new Reader($provider);
 $entries = $reader->createQuery(User::class)->execute();
 
