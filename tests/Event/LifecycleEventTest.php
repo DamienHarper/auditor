@@ -20,21 +20,19 @@ final class LifecycleEventTest extends TestCase
     use AuditorTrait;
 
     /**
-     * @var array<string, class-string<AuditEventSubscriber>|string>
+     * @var array<string, class-string<AuditEventSubscriber>|int|string>
      */
     private const array PAYLOAD = [
         'entity' => AuditEventSubscriber::class,
         'table' => '',
+        'schema_version' => 2,
         'type' => '',
         'object_id' => '',
         'discriminator' => '',
-        'transaction_hash' => '',
+        'transaction_id' => '',
         'diffs' => '',
         'blame_id' => '',
-        'blame_user' => '',
-        'blame_user_fqdn' => '',
-        'blame_user_firewall' => '',
-        'ip' => '',
+        'blame' => '',
         'extra_data' => '',
         'created_at' => '',
     ];
@@ -69,17 +67,15 @@ final class LifecycleEventTest extends TestCase
         $payload = [
             'entity' => AuditEventSubscriber::class,
             'table' => '',
+            'schema_version' => 2,
             'type' => '',
             'object_id' => '',
             'discriminator' => '',
-            'transaction_hash' => '',
+            'transaction_id' => '',
             'diffs' => '',
             'extra_data' => '',
             'blame_id' => '',
-            'blame_user' => '',
-            'blame_user_fqdn' => '',
-            'blame_user_firewall' => '',
-            'ip' => '',
+            'blame' => '',
             'created_at' => '',
         ];
 
@@ -95,17 +91,15 @@ final class LifecycleEventTest extends TestCase
         $payload = [
             'entity' => AuditEventSubscriber::class,
             'table' => '',
+            'schema_version' => 2,
             'type' => '',
             'object_id' => '',
             'discriminator' => '',
-            'transaction_hash' => '',
+            'transaction_id' => '',
             'diffs' => '',
             'extra_data' => '',
             'blame_id' => '',
-            'blame_user' => '',
-            'blame_user_fqdn' => '',
-            'blame_user_firewall' => '',
-            'ip' => '',
+            'blame' => '',
             'created_at' => '',
         ];
 
@@ -118,24 +112,20 @@ final class LifecycleEventTest extends TestCase
 
     public function testPayloadWithoutExtraDataIsNormalized(): void
     {
-        // Payload without extra_data key
         $payload = [
             'entity' => AuditEventSubscriber::class,
             'table' => '',
+            'schema_version' => 2,
             'type' => '',
             'object_id' => '',
             'discriminator' => '',
-            'transaction_hash' => '',
+            'transaction_id' => '',
             'diffs' => '',
             'blame_id' => '',
-            'blame_user' => '',
-            'blame_user_fqdn' => '',
-            'blame_user_firewall' => '',
-            'ip' => '',
+            'blame' => '',
             'created_at' => '',
         ];
 
-        // Should not throw, extra_data should be auto-added as null
         $event = new LifecycleEvent($payload);
         $resultPayload = $event->getPayload();
 
@@ -147,28 +137,67 @@ final class LifecycleEventTest extends TestCase
     {
         $event = new LifecycleEvent(self::PAYLOAD);
 
-        // Payload without extra_data key
+        $payload = [
+            'entity' => AuditEventSubscriber::class,
+            'table' => '',
+            'schema_version' => 2,
+            'type' => '',
+            'object_id' => '',
+            'discriminator' => '',
+            'transaction_id' => '',
+            'diffs' => '',
+            'blame_id' => '',
+            'blame' => '',
+            'created_at' => '',
+        ];
+
+        $event->setPayload($payload);
+        $resultPayload = $event->getPayload();
+
+        $this->assertArrayHasKey('extra_data', $resultPayload);
+        $this->assertNull($resultPayload['extra_data']);
+    }
+
+    public function testPayloadWithoutBlameIsNormalized(): void
+    {
+        $payload = [
+            'entity' => AuditEventSubscriber::class,
+            'table' => '',
+            'schema_version' => 2,
+            'type' => '',
+            'object_id' => '',
+            'discriminator' => '',
+            'transaction_id' => '',
+            'diffs' => '',
+            'blame_id' => '',
+            'created_at' => '',
+        ];
+
+        $event = new LifecycleEvent($payload);
+        $resultPayload = $event->getPayload();
+
+        $this->assertArrayHasKey('blame', $resultPayload);
+        $this->assertNull($resultPayload['blame']);
+    }
+
+    public function testPayloadWithoutSchemaVersionIsNormalized(): void
+    {
         $payload = [
             'entity' => AuditEventSubscriber::class,
             'table' => '',
             'type' => '',
             'object_id' => '',
             'discriminator' => '',
-            'transaction_hash' => '',
+            'transaction_id' => '',
             'diffs' => '',
             'blame_id' => '',
-            'blame_user' => '',
-            'blame_user_fqdn' => '',
-            'blame_user_firewall' => '',
-            'ip' => '',
             'created_at' => '',
         ];
 
-        // Should not throw, extra_data should be auto-added as null
-        $event->setPayload($payload);
+        $event = new LifecycleEvent($payload);
         $resultPayload = $event->getPayload();
 
-        $this->assertArrayHasKey('extra_data', $resultPayload);
-        $this->assertNull($resultPayload['extra_data']);
+        $this->assertArrayHasKey('schema_version', $resultPayload);
+        $this->assertSame(2, $resultPayload['schema_version']);
     }
 }

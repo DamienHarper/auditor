@@ -150,17 +150,15 @@ The `$payload` array always contains these keys:
 
 | Key | Type | Description |
 |-----|------|-------------|
+| `schema_version` | `int` | Row format version (`2` for current) |
 | `type` | `string` | Operation: `'insert'`, `'update'`, `'remove'`, `'associate'`, `'dissociate'` |
 | `object_id` | `string` | Stringified primary key of the entity |
 | `discriminator` | `?string` | Doctrine inheritance discriminator (or `null`) |
-| `transaction_hash` | `?string` | Groups all changes in a single flush |
-| `diffs` | `string` | JSON-encoded field-level changes |
+| `transaction_id` | `?string` | ULID grouping all changes in a single flush |
+| `diffs` | `string` | JSON-encoded field-level changes (`{source, changes}` envelope) |
 | `extra_data` | `?string` | Optional JSON metadata (enriched by event listeners) |
 | `blame_id` | `int\|string\|null` | Authenticated user identifier |
-| `blame_user` | `?string` | Authenticated username |
-| `blame_user_fqdn` | `?string` | User class FQCN |
-| `blame_user_firewall` | `?string` | Symfony firewall name |
-| `ip` | `?string` | Client IP address |
+| `blame` | `array\|null` | Blame context: `['username', 'user_fqdn', 'user_firewall', 'ip']` |
 | `created_at` | `DateTimeImmutable` | Timestamp of the change |
 
 Providers built on Doctrine ORM also add:
@@ -392,18 +390,16 @@ final class AcmeProviderTest extends TestCase
         $provider = new AcmeProvider(new Configuration($backend));
 
         $event = new LifecycleEvent([
-            'type'                => TransactionType::INSERT,
-            'object_id'           => '42',
-            'discriminator'       => null,
-            'transaction_hash'    => 'abc123',
-            'diffs'               => '{}',
-            'extra_data'          => null,
-            'blame_id'            => null,
-            'blame_user'          => null,
-            'blame_user_fqdn'     => null,
-            'blame_user_firewall' => null,
-            'ip'                  => '127.0.0.1',
-            'created_at'          => new \DateTimeImmutable(),
+            'schema_version' => 2,
+            'type'           => TransactionType::INSERT,
+            'object_id'      => '42',
+            'discriminator'  => null,
+            'transaction_id' => '01JXXXXXXXXXXXXXXXXXXXXXXXXX',
+            'diffs'          => '{}',
+            'extra_data'     => null,
+            'blame_id'       => null,
+            'blame'          => null,
+            'created_at'     => new \DateTimeImmutable(),
         ]);
 
         $provider->persist($event);

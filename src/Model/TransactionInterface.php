@@ -7,9 +7,9 @@ namespace DH\Auditor\Model;
 interface TransactionInterface
 {
     /**
-     * Returns transaction hash.
+     * Returns transaction ID (ULID).
      */
-    public function getTransactionHash(): string;
+    public function getTransactionId(): string;
 
     public function getInserted(): array;
 

@@ -13,7 +13,8 @@
   "require": {
     "php": ">=8.4",
     "symfony/event-dispatcher": "^8.0",
-    "symfony/options-resolver": "^8.0"
+    "symfony/options-resolver": "^8.0",
+    "symfony/uid": "^8.0"
   },
   "suggest": {
     "damienharper/auditor-bundle": "Integrate auditor library in your Symfony projects."

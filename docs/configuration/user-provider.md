@@ -9,7 +9,7 @@ The user provider is responsible for identifying who made changes to audited ent
 When an audit entry is created, auditor can record:
 
 - **blame_id** - The unique identifier of the user
-- **blame_user** - The username or display name
+- **username** - The username or display name (stored in the `blame` JSON column)
 
 This information comes from the user provider callback.
 
@@ -37,7 +37,7 @@ $configuration->setUserProvider(function (): ?User {
     
     return new User(
         (string) $currentUser->getId(),    // User ID (stored as blame_id)
-        $currentUser->getUsername()         // Username (stored as blame_user)
+        $currentUser->getUsername()         // Username (stored in blame JSON column)
     );
 });
 ```
@@ -216,9 +216,9 @@ $query = $reader->createQuery(Post::class, ['object_id' => 123]);
 $audits = $query->execute();
 
 foreach ($audits as $entry) {
-    echo "User ID: " . $entry->getUserId();       // blame_id
-    echo "Username: " . $entry->getUsername();    // blame_user
-    echo "User FQDN: " . $entry->getUserFqdn();   // blame_user_fqdn
+    echo "User ID: " . $entry->userId;    // blame_id column
+    echo "Username: " . $entry->username; // blame JSON → username key
+    echo "User FQDN: " . $entry->userFqdn; // blame JSON → user_fqdn key
 }
 ```
 
