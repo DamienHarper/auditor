@@ -138,6 +138,34 @@ final class AuditDiffCollectionTest extends TestCase
         $this->assertCount(0, $collection);
     }
 
+    public function testChangedExcludesNullNullDiff(): void
+    {
+        // A diff where both old and new are null is neither added nor removed nor changed.
+        $collection = new AuditDiffCollection([
+            'ghost' => ['old' => null, 'new' => null],
+            'name' => ['old' => 'Alice', 'new' => 'Bob'],
+        ]);
+
+        $this->assertCount(1, $collection->changed());
+        $this->assertNull($collection->changed()->getField('ghost'));
+        $this->assertNotNull($collection->changed()->getField('name'));
+        $this->assertCount(0, $collection->added());
+        $this->assertCount(0, $collection->removed());
+    }
+
+    public function testMixedSkippedAndValidEntries(): void
+    {
+        // Legacy REMOVE flat shape mixed with a valid field diff: only the valid one is counted
+        $collection = new AuditDiffCollection([
+            'id' => '1',           // scalar — skipped
+            'class' => 'App\Foo',  // scalar — skipped
+            'name' => ['old' => 'Alice', 'new' => 'Bob'],
+        ]);
+
+        $this->assertCount(1, $collection);
+        $this->assertNotNull($collection->getField('name'));
+    }
+
     public function testFilteredCollectionIsIterable(): void
     {
         $collection = new AuditDiffCollection([

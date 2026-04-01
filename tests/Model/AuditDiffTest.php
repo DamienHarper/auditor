@@ -93,6 +93,19 @@ final class AuditDiffTest extends TestCase
         $diff = new AuditDiff('field', null, null);
 
         $this->assertFalse($diff->isRelation());
+        $this->assertFalse($diff->wasAdded());
+        $this->assertFalse($diff->wasRemoved());
+    }
+
+    public function testIsRelationWhenBothSidesAreRelationDescriptors(): void
+    {
+        $old = ['id' => '1', 'class' => 'App\Entity\Author', 'label' => 'Alice', 'table' => 'author'];
+        $new = ['id' => '2', 'class' => 'App\Entity\Author', 'label' => 'Bob', 'table' => 'author'];
+        $diff = new AuditDiff('author', $old, $new);
+
+        $this->assertTrue($diff->isRelation());
+        $this->assertFalse($diff->wasAdded());
+        $this->assertFalse($diff->wasRemoved());
     }
 
     public function testIsRelationIsFalseForIncompleteArray(): void

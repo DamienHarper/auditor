@@ -10,8 +10,8 @@ use DH\Auditor\Tests\Model\AuditDiffCollectionTest;
  * Typed, iterable collection of {@see AuditDiff} objects for a single audit entry.
  *
  * Built from the 'changes' map returned by Entry::getDiffs() internals.
- * Non-array values (e.g. legacy REMOVE flat shape) are silently skipped so
- * the collection is always safe to iterate.
+ * Non-array values (e.g. legacy REMOVE flat shape) are skipped so the collection
+ * is always safe to iterate — use Entry::getDiffsAsArray() to access the raw descriptor.
  *
  * @implements \IteratorAggregate<int, AuditDiff>
  *
@@ -92,13 +92,16 @@ final class AuditDiffCollection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Returns a new collection containing only fields that were changed (both old and new are set).
+     * Returns a new collection containing only fields that were changed (old !== null and new !== null).
+     *
+     * Diffs where both old and new are null are excluded — a field with no before and no after
+     * value is not a meaningful change.
      */
     public function changed(): self
     {
         return self::fromDiffs(array_values(array_filter(
             $this->diffs,
-            static fn (AuditDiff $d): bool => !$d->wasAdded() && !$d->wasRemoved(),
+            static fn (AuditDiff $d): bool => null !== $d->getOldValue() && null !== $d->getNewValue(),
         )));
     }
 

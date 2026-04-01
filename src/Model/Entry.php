@@ -90,11 +90,15 @@ final class Entry
      * (field => {old, new}). ASSOCIATE/DISSOCIATE entries have no 'changes' key
      * and return an empty collection; use getDiffSource() / getDiffTarget() instead.
      *
-     * For legacy entries (schema_version = 1), builds the collection from the raw
-     * decoded diffs array. Non-array values (legacy REMOVE flat shape) are silently
-     * skipped, yielding an empty collection for those entries.
+     * For schema_version = 1 REMOVE entries, the diffs JSON contains a flat entity
+     * descriptor (id, class, label, table) rather than field-level changes, which
+     * yields an empty collection. Use getDiffsAsArray() to access the raw descriptor,
+     * or check $entry->type === TransactionType::REMOVE->value before calling getDiffs().
      *
-     * Use getDiffsAsArray() to retrieve the raw array in the legacy format.
+     * For other schema_version = 1 entries (INSERT/UPDATE), returns the field changes
+     * with old defaulting to null for INSERT (no 'old' key in legacy format).
+     *
+     * Use getDiffsAsArray() as an escape hatch when a raw array is required.
      */
     public function getDiffs(): AuditDiffCollection
     {
@@ -107,9 +111,15 @@ final class Entry
                 return new AuditDiffCollection([]);
             }
 
-            $changes = \is_array($diffs['changes']) ? $diffs['changes'] : [];
+            if (!\is_array($diffs['changes'])) {
+                throw new \UnexpectedValueException(\sprintf(
+                    'Entry #%d: expected array for "changes" key in diffs JSON, got %s.',
+                    $this->id ?? 0,
+                    get_debug_type($diffs['changes']),
+                ));
+            }
 
-            return new AuditDiffCollection($this->sort($changes));
+            return new AuditDiffCollection($this->sort($diffs['changes']));
         }
 
         // Legacy format (schema_version = 1): strip @source and build collection.
@@ -138,9 +148,15 @@ final class Entry
                 return $this->sort($diffs);
             }
 
-            $changes = \is_array($diffs['changes']) ? $diffs['changes'] : [];
+            if (!\is_array($diffs['changes'])) {
+                throw new \UnexpectedValueException(\sprintf(
+                    'Entry #%d: expected array for "changes" key in diffs JSON, got %s.',
+                    $this->id ?? 0,
+                    get_debug_type($diffs['changes']),
+                ));
+            }
 
-            return $this->sort($changes);
+            return $this->sort($diffs['changes']);
         }
 
         unset($diffs['@source']);

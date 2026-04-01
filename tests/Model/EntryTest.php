@@ -154,6 +154,26 @@ final class EntryTest extends TestCase
         $this->assertSame(['name' => ['old' => 'Alice', 'new' => 'Bob']], $diffs);
     }
 
+    public function testGetDiffsAsArrayReturnsFullEnvelopeForAssociation(): void
+    {
+        // ASSOCIATE/DISSOCIATE (schema_version >= 2, no 'changes' key): getDiffsAsArray() must
+        // return the full diffs envelope so consumers can inspect source/target/is_owning_side.
+        $entry = Entry::fromArray([
+            'schema_version' => 2,
+            'diffs' => json_encode([
+                'source' => ['id' => '1', 'class' => 'App\Entity\Post', 'label' => 'Post', 'table' => 'post'],
+                'target' => ['id' => '5', 'class' => 'App\Entity\Tag', 'label' => 'php', 'table' => 'tag'],
+                'is_owning_side' => true,
+            ]),
+        ]);
+
+        $array = $entry->getDiffsAsArray();
+        $this->assertIsArray($array);
+        $this->assertArrayHasKey('source', $array);
+        $this->assertArrayHasKey('target', $array);
+        $this->assertArrayHasKey('is_owning_side', $array);
+    }
+
     public function testGetDiffSource(): void
     {
         $entry = Entry::fromArray([
