@@ -149,6 +149,33 @@ final class Entry
         return \is_array($target) ? $target : null;
     }
 
+    /**
+     * Returns a flat associative array suitable for CSV/JSON/NDJSON export.
+     * Blame fields are expanded from the unified blame structure for consistent output
+     * regardless of schema version.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'schema_version' => $this->schemaVersion,
+            'type' => $this->type,
+            'object_id' => $this->objectId,
+            'discriminator' => $this->discriminator,
+            'transaction_id' => $this->transactionId,
+            'diffs' => $this->getDiffs(),
+            'blame_id' => $this->userId,
+            'blame_user' => $this->username,
+            'blame_user_fqdn' => $this->userFqdn,
+            'blame_user_firewall' => $this->userFirewall,
+            'ip' => $this->ip,
+            'extra_data' => $this->extraData,
+            'created_at' => $this->createdAt?->format(\DateTimeInterface::ATOM),
+        ];
+    }
+
     public function getExtraData(): ?array
     {
         if (null === $this->extra_data) {
