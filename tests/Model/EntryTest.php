@@ -189,6 +189,91 @@ final class EntryTest extends TestCase
         $this->assertNull($entry->transactionId);
     }
 
+    public function testToArrayHasExpectedKeys(): void
+    {
+        $entry = new Entry();
+        $data = $entry->toArray();
+
+        $expected = ['id', 'schema_version', 'type', 'object_id', 'discriminator', 'transaction_id', 'diffs', 'blame_id', 'blame_user', 'blame_user_fqdn', 'blame_user_firewall', 'ip', 'extra_data', 'created_at'];
+        $this->assertSame($expected, array_keys($data));
+    }
+
+    public function testToArrayV2Entry(): void
+    {
+        $createdAt = new \DateTimeImmutable('2025-01-15T10:00:00+00:00');
+        $blame = json_encode(['username' => 'john', 'user_fqdn' => 'App\User', 'user_firewall' => 'main', 'ip' => '1.2.3.4']);
+        $diffs = json_encode(['source' => ['id' => '1', 'class' => 'App\Entity\Foo', 'label' => 'Foo', 'table' => 'foo'], 'changes' => ['name' => ['old' => 'Alice', 'new' => 'Bob']]]);
+
+        $entry = Entry::fromArray([
+            'id' => 7,
+            'schema_version' => 2,
+            'type' => 'update',
+            'object_id' => '99',
+            'discriminator' => null,
+            'transaction_id' => '01HXYZ1234567890ABCDEFGHIJ',
+            'diffs' => $diffs,
+            'blame_id' => 42,
+            'blame' => $blame,
+            'extra_data' => '{"source":"api"}',
+            'created_at' => $createdAt,
+        ]);
+
+        $data = $entry->toArray();
+
+        $this->assertSame(7, $data['id']);
+        $this->assertSame(2, $data['schema_version']);
+        $this->assertSame('update', $data['type']);
+        $this->assertSame('99', $data['object_id']);
+        $this->assertSame('01HXYZ1234567890ABCDEFGHIJ', $data['transaction_id']);
+        $this->assertSame(['name' => ['old' => 'Alice', 'new' => 'Bob']], $data['diffs']);
+        $this->assertSame(42, $data['blame_id']);
+        $this->assertSame('john', $data['blame_user']);
+        $this->assertSame('App\User', $data['blame_user_fqdn']);
+        $this->assertSame('main', $data['blame_user_firewall']);
+        $this->assertSame('1.2.3.4', $data['ip']);
+        $this->assertSame(['source' => 'api'], $data['extra_data']);
+        $this->assertSame($createdAt->format(\DateTimeInterface::ATOM), $data['created_at']);
+    }
+
+    public function testToArrayV1LegacyEntry(): void
+    {
+        $entry = Entry::fromArray([
+            'id' => 3,
+            'schema_version' => 1,
+            'type' => 'insert',
+            'object_id' => '5',
+            'blame_id' => 'user@example.com',
+            'blame_user' => 'Jane',
+            'blame_user_fqdn' => 'App\Entity\User',
+            'blame_user_firewall' => 'api',
+            'ip' => '10.0.0.1',
+            'diffs' => '{}',
+        ]);
+
+        $data = $entry->toArray();
+
+        $this->assertSame('user@example.com', $data['blame_id']);
+        $this->assertSame('Jane', $data['blame_user']);
+        $this->assertSame('App\Entity\User', $data['blame_user_fqdn']);
+        $this->assertSame('api', $data['blame_user_firewall']);
+        $this->assertSame('10.0.0.1', $data['ip']);
+    }
+
+    public function testToArrayCreatedAtIsAtomFormattedString(): void
+    {
+        $createdAt = new \DateTimeImmutable('2025-06-01T12:30:00+02:00');
+        $entry = Entry::fromArray(['created_at' => $createdAt]);
+
+        $this->assertSame($createdAt->format(\DateTimeInterface::ATOM), $entry->toArray()['created_at']);
+    }
+
+    public function testToArrayCreatedAtIsNullWhenNotSet(): void
+    {
+        $entry = new Entry();
+
+        $this->assertNull($entry->toArray()['created_at']);
+    }
+
     public function testFromArrayWithLegacyV1Row(): void
     {
         // Simulate a SELECT * row from a v1 table (or a transitional table with both
