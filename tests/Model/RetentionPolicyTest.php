@@ -47,9 +47,9 @@ final class RetentionPolicyTest extends TestCase
     {
         $now = new \DateTimeImmutable('2026-03-31 12:00:00', new \DateTimeZone('UTC'));
 
-        $this->assertSame(new \DateTimeImmutable('2026-03-01 12:00:00', new \DateTimeZone('UTC')), new RetentionPolicy('P30D')->getCutoff($now));
-        $this->assertSame(new \DateTimeImmutable('2019-03-31 12:00:00', new \DateTimeZone('UTC')), new RetentionPolicy('P7Y')->getCutoff($now));
-        $this->assertSame(new \DateTimeImmutable('2026-03-31 10:30:00', new \DateTimeZone('UTC')), new RetentionPolicy('PT1H30M')->getCutoff($now));
+        $this->assertSame('2026-03-01 12:00:00 UTC', new RetentionPolicy('P30D')->getCutoff($now)?->format('Y-m-d H:i:s T'));
+        $this->assertSame('2019-03-31 12:00:00 UTC', new RetentionPolicy('P7Y')->getCutoff($now)?->format('Y-m-d H:i:s T'));
+        $this->assertSame('2026-03-31 10:30:00 UTC', new RetentionPolicy('PT1H30M')->getCutoff($now)?->format('Y-m-d H:i:s T'));
     }
 
     #[DataProvider('provideInvalidMaxAgeIsRejectedCases')]
