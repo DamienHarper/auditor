@@ -152,6 +152,49 @@ The `keep` argument uses ISO 8601 duration format:
 | `P1D`   | 1 day                |
 | `PT12H` | 12 hours             |
 
+### Per-Entity Retention Policies
+
+An entity can define its own retention policy, either with `#[Auditable]` or in the bundle configuration
+(see the `auditor-bundle` documentation):
+
+```php
+use DH\Auditor\Attribute\Auditable;
+
+#[Auditable(maxAge: 'P7Y')]               // keep 7 years of history
+class Payment {}
+
+#[Auditable(maxEntries: 10_000)]          // keep the 10,000 most recent entries
+class Session {}
+
+#[Auditable(maxAge: 'P1Y', maxEntries: 500)]
+class User {}
+```
+
+- `maxAge` is an ISO 8601 duration greater than zero; `maxEntries` is a positive integer. Invalid values make the
+  attribute fail as soon as it is loaded.
+- For an entity with a `maxAge`, that value **replaces** the global cutoff (`keep` argument or `--date` option),
+  whether it is shorter or longer.
+- Entities without a `maxAge` keep using the global cutoff, exactly as before.
+- `maxEntries` applies on top of the age rule: an entry is deleted when it is older than the cutoff **or** not among
+  the `maxEntries` most recent entries of the entity (most recent first, ties broken by insertion order).
+- With single-table inheritance, the classes of a hierarchy share one audit table: each rule only deletes the
+  entries of its own class (`discriminator` column). Entries without a discriminator are left untouched.
+- Every policy is validated before anything is deleted: one invalid policy makes the command fail without
+  deleting anything.
+- Cutoffs are computed in the auditor timezone (the one audit entries are written in).
+
+The policies in use are listed before the confirmation prompt:
+
+```
+Per-entity retention policies (they override the global cutoff for these entities):
+ --------------------- --------- -------------
+  Entity                Max age   Max entries
+ --------------------- --------- -------------
+  App\Entity\Payment    P7Y       -
+  App\Entity\Session    -         10000
+ --------------------- --------- -------------
+```
+
 ### Examples
 
 #### Basic Cleanup
@@ -230,6 +273,10 @@ For automated cleanup, add to your crontab:
 # Clean up audits older than 12 months, daily at 2 AM
 0 2 * * * /path/to/php /path/to/bin/console audit:clean P12M --no-confirm >> /var/log/audit-clean.log 2>&1
 ```
+
+With `auditor-bundle`, pruning can also be scheduled with Symfony Scheduler (opt-in, see the bundle configuration).
+Unlike `audit:clean`, a scheduled run only applies explicit retention policies: entities without a policy are left
+untouched unless a default max age is configured.
 
 > [!TIP]
 > Use Symfony Messenger Scheduler if available for more robust scheduling.

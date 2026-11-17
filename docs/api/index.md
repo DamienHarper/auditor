@@ -177,11 +177,40 @@ class User implements UserInterface
 namespace DH\Auditor\Attribute;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
-final class Auditable
+class Auditable
 {
-    public function __construct(public bool $enabled = true);
+    public function __construct(
+        public bool $enabled = true,
+        public ?string $maxAge = null,     // ISO 8601 duration, e.g. 'P1Y'
+        public ?int $maxEntries = null,    // keep the N most recent entries
+    );
+
+    public function getRetentionPolicy(): RetentionPolicy;
 }
 ```
+
+`maxAge` and `maxEntries` define an optional retention policy, applied by providers that support pruning
+(`audit:clean` with the Doctrine provider). Invalid values throw `DH\Auditor\Exception\InvalidArgumentException`
+when the attribute is instantiated.
+
+### RetentionPolicy
+
+```php
+namespace DH\Auditor\Model;
+
+final readonly class RetentionPolicy
+{
+    public function __construct(public ?string $maxAge = null, public ?int $maxEntries = null);
+
+    public function isEmpty(): bool;
+
+    // Date before which entries are eligible for deletion, null when no max age is set
+    public function getCutoff(\DateTimeImmutable $now): ?\DateTimeImmutable;
+}
+```
+
+Validation rules: `maxAge` must be an ISO 8601 duration greater than zero (`P0D` is rejected), `maxEntries` must be
+a positive integer.
 
 ### Ignore
 
