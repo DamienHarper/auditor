@@ -130,7 +130,7 @@ Database support depends on the provider used. Via **DoctrineProvider**:
 | Version | Status                     | Requirements                                                           |
 |---------|----------------------------|------------------------------------------------------------------------|
 | 5.x     | Active development 🚀      | PHP >= 8.4, Symfony >= 8.0                                             |
-| 4.x     | Active support             | PHP >= 8.4, Symfony >= 8.0, Doctrine DBAL >= 4.0, Doctrine ORM >= 3.2 |
+| 4.x     | Bug and security fixes     | PHP >= 8.4, Symfony >= 8.0, Doctrine DBAL >= 4.0, Doctrine ORM >= 3.2 |
 | 3.x     | End of Life                | PHP >= 8.2, Symfony >= 5.4                                             |
 | 2.x     | End of Life                | PHP >= 7.4, Symfony >= 4.4                                             |
 | 1.x     | End of Life                | PHP >= 7.2, Symfony >= 3.4                                             |
