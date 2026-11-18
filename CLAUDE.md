@@ -8,6 +8,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The Doctrine ORM provider lives in the separate [`damienharper/auditor-doctrine-provider`](https://github.com/DamienHarper/auditor-doctrine-provider) package.
 
+## auditor family
+
+| Package | Repository | Default branch | Role |
+|---|---|---|---|
+| `damienharper/auditor` | `DamienHarper/auditor` | `master` | Core: contracts, models, events |
+| `damienharper/auditor-doctrine-provider` | `DamienHarper/auditor-doctrine-provider` | `main` | Doctrine ORM provider: change detection, storage, reader, schema |
+| `damienharper/auditor-bundle` | `DamienHarper/auditor-bundle` | `master` | Symfony bundle: configuration, viewer, export |
+
+- Dependency order: core → provider → bundle. Downstream packages require the upstream ones at `@dev`, so their CI runs against the upstream default branch.
+- A change spanning several packages lands as one PR per repository, in that order; a downstream PR goes green once the upstream one is merged.
+- Each repository has its own `CLAUDE.md`, `Makefile` (`wt-*` worktree targets, Docker matrix) and `composer agent-*` scripts.
+
 ## Commands
 
 ### Run tests locally
