@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\Model;
 
 use DH\Auditor\Model\Entry;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
 
@@ -142,6 +143,124 @@ final class EntryTest extends TestCase
         ]);
 
         $this->assertNull($entry->getDiffTarget());
+    }
+
+    public function testIsDeepDiffUsesTheMarkerWhenPresent(): void
+    {
+        $entry = Entry::fromArray([
+            'schema_version' => 2,
+            'diffs' => json_encode([
+                'source' => ['id' => '1', 'class' => 'App\Entity\Foo', 'label' => 'Foo', 'table' => 'foo'],
+                'changes' => [
+                    'json_array' => ['a' => ['new' => 2, 'old' => 1]],
+                    'title' => ['old' => 'Foo', 'new' => 'Bar'],
+                ],
+                'deep_diffs' => ['json_array'],
+            ]),
+        ]);
+
+        $this->assertTrue($entry->isDeepDiff('json_array'), 'A field listed in deep_diffs is a deep diff.');
+        $this->assertFalse($entry->isDeepDiff('title'), 'A field not listed in deep_diffs is a field diff.');
+        $this->assertFalse($entry->isDeepDiff('missing'), 'An unknown field is not a deep diff.');
+        $this->assertArrayNotHasKey('deep_diffs', $entry->getDiffs(), 'getDiffs() does not expose the marker.');
+    }
+
+    public function testIsDeepDiffResolvesJsonObjectWithNewOldKeysThroughTheMarker(): void
+    {
+        // A JSON object whose own keys are new/old: {"new": 1} -> {"new": 2}
+        // produces a deep diff that looks exactly like a flat field diff.
+        $changes = ['json_array' => ['new' => ['new' => 2, 'old' => 1]]];
+
+        $marked = Entry::fromArray([
+            'schema_version' => 2,
+            'diffs' => json_encode(['source' => [], 'changes' => $changes, 'deep_diffs' => ['json_array']]),
+        ]);
+        $unmarked = Entry::fromArray([
+            'schema_version' => 2,
+            'diffs' => json_encode(['source' => [], 'changes' => $changes]),
+        ]);
+
+        $this->assertTrue($marked->isDeepDiff('json_array'), 'The marker lifts the ambiguity.');
+        $this->assertFalse($unmarked->isDeepDiff('json_array'), 'Without the marker, the ambiguous shape is read as a field diff.');
+        $this->assertSame($changes, $marked->getDiffs(), 'getDiffs() output is unchanged by the marker.');
+    }
+
+    public function testIsDeepDiffInfersFromStructureWithoutMarker(): void
+    {
+        $entry = Entry::fromArray([
+            'schema_version' => 2,
+            'diffs' => json_encode([
+                'source' => [],
+                'changes' => [
+                    'json_array' => ['a' => ['new' => 2, 'old' => 1], 'b' => ['old' => 'x']],
+                    'emptied' => [],
+                    'title' => ['old' => 'Foo', 'new' => 'Bar'],
+                    'created' => ['new' => 'Foo'],
+                    'nullified' => ['old' => 'Foo', 'new' => null],
+                ],
+            ]),
+        ]);
+
+        $this->assertTrue($entry->isDeepDiff('json_array'), 'Keys other than new/old denote a deep diff.');
+        $this->assertTrue($entry->isDeepDiff('emptied'), 'An empty changeset is a deep diff.');
+        $this->assertFalse($entry->isDeepDiff('title'), '{old, new} is a field diff.');
+        $this->assertFalse($entry->isDeepDiff('created'), '{new} is a field diff.');
+        $this->assertFalse($entry->isDeepDiff('nullified'), '{old, new: null} is a field diff.');
+        $this->assertFalse($entry->isDeepDiff('missing'), 'An unknown field is not a deep diff.');
+    }
+
+    public function testIsDeepDiffInfersFromStructureForLegacyEntry(): void
+    {
+        $entry = Entry::fromArray([
+            'schema_version' => 1,
+            'diffs' => json_encode([
+                '@source' => ['id' => 1, 'class' => 'App\Entity\Foo', 'label' => 'Foo', 'table' => 'foo'],
+                'json_array' => ['a' => ['new' => 2, 'old' => 1]],
+                'name' => ['old' => 'Alice', 'new' => 'Bob'],
+                'counter' => 3,
+                // v1 has no marker: a deep_diffs key here is an ordinary field and must be ignored.
+                'deep_diffs' => ['name'],
+            ]),
+        ]);
+
+        $this->assertTrue($entry->isDeepDiff('json_array'));
+        $this->assertFalse($entry->isDeepDiff('name'), 'The marker is only read on schema_version >= 2.');
+        $this->assertFalse($entry->isDeepDiff('counter'), 'A non-array changeset is not a deep diff.');
+        $this->assertFalse($entry->isDeepDiff('@source'), 'The stripped @source block is not a field.');
+    }
+
+    #[DataProvider('provideIsDiffLeafCases')]
+    public function testIsDiffLeaf(array $node, bool $expected): void
+    {
+        $this->assertSame($expected, Entry::isDiffLeaf($node));
+    }
+
+    /**
+     * @return iterable<string, array{array<array-key, mixed>, bool}>
+     */
+    public static function provideIsDiffLeafCases(): iterable
+    {
+        yield 'leaf {new: scalar}' => [['new' => 2], true];
+
+        yield 'leaf {old: scalar}' => [['old' => 'x'], true];
+
+        yield 'leaf {new, old} scalars' => [['new' => 2, 'old' => 1], true];
+
+        yield 'leaf {new: null}' => [['new' => null], true];
+
+        yield 'leaf {new: array, old: scalar}' => [['new' => ['a' => 1], 'old' => 'x'], true];
+
+        yield 'intermediate {new: {new: 2, old: 1}}' => [['new' => ['new' => 2, 'old' => 1]], false];
+
+        yield 'intermediate {new: {a: {new: 1}}}' => [['new' => ['a' => ['new' => 1]]], false];
+
+        yield 'intermediate with other keys' => [['a' => ['new' => 1]], false];
+
+        yield 'empty array' => [[], false];
+
+        yield 'mixed keys' => [['new' => 1, 'other' => 2], false];
+
+        yield 'list' => [[1, 2], false];
     }
 
     public function testGetDiffsReturnsAnArray(): void
