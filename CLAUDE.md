@@ -8,6 +8,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The Doctrine ORM provider lives in the separate [`damienharper/auditor-doctrine-provider`](https://github.com/DamienHarper/auditor-doctrine-provider) package.
 
+## auditor family
+
+| Package | Repository | Default branch | Role |
+|---|---|---|---|
+| `damienharper/auditor` | `DamienHarper/auditor` | `master` | Core: contracts, models, events |
+| `damienharper/auditor-doctrine-provider` | `DamienHarper/auditor-doctrine-provider` | `main` | Doctrine ORM provider: change detection, storage, reader, schema |
+| `damienharper/auditor-bundle` | `DamienHarper/auditor-bundle` | `master` | Symfony bundle: configuration, viewer, export |
+
+- Dependency order: core → provider → bundle. Downstream packages require the upstream ones at `@dev`, so their CI runs against the upstream default branch.
+- A change spanning several packages lands as one PR per repository, in that order; a downstream PR goes green once the upstream one is merged.
+- Each repository has its own `CLAUDE.md`, `Makefile` (`wt-*` worktree targets, Docker matrix) and `composer agent-*` scripts.
+
 ## Commands
 
 ### Run tests locally
@@ -110,11 +122,18 @@ Three attributes live in `src/Attribute/`:
 
 ### `Entry` model gotchas
 - `$entry->type` is a plain `string` (`'insert'`, `'update'`, etc.)
+- `$entry->schemaVersion` is `2` for entries written in the current format, `1` for legacy rows
 - `$entry->extraData` is a virtual property that returns `?array` (already `json_decode`'d) — do not call `json_decode()` on it
-- `$entry->objectId`, `$entry->transactionHash`, `$entry->userId`, `$entry->username` etc. are virtual properties backed by snake_case private fields
+- `$entry->objectId`, `$entry->transactionId` (a ULID in schema v2), `$entry->userId` are virtual properties backed by snake_case private fields
+- `$entry->blame` is the decoded `blame` JSON column (`username`, `user_fqdn`, `user_firewall`, `ip`); `$entry->username`, `$entry->userFqdn`, `$entry->userFirewall` and `$entry->ip` are shortcuts to it
+- There is no `transactionHash` any more: a legacy `transaction_hash` column is read into `transactionId` by `Entry::fromArray()`
+- `getDiffs()` returns the `changes` of a v2 diff (`field => ['old' => …, 'new' => …]`), or the whole diff of an association/dissociation (no `changes` key); legacy entries return the raw diff. `getDiffSource()` / `getDiffTarget()` read the `source` / `target` blocks; `isDeepDiff()` and `isDiffLeaf()` tell JSON deep diffs from field diffs
 
-### `LifecycleEvent` payload keys
-`entity` (FQCN), `table`, `type` (string operation), `object_id`, `discriminator`, `transaction_hash`, `diffs`, `extra_data`, `blame_id`, `blame_user`, `blame_user_fqdn`, `blame_user_firewall`, `ip`, `created_at`. No `action` key at the `LifecycleEvent` level — use `$payload['type']`.
+### `LifecycleEvent` payload keys (schema v2)
+`entity` (FQCN), `table`, `schema_version` (`2`), `type` (string operation), `object_id`, `discriminator`, `transaction_id` (ULID), `diffs` (JSON string), `extra_data`, `blame_id`, `blame` (JSON string: `username`, `user_fqdn`, `user_firewall`, `ip`), `created_at`.
+- No `action` key at the `LifecycleEvent` level — use `$payload['type']`.
+- The v1 keys `transaction_hash`, `blame_user`, `blame_user_fqdn`, `blame_user_firewall` and `ip` are gone: the blame context lives in `blame`.
+- `diffs` envelope: `source` (summary of the audited entity) and `changes`, plus `deep_diffs` (fields whose changeset is a JSON deep diff) when relevant; association/dissociation diffs carry `source`, `target`, `is_owning_side` and `join_table` instead of `changes`.
 
 ## Tooling details
 
