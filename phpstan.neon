@@ -24,7 +24,6 @@ parameters:
         - path: src/Provider/Doctrine/*
           identifier: classConstant.deprecatedClass
         # false positives
-        - '~Dead catch - Throwable is never thrown in the try block~'
         - '~Parameter \#1 \$className of method Doctrine\\ORM\\EntityManagerInterface\:\:getClassMetadata\(\) expects class-string<object>, string given\.~'
         - '~Unable to resolve the template type T in call to method Doctrine\\ORM\\EntityManagerInterface\:\:getClassMetadata\(\)~'
         # TODO: Fix these typing issues progressively (PHPStan 2.x is stricter)
