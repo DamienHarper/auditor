@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 #[Small]
-#[RequiresPhp('>= 8.1')]
+#[RequiresPhp('>= 8.1.0')]
 final class Issue115Test extends TestCase
 {
     use DefaultSchemaSetupTrait;
