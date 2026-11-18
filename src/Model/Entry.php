@@ -91,6 +91,11 @@ final class Entry
      *
      * For legacy entries (schema_version = 1, old format), returns the raw decoded
      * diffs array as-is so that existing consumers continue to work unchanged.
+     *
+     * The changeset of a JSON column may be a deep diff (a nested tree whose leaves are
+     * {new}, {old} or {new, old}) instead of a flat {old, new} pair. The envelope's
+     * 'deep_diffs' marker lists those fields; it is not part of the returned array.
+     * Use isDeepDiff() to tell both shapes apart and isDiffLeaf() to walk a deep diff.
      */
     public function getDiffs(): array
     {
@@ -112,6 +117,49 @@ final class Entry
         unset($diffs['@source']);
 
         return $this->sort($diffs);
+    }
+
+    /**
+     * Tells whether getDiffs()[$field] is a JSON deep diff rather than a field diff ({old, new} pair).
+     *
+     * Entries carrying the 'deep_diffs' envelope marker (schema_version >= 2) are answered
+     * from it. Otherwise (legacy entries, or entries written before the marker existed),
+     * the answer is inferred from the changeset structure: a non-empty array whose keys
+     * are all 'new'/'old' is read as a field diff, any other array as a deep diff. A JSON
+     * object whose own keys are 'new'/'old' is therefore only recognised through the marker.
+     */
+    public function isDeepDiff(string $field): bool
+    {
+        if ($this->schemaVersion >= 2) {
+            $diffs = $this->decodeJson($this->diffs);
+
+            if (\is_array($diffs['deep_diffs'] ?? null)) {
+                return \in_array($field, $diffs['deep_diffs'], true);
+            }
+        }
+
+        $changeset = $this->getDiffs()[$field] ?? null;
+
+        if (!\is_array($changeset)) {
+            return false;
+        }
+
+        return [] === $changeset || !self::hasOnlyDiffKeys($changeset);
+    }
+
+    /**
+     * Tells whether a node found inside a deep diff is a leaf ({new}, {old} or {new, old}).
+     *
+     * A leaf has only 'new'/'old' keys and at least one non-array value; intermediate
+     * nodes only hold arrays. Not meant for the root of a changeset: use isDeepDiff().
+     */
+    public static function isDiffLeaf(array $node): bool
+    {
+        if ([] === $node || !self::hasOnlyDiffKeys($node)) {
+            return false;
+        }
+
+        return array_any($node, static fn (mixed $value): bool => !\is_array($value));
     }
 
     /**
@@ -269,6 +317,14 @@ final class Entry
         $decoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
         return \is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Tells whether every key of the array is 'new' or 'old' (true for an empty array).
+     */
+    private static function hasOnlyDiffKeys(array $array): bool
+    {
+        return array_all(array_keys($array), static fn (int|string $key): bool => 'new' === $key || 'old' === $key);
     }
 
     /**
