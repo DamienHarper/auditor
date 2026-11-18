@@ -42,6 +42,27 @@ composer agent-qa          # agent-rector + agent-cs-fix + agent-phpstan
 composer update-tools  # updates php-cs-fixer, phpstan, rector independently
 ```
 
+### Docker matrix (Makefile)
+```bash
+make tests php=8.5 db=mysql             # PHPUnit in Docker; db: sqlite (default), mysql, pgsql, mariadb
+make tests args='--filter=EntryTest'
+make qa                                 # rector + cs-fix + phpstan in Docker
+make help                               # all targets and options
+```
+
+### Git worktrees (Makefile)
+Parallel work happens in worktrees under `.claude/worktrees/<name>/` (git-ignored), each with its
+own `vendor/` and `tools/`. The `wt-*` targets run the `composer agent-*` scripts with the host
+PHP; `wt=<name>` can be omitted when `make` runs from inside the worktree.
+```bash
+make wt-create branch=feature/my-feature   # new branch from the freshly fetched origin/HEAD, then install
+make wt-qa wt=feature-my-feature           # composer agent-qa
+make wt-test wt=feature-my-feature args='--filter=EntryTest'
+make wt-clean wt=feature-my-feature confirm=yes   # refused while the worktree has uncommitted changes
+```
+Other targets: `wt-init`, `wt-list`, `wt-exec args=<cmd>`, `wt-phpstan`. The Docker targets also
+work from a worktree (`make -C .claude/worktrees/<name> tests`).
+
 ## Architecture
 
 ### Core design
