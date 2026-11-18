@@ -11,12 +11,6 @@ composer.lock
 *.sqlite
 symfony.lock
 
-###> phpbench/phpbench ###
-.phpbench/
-benchmark-report.html
-benchmark-summary.txt
-###< phpbench/phpbench ###
-
 ###> phpunit/phpunit ###
 /phpunit.xml
 /.phpunit.cache/
@@ -25,3 +19,4 @@ benchmark-summary.txt
 # Local Claude Code customizations (machine-specific)
 .claude/agents/
 .claude/hooks/
+.claude/worktrees/
