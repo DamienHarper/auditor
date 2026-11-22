@@ -480,4 +480,27 @@ final class EntryTest extends TestCase
         $this->assertSame('main', $entry->userFirewall, 'userFirewall synthesized from blame_user_firewall.');
         $this->assertSame('1.2.3.4', $entry->ip, 'ip synthesized from legacy ip column.');
     }
+
+    public function testDecodedColumnsAreReadOnce(): void
+    {
+        $entry = Entry::fromArray([
+            'schema_version' => 2,
+            'type' => 'update',
+            'diffs' => json_encode(['source' => ['id' => '1', 'class' => 'App\Post', 'label' => 'Post #1', 'table' => 'post'], 'changes' => ['title' => ['old' => 'a', 'new' => 'b']]], JSON_THROW_ON_ERROR),
+            'blame' => json_encode(['username' => 'john', 'user_fqdn' => 'App\User', 'user_firewall' => 'main', 'ip' => '127.0.0.1'], JSON_THROW_ON_ERROR),
+            'extra_data' => '{"route":"post_edit"}',
+            // not columns: never assigned from a row
+            'decoded' => ['diffs' => ['changes' => ['forged' => ['old' => null, 'new' => 1]]]],
+            'sortedDiffs' => ['forged' => ['old' => null, 'new' => 1]],
+        ]);
+
+        $this->assertSame(['title' => ['old' => 'a', 'new' => 'b']], $entry->getDiffs());
+        $this->assertSame($entry->getDiffs(), $entry->getDiffs());
+        $this->assertSame('john', $entry->username);
+        $this->assertSame('127.0.0.1', $entry->ip);
+        $this->assertSame(['username' => 'john', 'user_fqdn' => 'App\User', 'user_firewall' => 'main', 'ip' => '127.0.0.1'], $entry->blame);
+        $this->assertSame(['route' => 'post_edit'], $entry->extraData);
+        $this->assertSame('Post #1', $entry->getDiffSource()['label'] ?? null);
+        $this->assertFalse($entry->isDeepDiff('title'));
+    }
 }
