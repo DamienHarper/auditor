@@ -4,7 +4,7 @@
 
 > [!NOTE]
 > These commands are provided by **DoctrineProvider**. For programmatic usage and standalone
-> registration, see [Schema Management](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/schema).
+> registration, see [Schema Management](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/providers/doctrine/schema).
 
 When using auditor-bundle or the standalone DoctrineProvider, two console commands are available:
 
@@ -15,7 +15,7 @@ When using auditor-bundle or the standalone DoctrineProvider, two console comman
 | `audit:schema:update`   | Create or update audit table schemas   |
 | `audit:clean`           | Remove old audit entries               |
 
-## 🛠️ audit:schema:update
+## 🛠️ `audit:schema:update`
 
 Creates new audit tables and updates existing ones to match the current schema.
 
@@ -70,7 +70,7 @@ Run this command:
 | 0    | Success (including "nothing to update")          |
 | 1    | Error or missing required options                |
 
-## 🧹 audit:clean
+## 🧹 `audit:clean`
 
 Removes audit entries older than a specified retention period.
 
