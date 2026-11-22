@@ -20,7 +20,7 @@ flowchart TD
 
     B["TransactionProcessor
     Builds payload: diffs, blame
-    Calls extra_data_provider (if set)
+    Calls extra_data_provider once per flush (if set)
     → extra_data = JSON string or null"] --> C
 
     C["LifecycleEvent dispatched"]

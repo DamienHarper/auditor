@@ -94,6 +94,19 @@ final class Entry
     private ?\DateTimeImmutable $created_at = null;
 
     /**
+     * Decoded JSON columns, by column: an entry is read-only, each column is decoded at most once (the viewer reads
+     * the blame several times per entry, and the diffs once per field).
+     *
+     * @var array<string, array<string, mixed>>
+     */
+    private array $decoded = [];
+
+    /**
+     * Result of getDiffs(), computed on first call.
+     */
+    private ?array $sortedDiffs = null;
+
+    /**
      * Get diff changes for the current entry.
      *
      * For entries written with schema_version >= 2 (new unified format), returns
@@ -109,24 +122,7 @@ final class Entry
      */
     public function getDiffs(): array
     {
-        $diffs = $this->decodeJson($this->diffs);
-
-        if ($this->schemaVersion >= 2) {
-            // Association/dissociation entries have no 'changes' key — return the full diff
-            // (source, target, is_owning_side, join_table) so consumers can inspect it uniformly.
-            if (!\array_key_exists('changes', $diffs)) {
-                return $this->sort($diffs);
-            }
-
-            $changes = \is_array($diffs['changes']) ? $diffs['changes'] : [];
-
-            return $this->sort($changes);
-        }
-
-        // Legacy format (schema_version = 1): return raw array, stripping @source metadata
-        unset($diffs['@source']);
-
-        return $this->sort($diffs);
+        return $this->sortedDiffs ??= $this->computeDiffs();
     }
 
     /**
@@ -141,7 +137,7 @@ final class Entry
     public function isDeepDiff(string $field): bool
     {
         if ($this->schemaVersion >= 2) {
-            $diffs = $this->decodeJson($this->diffs);
+            $diffs = $this->decodedDiffs();
 
             if (\is_array($diffs['deep_diffs'] ?? null)) {
                 return \in_array($field, $diffs['deep_diffs'], true);
@@ -184,7 +180,7 @@ final class Entry
             return null;
         }
 
-        $diffs = $this->decodeJson($this->diffs);
+        $diffs = $this->decodedDiffs();
         $source = $diffs['source'] ?? null;
 
         return \is_array($source) ? $this->sort($source) : null;
@@ -201,7 +197,7 @@ final class Entry
             return null;
         }
 
-        $diffs = $this->decodeJson($this->diffs);
+        $diffs = $this->decodedDiffs();
         $target = $diffs['target'] ?? null;
 
         return \is_array($target) ? $target : null;
@@ -219,7 +215,7 @@ final class Entry
             return false;
         }
 
-        return true === ($this->decodeJson($this->diffs)['snapshot'] ?? null);
+        return true === ($this->decodedDiffs()['snapshot'] ?? null);
     }
 
     /**
@@ -256,7 +252,7 @@ final class Entry
             return null;
         }
 
-        return $this->decodeJson($this->extra_data);
+        return $this->decoded['extra_data'] ??= $this->decodeJson($this->extra_data);
     }
 
     public function getBlame(): ?array
@@ -265,7 +261,7 @@ final class Entry
             return null;
         }
 
-        return $this->decodeJson($this->blame_raw);
+        return $this->decoded['blame'] ??= $this->decodeJson($this->blame_raw);
     }
 
     public static function fromArray(array $row): self
@@ -313,7 +309,8 @@ final class Entry
                 continue;
             }
 
-            if (property_exists($entry, $key)) {
+            // the caches of decoded columns are not columns
+            if ('decoded' !== $key && 'sortedDiffs' !== $key && property_exists($entry, $key)) {
                 $entry->{$key} = 'id' === $key ? (int) $value : $value;
             }
         }
@@ -335,6 +332,28 @@ final class Entry
         return $entry;
     }
 
+    private function computeDiffs(): array
+    {
+        $diffs = $this->decodedDiffs();
+
+        if ($this->schemaVersion >= 2) {
+            // Association/dissociation entries have no 'changes' key — return the full diff
+            // (source, target, is_owning_side, join_table) so consumers can inspect it uniformly.
+            if (!\array_key_exists('changes', $diffs)) {
+                return $this->sort($diffs);
+            }
+
+            $changes = \is_array($diffs['changes']) ? $diffs['changes'] : [];
+
+            return $this->sort($changes);
+        }
+
+        // Legacy format (schema_version = 1): return raw array, stripping @source metadata
+        unset($diffs['@source']);
+
+        return $this->sort($diffs);
+    }
+
     /**
      * @return null|array{type: string, label?: string, data?: array<string, mixed>}
      */
@@ -348,6 +367,14 @@ final class Entry
 
         /** @var array{type: string, label?: string, data?: array<string, mixed>} $via */
         return $via;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function decodedDiffs(): array
+    {
+        return $this->decoded['diffs'] ??= $this->decodeJson($this->diffs);
     }
 
     /**
