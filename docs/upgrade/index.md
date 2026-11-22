@@ -6,7 +6,7 @@ This guide helps you upgrade between major versions of auditor.
 
 ## 📚 Upgrade Paths
 
-- [⬆️ Upgrading to 5.x from 4.x](v5.md)
+- [⬆️ Upgrading to 5.x from 4.x](https://github.com/DamienHarper/auditor/blob/master/docs/upgrade/v5.md)
 - [⬆️ Upgrading to 4.x from 3.x](v4.md)
 - [⬆️ Upgrading to 3.x from 2.x](v3.md)
 
@@ -14,8 +14,9 @@ This guide helps you upgrade between major versions of auditor.
 
 | Version | Status                      | PHP       | Symfony   |
 |:--------|:----------------------------|:----------|:----------|
-| 4.x     | Active development 🚀       | >= 8.4    | >= 8.0    |
-| 3.x     | Active support              | >= 8.2    | >= 5.4    |
+| 5.x     | Active development 🚀       | >= 8.4    | >= 8.1    |
+| 4.x     | Bug and security fixes      | >= 8.4    | >= 8.1    |
+| 3.x     | End of Life                 | >= 8.2    | >= 5.4    |
 | 2.x     | End of Life                 | >= 7.4    | >= 4.4    |
 | 1.x     | End of Life                 | >= 7.2    | >= 3.4    |
 

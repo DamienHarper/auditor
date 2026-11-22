@@ -4,7 +4,7 @@
 
 > [!NOTE]
 > These commands are provided by **DoctrineProvider**. For programmatic usage and standalone
-> registration, see [Schema Management](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/schema).
+> registration, see [Schema Management](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/providers/doctrine/schema).
 
 When using auditor-bundle or the standalone DoctrineProvider, two console commands are available:
 
