@@ -198,6 +198,21 @@ final class Entry
     }
 
     /**
+     * Tells whether this entry was written by a snapshot of an existing entity (schema_version >= 2 only).
+     *
+     * A snapshot is an 'insert' entry whose diffs envelope carries "snapshot": true: it records the state
+     * of an entity that existed before auditing started, not its creation.
+     */
+    public function isSnapshot(): bool
+    {
+        if ($this->schemaVersion < 2) {
+            return false;
+        }
+
+        return true === ($this->decodeJson($this->diffs)['snapshot'] ?? null);
+    }
+
+    /**
      * Returns a flat associative array suitable for CSV/JSON/NDJSON export.
      * Blame fields are expanded from the unified blame structure for consistent output
      * regardless of schema version.

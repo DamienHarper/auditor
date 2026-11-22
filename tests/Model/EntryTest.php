@@ -145,6 +145,31 @@ final class EntryTest extends TestCase
         $this->assertNull($entry->getDiffTarget());
     }
 
+    public function testIsSnapshotReadsTheMarker(): void
+    {
+        $changes = ['title' => ['new' => 'Foo', 'old' => null]];
+        $snapshot = Entry::fromArray([
+            'schema_version' => 2,
+            'type' => 'insert',
+            'diffs' => json_encode(['source' => [], 'changes' => $changes, 'snapshot' => true]),
+        ]);
+        $insert = Entry::fromArray([
+            'schema_version' => 2,
+            'type' => 'insert',
+            'diffs' => json_encode(['source' => [], 'changes' => $changes]),
+        ]);
+        $legacy = Entry::fromArray([
+            'schema_version' => 1,
+            'type' => 'insert',
+            'diffs' => json_encode(['snapshot' => true]),
+        ]);
+
+        $this->assertTrue($snapshot->isSnapshot(), 'An entry carrying the marker is a snapshot.');
+        $this->assertSame($changes, $snapshot->getDiffs(), 'getDiffs() does not expose the marker.');
+        $this->assertFalse($insert->isSnapshot(), 'An entry without the marker is not a snapshot.');
+        $this->assertFalse($legacy->isSnapshot(), 'The marker is only read on schema_version >= 2.');
+    }
+
     public function testIsDeepDiffUsesTheMarkerWhenPresent(): void
     {
         $entry = Entry::fromArray([
