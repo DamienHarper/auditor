@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-`auditor` is a provider-agnostic PHP library (namespace `DH\Auditor`) that provides the core infrastructure for audit logging. It defines the contracts (`ProviderInterface`, `AuditingServiceInterface`, `StorageServiceInterface`) and core models (`Entry`, `TransactionType`, `LifecycleEvent`) that concrete provider packages implement. Active development targets **5.x** (PHP ≥ 8.4, Symfony ≥ 8.0).
+`auditor` is a provider-agnostic PHP library (namespace `DH\Auditor`) that provides the core infrastructure for audit logging. It defines the contracts (`ProviderInterface`, `AuditingServiceInterface`, `StorageServiceInterface`) and core models (`Entry`, `TransactionType`, `LifecycleEvent`) that concrete provider packages implement. Active development targets **5.x** (PHP ≥ 8.4, Symfony ≥ 8.1).
 
 The Doctrine ORM provider lives in the separate [`damienharper/auditor-doctrine-provider`](https://github.com/DamienHarper/auditor-doctrine-provider) package.
 
