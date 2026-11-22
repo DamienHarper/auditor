@@ -267,8 +267,25 @@ a positive integer.
 ```php
 namespace DH\Auditor\Attribute;
 
-#[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class Ignore {}
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
+class Ignore
+{
+    public function __construct(public ?string $field = null);
+}
+```
+
+On a property, the property is the ignored field: leave `field` out. On a class, `field` names the
+ignored field, and the attribute can be repeated. This is the form to use on models that do not declare
+a property per column, such as Eloquent models:
+
+```php
+use DH\Auditor\Attribute\Auditable;
+use DH\Auditor\Attribute\Ignore;
+
+#[Auditable]
+#[Ignore(field: 'password')]
+#[Ignore(field: 'remember_token')]
+class User extends Model {}
 ```
 
 ### Security
@@ -290,14 +307,14 @@ final class Security
 ```php
 namespace DH\Auditor\Attribute;
 
-#[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class DiffLabel
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
+class DiffLabel
 {
-    public function __construct(public string $resolver);
+    public function __construct(public string $resolver, public ?string $field = null);
 }
 ```
 
-Annotates a property with a resolver service that will translate the raw stored value into a
+Annotates a field with a resolver service that will translate the raw stored value into a
 human-readable label. The `resolver` argument must be the FQCN of a service that implements
 `DiffLabelResolverInterface`.
 
@@ -317,6 +334,9 @@ class Order
     private int $status;
 }
 ```
+
+As with `#[Ignore]`, the attribute can also be put on the class, repeated, with `field` naming the field:
+`#[DiffLabel(resolver: StatusLabelResolver::class, field: 'status')]`.
 
 ## 📋 Contracts
 
