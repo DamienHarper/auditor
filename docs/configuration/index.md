@@ -89,7 +89,8 @@ interface UserInterface
 }
 ```
 
-See [User Provider Configuration](user-provider.md) for more details.
+See [User Provider Configuration](user-provider.md) for more details. To record *how* a change was made (an
+import, a command, a message…), see [Blame Context](blame-context.md).
 
 ## 🔐 Security Provider
 
@@ -176,6 +177,7 @@ $auditor = new Auditor($configuration, new EventDispatcher());
 ## Next Steps
 
 - 👤 [User Provider Configuration](user-provider.md)
+- 🧭 [Blame Context](blame-context.md)
 - 🔐 [Security Provider Configuration](security-provider.md)
 - 🛡️ [Role Checker Configuration](role-checker.md)
 - 🗄️ [DoctrineProvider Configuration](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/configuration)

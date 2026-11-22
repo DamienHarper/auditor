@@ -49,6 +49,25 @@ the audit entry (the message lists each provider's error, `getPrevious()` return
 With the Doctrine provider, the flush fails and the database transaction is rolled back.
 A failure is still ignored when another storage provider persisted the entry.
 
+## New: blame contexts
+
+A blame context records *how* a change was made (an import, a console command, a Messenger message…) in the
+`via` key of the `blame` JSON, next to the user. It is additive: nothing changes until a context is pushed.
+
+```php
+use DH\Auditor\Blame\BlameContext;
+
+$auditor->getConfiguration()->getBlameContextStack()->run(
+    new BlameContext('import', 'Import batch #42'),
+    fn () => $entityManager->flush(),
+);
+
+$entry->via; // ['type' => 'import', 'label' => 'Import batch #42']
+```
+
+A context may also carry the user to blame instead of the user provider's one. `Entry::toArray()` exports it
+as `blame_via`. See [Blame Context](docs/configuration/blame-context.md).
+
 ## Quick migration
 
 ```bash
