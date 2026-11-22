@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests;
 
+use DH\Auditor\Auditor;
 use DH\Auditor\Configuration;
+use DH\Auditor\Event\LifecycleEvent;
+use DH\Auditor\EventSubscriber\AuditEventSubscriber;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Exception\ProviderException;
 use DH\Auditor\Tests\Fixtures\Provider\AuditNoStorageProvider;
@@ -235,5 +238,24 @@ final class AuditorTest extends TestCase
         $auditor = $this->createAuditor();
 
         $this->assertInstanceOf(EventDispatcher::class, $auditor->getEventDispatcher(), 'Auditor::getEventDispatcher() is OK.');
+    }
+
+    public function testAuditEventSubscriberIsRegisteredByDefault(): void
+    {
+        $dispatcher = new EventDispatcher();
+        $this->createAuditor(dispatcher: $dispatcher);
+
+        $listeners = $dispatcher->getListeners(LifecycleEvent::class);
+        $this->assertCount(1, $listeners);
+        $this->assertInstanceOf(AuditEventSubscriber::class, $listeners[0]);
+        $this->assertSame(AuditEventSubscriber::PRIORITY, $dispatcher->getListenerPriority(LifecycleEvent::class, $listeners[0]));
+    }
+
+    public function testAuditEventSubscriberRegistrationCanBeSkipped(): void
+    {
+        $dispatcher = new EventDispatcher();
+        new Auditor($this->createAuditorConfiguration(), $dispatcher, false);
+
+        $this->assertFalse($dispatcher->hasListeners(LifecycleEvent::class));
     }
 }
