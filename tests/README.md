@@ -50,8 +50,8 @@ make tests args='--filter=ReaderTest'
 
 | Option | Values                                |
 |--------|---------------------------------------|
-| `php`  | `8.4`, `8.5`                          |
-| `sf`   | `8.0`                                 |
+| `php`  | `8.4`, `8.5`, `8.6`                   |
+| `sf`   | `8.0`, `8.1`, `8.2`                   |
 | `db`   | `sqlite`, `mysql`, `pgsql`, `mariadb` |
 
 ### Testing Full Matrix
