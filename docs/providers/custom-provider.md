@@ -136,6 +136,13 @@ final class MyStorageService extends AbstractService implements StorageServiceIn
 `persist()` is called by `AuditEventSubscriber` for every `LifecycleEvent` dispatched by
 auditor. This is where you write the audit entry to your backend.
 
+Throw an exception (any `\Exception`) when the entry cannot be written. `AuditEventSubscriber`
+still hands the entry to the other storage providers, and throws a
+`DH\Auditor\Exception\ProviderException` when none of them could persist it. Its message lists
+every failing provider with its error, and `getPrevious()` returns the first provider's exception.
+The exception reaches the code that dispatched the `LifecycleEvent`: with the Doctrine provider,
+the database transaction is rolled back.
+
 ### `LifecycleEvent` payload
 
 ```php
