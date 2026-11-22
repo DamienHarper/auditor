@@ -41,6 +41,14 @@ use DH\Auditor\Transaction\NeedsConversionToAuditableType;
 use DH\Auditor\Provider\Doctrine\Transaction\NeedsConversionToAuditableType;
 ```
 
+## Persistence failures are no longer silent
+
+`AuditEventSubscriber` used to swallow every exception thrown by `ProviderInterface::persist()`.
+It now throws a `DH\Auditor\Exception\ProviderException` when no storage provider could persist
+the audit entry (the message lists each provider's error, `getPrevious()` returns the first one).
+With the Doctrine provider, the flush fails and the database transaction is rolled back.
+A failure is still ignored when another storage provider persisted the entry.
+
 ## Quick migration
 
 ```bash
