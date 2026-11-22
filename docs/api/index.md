@@ -15,7 +15,11 @@ namespace DH\Auditor;
 
 final class Auditor
 {
-    public function __construct(Configuration $configuration, EventDispatcherInterface $dispatcher);
+    public function __construct(
+        Configuration $configuration,
+        EventDispatcherInterface $dispatcher,
+        bool $registerAuditEventSubscriber = true,
+    );
     
     public function getEventDispatcher(): EventDispatcherInterface;
     public function getConfiguration(): Configuration;
@@ -37,6 +41,11 @@ final class Auditor
     public function isAuditingEnabled(ProviderInterface $provider): bool;
 }
 ```
+
+By default, the constructor attaches `AuditEventSubscriber` to `$dispatcher` (priority
+`AuditEventSubscriber::PRIORITY`, i.e. `-1_000_000`). Pass `false` as third argument when the
+subscriber is declared as a listener of the dispatcher instead, e.g. in a Symfony container: since
+Symfony 8.2, the compiled event dispatcher deprecates `addListener()` at runtime.
 
 ### Configuration
 
