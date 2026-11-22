@@ -72,6 +72,42 @@ final class Configuration
     
     public function setRoleChecker(callable $roleChecker): self;
     public function getRoleChecker(): ?callable;
+
+    public function setExtraDataProvider(callable $extraDataProvider): self;
+    public function getExtraDataProvider(): ?callable;
+
+    public function getBlameContextStack(): BlameContextStack;
+}
+```
+
+### BlameContext and BlameContextStack
+
+The context a change is made in, written in the `via` key of the `blame` JSON. See
+[Blame Context](../configuration/blame-context.md).
+
+```php
+namespace DH\Auditor\Blame;
+
+final readonly class BlameContext
+{
+    public function __construct(
+        public string $type,                  // e.g. 'import', 'console', 'messenger'
+        public ?string $label = null,
+        public array $data = [],              // JSON encodable
+        public ?UserInterface $user = null,   // user to blame instead of the user provider's
+    );
+
+    public function toArray(): array;         // value of the `via` key
+}
+
+final class BlameContextStack
+{
+    public function push(BlameContext $context): void;
+    public function pop(): ?BlameContext;
+    public function current(): ?BlameContext;  // top of the stack, the one written
+    public function run(BlameContext $context, callable $callback): mixed;
+    public function isEmpty(): bool;
+    public function reset(): void;
 }
 ```
 
@@ -146,6 +182,7 @@ final class Entry
     public ?string $userFqdn;                 // virtual: blame['user_fqdn']
     public ?string $userFirewall;             // virtual: blame['user_firewall']
     public ?string $ip;                       // virtual: blame['ip']
+    public ?array $via;                       // virtual: blame['via'] (blame context)
     public ?array $extraData;                 // virtual: decoded extra_data JSON
     public ?\DateTimeImmutable $createdAt;    // virtual: maps to created_at column
 
@@ -154,6 +191,9 @@ final class Entry
     public function getDiffSource(): ?array;       // entity metadata (schema v2 only)
     public function getDiffTarget(): ?array;       // association target (schema v2 only)
     public function isSnapshot(): bool;            // insert written by audit:snapshot (schema v2 only)
+    public function isDeepDiff(string $field): bool;   // the field's changeset is a JSON deep diff
+    public static function isDiffLeaf(array $node): bool; // leaf ({old}, {new}, {old, new}) of a deep diff
+    public function toArray(): array;              // flat array used by exports (same keys for v1 and v2)
     public function getExtraData(): ?array;
     public function getBlame(): ?array;
 }

@@ -225,6 +225,6 @@ $configuration = new Configuration([
 
 ## Related
 
-- 🏷️ [Security Attribute](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/attributes#-security)
+- 🏷️ [Security Attribute](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/providers/doctrine/attributes#-security)
 - 👤 [User Provider Configuration](user-provider.md)
 - 🔐 [Security Provider Configuration](security-provider.md)
