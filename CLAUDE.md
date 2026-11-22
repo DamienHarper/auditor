@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-`auditor` is a PHP library (namespace `DH\Auditor`) that provides audit logging for Doctrine ORM. It tracks inserts, updates, deletes, and many-to-many association changes. Active development is on **4.x** (PHP ≥ 8.4, Symfony ≥ 8.0, Doctrine DBAL ≥ 4.0, Doctrine ORM ≥ 3.2).
+`auditor` is a PHP library (namespace `DH\Auditor`) that provides audit logging for Doctrine ORM. It tracks inserts, updates, deletes, and many-to-many association changes. Active development is on **4.x** (PHP ≥ 8.4, Symfony ≥ 8.1, Doctrine DBAL ≥ 4.0, Doctrine ORM ≥ 3.2).
 
 ## Commands
 
@@ -19,7 +19,7 @@ vendor/bin/phpunit --filter=testMethodName # single test method
 
 ### Run tests via Docker (recommended for CI parity)
 ```bash
-make tests                             # defaults: PHP 8.4, Symfony 8.0, SQLite
+make tests                             # defaults: PHP 8.4, Symfony 8.1, SQLite
 make tests db=mysql                    # or pgsql, mariadb
 make tests php=8.5
 make tests args='--filter=ReaderTest'
