@@ -71,4 +71,12 @@ final class ConfigurationTest extends TestCase
 
         $this->assertSame($provider, $configuration->getExtraDataProvider(), 'ExtraDataProvider is set correctly.');
     }
+
+    public function testBlameContextStack(): void
+    {
+        $configuration = $this->createAuditorConfiguration();
+
+        $this->assertTrue($configuration->getBlameContextStack()->isEmpty(), 'The blame context stack is empty by default.');
+        $this->assertSame($configuration->getBlameContextStack(), $configuration->getBlameContextStack(), 'The configuration holds a single stack.');
+    }
 }

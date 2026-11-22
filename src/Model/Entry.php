@@ -32,7 +32,8 @@ final class Entry
     }
 
     /**
-     * Returns the decoded blame context: username, user_fqdn, user_firewall, ip.
+     * Returns the decoded blame: username, user_fqdn, user_firewall, ip and, when the change was made in a blame
+     * context, via.
      */
     public ?array $blame {
         get => $this->getBlame();
@@ -56,6 +57,15 @@ final class Entry
     /** Convenience accessor for $blame['ip']. */
     public ?string $ip {
         get => $this->getBlame()['ip'] ?? null;
+    }
+
+    /**
+     * Convenience accessor for $blame['via']: the blame context (type, label, data) the change was made in.
+     *
+     * @var null|array{type: string, label?: string, data?: array<string, mixed>}
+     */
+    public ?array $via {
+        get => $this->getVia();
     }
 
     public ?array $extraData {
@@ -234,6 +244,7 @@ final class Entry
             'blame_user_fqdn' => $this->userFqdn,
             'blame_user_firewall' => $this->userFirewall,
             'ip' => $this->ip,
+            'blame_via' => $this->via,
             'extra_data' => $this->extraData,
             'created_at' => $this->createdAt?->format(\DateTimeInterface::ATOM),
         ];
@@ -322,6 +333,21 @@ final class Entry
         }
 
         return $entry;
+    }
+
+    /**
+     * @return null|array{type: string, label?: string, data?: array<string, mixed>}
+     */
+    private function getVia(): ?array
+    {
+        $via = $this->getBlame()['via'] ?? null;
+
+        if (!\is_array($via) || !\is_string($via['type'] ?? null)) {
+            return null;
+        }
+
+        /** @var array{type: string, label?: string, data?: array<string, mixed>} $via */
+        return $via;
     }
 
     /**

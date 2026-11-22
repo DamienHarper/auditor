@@ -56,6 +56,38 @@ final class EntryTest extends TestCase
 
         $this->assertNull($entry->userId, 'Entry::userId is ok with undefined user.');
         $this->assertNull($entry->blame, 'Entry::blame is null with undefined user.');
+        $this->assertNull($entry->via, 'Entry::via is null with undefined user.');
+    }
+
+    public function testVia(): void
+    {
+        $via = ['type' => 'import', 'label' => 'Import batch #42', 'data' => ['file' => 'products.csv']];
+        $entry = Entry::fromArray([
+            'schema_version' => 2,
+            'blame' => json_encode(['username' => null, 'user_fqdn' => null, 'user_firewall' => null, 'ip' => null, 'via' => $via]),
+        ]);
+
+        $this->assertSame($via, $entry->via, 'Entry::via returns the blame context.');
+        $this->assertSame($via, $entry->blame['via'] ?? null, 'Entry::blame contains the blame context.');
+        $this->assertSame($via, $entry->toArray()['blame_via'], 'Entry::toArray() exports the blame context.');
+    }
+
+    public function testViaIsNullWithoutBlameContext(): void
+    {
+        $entry = Entry::fromArray([
+            'schema_version' => 2,
+            'blame' => json_encode(['username' => 'john', 'user_fqdn' => 'App\User', 'user_firewall' => 'main', 'ip' => '1.2.3.4']),
+        ]);
+
+        $this->assertNull($entry->via, 'Entry::via is null without blame context.');
+        $this->assertNull($entry->toArray()['blame_via'], 'Entry::toArray() exports a null blame context.');
+    }
+
+    public function testViaIsNullWhenMalformed(): void
+    {
+        $entry = Entry::fromArray(['blame' => json_encode(['username' => 'john', 'via' => 'import'])]);
+
+        $this->assertNull($entry->via, 'Entry::via is null when the blame context has no type.');
     }
 
     public function testSchemaVersionDefaultsToOne(): void
@@ -338,7 +370,7 @@ final class EntryTest extends TestCase
         $entry = new Entry();
         $data = $entry->toArray();
 
-        $expected = ['id', 'schema_version', 'type', 'object_id', 'discriminator', 'transaction_id', 'diffs', 'blame_id', 'blame_user', 'blame_user_fqdn', 'blame_user_firewall', 'ip', 'extra_data', 'created_at'];
+        $expected = ['id', 'schema_version', 'type', 'object_id', 'discriminator', 'transaction_id', 'diffs', 'blame_id', 'blame_user', 'blame_user_fqdn', 'blame_user_firewall', 'ip', 'blame_via', 'extra_data', 'created_at'];
         $this->assertSame($expected, array_keys($data));
     }
 

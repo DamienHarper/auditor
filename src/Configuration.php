@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor;
 
+use DH\Auditor\Blame\BlameContextStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -35,6 +36,8 @@ final class Configuration
      */
     private mixed $extraDataProvider = null;
 
+    private readonly BlameContextStack $blameContextStack;
+
     public function __construct(array $options)
     {
         $resolver = new OptionsResolver();
@@ -47,6 +50,7 @@ final class Configuration
         $this->securityProvider = $config['security_provider'];
         $this->roleChecker = $config['role_checker'];
         $this->extraDataProvider = $config['extra_data_provider'];
+        $this->blameContextStack = new BlameContextStack();
     }
 
     /**
@@ -127,6 +131,14 @@ final class Configuration
     public function getExtraDataProvider(): mixed
     {
         return $this->extraDataProvider;
+    }
+
+    /**
+     * Returns the stack of blame contexts: its current context is written in the `via` key of the `blame` JSON.
+     */
+    public function getBlameContextStack(): BlameContextStack
+    {
+        return $this->blameContextStack;
     }
 
     private function configureOptions(OptionsResolver $resolver): void
