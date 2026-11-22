@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-`auditor` is a PHP library (namespace `DH\Auditor`) that provides audit logging for Doctrine ORM. It tracks inserts, updates, deletes, and many-to-many association changes. Active development is on **4.x** (PHP ≥ 8.4, Symfony ≥ 8.0, Doctrine DBAL ≥ 4.0, Doctrine ORM ≥ 3.2).
+`auditor` is a PHP library (namespace `DH\Auditor`) that provides audit logging for Doctrine ORM. It tracks inserts, updates, deletes, and many-to-many association changes. Active development is on **4.x** (PHP ≥ 8.4, Symfony ≥ 8.1, Doctrine DBAL ≥ 4.0, Doctrine ORM ≥ 3.2).
 
 ## Commands
 

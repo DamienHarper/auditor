@@ -12,8 +12,8 @@
   ],
   "require": {
     "php": ">=8.4",
-    "symfony/event-dispatcher": "^8.0",
-    "symfony/options-resolver": "^8.0"
+    "symfony/event-dispatcher": "^8.1",
+    "symfony/options-resolver": "^8.1"
   },
   "suggest": {
     "damienharper/auditor-bundle": "Integrate auditor library in your Symfony projects.",
@@ -38,10 +38,10 @@
     "gedmo/doctrine-extensions": "^3.0",
     "phpbench/phpbench": "^1.4",
     "phpunit/phpunit": "^12.0",
-    "symfony/cache": "^8.0",
+    "symfony/cache": "^8.1",
     "symfony/flex": "^2.4",
-    "symfony/lock": "^8.0",
-    "symfony/var-dumper": "^8.0"
+    "symfony/lock": "^8.1",
+    "symfony/var-dumper": "^8.1"
   },
   "scripts": {
     "test": "./vendor/bin/phpunit --colors=always --no-coverage",
