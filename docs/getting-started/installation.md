@@ -15,7 +15,7 @@ This guide covers the installation of the auditor library using Composer.
 | Doctrine DBAL  | >= 4.0   |
 | Doctrine ORM   | >= 3.2   |
 
-Tested with PHP 8.4, 8.5 and 8.6, and Symfony 8.0 to 8.2.
+Tested with PHP 8.4, 8.5 and 8.6, and Symfony 8.1 and 8.2.
 
 ### Previous Versions
 

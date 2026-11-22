@@ -31,7 +31,7 @@ The project includes a `Makefile` that lets you test across different PHP versio
 # Show help
 make help
 
-# Run tests (defaults: PHP 8.4, Symfony 8.0, SQLite)
+# Run tests (defaults: PHP 8.4, Symfony 8.1, SQLite)
 make tests
 
 # Run tests with specific database
@@ -51,7 +51,7 @@ make tests args='--filter=ReaderTest'
 | Option | Values                                |
 |--------|---------------------------------------|
 | `php`  | `8.4`, `8.5`, `8.6`                   |
-| `sf`   | `8.0`, `8.1`, `8.2`                   |
+| `sf`   | `8.1`, `8.2`                          |
 | `db`   | `sqlite`, `mysql`, `pgsql`, `mariadb` |
 
 ### Testing Full Matrix

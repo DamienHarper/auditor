@@ -19,7 +19,7 @@ vendor/bin/phpunit --filter=testMethodName # single test method
 
 ### Run tests via Docker (recommended for CI parity)
 ```bash
-make tests                             # defaults: PHP 8.4, Symfony 8.0, SQLite
+make tests                             # defaults: PHP 8.4, Symfony 8.1, SQLite
 make tests db=mysql                    # or pgsql, mariadb
 make tests php=8.5
 make tests args='--filter=ReaderTest'
