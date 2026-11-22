@@ -78,8 +78,8 @@ The project includes a `Makefile` that allows you to test against different comb
 
 | Option | Values                                | Default  | Description              |
 |--------|---------------------------------------|----------|--------------------------|
-| `php`  | `8.4`, `8.5`                          | `8.4`    | PHP version              |
-| `sf`   | `8.0`                                 | `8.0`    | Symfony version          |
+| `php`  | `8.4`, `8.5`, `8.6`                   | `8.4`    | PHP version              |
+| `sf`   | `8.0`, `8.1`, `8.2`                   | `8.0`    | Symfony version          |
 | `db`   | `sqlite`, `mysql`, `pgsql`, `mariadb` | `sqlite` | Database type            |
 | `args` | Any PHPUnit/tool arguments            | (varies) | Additional arguments     |
 
@@ -87,8 +87,9 @@ The project includes a `Makefile` that allows you to test against different comb
 
 | PHP Version | Symfony Versions |
 |-------------|------------------|
-| 8.4         | 8.0              |
-| 8.5         | 8.0              |
+| 8.4         | 8.0, 8.1, 8.2    |
+| 8.5         | 8.0, 8.1, 8.2    |
+| 8.6         | 8.0, 8.1, 8.2    |
 
 **Examples:**
 
@@ -372,8 +373,8 @@ Good examples:
 When you submit a Pull Request, GitHub Actions will automatically run:
 
 - **PHPUnit tests** across the full matrix:
-  - PHP versions: 8.4, 8.5
-  - Symfony versions: 8.0
+  - PHP versions: 8.4, 8.5, 8.6
+  - Symfony versions: 8.0, 8.2
   - Databases: SQLite, MySQL, PostgreSQL, MariaDB
 - **PHP-CS-Fixer** for code style validation
 - **PHPStan** for static analysis

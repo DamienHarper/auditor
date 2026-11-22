@@ -71,12 +71,18 @@ jobs:
         php:
           - '8.4'
           - '8.5'
+          - '8.6'
         symfony:
-          - '8.*'
+          - '8.2.*'
         db:
           - 'sqlite'
           - 'mysql'
           - 'pgsql'
+        include:
+          # Lowest supported Symfony version
+          - php: '8.4'
+            symfony: '8.0.*'
+            db: 'sqlite'
       fail-fast: false
 
     steps:
@@ -107,6 +113,8 @@ jobs:
           composer global config --no-plugins allow-plugins.symfony/flex true
           composer global require --no-progress --no-scripts --no-plugins symfony/flex
           composer config extra.symfony.require "${{ matrix.symfony }}"
+          # Allows testing a Symfony minor before its stable release; --prefer-stable keeps the rest stable
+          composer config minimum-stability dev
 
       - name: Get Composer Cache Directory
         id: composer-cache
@@ -121,7 +129,7 @@ jobs:
 
       - name: Update project dependencies
         env:
-          SYMFONY_REQUIRE: "^8.0"
+          SYMFONY_REQUIRE: ${{ matrix.symfony }}
         run: composer update --no-progress --ansi --prefer-stable
 
       - name: Install PHPStan

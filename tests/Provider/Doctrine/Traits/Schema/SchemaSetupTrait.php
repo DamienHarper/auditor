@@ -169,10 +169,10 @@ trait SchemaSetupTrait
         $done = [];
 
         foreach ($storageServices as $storageService) {
-            $hash = spl_object_hash($storageService);
-            if (!\in_array($hash, $done, true)) {
+            $id = spl_object_id($storageService);
+            if (!\in_array($id, $done, true)) {
                 $storageService->getEntityManager()->flush();
-                $done[] = $hash;
+                $done[] = $id;
             }
         }
     }
