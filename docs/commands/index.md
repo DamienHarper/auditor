@@ -6,7 +6,7 @@
 > These commands are provided by **[auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/)** (not auditor core).
 > For programmatic usage and standalone registration, see [Schema Management](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/schema).
 
-When using auditor-bundle or the standalone `auditor-doctrine-provider`, three console commands are available:
+When using auditor-bundle or the standalone `auditor-doctrine-provider`, these console commands are available:
 
 ## 📋 Available Commands
 
@@ -15,6 +15,7 @@ When using auditor-bundle or the standalone `auditor-doctrine-provider`, three c
 | `audit:schema:update`    | Create or update audit tables to the current schema  |
 | `audit:schema:migrate`   | Migrate legacy v1 audit tables to schema v2          |
 | `audit:clean`            | Remove old audit entries                             |
+| `audit:snapshot`         | Record the current state of existing entities        |
 
 ## 🛠️ audit:schema:update
 
@@ -288,9 +289,66 @@ untouched unless a default max age is configured.
 | 0    | Success or cancelled by user   |
 | 1    | Error                          |
 
+## 📸 audit:snapshot
+
+Records the current state of existing entities in their audit tables. Run it once auditing is enabled on a
+database that already holds data: the history of each entity then starts with its state at that time
+instead of its first change.
+
+### Usage
+
+```bash
+php bin/console audit:snapshot [options] [--] [<entities>...]
+```
+
+### Arguments
+
+| Argument   | Description                                      |
+|------------|--------------------------------------------------|
+| `entities` | Audited entities to snapshot (FQCN), or `--all`  |
+
+### Options
+
+| Option         | Short | Default | Description                                                     |
+|----------------|-------|---------|-----------------------------------------------------------------|
+| `--all`        | `-a`  |         | Snapshot every audited entity                                   |
+| `--batch-size` | `-b`  | `500`   | Entities read and written per database transaction              |
+| `--force`      | `-f`  |         | Also snapshot entities that already have an audit history       |
+| `--dry-run`    |       |         | Count the entities to snapshot, write nothing                   |
+
+### What is written
+
+One `insert` entry per entity, whose diffs carry `"snapshot": true` (`Entry::isSnapshot()` returns `true`):
+every audited field with `old: null` and its current value as `new`, as for an insertion. Its `created_at`
+is the date of the snapshot and its blame is the console user.
+
+Entities that already have an audit entry are skipped, so the command can be run again safely.
+To-many associations are not snapshotted, and enabled Doctrine filters (e.g. soft-delete) apply.
+
+### Examples
+
+```bash
+# Preview: how many entities would be snapshotted
+php bin/console audit:snapshot --all --dry-run
+
+# Snapshot two entities
+php bin/console audit:snapshot 'App\Entity\Post' 'App\Entity\Author'
+
+# Snapshot everything with bigger batches
+php bin/console audit:snapshot --all --batch-size=2000
+```
+
+### Exit Codes
+
+| Code | Meaning                                         |
+|------|-------------------------------------------------|
+| 0    | Success (or already running)                    |
+| 1    | Error (e.g. entity not audited)                 |
+| 2    | Invalid arguments                               |
+
 ## 🔒 Command Locking
 
-Both commands use Symfony's Lock component to prevent concurrent execution:
+These commands use Symfony's Lock component to prevent concurrent execution:
 
 ```
 The command is already running in another process.

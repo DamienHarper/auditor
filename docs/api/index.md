@@ -153,6 +153,7 @@ final class Entry
     public function getDiffs(): array;             // field changes (schema v2: changes envelope)
     public function getDiffSource(): ?array;       // entity metadata (schema v2 only)
     public function getDiffTarget(): ?array;       // association target (schema v2 only)
+    public function isSnapshot(): bool;            // insert written by audit:snapshot (schema v2 only)
     public function getExtraData(): ?array;
     public function getBlame(): ?array;
 }
