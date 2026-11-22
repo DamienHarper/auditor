@@ -12,9 +12,9 @@
   ],
   "require": {
     "php": ">=8.4",
-    "symfony/event-dispatcher": "^8.0",
-    "symfony/options-resolver": "^8.0",
-    "symfony/uid": "^8.0"
+    "symfony/event-dispatcher": "^8.1",
+    "symfony/options-resolver": "^8.1",
+    "symfony/uid": "^8.1"
   },
   "suggest": {
     "damienharper/auditor-bundle": "Integrate auditor library in your Symfony projects."
@@ -33,7 +33,7 @@
     "ext-pdo": "*",
     "phpunit/phpunit": "^13.4",
     "symfony/flex": "^2.4",
-    "symfony/var-dumper": "^8.0"
+    "symfony/var-dumper": "^8.1"
   },
   "scripts": {
     "test": "./vendor/bin/phpunit --colors=always --no-coverage",
