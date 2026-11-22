@@ -13,7 +13,7 @@ This guide covers the installation of the auditor library using Composer.
 | PHP            | >= 8.4   |
 | Symfony        | >= 8.0   |
 
-Tested with PHP 8.4, 8.5 and 8.6, and Symfony 8.0 to 8.2.
+Tested with PHP 8.4, 8.5 and 8.6, and Symfony 8.1 and 8.2.
 
 Doctrine ORM support requires the separate [`auditor-doctrine-provider`](https://github.com/DamienHarper/auditor-doctrine-provider) package.
 
