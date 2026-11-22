@@ -12,9 +12,14 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 /**
  * @see AuditEventSubscriberTest
  */
-#[AsEventListener(event: LifecycleEvent::class, priority: -1_000_000)]
+#[AsEventListener(event: LifecycleEvent::class, priority: self::PRIORITY)]
 final readonly class AuditEventSubscriber
 {
+    /**
+     * Runs after any other LifecycleEvent listener, so that they can alter the payload before it is persisted.
+     */
+    public const int PRIORITY = -1_000_000;
+
     public function __construct(private Auditor $auditor) {}
 
     public function __invoke(LifecycleEvent $event): LifecycleEvent

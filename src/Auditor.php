@@ -32,12 +32,20 @@ final class Auditor
     private array $auditProviders = [];
 
     /**
-     * @throws \ReflectionException
+     * @param bool $registerAuditEventSubscriber whether to attach the AuditEventSubscriber to $dispatcher at runtime.
+     *                                           Pass false when the subscriber is already declared as a listener of a
+     *                                           compiled dispatcher (e.g. a Symfony container), which can no longer
+     *                                           receive listeners at runtime.
      */
-    public function __construct(private readonly Configuration $configuration, private readonly EventDispatcherInterface $dispatcher)
-    {
-        // Attach persistence event listener to provided dispatcher
-        $this->dispatcher->addListener(LifecycleEvent::class, new AuditEventSubscriber($this), -1_000_000);
+    public function __construct(
+        private readonly Configuration $configuration,
+        private readonly EventDispatcherInterface $dispatcher,
+        bool $registerAuditEventSubscriber = true,
+    ) {
+        if ($registerAuditEventSubscriber) {
+            // Attach persistence event listener to provided dispatcher
+            $this->dispatcher->addListener(LifecycleEvent::class, new AuditEventSubscriber($this), AuditEventSubscriber::PRIORITY);
+        }
     }
 
     public function getEventDispatcher(): EventDispatcherInterface
