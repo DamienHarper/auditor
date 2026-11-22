@@ -4,7 +4,7 @@
 
 > [!NOTE]
 > These commands are provided by **[auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/)** (not auditor core).
-> For programmatic usage and standalone registration, see [Schema Management](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/schema).
+> For programmatic usage and standalone registration, see [Schema Management](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/providers/doctrine/schema).
 
 When using auditor-bundle or the standalone `auditor-doctrine-provider`, these console commands are available:
 
@@ -17,7 +17,7 @@ When using auditor-bundle or the standalone `auditor-doctrine-provider`, these c
 | `audit:clean`            | Remove old audit entries                             |
 | `audit:snapshot`         | Record the current state of existing entities        |
 
-## 🛠️ audit:schema:update
+## 🛠️ `audit:schema:update`
 
 Creates new audit tables and updates existing ones to match the current schema.
 
@@ -72,7 +72,7 @@ Run this command:
 | 0    | Success (including "nothing to update")          |
 | 1    | Error or missing required options                |
 
-## 🔄 audit:schema:migrate
+## 🔄 `audit:schema:migrate`
 
 Migrates legacy v1 audit tables to schema v2 (ULID `transaction_id`, unified `blame` JSON column).
 Safe to run multiple times; skips already-migrated tables.
@@ -112,7 +112,7 @@ php bin/console audit:schema:migrate --force
 
 ---
 
-## 🧹 audit:clean
+## 🧹 `audit:clean`
 
 Removes audit entries older than a specified retention period.
 
@@ -289,7 +289,7 @@ untouched unless a default max age is configured.
 | 0    | Success or cancelled by user   |
 | 1    | Error                          |
 
-## 📸 audit:snapshot
+## 📸 `audit:snapshot`
 
 Records the current state of existing entities in their audit tables. Run it once auditing is enabled on a
 database that already holds data: the history of each entity then starts with its state at that time
