@@ -308,6 +308,7 @@ final class Entry
         // Collect v1 legacy blame columns so we can synthesize blame_raw if no
         // v2 'blame' JSON column is present in the row (un-migrated v1 tables).
         $legacyBlame = [];
+        $legacyTransactionHash = null;
 
         foreach ($row as $key => $value) {
             // The 'blame' DB column maps to the $blame_raw backing field (the $blame
@@ -335,13 +336,9 @@ final class Entry
             }
 
             // v1 legacy transaction_hash column — superseded by transaction_id in schema v2.
-            // When no transaction_id has been set yet (un-migrated v1 table), fall back to
-            // transaction_hash so that $entry->transactionId is non-null and templates can
-            // display and link to the transaction stream.
+            // Kept aside: it is the transaction id of a row that has none (see below).
             if ('transaction_hash' === $key) {
-                if (null === $entry->transaction_id && null !== $value && '' !== $value) {
-                    $entry->transaction_id = $value;
-                }
+                $legacyTransactionHash = \is_string($value) && '' !== $value ? $value : null;
 
                 continue;
             }
@@ -364,6 +361,13 @@ final class Entry
             if ('decoded' !== $key && 'sortedDiffs' !== $key && property_exists($entry, $key)) {
                 $entry->{$key} = 'id' === $key ? (int) $value : $value;
             }
+        }
+
+        // A row of an un-migrated v1 table, or of a table being migrated whose transaction_hash has not been
+        // converted yet (transaction_id NULL), falls back to transaction_hash, whatever the order of the columns:
+        // $entry->transactionId stays non-null and the entries of the transaction can still be grouped.
+        if (null === $entry->transaction_id && null !== $legacyTransactionHash) {
+            $entry->transaction_id = $legacyTransactionHash;
         }
 
         // If no v2 'blame' column was present but v1 individual columns were, synthesize blame_raw.

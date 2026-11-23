@@ -474,11 +474,31 @@ final class EntryTest extends TestCase
 
         $this->assertSame(42, $entry->id);
         $this->assertSame(1, $entry->schemaVersion);
-        $this->assertNull($entry->transactionId, 'Legacy transaction_hash is not mapped to transactionId.');
+        $this->assertSame('abc123', $entry->transactionId, 'An unconverted transaction_hash stands for the transaction id.');
         $this->assertSame('John Doe', $entry->username, 'username synthesized from blame_user.');
         $this->assertSame('App\Entity\User', $entry->userFqdn, 'userFqdn synthesized from blame_user_fqdn.');
         $this->assertSame('main', $entry->userFirewall, 'userFirewall synthesized from blame_user_firewall.');
         $this->assertSame('1.2.3.4', $entry->ip, 'ip synthesized from legacy ip column.');
+    }
+
+    /**
+     * The fallback on transaction_hash does not depend on the order of the columns: in a table being migrated,
+     * transaction_id is added after transaction_hash, so SELECT * returns it last.
+     */
+    public function testFromArrayFallsBackOnTransactionHashWhateverTheColumnOrder(): void
+    {
+        $hashFirst = Entry::fromArray(['transaction_hash' => 'abc123', 'transaction_id' => null]);
+        $idFirst = Entry::fromArray(['transaction_id' => null, 'transaction_hash' => 'abc123']);
+
+        $this->assertSame('abc123', $hashFirst->transactionId);
+        $this->assertSame('abc123', $idFirst->transactionId);
+    }
+
+    public function testFromArrayPrefersTheConvertedTransactionId(): void
+    {
+        $entry = Entry::fromArray(['transaction_hash' => 'abc123', 'transaction_id' => '01HXYZ1234567890ABCDEFGHIJ']);
+
+        $this->assertSame('01HXYZ1234567890ABCDEFGHIJ', $entry->transactionId);
     }
 
     public function testDecodedColumnsAreReadOnce(): void
