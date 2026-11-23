@@ -524,16 +524,16 @@ final class EntryTest extends TestCase
         $second = Entry::fromArray(['id' => 2, 'transaction_id' => '01A', 'entity' => 'App\Comment', 'created_at' => new \DateTimeImmutable('2026-11-23 09:00:00.5', new \DateTimeZone('UTC'))]);
         $third = Entry::fromArray(['id' => 3, 'transaction_id' => '01A', 'entity' => 'App\Comment', 'created_at' => new \DateTimeImmutable('2026-11-23 09:00:00.5', new \DateTimeZone('UTC'))]);
 
-        $this->assertSame('2026-11-23T09:00:00.000001 01B App\\Post 00000000000000000009', $first->getSortKey());
+        $this->assertSame('2026-11-23T09:00:00.000001 01B App\Post 00000000000000000009', $first->getSortKey());
 
         $keys = [$third->getSortKey(), $first->getSortKey(), $second->getSortKey()];
-        sort($keys, \SORT_STRING);
+        sort($keys, SORT_STRING);
 
         $this->assertSame([$first->getSortKey(), $second->getSortKey(), $third->getSortKey()], $keys);
 
         // a class name that starts with another one sorts after it, as in SQL
-        $post = Entry::fromArray(['id' => 1, 'transaction_id' => '01A', 'entity' => 'App\\Post', 'created_at' => new \DateTimeImmutable('2026-11-23 09:00:00')]);
-        $postTag = Entry::fromArray(['id' => 1, 'transaction_id' => '01A', 'entity' => 'App\\PostTag', 'created_at' => new \DateTimeImmutable('2026-11-23 09:00:00')]);
+        $post = Entry::fromArray(['id' => 1, 'transaction_id' => '01A', 'entity' => 'App\Post', 'created_at' => new \DateTimeImmutable('2026-11-23 09:00:00')]);
+        $postTag = Entry::fromArray(['id' => 1, 'transaction_id' => '01A', 'entity' => 'App\PostTag', 'created_at' => new \DateTimeImmutable('2026-11-23 09:00:00')]);
         $this->assertLessThan(0, strcmp($post->getSortKey(), $postTag->getSortKey()));
     }
 }
