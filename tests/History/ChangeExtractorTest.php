@@ -229,6 +229,24 @@ final class ChangeExtractorTest extends TestCase
         $this->assertSame('published', $change->getValue('status'));
         $this->assertSame('Published', $change->getLabel('status'));
         $this->assertNull($change->getValue('title'));
-        $this->assertNull($change->getTargetClass(), 'Only collection changes have a target.');
+        $this->assertNull($change->getTargetClass());
+
+        $association = EntryFactory::entry('update', 'App\Post', '1', ['changes' => ['author' => [
+            'old' => ['id' => 1, 'class' => 'App\Author', 'label' => 'John', 'table' => 'author'],
+            'new' => ['id' => 2, 'class' => 'App\Author', 'label' => 'Jane', 'table' => 'author'],
+        ]]]);
+        $change = new ChangeExtractor()->extract($association)[0];
+
+        $this->assertSame(ChangeKind::Changed, $change->kind);
+        $this->assertNull($change->getTargetClass(), 'Only collection changes have a target, not a changed association.');
+        $this->assertSame('Jane', $change->getLabel('author'));
+    }
+
+    public function testFieldChangesAreNotMirrors(): void
+    {
+        $first = EntryFactory::entry('update', 'App\Post', '1', ['changes' => ['title' => ['old' => 'a', 'new' => 'b']]], 'T1');
+        $second = EntryFactory::entry('update', 'App\Post', '1', ['changes' => ['title' => ['old' => 'b', 'new' => 'c']]], 'T1');
+
+        $this->assertCount(2, new ChangeExtractor()->extractAll([$first, $second]), 'Two changes of a field are both kept.');
     }
 }
