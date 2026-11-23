@@ -21,9 +21,7 @@ final class EntryFactory
      */
     public static function entry(string $type, string $class, string $objectId, array $diffs, string $transactionId = 'T1', ?array $blame = null, string $createdAt = '2026-11-23 10:00:00', ?string $label = null): Entry
     {
-        if (!isset($diffs['source'])) {
-            $diffs['source'] = ['id' => $objectId, 'class' => $class, 'label' => $label ?? $class.'#'.$objectId, 'table' => 'table'];
-        }
+        $diffs['source'] ??= ['id' => $objectId, 'class' => $class, 'label' => $label ?? $class.'#'.$objectId, 'table' => 'table'];
 
         return Entry::fromArray([
             'id' => ++self::$id,

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DH\Auditor\Tests\History;
 
 use DH\Auditor\History\BlameOrigin;
+use DH\Auditor\History\Change;
 use DH\Auditor\History\ChangeKind;
 use DH\Auditor\History\HistoryGrouper;
 use DH\Auditor\Model\Entry;
@@ -43,7 +44,7 @@ final class HistoryGrouperTest extends TestCase
         $this->assertSame(['App\Comment', 'App\Post'], $items[1]->getEntities());
 
         $changes = $items[1]->getChanges();
-        $this->assertSame([ChangeKind::Created, ChangeKind::Changed], array_map(static fn ($c): ChangeKind => $c->kind, $changes), 'Changes are in chronological order.');
+        $this->assertSame([ChangeKind::Created, ChangeKind::Changed], array_map(static fn (Change $c): ChangeKind => $c->kind, $changes), 'Changes are in chronological order.');
         $this->assertSame(ChangeKind::Created, $items[1]->getMainChange()?->kind);
         $this->assertSame(ChangeKind::Changed, $items[0]->getMainChange()?->kind);
     }

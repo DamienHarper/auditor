@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\History;
 
+use DH\Auditor\History\Change;
 use DH\Auditor\History\ChangeExtractor;
 use DH\Auditor\History\ChangeKind;
 use DH\Auditor\Model\Entry;
@@ -65,7 +66,7 @@ final class ChangeExtractorTest extends TestCase
         ]]);
 
         $changes = new ChangeExtractor()->extract($entry);
-        $byField = array_column(array_map(static fn ($c): array => ['field' => $c->field, 'change' => $c], $changes), 'change', 'field');
+        $byField = array_column(array_map(static fn (Change $c): array => ['field' => $c->field, 'change' => $c], $changes), 'change', 'field');
 
         $this->assertSame(['author', 'body', 'status', 'summary', 'title'], array_keys($byField));
         $this->assertSame(ChangeKind::Changed, $byField['title']->kind);
@@ -142,7 +143,7 @@ final class ChangeExtractorTest extends TestCase
 
         $extractor = new ChangeExtractor(['App\Post' => ['status', 'title']]);
 
-        $this->assertSame(['status', 'title'], array_map(static fn ($c): ?string => $c->field, $extractor->extract($update)));
+        $this->assertSame(['status', 'title'], array_map(static fn (Change $c): ?string => $c->field, $extractor->extract($update)));
         $this->assertSame(['title' => 'a'], $extractor->extract($insert)[0]->new);
         $this->assertSame([], $extractor->extract($tag));
         $this->assertCount(1, $extractor->extract($comment), 'Entities without a field list keep every field.');
