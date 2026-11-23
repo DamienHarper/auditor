@@ -64,12 +64,8 @@ final readonly class ChangeExtractor
         $diffs = $entry->getDiffs();
 
         return match ($entry->type) {
-            TransactionType::Insert->value => [
-                new Change($entry->isSnapshot() ? ChangeKind::Snapshot : ChangeKind::Created, $entity, $entry->objectId, $objectLabel, null, null, $this->values($entity, $diffs, 'new'), null, null, $entry),
-            ],
-            TransactionType::Remove->value => [
-                new Change(ChangeKind::Deleted, $entity, $entry->objectId, $objectLabel, null, $this->values($entity, $diffs, 'old'), null, null, null, $entry),
-            ],
+            TransactionType::Insert->value => [$this->entityChange($entry, $entity, $objectLabel, $diffs, 'new')],
+            TransactionType::Remove->value => [$this->entityChange($entry, $entity, $objectLabel, $diffs, 'old')],
             TransactionType::Update->value => $this->fieldChanges($entry, $entity, $objectLabel, $diffs),
             TransactionType::Associate->value, TransactionType::Dissociate->value => $this->collectionChanges($entry, $entity, $objectLabel, $diffs),
             default => [],
@@ -94,6 +90,17 @@ final readonly class ChangeExtractor
         $class = \is_array($source) ? ($source['class'] ?? null) : null;
 
         return \is_string($class) ? $class : '';
+    }
+
+    private function entityChange(Entry $entry, string $entity, ?string $objectLabel, array $diffs, string $side): Change
+    {
+        [$values, $labels] = $this->values($entry, $entity, $diffs, $side);
+
+        if ('old' === $side) {
+            return new Change(ChangeKind::Deleted, $entity, $entry->objectId, $objectLabel, null, $values, null, null, null, $entry, $labels);
+        }
+
+        return new Change($entry->isSnapshot() ? ChangeKind::Snapshot : ChangeKind::Created, $entity, $entry->objectId, $objectLabel, null, null, $values, null, null, $entry, $labels);
     }
 
     /**
@@ -152,22 +159,70 @@ final readonly class ChangeExtractor
     }
 
     /**
-     * Field => value map of a creation or deletion: the $side of each field diff, labels resolved to the raw value.
+     * Field => raw value map of a creation or deletion, read from the $side of each field diff, and the field => label
+     * map of the values written with a label (a #[DiffLabel] label or an association summary). The value of a JSON
+     * field is rebuilt from its deep diff tree.
      *
-     * @return array<string, mixed>
+     * @return array{0: array<string, mixed>, 1: array<string, string>}
      */
-    private function values(string $entity, array $diffs, string $side): array
+    private function values(Entry $entry, string $entity, array $diffs, string $side): array
     {
         $values = [];
+        $labels = [];
 
         foreach ($this->orderedFields($entity, array_keys($diffs)) as $field) {
             $diff = $diffs[$field];
-            if (\is_array($diff) && \array_key_exists($side, $diff)) {
-                $values[$field] = $diff[$side];
+            if (!\is_array($diff)) {
+                continue;
+            }
+
+            if ($entry->isDeepDiff($field)) {
+                $values[$field] = self::rebuild($diff, $side);
+
+                continue;
+            }
+
+            if (!\array_key_exists($side, $diff)) {
+                continue;
+            }
+
+            [$values[$field], $label] = $this->value($diff[$side]);
+            if (null !== $label) {
+                $labels[$field] = $label;
             }
         }
 
-        return $values;
+        return [$values, $labels];
+    }
+
+    /**
+     * Rebuilds the $side value of a JSON field from its deep diff tree.
+     *
+     * @param array<array-key, mixed> $node
+     *
+     * @return array<array-key, mixed>
+     */
+    private static function rebuild(array $node, string $side): array
+    {
+        $value = [];
+
+        foreach ($node as $key => $child) {
+            if (!\is_array($child)) {
+                continue;
+            }
+
+            if (Entry::isDiffLeaf($child)) {
+                if (\array_key_exists($side, $child)) {
+                    $value[$key] = $child[$side];
+                }
+
+                continue;
+            }
+
+            $value[$key] = self::rebuild($child, $side);
+        }
+
+        return $value;
     }
 
     /**

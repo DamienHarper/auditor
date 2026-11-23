@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DH\Auditor\History;
 
+use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\Model\Entry;
 use DH\Auditor\Tests\History\HistoryGrouperTest;
 
@@ -58,12 +59,18 @@ final class HistoryItem
 
     /**
      * @param non-empty-list<Entry> $entries entries of the item, most recent first
+     *
+     * @throws InvalidArgumentException when $entries is empty
      */
     public function __construct(
         public readonly string $key,
         public readonly array $entries,
         private readonly ChangeExtractor $extractor = new ChangeExtractor(),
-    ) {}
+    ) {
+        if ([] === $entries) {
+            throw new InvalidArgumentException('A history item needs at least one entry.');
+        }
+    }
 
     /**
      * Changes of the item in chronological order, without the mirror entries of bidirectional associations.

@@ -23,9 +23,9 @@ enum BlameOrigin: string
     /** Anything else: no firewall and no console or messenger context. */
     case System = 'system';
 
-    public const string CONSOLE_CONTEXT = 'console';
+    public const string CONSOLE_CONTEXT = self::Console->value;
 
-    public const string MESSENGER_CONTEXT = 'messenger';
+    public const string MESSENGER_CONTEXT = self::Messenger->value;
 
     /**
      * The blame context wins over the firewall: a message handled on behalf of a user carries that user, but the

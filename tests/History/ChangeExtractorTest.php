@@ -178,4 +178,57 @@ final class ChangeExtractorTest extends TestCase
 
         $this->assertSame('App\Post', ChangeExtractor::entityOf($entry));
     }
+
+    public function testCreationValuesAreRawAndKeepTheirLabels(): void
+    {
+        $entry = EntryFactory::entry('insert', 'App\Post', '1', [
+            'changes' => [
+                'status' => ['new' => ['value' => 'draft', 'label' => 'Draft']],
+                'author' => ['new' => ['id' => 7, 'class' => 'App\Author', 'label' => 'John', 'table' => 'author']],
+                'settings' => ['theme' => ['new' => 'dark'], 'layout' => ['columns' => ['new' => 2]]],
+                'title' => ['new' => 'Hello'],
+            ],
+            'deep_diffs' => ['settings'],
+        ]);
+
+        $change = new ChangeExtractor()->extract($entry)[0];
+
+        $this->assertSame('draft', $change->new['status'], 'A #[DiffLabel] value is read as its raw value.');
+        $this->assertSame(['layout' => ['columns' => 2], 'theme' => 'dark'], $change->new['settings'], 'A JSON field is rebuilt from its deep diff.');
+        $this->assertSame('Hello', $change->new['title']);
+        $this->assertSame(['author' => 'John', 'status' => 'Draft'], $change->labels, 'Fields are sorted by name.');
+        $this->assertSame('draft', $change->getValue('status'));
+        $this->assertSame('Draft', $change->getLabel('status'));
+        $this->assertNull($change->getLabel('title'));
+        $this->assertNull($change->getValue('unknown'));
+    }
+
+    public function testDeletionValuesAreRaw(): void
+    {
+        $entry = EntryFactory::entry('remove', 'App\Post', '1', [
+            'changes' => [
+                'status' => ['old' => ['value' => 'draft', 'label' => 'Draft']],
+                'settings' => ['theme' => ['old' => 'dark']],
+            ],
+            'deep_diffs' => ['settings'],
+        ]);
+
+        $change = new ChangeExtractor()->extract($entry)[0];
+
+        $this->assertSame(['settings' => ['theme' => 'dark'], 'status' => 'draft'], $change->old);
+        $this->assertSame('draft', $change->getValue('status'));
+        $this->assertSame(['status' => 'Draft'], $change->labels);
+    }
+
+    public function testValueOfAFieldChange(): void
+    {
+        $entry = EntryFactory::entry('update', 'App\Post', '1', ['changes' => ['status' => ['old' => 'draft', 'new' => ['value' => 'published', 'label' => 'Published']]]]);
+
+        $change = new ChangeExtractor()->extract($entry)[0];
+
+        $this->assertSame('published', $change->getValue('status'));
+        $this->assertSame('Published', $change->getLabel('status'));
+        $this->assertNull($change->getValue('title'));
+        $this->assertNull($change->getTargetClass(), 'Only collection changes have a target.');
+    }
 }

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace DH\Auditor\Tests\History;
 
+use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\History\BlameOrigin;
 use DH\Auditor\History\Change;
 use DH\Auditor\History\ChangeKind;
 use DH\Auditor\History\HistoryGrouper;
+use DH\Auditor\History\HistoryItem;
 use DH\Auditor\Model\Entry;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -73,6 +75,22 @@ final class HistoryGrouperTest extends TestCase
         $entry = Entry::fromArray(['id' => 9, 'type' => 'update', 'object_id' => '1', 'entity' => 'App\Post']);
 
         $this->assertSame('App\Post#9', HistoryGrouper::transactionKey($entry));
+    }
+
+    public function testAnItemNeedsEntries(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new HistoryItem('key', []);
+    }
+
+    public function testNumericKeysStayStrings(): void
+    {
+        $grouper = new HistoryGrouper(static fn (Entry $entry): string => '123');
+
+        $items = $grouper->group([EntryFactory::entry('update', 'App\Post', '1', ['changes' => ['title' => ['old' => 'a', 'new' => 'b']]])]);
+
+        $this->assertSame('123', $items[0]->key);
     }
 
     /**

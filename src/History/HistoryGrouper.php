@@ -73,13 +73,16 @@ final readonly class HistoryGrouper
     public function group(iterable $entries): array
     {
         $groups = [];
+        $keys = [];
         foreach ($entries as $entry) {
-            $groups[$this->keyOf($entry)][] = $entry;
+            $key = $this->keyOf($entry);
+            $groups[$key][] = $entry;
+            $keys[$key] = $key; // a numeric string key becomes an int array key: keep the string
         }
 
         $items = [];
-        foreach ($groups as $key => $groupEntries) {
-            $items[] = new HistoryItem((string) $key, $groupEntries, $this->extractor);
+        foreach ($groups as $index => $groupEntries) {
+            $items[] = new HistoryItem($keys[$index], $groupEntries, $this->extractor);
         }
 
         return $items;

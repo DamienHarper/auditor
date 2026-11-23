@@ -45,7 +45,9 @@ belongs to Property#42 through `property`". The audit tables do not change. What
 
 - the history of a root is one read, whatever the number of satellite tables;
 - a deleted satellite keeps its history in the history of its root (it is indexed while it still knows its root);
-- an entity can belong to several roots, and a root can itself be the satellite of another root;
+- an entity can belong to several roots, and a root can itself be the satellite of another root. Indexing is not
+  transitive: the satellites of `Visit` are only in the history of `Property` when they declare the path
+  `visit.property` too;
 - the path that led to the root (`$entry->rootPath`) tells on which side of a relation the root is, such as the
   source or the target ticket of a link between two tickets.
 
@@ -94,11 +96,14 @@ Pass the entries most recent first, as readers return them: items keep the order
 
 | `ChangeKind` | Entry | `field` | `old` / `new` |
 |---|---|---|---|
-| `Created`, `Snapshot` | insert (snapshot: written by a snapshot command) | null | `new`: field => value |
-| `Deleted` | remove | null | `old`: field => value when the provider recorded the removed state, otherwise `[]` |
+| `Created`, `Snapshot` | insert (snapshot: written by a snapshot command) | null | `new`: field => raw value (a JSON field is rebuilt from its deep diff); `labels`: field => label of the values written with one |
+| `Deleted` | remove | null | `old`: field => raw value when the provider recorded the removed state, otherwise `[]`; `labels` as above |
 | `Set`, `Changed`, `Cleared` | update | the field | raw values; `oldLabel` / `newLabel` hold the association label or the `#[DiffLabel]` label |
 | `Json` | update of a JSON deep diff | the field | `new`: the deep diff tree |
 | `Added`, `Removed` | associate / dissociate | the collection | the element summary (`class`, `id`, `label`…); its label is kept once the element is deleted |
+
+`$change->getValue($field)` and `$change->getLabel($field)` read one field whatever the kind: the value held by a
+creation, snapshot or deletion, or the value after a field change.
 
 `extractAll()` drops the mirror entries of bidirectional associations (the same change audited on both sides) and
 keeps the first one read. An optional field list per entity keeps only those fields, in that order:
