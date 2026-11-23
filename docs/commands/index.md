@@ -16,6 +16,8 @@ When using auditor-bundle or the standalone `auditor-doctrine-provider`, these c
 | `audit:schema:migrate`   | Migrate legacy v1 audit tables to schema v2          |
 | `audit:clean`            | Remove old audit entries                             |
 | `audit:snapshot`         | Record the current state of existing entities        |
+| `audit:export`           | Export audit entries as NDJSON, JSON or CSV          |
+| `audit:roots:rebuild`    | Index existing entries under their audit roots       |
 
 ## 🛠️ `audit:schema:update`
 
@@ -92,10 +94,12 @@ php bin/console audit:schema:migrate [options]
 | Option                       | Description                                                  |
 |------------------------------|--------------------------------------------------------------|
 | `--dump-sql`                 | Show SQL statements without executing them                   |
-| `--force`                    | Execute the DDL changes                                      |
-| `--convert-all`              | Convert transaction hashes and diffs in one pass             |
+| `--force`, `-f`              | Execute the migration                                        |
+| `--convert-all`              | Convert transaction hashes and diffs in one pass (recommended) |
 | `--convert-transaction-hash` | Convert SHA-1 `transaction_hash` values to ULID format       |
 | `--convert-diffs`            | Convert legacy diffs JSON to the v2 envelope format          |
+| `--limit=N`                  | Convert `N` transactions or rows only, keep the legacy columns (resumable), print an estimate of the remaining time |
+| `--drop-transaction-hash`    | ⚠️ Drop `transaction_hash` **without** converting it: legacy rows lose their transaction grouping for good |
 
 ### Examples
 
@@ -106,8 +110,8 @@ php bin/console audit:schema:migrate --dump-sql
 # Full migration in one pass (recommended)
 php bin/console audit:schema:migrate --force --convert-all
 
-# DDL only (skip data conversion — safe to run first on large tables)
-php bin/console audit:schema:migrate --force
+# Estimate the duration on a copy of the production data
+php bin/console audit:schema:migrate --force --convert-all --limit=10000
 ```
 
 ---
@@ -345,6 +349,46 @@ php bin/console audit:snapshot --all --batch-size=2000
 | 0    | Success (or already running)                    |
 | 1    | Error (e.g. entity not audited)                 |
 | 2    | Invalid arguments                               |
+
+## 📤 `audit:export`
+
+Exports audit entries as NDJSON (default, recommended for large exports), JSON or CSV, streamed to the standard
+output or to a file. Each line or row is an `Entry::toArray()`.
+
+```bash
+php bin/console audit:export [options] [entity]
+```
+
+| Option        | Description                                              |
+|---------------|----------------------------------------------------------|
+| `entity`      | Entity FQCN to export, all auditable entities by default |
+| `--id`        | Filter by object ID                                      |
+| `--from`      | Entries created on or after this date (ISO 8601)         |
+| `--to`        | Entries created on or before this date (ISO 8601)        |
+| `--blame-id`  | Filter by user ID                                        |
+| `--format`    | `ndjson` (default), `json` or `csv`                      |
+| `--anonymize` | Mask the user and IP fields                              |
+| `--output`    | Write to this file instead of the standard output        |
+
+```bash
+php bin/console audit:export App\\Entity\\Post --format=csv --from=2026-01-01 --output=posts.csv
+```
+
+---
+
+## 🌳 `audit:roots:rebuild`
+
+Indexes the existing audit entries under their audit roots (`#[AuditRoot]`), after declaring a new root or after
+migrating audit tables to schema v2. Only missing index rows are written, so the command can be run again.
+
+```bash
+php bin/console audit:roots:rebuild [--entity=FQCN ...] [--dry-run]
+```
+
+See [Histories](../history.md) and the
+[Doctrine provider history page](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/querying/history#rebuilding-the-index).
+
+---
 
 ## 🔒 Command Locking
 

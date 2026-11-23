@@ -84,6 +84,7 @@ The `auditor` core library automatically installs the following dependencies:
 |------------------------------|--------------------------------|
 | `symfony/event-dispatcher`   | Event handling                 |
 | `symfony/options-resolver`   | Configuration handling         |
+| `symfony/uid`                | ULID transaction identifiers   |
 
 Provider packages bring their own additional dependencies. For example, `auditor-doctrine-provider` adds:
 

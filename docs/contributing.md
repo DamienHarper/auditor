@@ -74,7 +74,12 @@ composer testdox
 
 #### 🐳 Testing with Docker (Recommended)
 
-The project includes a `Makefile` that allows you to test against different combinations of PHP versions, Symfony versions, and databases using Docker containers.
+The project includes a `Makefile` that allows you to test against different combinations of PHP and Symfony versions using Docker containers.
+
+> [!NOTE]
+> The core library has no database code: its tests do not use one. Database-specific behaviour is tested in
+> [auditor-doctrine-provider](https://github.com/DamienHarper/auditor-doctrine-provider), whose Makefile has a `db`
+> option.
 
 > [!TIP]
 > This ensures your code works across all supported environments before submitting a PR.
@@ -101,7 +106,6 @@ The project includes a `Makefile` that allows you to test against different comb
 |--------|---------------------------------------|----------|--------------------------|
 | `php`  | `8.4`, `8.5`, `8.6`                   | `8.4`    | PHP version              |
 | `sf`   | `8.1`, `8.2`                          | `8.1`    | Symfony version          |
-| `db`   | `sqlite`, `mysql`, `pgsql`, `mariadb` | `sqlite` | Database type            |
 | `args` | Any PHPUnit/tool arguments            | (varies) | Additional arguments     |
 
 **Valid PHP/Symfony Combinations:**
@@ -118,56 +122,26 @@ The project includes a `Makefile` that allows you to test against different comb
 # Show all available commands and options
 make help
 
-# Run tests with defaults (PHP 8.4, Symfony 8.1, SQLite)
+# Run tests with defaults (PHP 8.4, Symfony 8.1)
 make tests
 
 # Run tests with specific PHP version
 make tests php=8.5
 
-# Run tests with MySQL
-make tests db=mysql
-
-# Run tests with PostgreSQL
-make tests db=pgsql
-
-# Run tests with MariaDB
-make tests db=mariadb
-
 # Full specification
-make tests php=8.4 sf=8.1 db=mysql
+make tests php=8.5 sf=8.2
 
 # Run specific test class
-make tests args='--filter=ReaderTest'
+make tests args='--filter=EntryTest'
 
 # Run tests with coverage
 make tests args='--coverage-html=coverage'
 ```
 
-**Testing the Full Matrix:**
-
-> [!IMPORTANT]
-> Before submitting a pull request, it's recommended to test against multiple database types.
-
-```bash
-# Test all databases with PHP 8.4
-make tests php=8.4 db=sqlite
-make tests php=8.4 db=mysql
-make tests php=8.4 db=pgsql
-make tests php=8.4 db=mariadb
-```
-
 **How It Works:**
 
-The Makefile uses Docker Compose to spin up containers with the specified PHP version and database. The configuration files are located in `tools/docker/`:
-
-```
-tools/docker/
-├── compose.yaml             # Base configuration
-├── compose.mysql.yaml       # MySQL service
-├── compose.pgsql.yaml       # PostgreSQL service
-├── compose.mariadb.yaml     # MariaDB service
-└── Dockerfile               # PHP CLI image
-```
+The Makefile uses Docker Compose to spin up a container with the specified PHP version. The configuration files are
+located in `tools/docker/`.
 
 ### 🧹 Code Quality
 
@@ -225,7 +199,7 @@ Good examples:
 
 ### 🔄 Pull Request Process
 
-1. Ensure all tests pass (ideally on multiple databases)
+1. Ensure all tests pass
 2. Run code quality tools (`make cs-fix`, `make phpstan`)
 3. Update documentation if needed
 4. Add a changelog entry if significant
@@ -239,16 +213,12 @@ When you submit a Pull Request, GitHub Actions will automatically run:
 - **PHPUnit tests** across the full matrix:
   - PHP versions: 8.4, 8.5, 8.6
   - Symfony versions: 8.1, 8.2
-  - Databases: SQLite, MySQL, PostgreSQL, MariaDB
 - **PHP-CS-Fixer** for code style validation
 - **PHPStan** for static analysis
 - **Code coverage** report
 
 > [!WARNING]
 > Your PR must pass all CI checks before it can be merged. If a check fails, review the logs to identify and fix the issue.
-
-> [!TIP]
-> Run `make tests db=mysql` and `make tests db=pgsql` locally before pushing to catch database-specific issues early.
 
 ### ✏️ Writing Tests
 
@@ -258,7 +228,6 @@ Tests are **highly encouraged** and often required for new features or bug fixes
 - Use meaningful test method names that describe the behavior being tested
 - Include both positive and negative test cases
 - Test edge cases and error conditions
-- For database-related features, ensure tests work with all supported databases
 
 **Test Structure Example:**
 

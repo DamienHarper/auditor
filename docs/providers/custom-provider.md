@@ -165,8 +165,8 @@ The `$payload` array always contains these keys:
 | `diffs` | `string` | JSON-encoded field-level changes (`{source, changes}` envelope) |
 | `extra_data` | `?string` | Optional JSON metadata (enriched by event listeners) |
 | `blame_id` | `int\|string\|null` | Authenticated user identifier |
-| `blame` | `array\|null` | Blame context: `['username', 'user_fqdn', 'user_firewall', 'ip']` |
-| `created_at` | `DateTimeImmutable` | Timestamp of the change |
+| `blame` | `?string` | JSON-encoded blame: `{"username", "user_fqdn", "user_firewall", "ip"}`, plus `via` (blame context) when set |
+| `created_at` | `string` | Timestamp of the change (`Y-m-d H:i:s.u`, in the auditor timezone) |
 
 Providers built on Doctrine ORM also add:
 
@@ -221,7 +221,8 @@ final class AcmeProvider extends AbstractProvider
             'operation'  => $payload['type'],
             'entity_id'  => $payload['object_id'],
             'changes'    => json_decode($payload['diffs'], true),
-            'created_at' => $payload['created_at']->format(\DateTimeInterface::ATOM),
+            'user'       => json_decode($payload['blame'] ?? 'null', true)['username'] ?? null,
+            'created_at' => $payload['created_at'],
         ]);
     }
 }
@@ -309,10 +310,10 @@ acme/auditor-acme-provider/
     "license": "MIT",
     "require": {
         "php": ">=8.4",
-        "damienharper/auditor": "^4.0"
+        "damienharper/auditor": "^5.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^11.0"
+        "phpunit/phpunit": "^13.0"
     },
     "autoload": {
         "psr-4": {
@@ -356,7 +357,8 @@ container automatically.
 namespace Acme\AuditProvider\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Reference;
 
 final class AcmeAuditExtension extends Extension
 {

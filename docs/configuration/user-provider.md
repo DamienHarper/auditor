@@ -48,7 +48,7 @@ $configuration->setUserProvider(function (): ?User {
 <?php
 
 use DH\Auditor\User\User;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 
 // In a service or controller
 $configuration->setUserProvider(function () use ($security): ?User {
@@ -96,31 +96,35 @@ $configuration->setUserProvider(function () use ($security, $entityManager): ?Us
 
 ## 📦 The User Class
 
-The built-in `User` class is a simple value object:
+The built-in `User` class is a final value object. `UserInterface` declares two read-only properties (PHP 8.4
+property hooks), read by the providers:
 
 ```php
 <?php
 
 namespace DH\Auditor\User;
 
-class User implements UserInterface
+interface UserInterface
 {
+    public ?string $identifier { get; }   // stored as blame_id
+
+    public ?string $username { get; }     // stored in the blame JSON column
+}
+
+final class User implements UserInterface
+{
+    public ?string $identifier {
+        get => $this->id;
+    }
+
     public function __construct(
-        private ?string $identifier,
-        private ?string $username
+        private readonly ?string $id = null,
+        public readonly ?string $username = null,
     ) {}
-
-    public function getIdentifier(): ?string
-    {
-        return $this->identifier;
-    }
-
-    public function getUsername(): ?string
-    {
-        return $this->username;
-    }
 }
 ```
+
+The class of the object returned by the user provider is recorded as `user_fqdn`.
 
 ## 🧩 Custom User Implementation
 
@@ -133,37 +137,20 @@ namespace App\Audit;
 
 use DH\Auditor\User\UserInterface;
 
-class CustomUser implements UserInterface
+final readonly class CustomUser implements UserInterface
 {
-    public function __construct(
-        private string $id,
-        private string $username,
-        private string $email,
-        private array $roles
-    ) {}
+    public ?string $identifier;
+    public ?string $username;
 
-    public function getIdentifier(): ?string
+    public function __construct(string $id, string $name, public string $email)
     {
-        return $this->id;
-    }
-
-    public function getUsername(): ?string
-    {
-        return sprintf('%s (%s)', $this->username, $this->email);
-    }
-    
-    // Additional methods for your needs
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-    
-    public function getRoles(): array
-    {
-        return $this->roles;
+        $this->identifier = $id;
+        $this->username = sprintf('%s (%s)', $name, $email);
     }
 }
 ```
+
+A readonly property satisfies a `{ get; }` property of an interface.
 
 ## 🌐 API/CLI Context
 

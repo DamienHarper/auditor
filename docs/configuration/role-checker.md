@@ -38,7 +38,7 @@ $configuration->setRoleChecker(function (string $entity, string $scope): bool {
 
 use App\Entity\User;
 use App\Entity\Payment;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 
 $configuration->setRoleChecker(function (string $entity, string $scope) use ($security): bool {
     // Admins can view all audits

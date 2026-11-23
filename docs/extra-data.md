@@ -48,7 +48,7 @@ flowchart TD
 
 ## Approach 1: `extra_data_provider` Callable
 
-Register a callable on the `Configuration` object. It is invoked for every audit entry in every transaction. The callable must return `?array` — return `null` to leave `extra_data` empty.
+Register a callable on the `Configuration` object. It is invoked once per flush, and every audit entry of the flush gets its value. The callable must return `?array` — return `null` to leave `extra_data` empty.
 
 ```php
 $auditor->getConfiguration()->setExtraDataProvider(
@@ -290,4 +290,4 @@ php bin/console audit:schema:update --force
 
 ## Next Steps
 
-- [Upgrade Guide](upgrade/v4.md)
+- [Upgrade Guide](upgrade/v5.md)
