@@ -215,7 +215,7 @@ interface UserInterface
 
 final class User implements UserInterface
 {
-    public ?string $identifier { get; }   // the $id given to the constructor
+    public ?string $identifier { get => $this->id; }   // the $id given to the constructor
 
     public function __construct(?string $id = null, public readonly ?string $username = null);
 }
@@ -474,10 +474,24 @@ final readonly class Change
 
 enum ChangeKind: string
 {
-    case Created; case Snapshot; case Deleted; case Set; case Changed; case Cleared; case Added; case Removed; case Json;
+    case Created = 'created';
+    case Snapshot = 'snapshot';
+    case Deleted = 'deleted';
+    case Set = 'set';
+    case Changed = 'changed';
+    case Cleared = 'cleared';
+    case Added = 'added';
+    case Removed = 'removed';
+    case Json = 'json';
     public function isEntityLevel(): bool;        // Created, Snapshot or Deleted
 }
-enum BlameOrigin: string { Http, Console, Messenger, System }
+enum BlameOrigin: string
+{
+    case Http = 'http';
+    case Console = 'console';
+    case Messenger = 'messenger';
+    case System = 'system';
+}
 ```
 
 See [Histories](../history.md).
