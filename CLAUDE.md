@@ -103,10 +103,16 @@ Auditor (src/Auditor.php)
 
 ### PHP Attributes for entity configuration
 
-Three attributes live in `src/Attribute/`:
+Attributes live in `src/Attribute/`:
 - `#[Auditable]` — marks an entity class as auditable
 - `#[Ignore]` — marks a field to skip
 - `#[Security]` — restricts who can view audit entries for an entity
+- `#[DiffLabel]` — readable value of a field in the diffs
+- `#[AuditRoot('path')]` — repeatable: the entries of the entity belong to the history of the entity at the end of the path (providers index them)
+
+### Histories (`src/History/`)
+
+`HistoryGrouper` groups entries into `HistoryItem`s (one per transaction, or a custom key), `ChangeExtractor` turns entries into `Change`s (`ChangeKind`), `BlameOrigin` tells a web request from a command, a worker or the system. `Entry::$entity`, `Entry::$rootPath` and `Entry::getSortKey()` support readers that merge several audit tables. See `docs/history.md`.
 
 ### Provider contracts
 

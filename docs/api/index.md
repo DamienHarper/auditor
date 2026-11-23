@@ -185,6 +185,8 @@ final class Entry
     public ?array $via;                       // virtual: blame['via'] (blame context)
     public ?array $extraData;                 // virtual: decoded extra_data JSON
     public ?\DateTimeImmutable $createdAt;    // virtual: maps to created_at column
+    public ?string $entity;                   // virtual: FQCN, set by readers of several tables
+    public ?string $rootPath;                 // virtual: audit root path, set in the history of a root
 
     // Methods
     public function getDiffs(): array;             // field changes (schema v2: changes envelope)
@@ -194,6 +196,7 @@ final class Entry
     public function isDeepDiff(string $field): bool;   // the field's changeset is a JSON deep diff
     public static function isDiffLeaf(array $node): bool; // leaf ({old}, {new}, {old, new}) of a deep diff
     public function toArray(): array;              // flat array used by exports (same keys for v1 and v2)
+    public function getSortKey(): string;          // total order across tables (date, transaction, entity, id)
     public function getExtraData(): ?array;
     public function getBlame(): ?array;
 }
@@ -302,6 +305,22 @@ final class Security
 }
 ```
 
+### AuditRoot
+
+```php
+namespace DH\Auditor\Attribute;
+
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
+final readonly class AuditRoot
+{
+    public function __construct(public string $path); // e.g. 'property' or 'visit.property'
+
+    public function getSegments(): array;
+}
+```
+
+Indexes the audit entries of the entity under a root entity. See [Histories](../history.md).
+
 ### DiffLabel
 
 ```php
@@ -380,6 +399,82 @@ final class StatusLabelResolver implements DiffLabelResolverInterface
     }
 }
 ```
+
+### EntityLabelResolverInterface and FieldLabelResolverInterface
+
+```php
+namespace DH\Auditor\Contract;
+
+interface EntityLabelResolverInterface
+{
+    public function __invoke(object $entity): ?string; // label of "source" / "target", null = default
+}
+
+interface FieldLabelResolverInterface
+{
+    public function resolve(string $entity, string $field): string;
+}
+```
+
+## 🕰️ Histories
+
+```php
+namespace DH\Auditor\History;
+
+final readonly class HistoryGrouper
+{
+    public function __construct(?callable $key = null, ChangeExtractor $extractor = new ChangeExtractor());
+    public static function byTransaction(iterable $entries): array; // list<HistoryItem>
+    public static function transactionKey(Entry $entry): string;
+    public function keyOf(Entry $entry): string;
+    public function group(iterable $entries): array;               // list<HistoryItem>
+}
+
+final class HistoryItem
+{
+    public readonly string $key;
+    public readonly array $entries;            // list<Entry>, most recent first
+    public \DateTimeImmutable $createdAt;
+    public int|string|null $userId;
+    public ?string $username;
+    public ?string $userFqdn;
+    public BlameOrigin $origin;
+    public ?array $via;
+    public function getChanges(): array;       // list<Change>, chronological
+    public function getMainChange(): ?Change;
+    public function getTransactionIds(): array;
+    public function getEntities(): array;
+}
+
+final readonly class ChangeExtractor
+{
+    public function __construct(array $fields = []); // entity FQCN => ordered list of fields to keep
+    public function extract(Entry $entry): array;    // list<Change>
+    public function extractAll(iterable $entries): array; // without mirror association entries
+    public static function entityOf(Entry $entry): string;
+}
+
+final readonly class Change
+{
+    public ChangeKind $kind;
+    public string $entity;
+    public string $objectId;
+    public ?string $objectLabel;
+    public ?string $field;
+    public mixed $old;
+    public mixed $new;
+    public ?string $oldLabel;
+    public ?string $newLabel;
+    public Entry $entry;
+    public function getTargetClass(): ?string;
+    public function getTargetId(): ?string;
+}
+
+enum ChangeKind: string { Created, Snapshot, Deleted, Set, Changed, Cleared, Added, Removed, Json }
+enum BlameOrigin: string { Http, Console, Messenger, System }
+```
+
+See [Histories](../history.md).
 
 ## 📣 Events
 

@@ -68,6 +68,14 @@ $entry->via; // ['type' => 'import', 'label' => 'Import batch #42']
 A context may also carry the user to blame instead of the user provider's one. `Entry::toArray()` exports it
 as `blame_via`. See [Blame Context](docs/configuration/blame-context.md).
 
+## New: audit roots and histories
+
+Additive. `#[AuditRoot('property')]` (repeatable, a path of association properties) indexes the audit entries of an
+entity under a root, so that providers can read the history of a business object across tables.
+`DH\Auditor\History\HistoryGrouper` groups entries into actions (by transaction or by any key), with their author,
+`BlameOrigin` (http, console, messenger, system) and a list of `Change` that does not depend on the diff format.
+`Entry` gains `$entity`, `$rootPath` and `getSortKey()`. See [Histories](docs/history.md).
+
 ## Quick migration
 
 ```bash

@@ -76,6 +76,22 @@ final class Entry
         get => $this->created_at;
     }
 
+    /**
+     * FQCN of the audited entity, set by readers that return entries of several entities (such as the history of an
+     * audit root). Null when the reader did not set it: see getDiffSource() for the class written in the diffs.
+     */
+    public ?string $entity {
+        get => $this->entity_class;
+    }
+
+    /**
+     * Path of the audit root the entry was found under (such as "property"), when it was read in the history of a
+     * root; null for the entries of the root itself.
+     */
+    public ?string $rootPath {
+        get => $this->root_path;
+    }
+
     private string $object_id = '';
 
     private ?string $transaction_id = null;
@@ -92,6 +108,10 @@ final class Entry
     private ?string $blame_raw = null;
 
     private ?\DateTimeImmutable $created_at = null;
+
+    private ?string $entity_class = null;
+
+    private ?string $root_path = null;
 
     /**
      * Decoded JSON columns, by column: an entry is read-only, each column is decoded at most once (the viewer reads
@@ -246,6 +266,23 @@ final class Entry
         ];
     }
 
+    /**
+     * Returns a key that sorts the entries of several audit tables in a total, stable order: the creation date (UTC,
+     * to the microsecond), then the transaction id, the entity and the entry id, separated by spaces. Comparing two
+     * keys as strings (strcmp()) gives their chronological order; reverse it for the most recent first.
+     *
+     * Applications that mix audit entries with their own events can build the same kind of key for those.
+     */
+    public function getSortKey(): string
+    {
+        $createdAt = $this->created_at instanceof \DateTimeImmutable
+            ? $this->created_at->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d\TH:i:s.u')
+            : '0000-00-00T00:00:00.000000';
+
+        // parts are separated by a space, which sorts before any character of a date, an id or a class name
+        return \sprintf('%s %s %s %020d', $createdAt, $this->transaction_id ?? '', $this->entity_class ?? '', $this->id ?? 0);
+    }
+
     public function getExtraData(): ?array
     {
         if (null === $this->extra_data) {
@@ -305,6 +342,20 @@ final class Entry
                 if (null === $entry->transaction_id && null !== $value && '' !== $value) {
                     $entry->transaction_id = $value;
                 }
+
+                continue;
+            }
+
+            // The FQCN of the audited entity and the audit root path are not columns of the audit tables: readers of
+            // several tables add them to the row.
+            if ('entity' === $key) {
+                $entry->entity_class = \is_string($value) && '' !== $value ? $value : null;
+
+                continue;
+            }
+
+            if ('root_path' === $key) {
+                $entry->root_path = \is_string($value) && '' !== $value ? $value : null;
 
                 continue;
             }

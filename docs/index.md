@@ -143,6 +143,7 @@ Database support depends on the provider used. Via **DoctrineProvider**:
 - [DoctrineProvider](providers/doctrine/index.md)
 - [Building a Custom Provider](providers/custom-provider.md)
 - [Querying Audits](querying/index.md)
+- [Histories](history.md)
 - [Extra Data](extra-data.md)
 - [API Reference](api/index.md)
 

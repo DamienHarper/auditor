@@ -503,4 +503,37 @@ final class EntryTest extends TestCase
         $this->assertSame('Post #1', $entry->getDiffSource()['label'] ?? null);
         $this->assertFalse($entry->isDeepDiff('title'));
     }
+
+    public function testEntityAndRootPath(): void
+    {
+        $entry = Entry::fromArray(['id' => 1, 'type' => 'update', 'object_id' => '1', 'entity' => 'App\Post', 'root_path' => 'blog']);
+
+        $this->assertSame('App\Post', $entry->entity);
+        $this->assertSame('blog', $entry->rootPath);
+
+        $entry = Entry::fromArray(['id' => 1, 'type' => 'update', 'object_id' => '1', 'root_path' => '']);
+
+        $this->assertNull($entry->entity);
+        $this->assertNull($entry->rootPath);
+    }
+
+    public function testSortKey(): void
+    {
+        $paris = new \DateTimeZone('Europe/Paris');
+        $first = Entry::fromArray(['id' => 9, 'transaction_id' => '01B', 'entity' => 'App\Post', 'created_at' => new \DateTimeImmutable('2026-11-23 10:00:00.000001', $paris)]);
+        $second = Entry::fromArray(['id' => 2, 'transaction_id' => '01A', 'entity' => 'App\Comment', 'created_at' => new \DateTimeImmutable('2026-11-23 09:00:00.5', new \DateTimeZone('UTC'))]);
+        $third = Entry::fromArray(['id' => 3, 'transaction_id' => '01A', 'entity' => 'App\Comment', 'created_at' => new \DateTimeImmutable('2026-11-23 09:00:00.5', new \DateTimeZone('UTC'))]);
+
+        $this->assertSame('2026-11-23T09:00:00.000001 01B App\Post 00000000000000000009', $first->getSortKey());
+
+        $keys = [$third->getSortKey(), $first->getSortKey(), $second->getSortKey()];
+        sort($keys, SORT_STRING);
+
+        $this->assertSame([$first->getSortKey(), $second->getSortKey(), $third->getSortKey()], $keys);
+
+        // a class name that starts with another one sorts after it, as in SQL
+        $post = Entry::fromArray(['id' => 1, 'transaction_id' => '01A', 'entity' => 'App\Post', 'created_at' => new \DateTimeImmutable('2026-11-23 09:00:00')]);
+        $postTag = Entry::fromArray(['id' => 1, 'transaction_id' => '01A', 'entity' => 'App\PostTag', 'created_at' => new \DateTimeImmutable('2026-11-23 09:00:00')]);
+        $this->assertLessThan(0, strcmp($post->getSortKey(), $postTag->getSortKey()));
+    }
 }
