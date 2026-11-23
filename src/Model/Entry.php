@@ -349,13 +349,13 @@ final class Entry
             // The FQCN of the audited entity and the audit root path are not columns of the audit tables: readers of
             // several tables add them to the row.
             if ('entity' === $key) {
-                $entry->entity_class = null === $value ? null : (string) $value;
+                $entry->entity_class = \is_string($value) && '' !== $value ? $value : null;
 
                 continue;
             }
 
             if ('root_path' === $key) {
-                $entry->root_path = null === $value || '' === $value ? null : (string) $value;
+                $entry->root_path = \is_string($value) && '' !== $value ? $value : null;
 
                 continue;
             }
