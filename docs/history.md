@@ -103,7 +103,9 @@ Pass the entries most recent first, as readers return them: items keep the order
 | `Added`, `Removed` | associate / dissociate | the collection | the element summary (`class`, `id`, `label`…); its label is kept once the element is deleted |
 
 `$change->getValue($field)` and `$change->getLabel($field)` read one field whatever the kind: the value held by a
-creation, snapshot or deletion, or the value after a field change.
+creation, snapshot or deletion, or the value after a field change. For a `Json` change, `getValue()` returns the deep
+diff tree (only the changed keys, with their old and new values), not the whole JSON value: test `$change->kind`
+before printing it.
 
 `extractAll()` drops the mirror entries of bidirectional associations (the same change audited on both sides) and
 keeps the first one read. An optional field list per entity keeps only those fields, in that order:
