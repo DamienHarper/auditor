@@ -149,6 +149,7 @@ Database support depends on the provider used. Via **DoctrineProvider**:
 
 ## Related Projects
 
+- **[auditor-doctrine-provider](https://github.com/DamienHarper/auditor-doctrine-provider)** - Doctrine ORM provider
 - **[auditor-bundle](https://github.com/DamienHarper/auditor-bundle)** - Symfony bundle for seamless integration
 
 ## License

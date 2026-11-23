@@ -2,17 +2,23 @@
 
 > **Capture contextual security information for each audit event**
 
-The security provider captures additional contextual information about each audit event, such as the client IP address and firewall name.
+The security provider captures additional contextual information about each audit event: the client IP address and
+the firewall name.
 
 ## 🔍 Overview
 
-When an audit entry is created, the security provider can supply:
+When an audit entry is created, the security provider supplies:
 
-- **ip** - The client's IP address (stored in the `blame` JSON column)
-- **user_fqdn** - The fully qualified class name of the user (stored in the `blame` JSON column)
-- **user_firewall** - The Symfony firewall name (stored in the `blame` JSON column)
+- **the client IP address**, stored under the `ip` key of the `blame` JSON column;
+- **the firewall name**, stored under the `user_firewall` key of the `blame` JSON column.
+
+The class of the user (`user_fqdn`) is not supplied by the security provider: the provider takes it from the object
+returned by the [user provider](user-provider.md).
 
 ## 🚀 Setting Up a Security Provider
+
+The security provider is a callable (or a `DH\Auditor\Security\SecurityProviderInterface` implementation) that
+returns a **list of two values**: the client IP address, then the firewall name. Either may be `null`.
 
 ### Basic Example
 
@@ -25,9 +31,8 @@ $configuration = new Configuration(['enabled' => true]);
 
 $configuration->setSecurityProvider(function (): array {
     return [
-        'client_ip' => $_SERVER['REMOTE_ADDR'] ?? null,
-        'user_fqdn' => null,
-        'user_firewall' => null,
+        $_SERVER['REMOTE_ADDR'] ?? null, // client IP
+        null,                            // firewall
     ];
 });
 ```
@@ -37,121 +42,76 @@ $configuration->setSecurityProvider(function (): array {
 ```php
 <?php
 
-use DH\Auditor\Configuration;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use DH\Auditor\Security\SecurityProviderInterface;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
+use Symfony\Component\HttpFoundation\RequestStack;
 
-$configuration->setSecurityProvider(
-    function () use ($requestStack, $tokenStorage, $firewallMap): array {
-        $request = $requestStack->getCurrentRequest();
-        $token = $tokenStorage->getToken();
-        
+final readonly class SecurityProvider implements SecurityProviderInterface
+{
+    public function __construct(
+        private RequestStack $requestStack,
+        private FirewallMap $firewallMap,
+    ) {}
+
+    public function __invoke(): array
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return [null, null];
+        }
+
         return [
-            'client_ip' => $request?->getClientIp(),
-            'user_fqdn' => $token?->getUser()?::class,
-            'user_firewall' => $this->getFirewallName($request, $firewallMap),
+            $request->getClientIp(),
+            $this->firewallMap->getFirewallConfig($request)?->getName(),
         ];
     }
-);
-
-// Helper method to get firewall name
-function getFirewallName(?Request $request, FirewallMap $firewallMap): ?string
-{
-    if (null === $request) {
-        return null;
-    }
-    
-    $firewallConfig = $firewallMap->getFirewallConfig($request);
-    
-    return $firewallConfig?->getName();
 }
+
+$configuration->setSecurityProvider($securityProvider);
 ```
+
+> [!NOTE]
+> auditor-bundle ships such a security provider and configures it for you.
 
 ## 📋 Return Value Structure
 
-The security provider must return an array with these keys:
+The security provider must return a list (positional array) of two values:
 
-| Key              | Type          | Description                                      |
-|------------------|---------------|--------------------------------------------------|
-| `client_ip`      | `string\|null`| The IP address of the client making the request  |
-| `user_fqdn`      | `string\|null`| The fully qualified class name of the user object|
-| `user_firewall`  | `string\|null`| The name of the security firewall used           |
+| Position | Type           | Description                                     |
+|----------|----------------|-------------------------------------------------|
+| `0`      | `string\|null` | The IP address of the client making the request |
+| `1`      | `string\|null` | The name of the security firewall used          |
+
+> [!WARNING]
+> Return a list, not an associative array: the values are read by position, so keys such as `client_ip` are not
+> recognized and the IP address and firewall are stored as `null`.
 
 ## 🌐 Handling Different Contexts
-
-### Web Requests
-
-```php
-$configuration->setSecurityProvider(function () use ($requestStack): array {
-    $request = $requestStack->getCurrentRequest();
-    
-    return [
-        'client_ip' => $request?->getClientIp(),
-        'user_fqdn' => $this->security->getUser()?::class,
-        'user_firewall' => $this->getFirewallName($request),
-    ];
-});
-```
 
 ### Behind a Proxy
 
 > [!TIP]
-> When behind a load balancer or reverse proxy, ensure trusted proxies are configured in Symfony. The `getClientIp()` method will automatically handle `X-Forwarded-For`.
+> When behind a load balancer or reverse proxy, ensure trusted proxies are configured in Symfony. The
+> `getClientIp()` method then handles `X-Forwarded-For` automatically.
+
+### CLI Commands and Workers
+
+There is no request in a console command or a Messenger worker: return `[null, null]`, or a value of your choice:
 
 ```php
 $configuration->setSecurityProvider(function () use ($requestStack): array {
     $request = $requestStack->getCurrentRequest();
-    
-    // Ensure trusted proxies are configured in Symfony
-    // The getClientIp() method will automatically handle X-Forwarded-For
-    $clientIp = $request?->getClientIp();
-    
-    return [
-        'client_ip' => $clientIp,
-        'user_fqdn' => null,
-        'user_firewall' => null,
-    ];
-});
-```
 
-### CLI Commands
-
-```php
-$configuration->setSecurityProvider(function (): array {
-    if (PHP_SAPI === 'cli') {
-        return [
-            'client_ip' => gethostbyname(gethostname()) ?: '127.0.0.1',
-            'user_fqdn' => 'CLI',
-            'user_firewall' => null,
-        ];
+    if (null === $request) {
+        return [null, null];      // console command, worker…
     }
-    
-    // Regular web handling...
-    return [
-        'client_ip' => $_SERVER['REMOTE_ADDR'] ?? null,
-        'user_fqdn' => null,
-        'user_firewall' => null,
-    ];
+
+    return [$request->getClientIp(), str_starts_with($request->getPathInfo(), '/api') ? 'api' : 'main'];
 });
 ```
 
-### API Requests
-
-```php
-$configuration->setSecurityProvider(function () use ($requestStack): array {
-    $request = $requestStack->getCurrentRequest();
-    
-    // Check if this is an API request
-    $isApi = str_starts_with($request?->getPathInfo() ?? '', '/api');
-    
-    return [
-        'client_ip' => $request?->getClientIp(),
-        'user_fqdn' => $this->security->getUser()?::class,
-        'user_firewall' => $isApi ? 'api' : 'main',
-    ];
-});
-```
+To record *how* a change was made outside a web request (a command, an import, a message), use a
+[blame context](blame-context.md) rather than a fake IP address or firewall.
 
 ## 🔍 Accessing Security Info from Audit Entries
 
@@ -164,24 +124,22 @@ $reader = new Reader($provider);
 $audits = $reader->createQuery(Post::class)->execute();
 
 foreach ($audits as $entry) {
-    echo "IP Address: " . $entry->getIp();
-    echo "User Class: " . $entry->getUserFqdn();
-    echo "Firewall: " . $entry->getUserFirewall();
+    echo "IP Address: " . $entry->ip;
+    echo "User Class: " . $entry->userFqdn;
+    echo "Firewall: " . $entry->userFirewall;
 }
 ```
 
 ## 🌐 IP Address Format
 
-The `ip` column supports both IPv4 and IPv6 addresses (max 45 characters):
-
-- IPv4: `192.168.1.1`
-- IPv6: `2001:0db8:85a3:0000:0000:8a2e:0370:7334`
+The IP address is stored as a string in the `blame` JSON column, IPv4 (`192.168.1.1`) or IPv6
+(`2001:0db8:85a3:0000:0000:8a2e:0370:7334`).
 
 ## ✅ Best Practices
 
-1. **Always handle null request** - The request may not be available (CLI, async jobs)
+1. **Always handle a null request** - The request may not be available (CLI, async jobs)
 2. **Configure trusted proxies** - When behind a reverse proxy
-3. **Return consistent data types** - Always return an array with all three keys
+3. **Always return two values** - `[$ip, $firewall]`, each possibly `null`
 4. **Consider privacy regulations** - IP logging may be subject to GDPR or similar laws
 
 > [!NOTE]
@@ -193,3 +151,4 @@ The `ip` column supports both IPv4 and IPv6 addresses (max 45 characters):
 
 - 👤 [User Provider Configuration](user-provider.md)
 - 🛡️ [Role Checker Configuration](role-checker.md)
+- 🧭 [Blame Context](blame-context.md)

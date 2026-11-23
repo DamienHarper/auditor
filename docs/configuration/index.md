@@ -19,6 +19,7 @@ $configuration = new Configuration([
     'user_provider' => null,
     'security_provider' => null,
     'role_checker' => null,
+    'extra_data_provider' => null,
 ]);
 ```
 
@@ -31,6 +32,7 @@ $configuration = new Configuration([
 | `user_provider`     | `callable\|null`  | `null`  | Callback that returns the current user              |
 | `security_provider` | `callable\|null`  | `null`  | Callback that returns security context info         |
 | `role_checker`      | `callable\|null`  | `null`  | Callback that checks if user can view entity audits |
+| `extra_data_provider` | `callable\|null` | `null` | Callback that returns the `extra_data` of the entries of a flush (see [Extra Data](../extra-data.md)) |
 
 ## 🔧 Configuration Methods
 
@@ -44,7 +46,7 @@ $configuration->disable();
 $configuration->enable();
 
 // Check if auditing is enabled
-if ($configuration->isEnabled()) {
+if ($configuration->enabled) {
     // ...
 }
 ```
@@ -52,7 +54,7 @@ if ($configuration->isEnabled()) {
 ### Get Timezone
 
 ```php
-$timezone = $configuration->getTimezone();
+$timezone = $configuration->timezone;
 ```
 
 ## 👤 User Provider
@@ -84,8 +86,8 @@ namespace DH\Auditor\User;
 
 interface UserInterface
 {
-    public function getIdentifier(): ?string;
-    public function getUsername(): ?string;
+    public ?string $identifier { get; }
+    public ?string $username { get; }
 }
 ```
 
@@ -94,14 +96,13 @@ import, a command, a message…), see [Blame Context](blame-context.md).
 
 ## 🔐 Security Provider
 
-The security provider returns contextual security information to be stored with audit entries:
+The security provider returns the client IP address and the firewall name, as a list of two values:
 
 ```php
 $configuration->setSecurityProvider(function (): array {
     return [
-        'client_ip' => $_SERVER['REMOTE_ADDR'] ?? null,
-        'user_fqdn' => $this->security->getUser()?::class,
-        'user_firewall' => $this->getFirewallName(),
+        $_SERVER['REMOTE_ADDR'] ?? null, // client IP
+        $this->getFirewallName(),        // firewall name
     ];
 });
 ```
@@ -159,9 +160,7 @@ $configuration->setUserProvider(function (): ?User {
 
 // Set security provider
 $configuration->setSecurityProvider(function (): array {
-    return [
-        'client_ip' => $_SERVER['REMOTE_ADDR'] ?? null,
-    ];
+    return [$_SERVER['REMOTE_ADDR'] ?? null, null];
 });
 
 // Set role checker

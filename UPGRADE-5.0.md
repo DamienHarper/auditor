@@ -41,6 +41,44 @@ use DH\Auditor\Transaction\NeedsConversionToAuditableType;
 use DH\Auditor\Provider\Doctrine\Transaction\NeedsConversionToAuditableType;
 ```
 
+## Requirements
+
+| Requirement   | 4.x    | 5.0    |
+|---------------|--------|--------|
+| PHP           | >= 8.4 | >= 8.4 |
+| Symfony       | >= 8.1 | >= 8.1 |
+| `symfony/uid` | -      | ^8.1 (new, installed with auditor) |
+| Doctrine DBAL / ORM | required | via `auditor-doctrine-provider` 2.0 (DBAL >= 4.6, ORM >= 3.7) |
+
+## Audit format: schema v2
+
+auditor 5.0 introduces a new audit format. **Existing audit tables must be migrated** with
+`audit:schema:migrate --force --convert-all` (auditor-doctrine-provider 2.0), then `audit:schema:update --force`.
+The migration has no rollback: back up the audit tables and follow the
+[auditor-doctrine-provider 2.0 upgrade guide](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/upgrade/v2).
+
+### `Entry`
+
+- `$entry->transactionHash` is **removed**: use `$entry->transactionId` (a ULID, `CHAR(26)`). For rows not migrated
+  yet, `Entry::fromArray()` reads the legacy `transaction_hash` into `transactionId`.
+- The blame columns are merged into one `blame` JSON column: `$entry->blame` returns it, and `$entry->username`,
+  `userFqdn`, `userFirewall` and `ip` keep working.
+- `getDiffs()` returns the `changes` of a schema v2 entry (legacy entries are unchanged).
+- New: `$entry->schemaVersion`, `getDiffSource()`, `getDiffTarget()`.
+
+### `LifecycleEvent` payload
+
+Custom providers reading `$event->getPayload()` must be updated:
+
+| 4.x | 5.0 |
+|-----|-----|
+| `transaction_hash` | `transaction_id` (ULID) |
+| `blame_user`, `blame_user_fqdn`, `blame_user_firewall`, `ip` | `blame`: JSON string with the `username`, `user_fqdn`, `user_firewall` and `ip` keys (and `via` when a blame context is set) |
+| *(new)* | `schema_version` (`2`) |
+
+`diffs` uses an envelope: `source` (summary of the audited entity) and `changes`; association entries carry `source`,
+`target`, `is_owning_side` and `join_table`.
+
 ## Persistence failures are no longer silent
 
 `AuditEventSubscriber` used to swallow every exception thrown by `ProviderInterface::persist()`.
@@ -86,7 +124,13 @@ composer require damienharper/auditor-doctrine-provider:^2.0
 composer require damienharper/auditor:^5.0
 
 # 3. If you implement NeedsConversionToAuditableType, update the import (see above)
+
+# 4. Migrate the audit tables (back up first, see the provider upgrade guide)
+bin/console audit:schema:migrate --force --convert-all
+bin/console audit:schema:update --force
 ```
+
+The complete guide is in [docs/upgrade/v5.md](docs/upgrade/v5.md).
 
 ## Need Help?
 

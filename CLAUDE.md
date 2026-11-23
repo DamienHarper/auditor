@@ -56,7 +56,7 @@ composer update-tools  # updates php-cs-fixer, phpstan, rector independently
 
 ### Docker matrix (Makefile)
 ```bash
-make tests php=8.5 db=mysql             # PHPUnit in Docker; db: sqlite (default), mysql, pgsql, mariadb
+make tests php=8.5 sf=8.2               # PHPUnit in Docker (core tests use no database)
 make tests args='--filter=EntryTest'
 make qa                                 # rector + cs-fix + phpstan in Docker
 make help                               # all targets and options

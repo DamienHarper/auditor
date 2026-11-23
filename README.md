@@ -2,7 +2,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/damienharper/auditor/v/stable)](https://packagist.org/packages/damienharper/auditor)
 [![Latest Unstable Version](https://poser.pugx.org/damienharper/auditor/v/unstable)](https://packagist.org/packages/damienharper/auditor)
-[![auditor 4.x CI](https://github.com/DamienHarper/auditor/actions/workflows/ci-4.x.yml/badge.svg)](https://github.com/DamienHarper/auditor/actions/workflows/ci-4.x.yml)
+[![auditor 5.x CI](https://github.com/DamienHarper/auditor/actions/workflows/ci-5.x.yml/badge.svg)](https://github.com/DamienHarper/auditor/actions/workflows/ci-5.x.yml)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=master)
 [![codecov](https://codecov.io/gh/DamienHarper/auditor/branch/master/graph/badge.svg)](https://app.codecov.io/gh/DamienHarper/auditor/branch/master)
 [![License](https://poser.pugx.org/damienharper/auditor/license)](https://packagist.org/packages/damienharper/auditor)
@@ -21,30 +21,21 @@ This library is architected around two concepts:
 Those two kind of services are offered by Providers.
 
 
-## Default provider
-A default provider is included with this library: the `DoctrineProvider`
+## Providers
+The Doctrine ORM provider lives in its own package,
+[`auditor-doctrine-provider`](https://github.com/DamienHarper/auditor-doctrine-provider). It creates audit logs for
+all `Doctrine ORM` database related changes:
 
-`DoctrineProvider` offers both auditing services and sorage services.
-It creates audit logs for all `Doctrine ORM` database related changes:
-
-- inserts and updates including their diffs and relation field diffs.
-- many to many relation changes, association and dissociation actions.
-- if available, the user responsible for these changes and his IP address are recorded. 
-- audit entries are inserted within the same transaction during **flush** event 
+- inserts, updates and removals, including their diffs and relation field diffs;
+- many-to-many relation changes, association and dissociation actions;
+- if available, the user responsible for these changes, their IP address and how the change was made (blame context);
+- audit entries are written within the same database transaction as the changes,
 so that even if something fails the global state remains clean.
 
-`DoctrineProvider` supports following RDBMS
-* MySQL
-* MariaDB
-* PostgreSQL
-* SQLite
+It supports MySQL, MariaDB, PostgreSQL and SQLite. Symfony applications use
+[`auditor-bundle`](https://github.com/DamienHarper/auditor-bundle), which also ships a web viewer.
 
-`DoctrineProvider` should work with **any other** database supported by `Doctrine`. 
-Though, we can only really support the ones we can test with [GitHub Actions](https://github.com/features/actions).
-
-Basically you can track any change of any entity from audit logs.
-
-**NOTE:** `DoctrineProvider` cannot track DQL or direct SQL statements executions.
+You can also [build your own provider](docs/providers/custom-provider.md).
 
 
 ## Official Documentation
@@ -60,7 +51,7 @@ Basically you can track any change of any entity from audit logs.
 | 2.x     | EOL                         | PHP >= 7.4, Symfony >= 4.4                                          | [![auditor 2.x CI](https://github.com/DamienHarper/auditor/actions/workflows/ci-2.x.yml/badge.svg)](https://github.com/DamienHarper/auditor/actions/workflows/ci-2.x.yml) <br/>[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=2.x)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=2.x) <br/>[![codecov](https://codecov.io/gh/DamienHarper/auditor/branch/master/graph/badge.svg)](https://app.codecov.io/gh/DamienHarper/auditor/branch/2.x)          |
 | 1.x     | EOL                         | PHP >= 7.2, Symfony >= 3.4                                          | [![auditor 1.x CI](https://github.com/DamienHarper/auditor/actions/workflows/ci-1.x.yml/badge.svg)](https://github.com/DamienHarper/auditor/actions/workflows/ci-1.x.yml) <br/>[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=1.x)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=1.x) <br/>[![codecov](https://codecov.io/gh/DamienHarper/auditor/branch/1.x/graph/badge.svg)](https://app.codecov.io/gh/DamienHarper/auditor/branch/1.x)             |
 
-Changelog is available [here](https://damienharper.github.io/auditor-docs/docs/auditor/release-notes.html)
+Changelog is available in the [releases](https://github.com/DamienHarper/auditor/releases), and the upgrade guides in [UPGRADE-5.0.md](UPGRADE-5.0.md) and the [documentation](https://damienharper.github.io/auditor-docs/auditor/upgrade/).
 
 
 ## Contributing

@@ -58,11 +58,11 @@ final class Configuration
 {
     public function __construct(array $options);
     
+    public private(set) bool $enabled;
+    public readonly string $timezone;
+
     public function enable(): self;
     public function disable(): self;
-    public function isEnabled(): bool;
-    
-    public function getTimezone(): string;
     
     public function setUserProvider(callable $userProvider): self;
     public function getUserProvider(): ?callable;
@@ -209,16 +209,15 @@ namespace DH\Auditor\User;
 
 interface UserInterface
 {
-    public function getIdentifier(): ?string;
-    public function getUsername(): ?string;
+    public ?string $identifier { get; }
+    public ?string $username { get; }
 }
 
-class User implements UserInterface
+final class User implements UserInterface
 {
-    public function __construct(?string $identifier, ?string $username);
-    
-    public function getIdentifier(): ?string;
-    public function getUsername(): ?string;
+    public ?string $identifier { get; }   // the $id given to the constructor
+
+    public function __construct(?string $id = null, public readonly ?string $username = null);
 }
 ```
 
@@ -297,7 +296,7 @@ class User extends Model {}
 namespace DH\Auditor\Attribute;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
-final class Security
+class Security
 {
     public const string VIEW_SCOPE = 'view';
     
@@ -466,11 +465,18 @@ final readonly class Change
     public ?string $oldLabel;
     public ?string $newLabel;
     public Entry $entry;
+    public array $labels;                         // field => label, for Created, Snapshot and Deleted changes
+    public function getValue(string $field): mixed;   // value of a field of a Created, Snapshot or Deleted change
+    public function getLabel(string $field): ?string;
     public function getTargetClass(): ?string;
     public function getTargetId(): ?string;
 }
 
-enum ChangeKind: string { Created, Snapshot, Deleted, Set, Changed, Cleared, Added, Removed, Json }
+enum ChangeKind: string
+{
+    case Created; case Snapshot; case Deleted; case Set; case Changed; case Cleared; case Added; case Removed; case Json;
+    public function isEntityLevel(): bool;        // Created, Snapshot or Deleted
+}
 enum BlameOrigin: string { Http, Console, Messenger, System }
 ```
 
@@ -485,7 +491,7 @@ namespace DH\Auditor\Event;
 
 final class LifecycleEvent extends AuditEvent
 {
-    public function __construct(array $payload);
+    public function __construct(array $payload, public readonly ?object $entity = null); // the audited entity, when known
     
     public function setPayload(array $payload): self;
     public function getPayload(): array;
@@ -499,10 +505,10 @@ final class LifecycleEvent extends AuditEvent
 ```php
 namespace DH\Auditor\Exception;
 
-class AccessDeniedException extends \Exception {}
-class InvalidArgumentException extends \Exception {}
-class MappingException extends \Exception {}
-class ProviderException extends \Exception {}
+final class AccessDeniedException extends \Exception {}
+final class InvalidArgumentException extends \Exception {}
+final class MappingException extends \Exception {}
+final class ProviderException extends \Exception {}
 ```
 
 ---
