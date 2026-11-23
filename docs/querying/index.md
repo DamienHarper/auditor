@@ -32,6 +32,10 @@ Highlights:
 | Numeric range | `RangeFilter` |
 | NULL check | `NullFilter` |
 | JSON column content | `JsonFilter` |
+| History of a root and its satellites | `Reader::createRootQuery()` |
+| Last change of fields | `Reader::getLastChanges()` |
+
+The core turns the entries a reader returns into actions and changes: see [Histories](../history.md).
 
 ## Other providers
 
