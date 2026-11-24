@@ -57,7 +57,7 @@ $auditor->registerProvider($provider);
 
 | Provider | Package | Storage |
 |----------|---------|---------|
-| DoctrineProvider | [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/) | Doctrine ORM / DBAL |
+| DoctrineProvider | [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider) | Doctrine ORM / DBAL |
 
 ## 3️⃣ Mark Entities as Auditable
 

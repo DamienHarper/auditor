@@ -29,7 +29,7 @@ and the audit entry model, and providers do the change tracking and the storage.
 
 Since auditor 5.0 the Doctrine provider is no longer part of this package: it lives in
 `auditor-doctrine-provider` (in 4.x it is still bundled, deprecated). `auditor-bundle` was formerly
-known as `DoctrineAuditBundle`. See the [upgrade guides](https://damienharper.github.io/auditor-docs/auditor/upgrade/).
+known as `DoctrineAuditBundle`. See the [upgrade guides](https://damienharper.github.io/auditor-docs/auditor/upgrade).
 
 
 ## Using an AI coding agent?
@@ -80,7 +80,7 @@ You can also [build your own provider](docs/providers/custom-provider.md).
 | 2.x     | EOL                         | PHP >= 7.4, Symfony >= 4.4                                          | [![auditor 2.x CI](https://github.com/DamienHarper/auditor/actions/workflows/ci-2.x.yml/badge.svg)](https://github.com/DamienHarper/auditor/actions/workflows/ci-2.x.yml) <br/>[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=2.x)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=2.x) <br/>[![codecov](https://codecov.io/gh/DamienHarper/auditor/branch/master/graph/badge.svg)](https://app.codecov.io/gh/DamienHarper/auditor/branch/2.x)          |
 | 1.x     | EOL                         | PHP >= 7.2, Symfony >= 3.4                                          | [![auditor 1.x CI](https://github.com/DamienHarper/auditor/actions/workflows/ci-1.x.yml/badge.svg)](https://github.com/DamienHarper/auditor/actions/workflows/ci-1.x.yml) <br/>[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=1.x)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=1.x) <br/>[![codecov](https://codecov.io/gh/DamienHarper/auditor/branch/1.x/graph/badge.svg)](https://app.codecov.io/gh/DamienHarper/auditor/branch/1.x)             |
 
-Changelog is available in the [releases](https://github.com/DamienHarper/auditor/releases), and the upgrade guides in [UPGRADE-5.0.md](UPGRADE-5.0.md) and the [documentation](https://damienharper.github.io/auditor-docs/auditor/upgrade/).
+Changelog is available in the [releases](https://github.com/DamienHarper/auditor/releases), and the upgrade guides in [UPGRADE-5.0.md](UPGRADE-5.0.md) and the [documentation](https://damienharper.github.io/auditor-docs/auditor/upgrade).
 
 
 ## Contributing

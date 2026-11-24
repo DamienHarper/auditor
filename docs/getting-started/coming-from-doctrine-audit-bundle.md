@@ -36,7 +36,7 @@ The root key changed from `dh_doctrine_audit` to `dh_auditor`, and the Doctrine 
 | `storage_entity_manager`             | `providers.doctrine.storage_services` (and `storage_mapper`)   |
 | `enabled_viewer`                     | `providers.doctrine.viewer`                                    |
 
-The full reference is in the [auditor-bundle configuration](https://damienharper.github.io/auditor-docs/auditor-bundle/configuration/).
+The full reference is in the [auditor-bundle configuration](https://damienharper.github.io/auditor-docs/auditor-bundle/configuration).
 
 ## 🏷️ Annotations and classes
 
@@ -59,5 +59,5 @@ schema version 2 of auditor 5.0 (converted by `audit:schema:migrate`). Follow th
 major at a time and back up the audit tables first:
 
 - [auditor upgrade guides](../upgrade/index.md)
-- [auditor-bundle upgrade guides](https://damienharper.github.io/auditor-docs/auditor-bundle/upgrade/)
-- [auditor-doctrine-provider upgrade guides](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/upgrade/)
+- [auditor-bundle upgrade guides](https://damienharper.github.io/auditor-docs/auditor-bundle/upgrade)
+- [auditor-doctrine-provider upgrade guides](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/upgrade)

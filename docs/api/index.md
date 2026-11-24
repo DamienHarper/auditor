@@ -165,7 +165,7 @@ interface ConfigurationInterface
 > [!WARNING]
 > All DoctrineProvider classes (`DoctrineProvider`, `Configuration`, `Reader`, `Query`, filters,
 > `SchemaManager`, `AuditingService`, `StorageService`) were **removed** from auditor core in v5.0.
-> See the [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/)
+> See the [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider)
 > documentation for the current API reference.
 
 ## 📦 Models

@@ -15,7 +15,7 @@ application.
 > The built-in `DoctrineProvider` (namespace `DH\Auditor\Provider\Doctrine\`) was **removed**
 > in auditor 5.0.
 >
-> Use the standalone **[auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/)** package — it is a drop-in replacement
+> Use the standalone **[auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider)** package — it is a drop-in replacement
 > with the same namespace and feature set.
 
 ## What it supports

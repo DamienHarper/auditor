@@ -23,7 +23,7 @@ Providers that implement a reader expose at minimum:
 The **auditor-doctrine-provider** package ships a full Reader and filter system backed by
 Doctrine DBAL.
 
-→ **[Querying Audits (auditor-doctrine-provider)](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/querying/)**
+→ **[Querying Audits (auditor-doctrine-provider)](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/querying)**
 
 Highlights:
 

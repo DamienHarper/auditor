@@ -248,7 +248,7 @@ error semantics and a test: [references/custom-provider.md](references/custom-pr
 - Overview: https://damienharper.github.io/auditor-docs/auditor/
 - Installation: https://damienharper.github.io/auditor-docs/auditor/getting-started/installation
 - Quick start: https://damienharper.github.io/auditor-docs/auditor/getting-started/quick-start
-- Configuration: https://damienharper.github.io/auditor-docs/auditor/configuration/ (also `/user-provider`,
+- Configuration: https://damienharper.github.io/auditor-docs/auditor/configuration (also `/user-provider`,
   `/security-provider`, `/role-checker`, `/blame-context`)
 - Extra data: https://damienharper.github.io/auditor-docs/auditor/extra-data
 - Histories: https://damienharper.github.io/auditor-docs/auditor/history

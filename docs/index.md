@@ -108,7 +108,7 @@ flowchart TD
 
 | Provider | Package | Storage technology |
 |----------|---------|-------------------|
-| DoctrineProvider | [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/) | Doctrine ORM / DBAL |
+| DoctrineProvider | [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider) | Doctrine ORM / DBAL |
 
 > Need a different backend? See [Building a Custom Provider](providers/custom-provider.md).
 
