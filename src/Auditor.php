@@ -107,10 +107,13 @@ final class Auditor
     }
 
     /**
+     * @throws InvalidArgumentException when the provider is not registered
      * @throws ProviderException
      */
     public function enableStorage(ProviderInterface $provider): self
     {
+        $this->assertRegistered($provider);
+
         if (!$provider->supportsStorage()) {
             throw new ProviderException(\sprintf('Provider "%s" does not support storage.', $provider::class));
         }
@@ -121,10 +124,13 @@ final class Auditor
     }
 
     /**
+     * @throws InvalidArgumentException when the provider is not registered
      * @throws ProviderException
      */
     public function disableStorage(ProviderInterface $provider): self
     {
+        $this->assertRegistered($provider);
+
         if (!$provider->supportsStorage()) {
             throw new ProviderException(\sprintf('Provider "%s" does not support storage.', $provider::class));
         }
@@ -147,19 +153,19 @@ final class Auditor
      */
     public function isStorageEnabled(ProviderInterface $provider): bool
     {
-        $key = $provider::class;
-        if (!$this->hasProvider($key)) {
-            throw new InvalidArgumentException(\sprintf('Unknown provider "%s"', $key));
-        }
+        $this->assertRegistered($provider);
 
-        return \array_key_exists($key, $this->storageProviders);
+        return \array_key_exists($provider::class, $this->storageProviders);
     }
 
     /**
+     * @throws InvalidArgumentException when the provider is not registered
      * @throws ProviderException
      */
     public function enableAuditing(ProviderInterface $provider): self
     {
+        $this->assertRegistered($provider);
+
         if (!$provider->supportsAuditing()) {
             throw new ProviderException(\sprintf('Provider "%s" does not support audit hooks.', $provider::class));
         }
@@ -170,10 +176,13 @@ final class Auditor
     }
 
     /**
+     * @throws InvalidArgumentException when the provider is not registered
      * @throws ProviderException
      */
     public function disableAuditing(ProviderInterface $provider): self
     {
+        $this->assertRegistered($provider);
+
         if (!$provider->supportsAuditing()) {
             throw new ProviderException(\sprintf('Provider "%s" does not support audit hooks.', $provider::class));
         }
@@ -196,10 +205,18 @@ final class Auditor
      */
     public function isAuditingEnabled(ProviderInterface $provider): bool
     {
+        $this->assertRegistered($provider);
+
+        return \array_key_exists($provider::class, $this->auditProviders);
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function assertRegistered(ProviderInterface $provider): void
+    {
         if (!$this->hasProvider($provider::class)) {
             throw new InvalidArgumentException(\sprintf('Unknown provider "%s"', $provider::class));
         }
-
-        return \array_key_exists($provider::class, $this->auditProviders);
     }
 }
