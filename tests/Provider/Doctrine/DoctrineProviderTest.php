@@ -329,6 +329,45 @@ final class DoctrineProviderTest extends TestCase
     }
 
     #[Depends('testIsAudited')]
+    public function testIsAuditedWhenAuditingIsDisabledForTheProvider(): void
+    {
+        $configuration = $this->createProviderConfiguration([
+            'entities' => [
+                Post::class => [
+                    'enabled' => true,
+                ],
+            ],
+        ]);
+        $provider = $this->createDoctrineProvider($configuration);
+        $auditor = $provider->getAuditor();
+        $auditor->registerProvider(new AuditNoStorageProvider());
+
+        $auditor->disableAuditing($provider);
+
+        $this->assertFalse($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is not audited by a provider whose auditing is disabled.');
+
+        $auditor->enableAuditing($provider);
+
+        $this->assertTrue($provider->isAudited(Post::class), 'Entity "'.Post::class.'" is audited again once auditing is enabled.');
+    }
+
+    #[Depends('testIsAudited')]
+    public function testIsAuditedWhenTheProviderIsNotRegistered(): void
+    {
+        $configuration = $this->createProviderConfiguration([
+            'entities' => [
+                Post::class => [
+                    'enabled' => true,
+                ],
+            ],
+        ]);
+        $provider = new DoctrineProvider($configuration);
+        $provider->setAuditor($this->createAuditor());
+
+        $this->assertTrue($provider->isAudited(Post::class), 'An auditor that does not know the provider leaves auditing on.');
+    }
+
+    #[Depends('testIsAudited')]
     public function testIsAuditedFieldAuditsAnyFieldByDefault(): void
     {
         $entities = [

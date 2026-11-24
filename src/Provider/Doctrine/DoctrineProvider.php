@@ -218,6 +218,11 @@ final class DoctrineProvider extends AbstractProvider implements ResetInterface
             return false;
         }
 
+        // auditing switched off for this provider with Auditor::disableAuditing()
+        if ($this->auditor->hasProvider(self::class) && !$this->auditor->isAuditingEnabled($this)) {
+            return false;
+        }
+
         /** @var Configuration $configuration */
         $configuration = $this->configuration;
         $class = DoctrineHelper::getRealClassName($entity);

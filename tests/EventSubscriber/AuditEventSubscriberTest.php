@@ -7,6 +7,8 @@ namespace DH\Auditor\Tests\EventSubscriber;
 use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\EventSubscriber\AuditEventSubscriber;
 use DH\Auditor\Tests\Fixtures\EventSubscriber\CustomAuditEventSubscriber;
+use DH\Auditor\Tests\Fixtures\Provider\OtherRecordingStorageProvider;
+use DH\Auditor\Tests\Fixtures\Provider\RecordingStorageProvider;
 use DH\Auditor\Tests\Traits\AuditorTrait;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -80,5 +82,35 @@ final class AuditEventSubscriberTest extends TestCase
 
         // CustomAuditEventSubscriber modifie le payload pour mettre sa propre classe
         $this->assertSame(CustomAuditEventSubscriber::class, $event->getPayload()['entity']);
+    }
+
+    public function testSkipsAProviderWhoseStorageIsDisabled(): void
+    {
+        $auditor = $this->createAuditor();
+        $enabled = new RecordingStorageProvider();
+        $disabled = new OtherRecordingStorageProvider();
+        $auditor->registerProvider($enabled);
+        $auditor->registerProvider($disabled);
+        $auditor->disableStorage($disabled);
+
+        $event = $auditor->getEventDispatcher()->dispatch(new LifecycleEvent([
+            'entity' => AuditEventSubscriber::class,
+            'table' => '',
+            'type' => '',
+            'object_id' => '',
+            'discriminator' => '',
+            'transaction_hash' => '',
+            'diffs' => '',
+            'extra_data' => '',
+            'blame_id' => '',
+            'blame_user' => '',
+            'blame_user_fqdn' => '',
+            'blame_user_firewall' => '',
+            'ip' => '',
+            'created_at' => '',
+        ]));
+
+        $this->assertSame([$event], $enabled->persisted);
+        $this->assertSame([], $disabled->persisted, 'A provider whose storage is disabled must not persist.');
     }
 }

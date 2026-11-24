@@ -233,6 +233,38 @@ final class AuditorTest extends TestCase
         $auditor->enableAuditing($provider3);
     }
 
+    #[Depends('testDisableStorage')]
+    public function testDisableStorageOfAnAlreadyDisabledProvider(): void
+    {
+        $auditor = $this->createAuditor();
+        $provider1 = new StorageAndAuditProvider();
+        $provider2 = new StorageNoAuditProvider();
+
+        $auditor->registerProvider($provider1);
+        $auditor->registerProvider($provider2);
+        $auditor->disableStorage($provider2);
+        $auditor->disableStorage($provider2);
+
+        $this->assertFalse($auditor->isStorageEnabled($provider2), 'Storage provider 2 stays disabled.');
+        $this->assertTrue($auditor->isStorageEnabled($provider1), 'Storage provider 1 stays enabled.');
+    }
+
+    #[Depends('testDisableAuditing')]
+    public function testDisableAuditingOfAnAlreadyDisabledProvider(): void
+    {
+        $auditor = $this->createAuditor();
+        $provider1 = new StorageAndAuditProvider();
+        $provider2 = new AuditNoStorageProvider();
+
+        $auditor->registerProvider($provider1);
+        $auditor->registerProvider($provider2);
+        $auditor->disableAuditing($provider2);
+        $auditor->disableAuditing($provider2);
+
+        $this->assertFalse($auditor->isAuditingEnabled($provider2), 'Auditing provider 2 stays disabled.');
+        $this->assertTrue($auditor->isAuditingEnabled($provider1), 'Auditing provider 1 stays enabled.');
+    }
+
     public function testGetEventDispatcher(): void
     {
         $auditor = $this->createAuditor();

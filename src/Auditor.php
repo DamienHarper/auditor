@@ -129,6 +129,10 @@ final class Auditor
             throw new ProviderException(\sprintf('Provider "%s" does not support storage.', $provider::class));
         }
 
+        if (!\array_key_exists($provider::class, $this->storageProviders)) {
+            return $this;
+        }
+
         if (1 === \count($this->storageProviders)) {
             throw new ProviderException('At least one storage provider must be enabled.');
         }
@@ -172,6 +176,10 @@ final class Auditor
     {
         if (!$provider->supportsAuditing()) {
             throw new ProviderException(\sprintf('Provider "%s" does not support audit hooks.', $provider::class));
+        }
+
+        if (!\array_key_exists($provider::class, $this->auditProviders)) {
+            return $this;
         }
 
         if (1 === \count($this->auditProviders)) {
