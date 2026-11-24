@@ -22,7 +22,10 @@ Those two kind of services are offered by Providers.
 
 
 ## Default provider
-A default provider is included with this library: the `DoctrineProvider`
+A default provider is included with this library: the `DoctrineProvider`.
+It is deprecated since 4.1 and removed in 5.0: install its drop-in replacement,
+[`auditor-doctrine-provider`](https://github.com/DamienHarper/auditor-doctrine-provider), or
+[`auditor-bundle`](https://github.com/DamienHarper/auditor-bundle) in a Symfony application.
 
 `DoctrineProvider` offers both auditing services and sorage services.
 It creates audit logs for all `Doctrine ORM` database related changes:
@@ -60,7 +63,7 @@ Basically you can track any change of any entity from audit logs.
 | 2.x     | EOL                         | PHP >= 7.4, Symfony >= 4.4                                          | [![auditor 2.x CI](https://github.com/DamienHarper/auditor/actions/workflows/ci-2.x.yml/badge.svg)](https://github.com/DamienHarper/auditor/actions/workflows/ci-2.x.yml) <br/>[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=2.x)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=2.x) <br/>[![codecov](https://codecov.io/gh/DamienHarper/auditor/branch/master/graph/badge.svg)](https://app.codecov.io/gh/DamienHarper/auditor/branch/2.x)          |
 | 1.x     | EOL                         | PHP >= 7.2, Symfony >= 3.4                                          | [![auditor 1.x CI](https://github.com/DamienHarper/auditor/actions/workflows/ci-1.x.yml/badge.svg)](https://github.com/DamienHarper/auditor/actions/workflows/ci-1.x.yml) <br/>[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=1.x)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=1.x) <br/>[![codecov](https://codecov.io/gh/DamienHarper/auditor/branch/1.x/graph/badge.svg)](https://app.codecov.io/gh/DamienHarper/auditor/branch/1.x)             |
 
-Changelog is available [here](https://damienharper.github.io/auditor-docs/docs/auditor/release-notes.html)
+Changelog is available in the [releases](https://github.com/DamienHarper/auditor/releases), and the upgrade guides in the [documentation](https://damienharper.github.io/auditor-docs/auditor/upgrade).
 
 
 ## Contributing
