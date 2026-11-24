@@ -265,6 +265,42 @@ final class AuditorTest extends TestCase
         $this->assertTrue($auditor->isAuditingEnabled($provider1), 'Auditing provider 1 stays enabled.');
     }
 
+    public function testEnableStorageOfAnUnknownProvider(): void
+    {
+        $auditor = $this->createAuditor();
+        $auditor->registerProvider(new StorageAndAuditProvider());
+
+        $this->expectException(InvalidArgumentException::class);
+        $auditor->enableStorage(new StorageNoAuditProvider());
+    }
+
+    public function testDisableStorageOfAnUnknownProvider(): void
+    {
+        $auditor = $this->createAuditor();
+        $auditor->registerProvider(new StorageAndAuditProvider());
+
+        $this->expectException(InvalidArgumentException::class);
+        $auditor->disableStorage(new StorageNoAuditProvider());
+    }
+
+    public function testEnableAuditingOfAnUnknownProvider(): void
+    {
+        $auditor = $this->createAuditor();
+        $auditor->registerProvider(new StorageAndAuditProvider());
+
+        $this->expectException(InvalidArgumentException::class);
+        $auditor->enableAuditing(new AuditNoStorageProvider());
+    }
+
+    public function testDisableAuditingOfAnUnknownProvider(): void
+    {
+        $auditor = $this->createAuditor();
+        $auditor->registerProvider(new StorageAndAuditProvider());
+
+        $this->expectException(InvalidArgumentException::class);
+        $auditor->disableAuditing(new AuditNoStorageProvider());
+    }
+
     public function testGetEventDispatcher(): void
     {
         $auditor = $this->createAuditor();
