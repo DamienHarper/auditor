@@ -8,7 +8,7 @@ use DH\Auditor\Event\LifecycleEvent;
 use DH\Auditor\Provider\AbstractProvider;
 use DH\Auditor\Provider\ConfigurationInterface;
 
-final class RecordingStorageProvider extends AbstractProvider
+class RecordingStorageProvider extends AbstractProvider
 {
     /**
      * @var list<LifecycleEvent>

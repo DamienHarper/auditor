@@ -32,7 +32,7 @@ final readonly class AuditEventSubscriber
         $failures = [];
 
         foreach ($this->auditor->getProviders() as $provider) {
-            if (!$provider->supportsStorage()) {
+            if (!$provider->supportsStorage() || !$this->auditor->isStorageEnabled($provider)) {
                 continue;
             }
 
