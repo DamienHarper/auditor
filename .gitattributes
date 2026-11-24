@@ -4,3 +4,4 @@
 rector.php  export-ignore
 phpstan.neon    export-ignore
 phpunit.*    export-ignore
+context7.json   export-ignore

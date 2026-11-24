@@ -1,0 +1,23 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "auditor",
+  "description": "Provider-agnostic PHP audit log library: contracts, audit entry model, attributes and histories. Doctrine ORM support lives in auditor-doctrine-provider, Symfony integration in auditor-bundle.",
+  "folders": [
+    "docs",
+    "skills"
+  ],
+  "excludeFiles": [
+    "contributing.md"
+  ],
+  "rules": [
+    "Since auditor 5.0 the Doctrine ORM provider is the separate package damienharper/auditor-doctrine-provider; Symfony applications install damienharper/auditor-bundle.",
+    "Entry::$extraData is already decoded (?array): never call json_decode() on it.",
+    "LifecycleEvent payloads have no 'action' key: read the operation from $payload['type'].",
+    "Entry::$transactionHash no longer exists in 5.x: use Entry::$transactionId (a ULID)."
+  ],
+  "previousVersions": [
+    {
+      "branch": "4.x"
+    }
+  ]
+}
