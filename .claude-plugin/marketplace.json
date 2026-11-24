@@ -1,0 +1,38 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "auditor",
+  "description": "Agent Skills for the auditor PHP audit log library family: core, Doctrine ORM provider and Symfony bundle.",
+  "owner": {
+    "name": "Damien Harper",
+    "url": "https://github.com/DamienHarper"
+  },
+  "plugins": [
+    {
+      "name": "auditor",
+      "source": ".",
+      "description": "auditor core: audit entries, LifecycleEvent payload, attributes, histories and custom providers.",
+      "category": "development",
+      "tags": ["php", "audit-log"]
+    },
+    {
+      "name": "auditor-doctrine-provider",
+      "source": {
+        "source": "github",
+        "repo": "DamienHarper/auditor-doctrine-provider"
+      },
+      "description": "Doctrine ORM provider: configuration, audit tables, schema migration and querying audit entries.",
+      "category": "development",
+      "tags": ["php", "doctrine", "audit-log"]
+    },
+    {
+      "name": "auditor-bundle",
+      "source": {
+        "source": "github",
+        "repo": "DamienHarper/auditor-bundle"
+      },
+      "description": "Symfony bundle (formerly DoctrineAuditBundle): installation, configuration, viewer, security and customization.",
+      "category": "development",
+      "tags": ["php", "symfony", "doctrine", "audit-log"]
+    }
+  ]
+}
