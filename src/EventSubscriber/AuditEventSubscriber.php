@@ -25,7 +25,7 @@ final readonly class AuditEventSubscriber
     public function __invoke(LifecycleEvent $event): LifecycleEvent
     {
         foreach ($this->auditor->getProviders() as $provider) {
-            if ($provider->supportsStorage()) {
+            if ($provider->supportsStorage() && $this->auditor->isStorageEnabled($provider)) {
                 try {
                     $provider->persist($event);
                 } catch (\Exception) {
