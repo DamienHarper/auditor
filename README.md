@@ -10,7 +10,36 @@
 [![Monthly Downloads](https://poser.pugx.org/damienharper/auditor/d/monthly)](https://packagist.org/packages/damienharper/auditor)
 [![Daily Downloads](https://poser.pugx.org/damienharper/auditor/d/daily)](https://packagist.org/packages/damienharper/auditor)
 
-The purpose of `auditor` is to provide an easy and standardized way to collect audit logs.
+The purpose of `auditor` is to provide an easy and standardized way to collect audit logs:
+who changed what, when, and how. It is the core of the auditor family: it defines the contracts
+and the audit entry model, and providers do the change tracking and the storage.
+
+
+## Which package do I need?
+| Your application                     | Install                                                   | Brings                                              |
+|:-------------------------------------|:----------------------------------------------------------|:----------------------------------------------------|
+| Symfony with Doctrine ORM            | `composer require damienharper/auditor-bundle`            | auditor + Doctrine provider + configuration + viewer |
+| Doctrine ORM without Symfony         | `composer require damienharper/auditor-doctrine-provider` | auditor + Doctrine provider                         |
+| Another persistence layer            | `composer require damienharper/auditor`                   | the core only: [write your own provider](docs/providers/custom-provider.md) |
+
+| Line | auditor | auditor-doctrine-provider | auditor-bundle | Status |
+|:-----|:--------|:--------------------------|:---------------|:-------|
+| Next | 5.x     | 2.x                       | 8.x            | Active development |
+| Latest stable | 4.x  | 1.x                       | 7.x            | Maintained |
+
+Since auditor 5.0 the Doctrine provider is no longer part of this package: it lives in
+`auditor-doctrine-provider` (in 4.x it is still bundled, deprecated). `auditor-bundle` was formerly
+known as `DoctrineAuditBundle`. See the [upgrade guides](https://damienharper.github.io/auditor-docs/auditor/upgrade/).
+
+
+## Using an AI coding agent?
+Each package ships an [Agent Skill](https://agentskills.io) in its `skills/` folder (`vendor/damienharper/*/skills/`
+once installed) describing its API for the installed version. With Claude Code:
+```
+/plugin marketplace add DamienHarper/auditor
+/plugin install auditor-bundle@auditor
+```
+The documentation is also available as [llms.txt](https://damienharper.github.io/auditor-docs/llms.txt).
 
 
 ## Architecture
