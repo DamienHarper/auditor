@@ -34,7 +34,7 @@ known as `DoctrineAuditBundle`. See the [upgrade guides](https://damienharper.gi
 
 ## Using an AI coding agent?
 Each package ships an [Agent Skill](https://agentskills.io) in its `skills/` folder (`vendor/damienharper/*/skills/`
-once installed) describing its API for the installed version. With Claude Code:
+once installed) describing its API. The copy in `vendor/` matches your installed version; the marketplace serves the current major. With Claude Code:
 ```
 /plugin marketplace add DamienHarper/auditor
 /plugin install auditor-bundle@auditor

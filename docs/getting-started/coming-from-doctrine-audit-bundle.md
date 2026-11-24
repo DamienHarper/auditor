@@ -32,7 +32,7 @@ The root key changed from `dh_doctrine_audit` to `dh_auditor`, and the Doctrine 
 | `table_prefix`, `table_suffix`       | `providers.doctrine.table_prefix`, `providers.doctrine.table_suffix` |
 | `ignored_columns`                    | `providers.doctrine.ignored_columns`                           |
 | `entities.<FQCN>.ignored_columns`, `.enabled` | `providers.doctrine.entities.<FQCN>.ignored_columns`, `.enabled` |
-| `entities.<FQCN>.roles` (list of roles) | `providers.doctrine.entities.<FQCN>.roles.view` |
+| `entities.<FQCN>.roles.view` | `providers.doctrine.entities.<FQCN>.roles.view` |
 | `storage_entity_manager`             | `providers.doctrine.storage_services` (and `storage_mapper`)   |
 | `enabled_viewer`                     | `providers.doctrine.viewer`                                    |
 
@@ -55,8 +55,11 @@ Annotations are not supported any more: use the PHP attributes.
 ## 🗄️ Audit tables
 
 Audit tables created by DoctrineAuditBundle predate several format changes, the latest being the
-schema version 2 of auditor 5.0 (converted by `audit:schema:migrate`). Follow the upgrade guides one
-major at a time and back up the audit tables first:
+schema version 2 of auditor 5.0 (converted by `audit:schema:migrate`). Upgrade one major at a time.
+No single guide covers the whole path. The steps that exist: the
+[auditor-bundle 6.x upgrade notes](https://damienharper.github.io/auditor-docs/auditor-bundle/6.x/upgrading) and
+[auditor 3.x upgrade notes](https://damienharper.github.io/auditor-docs/auditor/3.x/upgrading) (from DoctrineAuditBundle
+and the early majors), then the guides below for 4.x and later. Back up the audit tables first.
 
 - [auditor upgrade guides](../upgrade/index.md)
 - [auditor-bundle upgrade guides](https://damienharper.github.io/auditor-docs/auditor-bundle/upgrade)

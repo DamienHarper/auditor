@@ -245,7 +245,7 @@ error semantics and a test: [references/custom-provider.md](references/custom-pr
 
 ## Documentation
 
-- Overview: https://damienharper.github.io/auditor-docs/auditor/
+- Overview: https://damienharper.github.io/auditor-docs/auditor
 - Installation: https://damienharper.github.io/auditor-docs/auditor/getting-started/installation
 - Quick start: https://damienharper.github.io/auditor-docs/auditor/getting-started/quick-start
 - Configuration: https://damienharper.github.io/auditor-docs/auditor/configuration (also `/user-provider`,
@@ -253,7 +253,7 @@ error semantics and a test: [references/custom-provider.md](references/custom-pr
 - Extra data: https://damienharper.github.io/auditor-docs/auditor/extra-data
 - Histories: https://damienharper.github.io/auditor-docs/auditor/history
 - Custom provider: https://damienharper.github.io/auditor-docs/auditor/providers/custom-provider
-- API reference: https://damienharper.github.io/auditor-docs/auditor/api/
+- API reference: https://damienharper.github.io/auditor-docs/auditor/api
 - Upgrade 4.x to 5.0 (schema v2, payload changes): https://damienharper.github.io/auditor-docs/auditor/upgrade/v5
   (source: `docs/upgrade/v5.md`)
-- Doctrine provider (reader, filters, commands): https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/
+- Doctrine provider (reader, filters, commands): https://damienharper.github.io/auditor-docs/auditor-doctrine-provider

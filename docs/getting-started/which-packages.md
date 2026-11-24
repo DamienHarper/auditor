@@ -14,7 +14,7 @@ description: "Choose between auditor, auditor-doctrine-provider and auditor-bund
 | Doctrine ORM without Symfony             | `composer require damienharper/auditor-doctrine-provider` | auditor + Doctrine provider, wired by hand                     |
 | Another persistence layer or a custom store | `composer require damienharper/auditor`                | the core only: [write your own provider](../providers/custom-provider.md) |
 
-Each package requires the ones above it: installing `auditor-bundle` installs the other two.
+`auditor-bundle` requires `auditor-doctrine-provider`, which requires `auditor`: installing the bundle installs the other two.
 
 | Package                                   | Role                                                                 |
 |-------------------------------------------|----------------------------------------------------------------------|
