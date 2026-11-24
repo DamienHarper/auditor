@@ -11,6 +11,7 @@ use DH\Auditor\Tests\Fixtures\EventSubscriber\CustomAuditEventSubscriber;
 use DH\Auditor\Tests\Fixtures\Provider\AuditNoStorageProvider;
 use DH\Auditor\Tests\Fixtures\Provider\FailingStorageProvider;
 use DH\Auditor\Tests\Fixtures\Provider\OtherFailingStorageProvider;
+use DH\Auditor\Tests\Fixtures\Provider\OtherRecordingStorageProvider;
 use DH\Auditor\Tests\Fixtures\Provider\RecordingStorageProvider;
 use DH\Auditor\Tests\Traits\AuditorTrait;
 use PHPUnit\Framework\Attributes\Small;
@@ -125,6 +126,38 @@ final class AuditEventSubscriberTest extends TestCase
         $event = $auditor->getEventDispatcher()->dispatch(new LifecycleEvent($this->createPayload()));
 
         $this->assertSame([$event], $recording->persisted);
+    }
+
+    public function testSkipsAProviderWhoseStorageIsDisabled(): void
+    {
+        $auditor = $this->createAuditor();
+        $enabled = new RecordingStorageProvider();
+        $disabled = new OtherRecordingStorageProvider();
+        $auditor->registerProvider($enabled);
+        $auditor->registerProvider($disabled);
+        $auditor->disableStorage($disabled);
+
+        $event = $auditor->getEventDispatcher()->dispatch(new LifecycleEvent($this->createPayload()));
+
+        $this->assertSame([$event], $enabled->persisted);
+        $this->assertSame([], $disabled->persisted, 'A provider whose storage is disabled must not persist.');
+    }
+
+    public function testThrowsWhenTheOnlyEnabledStorageProviderFails(): void
+    {
+        $auditor = $this->createAuditor();
+        $disabled = new RecordingStorageProvider();
+        $auditor->registerProvider(new FailingStorageProvider());
+        $auditor->registerProvider($disabled);
+        $auditor->disableStorage($disabled);
+
+        try {
+            $auditor->getEventDispatcher()->dispatch(new LifecycleEvent($this->createPayload()));
+            $this->fail('A ProviderException should have been thrown.');
+        } catch (ProviderException $providerException) {
+            $this->assertStringContainsString(FailingStorageProvider::class.': ', $providerException->getMessage());
+            $this->assertSame([], $disabled->persisted);
+        }
     }
 
     public function testDoesNotThrowWithoutStorageProvider(): void

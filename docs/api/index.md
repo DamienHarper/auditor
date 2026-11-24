@@ -42,6 +42,11 @@ final class Auditor
 }
 ```
 
+`disableStorage()` stops `AuditEventSubscriber` from passing audit entries to that provider's
+`persist()`; `disableAuditing()` tells the provider to stop producing entries (the Doctrine provider
+checks `isAuditingEnabled()`, a custom auditing provider must do the same). Both refuse to switch off
+the last enabled provider of their role, and disabling a provider that is already disabled does nothing.
+
 By default, the constructor attaches `AuditEventSubscriber` to `$dispatcher` (priority
 `AuditEventSubscriber::PRIORITY`, i.e. `-1_000_000`). Pass `false` as third argument when the
 subscriber is declared as a listener of the dispatcher instead, e.g. in a Symfony container: since
