@@ -1,3 +1,7 @@
+---
+description: "Restrict who can read audit log entries with a role checker callable, combined with the #[Security] attribute, and handle the AccessDeniedException it triggers."
+---
+
 # Role Checker Configuration
 
 > **Control access to audit logs with fine-grained permissions**

@@ -1,3 +1,7 @@
+---
+description: Install the auditor PHP audit log library with Composer, check the PHP and Symfony requirements, and add the Doctrine ORM provider or the Symfony bundle.
+---
+
 # Installation
 
 > **Install auditor using Composer**

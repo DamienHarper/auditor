@@ -1,3 +1,7 @@
+---
+description: Record who made each change with a user provider callable returning a User or a custom UserInterface, and read the blamed user back from audit entries.
+---
+
 # User Provider Configuration
 
 > **Identify who made changes to audited entities**

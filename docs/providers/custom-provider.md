@@ -1,6 +1,7 @@
 ---
 id: custom-provider
 title: Building a Custom Provider
+description: Write a custom auditor provider with ProviderInterface, AbstractProvider and auditing or storage services, read the LifecycleEvent payload, and package it.
 ---
 # Building a Custom Provider
 

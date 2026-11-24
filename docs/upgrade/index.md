@@ -1,3 +1,7 @@
+---
+description: Choose the upgrade guide between auditor major versions, check which versions are supported with which PHP and Symfony releases, and update with Composer.
+---
+
 # Upgrade Guide
 
 > **Navigate between major versions of auditor**

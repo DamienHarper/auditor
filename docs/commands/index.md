@@ -1,3 +1,7 @@
+---
+description: "Reference of the audit console commands shipped by auditor-doctrine-provider: schema update and migration, cleaning, snapshots, export and root indexing."
+---
+
 # Console Commands
 
 > **Manage audit data via the command line**

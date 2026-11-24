@@ -1,3 +1,7 @@
+---
+description: Reference of the auditor Configuration options (enabled, timezone, user provider, security provider, role checker, extra data provider) and how to set them.
+---
+
 # Configuration Reference
 
 > **All configuration options available in auditor**

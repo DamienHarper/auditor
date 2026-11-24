@@ -2,6 +2,7 @@
 id: index
 title: Introduction
 slug: /
+description: "Overview of auditor, a provider-based PHP audit log library: features, architecture and data flow, available providers, supported databases and versions."
 ---
 # auditor
 

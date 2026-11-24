@@ -1,3 +1,7 @@
+---
+description: Record the client IP address and firewall name of each audit entry with a security provider callable that returns a two-value list, in Symfony or plain PHP.
+---
+
 # Security Provider Configuration
 
 > **Capture contextual security information for each audit event**

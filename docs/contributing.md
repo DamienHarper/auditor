@@ -1,3 +1,7 @@
+---
+description: "Contribute to the auditor library: development setup, running PHPUnit locally or in the Docker matrix, code quality tools, bug reports and documentation fixes."
+---
+
 # Contributing
 
 > **Thank you for your interest in contributing to auditor!**

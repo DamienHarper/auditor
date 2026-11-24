@@ -1,3 +1,7 @@
+---
+description: Attach extra data to audit log entries with the extra_data_provider callable or a LifecycleEvent listener, then read it back as a decoded array from Entry.
+---
+
 # Extra Data
 
 The `extra_data` column allows you to store arbitrary supplementary information alongside each audit entry. This is useful for capturing contextual data that isn't part of the entity's fields, such as department, role, request metadata, or any business-specific information.

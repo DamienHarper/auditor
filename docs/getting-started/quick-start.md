@@ -1,3 +1,7 @@
+---
+description: "Set up the auditor core in plain PHP: create the Configuration and the Auditor, register a provider and mark entities with #[Auditable] and related attributes."
+---
+
 # Quick Start Guide
 
 > **Set up the auditor core and connect a provider**

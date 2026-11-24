@@ -1,3 +1,7 @@
+---
+description: "Doctrine ORM support for auditor lives in the separate auditor-doctrine-provider package since 5.0: what it supports and where its documentation is."
+---
+
 # DoctrineProvider
 
 DoctrineProvider adds Doctrine ORM support to `auditor`. It automatically tracks insertions,

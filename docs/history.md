@@ -1,3 +1,7 @@
+---
+description: "Build business histories from audit log entries with #[AuditRoot], HistoryGrouper, ChangeExtractor, BlameOrigin and label resolvers, across audited entities."
+---
+
 # Histories
 
 > **Show the history of a business object, not of one table**
