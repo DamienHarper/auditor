@@ -67,7 +67,7 @@ flowchart TD
 
             TP["TransactionProcessor
             Track inserts, updates, deletes, relations
-            Build payload (diffs, blame, extra_data = null)"]
+            Build payload (diffs, blame, extra_data)"]
         end
 
         subgraph EVENTS["EventDispatcher"]
@@ -98,7 +98,7 @@ flowchart TD
 
 1. **Entity Change** → Your application modifies data
 2. **Detection** → The provider's `AuditingService` detects the change
-3. **Processing** → `TransactionProcessor` computes diffs and prepares audit data (with `extra_data = null`)
+3. **Processing** → `TransactionProcessor` computes diffs and prepares audit data (`extra_data` comes from the [extra data provider](extra-data.md) when one is set, `null` otherwise)
 4. **Event** → A `LifecycleEvent` is dispatched with the audit payload and the entity object
 5. **Enrichment** *(optional)* → Your listener(s) inspect the entity and populate `extra_data` in the payload
 6. **Persistence** → The provider's `StorageService` persists the audit entry to the database

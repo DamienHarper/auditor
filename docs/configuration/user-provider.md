@@ -72,6 +72,7 @@ If your user has a database ID:
 ```php
 <?php
 
+use App\Entity\User as AppUser;
 use DH\Auditor\User\User;
 
 $configuration->setUserProvider(function () use ($security, $entityManager): ?User {
@@ -83,7 +84,7 @@ $configuration->setUserProvider(function () use ($security, $entityManager): ?Us
     
     // Get the user ID from the database entity
     $userId = $entityManager
-        ->getRepository(User::class)
+        ->getRepository(AppUser::class)
         ->findOneBy(['email' => $user->getUserIdentifier()])
         ?->getId();
     
@@ -155,15 +156,17 @@ A readonly property satisfies a `{ get; }` property of an interface.
 ## 🌐 API/CLI Context
 
 > [!TIP]
-> For API requests or CLI commands, consider identifying the context (API token, CLI user) rather than leaving it empty.
+> For API requests, consider identifying the API client rather than leaving the user empty. For CLI commands,
+> return `null` (no fake user) and record how the change was made with a [blame context](blame-context.md),
+> such as `new BlameContext('console', 'app:import-products')`.
 
 ```php
 <?php
 
 $configuration->setUserProvider(function (): ?User {
-    // Check for CLI context
+    // CLI context: no user to blame, the command is recorded by a blame context
     if (PHP_SAPI === 'cli') {
-        return new User('CLI', 'System (CLI)');
+        return null;
     }
     
     // Check for API token
