@@ -252,8 +252,11 @@ $elasticProvider = new ElasticProvider(new ElasticConfiguration($client));
 $auditor->registerProvider($elasticProvider);
 ```
 
-`auditor` requires **at least one provider** that supports auditing **and** at least one that
-supports storage. The two roles can be fulfilled by the same provider or by separate ones.
+`registerProvider()` only requires each provider to support **at least one** of the two roles
+(auditing or storage); it throws a `ProviderException` otherwise. Nothing is audited without a
+provider that supports auditing, and nothing is persisted without one that supports storage. The
+two roles can be fulfilled by the same provider or by separate ones. `disableAuditing()` and
+`disableStorage()` refuse to switch off the last enabled provider of their role.
 
 ---
 
@@ -408,7 +411,7 @@ final class AcmeProviderTest extends TestCase
             'extra_data'     => null,
             'blame_id'       => null,
             'blame'          => null,
-            'created_at'     => new \DateTimeImmutable(),
+            'created_at'     => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
         ]);
 
         $provider->persist($event);

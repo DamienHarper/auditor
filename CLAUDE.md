@@ -116,9 +116,9 @@ Attributes live in `src/Attribute/`:
 
 ### Provider contracts
 
-`src/Provider/Service/` defines abstract service interfaces:
-- `AuditingServiceInterface` — detects changes and produces `LifecycleEvent`s
-- `StorageServiceInterface` — persists audit entries
+`src/Provider/Service/` defines the service interfaces. Both are empty marker interfaces extending `ServiceInterface` (`getName()` only; `AbstractService` implements it):
+- `AuditingServiceInterface` — marks a service a provider registers to detect changes (`registerAuditingService()`); the detection logic and the dispatch of `LifecycleEvent`s live in the provider
+- `StorageServiceInterface` — marks a service a provider registers to store entries (`registerStorageService()`); persistence goes through `ProviderInterface::persist()`
 
 ## Testing conventions
 
@@ -136,7 +136,8 @@ Attributes live in `src/Attribute/`:
 - `getDiffs()` returns the `changes` of a v2 diff (`field => ['old' => …, 'new' => …]`), or the whole diff of an association/dissociation (no `changes` key); legacy entries return the raw diff. `getDiffSource()` / `getDiffTarget()` read the `source` / `target` blocks; `isDeepDiff()` and `isDiffLeaf()` tell JSON deep diffs from field diffs
 
 ### `LifecycleEvent` payload keys (schema v2)
-`entity` (FQCN), `table`, `schema_version` (`2`), `type` (string operation), `object_id`, `discriminator`, `transaction_id` (ULID), `diffs` (JSON string), `extra_data`, `blame_id`, `blame` (JSON string: `username`, `user_fqdn`, `user_firewall`, `ip`), `created_at`.
+- Core keys, required by `AuditEvent` (an `InvalidArgumentException` otherwise): `type` (string operation), `object_id`, `discriminator`, `schema_version` (`2`), `transaction_id` (ULID), `diffs` (JSON string), `extra_data`, `blame_id`, `blame` (JSON string: `username`, `user_fqdn`, `user_firewall`, `ip`, plus `via` when a blame context is set), `created_at` (`Y-m-d H:i:s.u` string). `normalizePayload()` defaults `extra_data` and `blame` to `null` and `schema_version` to `2` when missing; the other keys must be given.
+- Keys added by the Doctrine provider (`TransactionProcessor`), not checked by the core: `entity` (FQCN), `table` (audit table name), and `roots` when the entity declares `#[AuditRoot]`. `DoctrineProvider::persist()` strips them before writing the row.
 - No `action` key at the `LifecycleEvent` level — use `$payload['type']`.
 - The v1 keys `transaction_hash`, `blame_user`, `blame_user_fqdn`, `blame_user_firewall` and `ip` are gone: the blame context lives in `blame`.
 - `diffs` envelope: `source` (summary of the audited entity) and `changes`, plus `deep_diffs` (fields whose changeset is a JSON deep diff) when relevant; association/dissociation diffs carry `source`, `target`, `is_owning_side` and `join_table` instead of `changes`.
