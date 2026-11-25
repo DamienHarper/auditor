@@ -211,6 +211,10 @@ foreach ($items as $item) {          // HistoryItem
 }
 ```
 
+- `$grouper->groupsByTransaction()`: true when the grouper has no key of its own, so it makes one item per
+  transaction; a reader can then read a page of N items as a page of N transactions (whole actions). With a key of
+  its own, an item may span several transactions: page by entries instead.
+
 - `BlameOrigin::fromEntry($entry)`: `Console` / `Messenger` (blame context type), else `Http` when the blame has
   a firewall, else `System`. The context wins over the firewall.
 - For a `Json` change, `$change->new` is the deep diff tree, not the full value: test `$change->kind` before
