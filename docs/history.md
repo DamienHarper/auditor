@@ -90,6 +90,9 @@ $items = $grouper->group($entries);
 
 Pass the entries most recent first, as readers return them: items keep the order of their first entry.
 
+`groupsByTransaction()` tells whether a grouper has no key of its own, and so makes one item per transaction: a
+reader can then read a page of N items as a page of N transactions.
+
 ## 🔍 Reading changes
 
 `ChangeExtractor` reads schema v1 and v2 entries alike and returns `DH\Auditor\History\Change` objects:

@@ -432,6 +432,7 @@ final readonly class HistoryGrouper
     public function __construct(?callable $key = null, ChangeExtractor $extractor = new ChangeExtractor());
     public static function byTransaction(iterable $entries): array; // list<HistoryItem>
     public static function transactionKey(Entry $entry): string;
+    public function groupsByTransaction(): bool;                    // no key of its own: one item per transaction
     public function keyOf(Entry $entry): string;
     public function group(iterable $entries): array;               // list<HistoryItem>
 }

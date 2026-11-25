@@ -56,6 +56,15 @@ final readonly class HistoryGrouper
     }
 
     /**
+     * Tells whether the grouper makes one item per transaction (no key of its own): a reader can then read its pages by
+     * transactions, as many items as transactions.
+     */
+    public function groupsByTransaction(): bool
+    {
+        return null === $this->key;
+    }
+
+    /**
      * Returns the grouping key of an entry.
      */
     public function keyOf(Entry $entry): string
