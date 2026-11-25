@@ -7,6 +7,7 @@ namespace DH\Auditor\Tests\History;
 use DH\Auditor\Exception\InvalidArgumentException;
 use DH\Auditor\History\BlameOrigin;
 use DH\Auditor\History\Change;
+use DH\Auditor\History\ChangeExtractor;
 use DH\Auditor\History\ChangeKind;
 use DH\Auditor\History\HistoryGrouper;
 use DH\Auditor\History\HistoryItem;
@@ -68,6 +69,13 @@ final class HistoryGrouperTest extends TestCase
         $this->assertSame(['T3', 'T2'], $items[0]->getTransactionIds());
         $this->assertSame('T1', $items[1]->key, 'A null key falls back to the transaction id.');
         $this->assertSame('R1', $grouper->keyOf($entries[0]));
+    }
+
+    public function testGroupsByTransactionUnlessItHasAKeyOfItsOwn(): void
+    {
+        $this->assertTrue(new HistoryGrouper()->groupsByTransaction());
+        $this->assertTrue(new HistoryGrouper(extractor: new ChangeExtractor(['App\Post' => ['title']]))->groupsByTransaction(), 'An extractor of its own keeps the grouping by transaction.');
+        $this->assertFalse(new HistoryGrouper(static fn (Entry $entry): ?string => null)->groupsByTransaction());
     }
 
     public function testEntryWithoutTransaction(): void
