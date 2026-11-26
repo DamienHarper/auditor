@@ -87,6 +87,35 @@ the audit entry (the message lists each provider's error, `getPrevious()` return
 With the Doctrine provider, the flush fails and the database transaction is rolled back.
 A failure is still ignored when another storage provider persisted the entry.
 
+## `UserInterface`: user class and impersonator
+
+`UserInterface` declares two new properties, written in the `blame` JSON by the providers:
+
+- `?string $fqdn`: the class of the user in the application, written as `user_fqdn`. Providers used to write the class
+  of the object returned by the user provider, which was `DH\Auditor\User\User` whenever the built-in class was used.
+- `?UserInterface $impersonator`: the user who impersonates this one (switch user), written in a new `impersonator`
+  key (`{"id", "username", "fqdn"}`) only when set. `$entry->impersonator`, `HistoryItem::$impersonator` and the
+  `blame_impersonator_id`, `blame_impersonator` and `blame_impersonator_fqdn` keys of `Entry::toArray()` return it.
+
+The built-in `User` takes them as optional constructor arguments:
+
+```php
+new User($id, $username, App\Entity\User::class, new User($adminId, $adminName, App\Entity\Admin::class));
+```
+
+Custom implementations of `UserInterface` must declare both properties (`null` when unknown).
+
+Entries written before keep their values: a `user_fqdn` of `DH\Auditor\User\User`, and an impersonator that the
+user provider may have appended to the username (such as `alice[impersonator admin]`, the format of auditor-bundle
+before 8.0), which is not parsed. To find the latter:
+
+```sql
+-- MySQL, MariaDB, SQLite
+SELECT * FROM post_audit WHERE JSON_EXTRACT(blame, '$.username') LIKE '%[impersonator %';
+-- PostgreSQL
+SELECT * FROM post_audit WHERE CAST(blame AS jsonb) ->> 'username' LIKE '%[impersonator %';
+```
+
 ## New: blame contexts
 
 A blame context records *how* a change was made (an import, a console command, a Messenger message…) in the
