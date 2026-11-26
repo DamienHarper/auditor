@@ -74,7 +74,8 @@ $configuration->setUserProvider(function (): ?User {
     
     return new User(
         (string) $currentUser->getId(),  // User identifier
-        $currentUser->getUsername()       // Username for display
+        $currentUser->getUsername(),      // Username for display
+        $currentUser::class,              // Class of the user (user_fqdn)
     );
 });
 ```
@@ -88,6 +89,8 @@ interface UserInterface
 {
     public ?string $identifier { get; }
     public ?string $username { get; }
+    public ?string $fqdn { get; }
+    public ?UserInterface $impersonator { get; }
 }
 ```
 
@@ -155,7 +158,7 @@ $configuration->setUserProvider(function (): ?User {
     if (null === $user) {
         return null;
     }
-    return new User((string) $user->getId(), $user->getUsername());
+    return new User((string) $user->getId(), $user->getUsername(), $user::class);
 });
 
 // Set security provider

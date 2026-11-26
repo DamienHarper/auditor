@@ -70,6 +70,7 @@ foreach (HistoryGrouper::byTransaction($entries) as $item) {
     $item->userId;          // a user id without a username is a user whose name was not recorded
     $item->origin;          // BlameOrigin::Http, Console, Messenger or System
     $item->via;             // blame context, if any
+    $item->impersonator;    // user who impersonated the author (switch user), if any
     $item->getChanges();    // list<Change>, in chronological order
     $item->getMainChange(); // the creation, snapshot or deletion if any, otherwise the first change
     $item->entries;         // raw Entry objects, most recent first, for technical details

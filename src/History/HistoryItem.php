@@ -41,6 +41,15 @@ final class HistoryItem
         get => $this->entries[0]->userFqdn;
     }
 
+    /**
+     * User who impersonated the author (switch user), from the blame.
+     *
+     * @var null|array{id?: null|string, username?: null|string, fqdn?: null|string}
+     */
+    public ?array $impersonator {
+        get => $this->entries[0]->impersonator;
+    }
+
     public BlameOrigin $origin {
         get => BlameOrigin::fromEntry($this->entries[0]);
     }

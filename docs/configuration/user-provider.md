@@ -37,7 +37,8 @@ $configuration->setUserProvider(function (): ?User {
     
     return new User(
         (string) $currentUser->getId(),    // User ID (stored as blame_id)
-        $currentUser->getUsername()         // Username (stored in blame JSON column)
+        $currentUser->getUsername(),        // Username (stored in blame JSON column)
+        $currentUser::class,                // Class of the user (user_fqdn key of the blame JSON column)
     );
 });
 ```
@@ -60,7 +61,8 @@ $configuration->setUserProvider(function () use ($security): ?User {
     
     return new User(
         $user->getUserIdentifier(),
-        $user->getUserIdentifier()
+        $user->getUserIdentifier(),
+        $user::class,
     );
 });
 ```
@@ -97,7 +99,7 @@ $configuration->setUserProvider(function () use ($security, $entityManager): ?Us
 
 ## 📦 The User Class
 
-The built-in `User` class is a final value object. `UserInterface` declares two read-only properties (PHP 8.4
+The built-in `User` class is a final value object. `UserInterface` declares four read-only properties (PHP 8.4
 property hooks), read by the providers:
 
 ```php
@@ -110,6 +112,10 @@ interface UserInterface
     public ?string $identifier { get; }   // stored as blame_id
 
     public ?string $username { get; }     // stored in the blame JSON column
+
+    public ?string $fqdn { get; }         // class of the user, user_fqdn key of the blame JSON column
+
+    public ?UserInterface $impersonator { get; } // impersonator key of the blame JSON column
 }
 
 final class User implements UserInterface
@@ -121,11 +127,43 @@ final class User implements UserInterface
     public function __construct(
         private readonly ?string $id = null,
         public readonly ?string $username = null,
+        public readonly ?string $fqdn = null,
+        public readonly ?UserInterface $impersonator = null,
     ) {}
 }
 ```
 
-The class of the object returned by the user provider is recorded as `user_fqdn`.
+`fqdn` is the class of the user in your application (such as `App\Entity\User`), recorded as `user_fqdn`: it tells
+users of different classes apart when they share an id. It is null when the user provider does not supply it.
+
+## 🎭 Impersonation
+
+When a user impersonates another one (switch user), return the impersonated user and pass the impersonator: the
+changes are blamed on the impersonated user, and the impersonator is recorded in the `impersonator` key of the
+blame JSON column.
+
+```php
+<?php
+
+return new User(
+    (string) $impersonated->getId(),
+    $impersonated->getUserIdentifier(),
+    $impersonated::class,
+    new User((string) $impersonator->getId(), $impersonator->getUserIdentifier(), $impersonator::class),
+);
+```
+
+```json
+{
+  "username": "alice",
+  "user_fqdn": "App\\Entity\\Customer",
+  "user_firewall": "main",
+  "ip": "10.0.0.1",
+  "impersonator": {"id": "1", "username": "admin", "fqdn": "App\\Entity\\Admin"}
+}
+```
+
+The key is written only when an impersonator is set; `$entry->impersonator` returns it (null otherwise).
 
 ## 🧩 Custom User Implementation
 
@@ -142,11 +180,15 @@ final readonly class CustomUser implements UserInterface
 {
     public ?string $identifier;
     public ?string $username;
+    public ?string $fqdn;
+    public ?UserInterface $impersonator;
 
     public function __construct(string $id, string $name, public string $email)
     {
         $this->identifier = $id;
         $this->username = sprintf('%s (%s)', $name, $email);
+        $this->fqdn = \App\Entity\User::class;
+        $this->impersonator = null;
     }
 }
 ```
@@ -209,6 +251,7 @@ foreach ($audits as $entry) {
     echo "User ID: " . $entry->userId;    // blame_id column
     echo "Username: " . $entry->username; // blame JSON → username key
     echo "User FQDN: " . $entry->userFqdn; // blame JSON → user_fqdn key
+    echo "Impersonator: " . ($entry->impersonator['username'] ?? '-'); // blame JSON → impersonator key
 }
 ```
 
