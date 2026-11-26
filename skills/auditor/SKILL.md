@@ -82,7 +82,7 @@ $configuration = new Configuration([
     'enabled' => true, 'timezone' => 'UTC',
     'user_provider' => null, 'security_provider' => null, 'role_checker' => null, 'extra_data_provider' => null,
 ]);
-$configuration->setUserProvider(fn (): ?User => $current ? new User((string) $current->getId(), $current->getEmail()) : null);
+$configuration->setUserProvider(fn (): ?User => $current ? new User((string) $current->getId(), $current->getEmail(), $current::class) : null);
 $configuration->setSecurityProvider(fn (): array => [$clientIp, $firewallName]); // a LIST [ip, firewall], each ?string
 $configuration->setRoleChecker(fn (string $entity, string $scope): bool => true); // false: readers throw AccessDeniedException
 $configuration->setExtraDataProvider(fn (): ?array => ['request_id' => $requestId]);
@@ -92,8 +92,11 @@ $auditor->registerProvider($provider); // e.g. a DoctrineProvider from auditor-d
 ```
 
 - `$configuration->enabled` (read) / `enable()` / `disable()`; `$configuration->timezone`.
-- User provider returns `?DH\Auditor\User\UserInterface` (`?string $identifier`, `?string $username`); `User` is
-  the built-in value object. Its class is recorded as `user_fqdn`. Return null when nobody is authenticated.
+- User provider returns `?DH\Auditor\User\UserInterface` (`?string $identifier`, `?string $username`,
+  `?string $fqdn`, `?UserInterface $impersonator`); `User($id, $username, $fqdn, $impersonator)` is the built-in
+  value object. `fqdn` (the user's class in your application) is recorded as `user_fqdn`. On switch user, return
+  the impersonated user with the impersonator: it is recorded in the `impersonator` key of the blame. Return null
+  when nobody is authenticated.
 - No role checker (null) means everyone can read every audit.
 
 ## Blame context: record *how* a change was made
@@ -125,8 +128,9 @@ $entry->objectId;        // string
 $entry->discriminator;   // ?string
 $entry->transactionId;   // ?string, a ULID (falls back on legacy transaction_hash)
 $entry->userId;          // int|string|null (blame_id)
-$entry->blame;           // ?array decoded: username, user_fqdn, user_firewall, ip, via
+$entry->blame;           // ?array decoded: username, user_fqdn, user_firewall, ip, impersonator, via
 $entry->username; $entry->userFqdn; $entry->userFirewall; $entry->ip; // shortcuts into $entry->blame
+$entry->impersonator;    // ?array{id?, username?, fqdn?}: who impersonated the user (switch user), else null
 $entry->via;             // ?array blame context
 $entry->extraData;       // ?array, ALREADY decoded: never json_decode() it
 $entry->createdAt;       // ?DateTimeImmutable
@@ -201,7 +205,7 @@ $items = new HistoryGrouper(
 )->group($entries);
 
 foreach ($items as $item) {          // HistoryItem
-    $item->createdAt; $item->username; $item->userId; $item->origin; $item->via; $item->entries;
+    $item->createdAt; $item->username; $item->userId; $item->impersonator; $item->origin; $item->via; $item->entries;
     foreach ($item->getChanges() as $change) {   // list<Change>, chronological, mirror associations removed
         $change->kind;               // ChangeKind: Created, Snapshot, Deleted, Set, Changed, Cleared, Added, Removed, Json
         $change->field; $change->old; $change->new; $change->oldLabel; $change->newLabel;
