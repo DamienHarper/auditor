@@ -16,8 +16,8 @@ When an audit entry is created, the security provider supplies:
 - **the client IP address**, stored under the `ip` key of the `blame` JSON column;
 - **the firewall name**, stored under the `user_firewall` key of the `blame` JSON column.
 
-The class of the user (`user_fqdn`) is not supplied by the security provider: the provider takes it from the object
-returned by the [user provider](user-provider.md).
+The class of the user (`user_fqdn`) is not supplied by the security provider: it is the `fqdn` of the user returned by
+the [user provider](user-provider.md).
 
 ## 🚀 Setting Up a Security Provider
 

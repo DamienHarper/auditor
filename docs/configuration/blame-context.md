@@ -40,7 +40,7 @@ new BlameContext(
 | `type`   | ✅ always         | Kind of context, such as `import`, `console`, `messenger`, `api_token` |
 | `label`  | ✅ when set       | What the viewer shows next to the type |
 | `data`   | ✅ when not empty | Anything else worth keeping |
-| `user`   | ❌                | Blamed instead of the user returned by the user provider (`blame_id`, `username`, `user_fqdn`) |
+| `user`   | ❌                | Blamed instead of the user returned by the user provider (`blame_id`, `username`, `user_fqdn`, `impersonator`) |
 
 The `user` lets a background process blame the person it acts for, such as the user who dispatched a message,
 instead of the process itself. The IP address and firewall still come from the security provider.

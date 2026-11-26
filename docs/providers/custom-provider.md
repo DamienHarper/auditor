@@ -166,7 +166,7 @@ The `$payload` array always contains these keys:
 | `diffs` | `string` | JSON-encoded field-level changes (`{source, changes}` envelope) |
 | `extra_data` | `?string` | Optional JSON metadata (enriched by event listeners) |
 | `blame_id` | `int\|string\|null` | Authenticated user identifier |
-| `blame` | `?string` | JSON-encoded blame: `{"username", "user_fqdn", "user_firewall", "ip"}`, plus `via` (blame context) when set |
+| `blame` | `?string` | JSON-encoded blame: `{"username", "user_fqdn", "user_firewall", "ip"}`, plus `impersonator` (`{"id", "username", "fqdn"}`) when the user is impersonated and `via` (blame context) when set |
 | `created_at` | `string` | Timestamp of the change (`Y-m-d H:i:s.u`, in the auditor timezone) |
 
 Providers built on Doctrine ORM also add:

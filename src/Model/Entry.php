@@ -32,8 +32,8 @@ final class Entry
     }
 
     /**
-     * Returns the decoded blame: username, user_fqdn, user_firewall, ip and, when the change was made in a blame
-     * context, via.
+     * Returns the decoded blame: username, user_fqdn, user_firewall, ip, impersonator when the user was impersonated
+     * and via when the change was made in a blame context.
      */
     public ?array $blame {
         get => $this->getBlame();
@@ -57,6 +57,17 @@ final class Entry
     /** Convenience accessor for $blame['ip']. */
     public ?string $ip {
         get => $this->getBlame()['ip'] ?? null;
+    }
+
+    /**
+     * Convenience accessor for $blame['impersonator']: the user who impersonated the blamed one (switch user).
+     *
+     * Entries written before this key existed keep the impersonator in the username, which is not parsed.
+     *
+     * @var null|array{id?: string, username?: string, fqdn?: string}
+     */
+    public ?array $impersonator {
+        get => $this->getImpersonator();
     }
 
     /**
@@ -259,6 +270,9 @@ final class Entry
             'blame_user' => $this->username,
             'blame_user_fqdn' => $this->userFqdn,
             'blame_user_firewall' => $this->userFirewall,
+            'blame_impersonator_id' => $this->impersonator['id'] ?? null,
+            'blame_impersonator' => $this->impersonator['username'] ?? null,
+            'blame_impersonator_fqdn' => $this->impersonator['fqdn'] ?? null,
             'ip' => $this->ip,
             'blame_via' => $this->via,
             'extra_data' => $this->extraData,
@@ -407,6 +421,28 @@ final class Entry
         unset($diffs['@source']);
 
         return $this->sort($diffs);
+    }
+
+    /**
+     * Keeps the id, username and fqdn of the impersonator that are strings; null when none is.
+     *
+     * @return null|array{id?: string, username?: string, fqdn?: string}
+     */
+    private function getImpersonator(): ?array
+    {
+        $impersonator = $this->getBlame()['impersonator'] ?? null;
+
+        if (!\is_array($impersonator)) {
+            return null;
+        }
+
+        $kept = array_filter(
+            array_intersect_key($impersonator, ['id' => true, 'username' => true, 'fqdn' => true]),
+            \is_string(...),
+        );
+
+        /** @var array{id?: string, username?: string, fqdn?: string} $kept */
+        return [] === $kept ? null : $kept;
     }
 
     /**

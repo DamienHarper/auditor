@@ -193,6 +193,7 @@ final class Entry
     public ?string $userFqdn;                 // virtual: blame['user_fqdn']
     public ?string $userFirewall;             // virtual: blame['user_firewall']
     public ?string $ip;                       // virtual: blame['ip']
+    public ?array $impersonator;              // virtual: blame['impersonator'] (switch user)
     public ?array $via;                       // virtual: blame['via'] (blame context)
     public ?array $extraData;                 // virtual: decoded extra_data JSON
     public ?\DateTimeImmutable $createdAt;    // virtual: maps to created_at column
@@ -222,13 +223,20 @@ interface UserInterface
 {
     public ?string $identifier { get; }
     public ?string $username { get; }
+    public ?string $fqdn { get; }                 // class of the user (user_fqdn)
+    public ?UserInterface $impersonator { get; }  // user who impersonates this one
 }
 
 final class User implements UserInterface
 {
     public ?string $identifier { get => $this->id; }   // the $id given to the constructor
 
-    public function __construct(?string $id = null, public readonly ?string $username = null);
+    public function __construct(
+        ?string $id = null,
+        public readonly ?string $username = null,
+        public readonly ?string $fqdn = null,
+        public readonly ?UserInterface $impersonator = null,
+    );
 }
 ```
 
@@ -449,6 +457,7 @@ final class HistoryItem
     public int|string|null $userId;
     public ?string $username;
     public ?string $userFqdn;
+    public ?array $impersonator;               // user who impersonated the author, if any
     public BlameOrigin $origin;
     public ?array $via;
     public function getChanges(): array;       // list<Change>, chronological

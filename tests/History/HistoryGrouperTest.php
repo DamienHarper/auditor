@@ -21,6 +21,20 @@ use PHPUnit\Framework\TestCase;
 #[Small]
 final class HistoryGrouperTest extends TestCase
 {
+    public function testImpersonatorOfTheMostRecentEntry(): void
+    {
+        $impersonator = ['id' => '1', 'username' => 'admin', 'fqdn' => 'App\Entity\Admin'];
+        $entries = [
+            EntryFactory::entry('update', 'App\Post', '1', ['changes' => ['title' => ['old' => 'a', 'new' => 'b']]], 'T1', ['id' => 42, 'username' => 'alice', 'user_firewall' => 'main', 'impersonator' => $impersonator]),
+            EntryFactory::entry('update', 'App\Post', '2', ['changes' => ['title' => ['old' => 'a', 'new' => 'b']]], 'T2', ['id' => 42, 'username' => 'alice', 'user_firewall' => 'main'], '2026-11-23 09:00:00'),
+        ];
+
+        $items = HistoryGrouper::byTransaction($entries);
+
+        $this->assertSame($impersonator, $items[0]->impersonator);
+        $this->assertNull($items[1]->impersonator, 'No impersonator when nobody impersonated the author.');
+    }
+
     public function testGroupsByTransaction(): void
     {
         $alice = ['id' => 1, 'username' => 'alice', 'user_firewall' => 'main'];

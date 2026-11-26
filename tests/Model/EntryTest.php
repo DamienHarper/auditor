@@ -90,6 +90,68 @@ final class EntryTest extends TestCase
         $this->assertNull($entry->via, 'Entry::via is null when the blame context has no type.');
     }
 
+    public function testImpersonator(): void
+    {
+        $impersonator = ['id' => '1', 'username' => 'admin', 'fqdn' => 'App\Entity\Admin'];
+        $entry = Entry::fromArray([
+            'schema_version' => 2,
+            'blame' => json_encode(['username' => 'alice', 'user_fqdn' => 'App\Entity\Customer', 'user_firewall' => 'main', 'ip' => null, 'impersonator' => $impersonator]),
+        ]);
+
+        $this->assertSame($impersonator, $entry->impersonator, 'Entry::impersonator returns the user who impersonated the blamed one.');
+        $this->assertSame('alice', $entry->username, 'Entry::username stays the impersonated user.');
+
+        $data = $entry->toArray();
+        $this->assertSame('1', $data['blame_impersonator_id']);
+        $this->assertSame('admin', $data['blame_impersonator']);
+        $this->assertSame('App\Entity\Admin', $data['blame_impersonator_fqdn']);
+    }
+
+    public function testImpersonatorIsNullWithoutImpersonation(): void
+    {
+        $entry = Entry::fromArray([
+            'schema_version' => 2,
+            'blame' => json_encode(['username' => 'john[impersonator admin]', 'user_fqdn' => 'App\User', 'user_firewall' => 'main', 'ip' => null]),
+        ]);
+
+        $this->assertNull($entry->impersonator, 'Entry::impersonator is null without the key, the legacy username suffix is not parsed.');
+
+        $data = $entry->toArray();
+        $this->assertNull($data['blame_impersonator_id']);
+        $this->assertNull($data['blame_impersonator']);
+        $this->assertNull($data['blame_impersonator_fqdn']);
+    }
+
+    #[DataProvider('provideImpersonatorIsNullWhenMalformedCases')]
+    public function testImpersonatorIsNullWhenMalformed(mixed $impersonator): void
+    {
+        $entry = Entry::fromArray(['blame' => json_encode(['username' => 'john', 'impersonator' => $impersonator])]);
+
+        $this->assertNull($entry->impersonator, 'Entry::impersonator is null without any string id, username or fqdn.');
+        $this->assertNull($entry->toArray()['blame_impersonator_id']);
+    }
+
+    /**
+     * @return iterable<string, array{mixed}>
+     */
+    public static function provideImpersonatorIsNullWhenMalformedCases(): iterable
+    {
+        yield 'a string' => ['admin'];
+
+        yield 'an empty object' => [[]];
+
+        yield 'a list' => [['admin']];
+
+        yield 'no string value' => [['id' => 1, 'username' => ['admin'], 'fqdn' => null]];
+    }
+
+    public function testImpersonatorKeepsOnlyItsStringValues(): void
+    {
+        $entry = Entry::fromArray(['blame' => json_encode(['username' => 'john', 'impersonator' => ['id' => 1, 'username' => 'admin', 'fqdn' => null, 'other' => 'x']])]);
+
+        $this->assertSame(['username' => 'admin'], $entry->impersonator, 'Only the string id, username and fqdn are kept.');
+    }
+
     public function testSchemaVersionDefaultsToOne(): void
     {
         $entry = new Entry();
@@ -370,7 +432,7 @@ final class EntryTest extends TestCase
         $entry = new Entry();
         $data = $entry->toArray();
 
-        $expected = ['id', 'schema_version', 'type', 'object_id', 'discriminator', 'transaction_id', 'diffs', 'blame_id', 'blame_user', 'blame_user_fqdn', 'blame_user_firewall', 'ip', 'blame_via', 'extra_data', 'created_at'];
+        $expected = ['id', 'schema_version', 'type', 'object_id', 'discriminator', 'transaction_id', 'diffs', 'blame_id', 'blame_user', 'blame_user_fqdn', 'blame_user_firewall', 'blame_impersonator_id', 'blame_impersonator', 'blame_impersonator_fqdn', 'ip', 'blame_via', 'extra_data', 'created_at'];
         $this->assertSame($expected, array_keys($data));
     }
 
