@@ -64,7 +64,7 @@ final class Entry
      *
      * Entries written before this key existed keep the impersonator in the username, which is not parsed.
      *
-     * @var null|array{id?: null|string, username?: null|string, fqdn?: null|string}
+     * @var null|array{id?: string, username?: string, fqdn?: string}
      */
     public ?array $impersonator {
         get => $this->getImpersonator();
@@ -424,10 +424,9 @@ final class Entry
     }
 
     /**
-     * @return null|array{type: string, label?: string, data?: array<string, mixed>}
-     */
-    /**
-     * @return null|array{id?: null|string, username?: null|string, fqdn?: null|string}
+     * Keeps the id, username and fqdn of the impersonator that are strings; null when none is.
+     *
+     * @return null|array{id?: string, username?: string, fqdn?: string}
      */
     private function getImpersonator(): ?array
     {
@@ -437,10 +436,18 @@ final class Entry
             return null;
         }
 
-        /** @var array{id?: null|string, username?: null|string, fqdn?: null|string} $impersonator */
-        return $impersonator;
+        $kept = array_filter(
+            array_intersect_key($impersonator, ['id' => true, 'username' => true, 'fqdn' => true]),
+            \is_string(...),
+        );
+
+        /** @var array{id?: string, username?: string, fqdn?: string} $kept */
+        return [] === $kept ? null : $kept;
     }
 
+    /**
+     * @return null|array{type: string, label?: string, data?: array<string, mixed>}
+     */
     private function getVia(): ?array
     {
         $via = $this->getBlame()['via'] ?? null;

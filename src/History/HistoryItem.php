@@ -44,7 +44,7 @@ final class HistoryItem
     /**
      * User who impersonated the author (switch user), from the blame.
      *
-     * @var null|array{id?: null|string, username?: null|string, fqdn?: null|string}
+     * @var null|array{id?: string, username?: string, fqdn?: string}
      */
     public ?array $impersonator {
         get => $this->entries[0]->impersonator;

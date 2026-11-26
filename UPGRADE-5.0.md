@@ -110,7 +110,10 @@ user provider may have appended to the username (such as `alice[impersonator adm
 before 8.0), which is not parsed. To find the latter:
 
 ```sql
+-- MySQL, MariaDB, SQLite
 SELECT * FROM post_audit WHERE JSON_EXTRACT(blame, '$.username') LIKE '%[impersonator %';
+-- PostgreSQL
+SELECT * FROM post_audit WHERE CAST(blame AS jsonb) ->> 'username' LIKE '%[impersonator %';
 ```
 
 ## New: blame contexts

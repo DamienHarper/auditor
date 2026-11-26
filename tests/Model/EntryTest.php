@@ -122,11 +122,34 @@ final class EntryTest extends TestCase
         $this->assertNull($data['blame_impersonator_fqdn']);
     }
 
-    public function testImpersonatorIsNullWhenMalformed(): void
+    #[DataProvider('provideImpersonatorIsNullWhenMalformedCases')]
+    public function testImpersonatorIsNullWhenMalformed(mixed $impersonator): void
     {
-        $entry = Entry::fromArray(['blame' => json_encode(['username' => 'john', 'impersonator' => 'admin'])]);
+        $entry = Entry::fromArray(['blame' => json_encode(['username' => 'john', 'impersonator' => $impersonator])]);
 
-        $this->assertNull($entry->impersonator, 'Entry::impersonator is null when the key is not an object.');
+        $this->assertNull($entry->impersonator, 'Entry::impersonator is null without any string id, username or fqdn.');
+        $this->assertNull($entry->toArray()['blame_impersonator_id']);
+    }
+
+    /**
+     * @return iterable<string, array{mixed}>
+     */
+    public static function provideImpersonatorIsNullWhenMalformedCases(): iterable
+    {
+        yield 'a string' => ['admin'];
+
+        yield 'an empty object' => [[]];
+
+        yield 'a list' => [['admin']];
+
+        yield 'no string value' => [['id' => 1, 'username' => ['admin'], 'fqdn' => null]];
+    }
+
+    public function testImpersonatorKeepsOnlyItsStringValues(): void
+    {
+        $entry = Entry::fromArray(['blame' => json_encode(['username' => 'john', 'impersonator' => ['id' => 1, 'username' => 'admin', 'fqdn' => null, 'other' => 'x']])]);
+
+        $this->assertSame(['username' => 'admin'], $entry->impersonator, 'Only the string id, username and fqdn are kept.');
     }
 
     public function testSchemaVersionDefaultsToOne(): void
