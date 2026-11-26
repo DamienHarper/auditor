@@ -108,6 +108,7 @@ Attributes live in `src/Attribute/`:
 - `#[Ignore]` — marks a field to skip
 - `#[Security]` — restricts who can view audit entries for an entity
 - `#[DiffLabel]` — readable value of a field in the diffs
+- `#[Mask]` — change of a field recorded without its values (`"***"` or a keyed HMAC, `Mask::apply()`)
 - `#[AuditRoot('path')]` — repeatable: the entries of the entity belong to the history of the entity at the end of the path (providers index them)
 
 ### Histories (`src/History/`)
