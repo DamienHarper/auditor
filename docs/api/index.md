@@ -371,6 +371,69 @@ class Order
 As with `#[Ignore]`, the attribute can also be put on the class, repeated, with `field` naming the field:
 `#[DiffLabel(resolver: StatusLabelResolver::class, field: 'status')]`.
 
+### Mask
+
+```php
+namespace DH\Auditor\Attribute;
+
+use DH\Auditor\Masking\MaskStrategy;
+
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
+class Mask
+{
+    public function __construct(public MaskStrategy $strategy = MaskStrategy::Hidden, public ?string $field = null);
+}
+```
+
+Records that a field changed without storing its values. Unlike `#[Ignore]`, the change still shows in the history.
+
+| Strategy                   | Stored value                                                                    |
+|----------------------------|---------------------------------------------------------------------------------|
+| `MaskStrategy::Hidden`     | `"***"` (`Masker::HIDDEN_VALUE`)                                                 |
+| `MaskStrategy::KeyedHash`  | HMAC-SHA256 of the value, keyed with the mask secret of the provider             |
+
+A null value stays null. With `KeyedHash`, equal values give equal hashes, so the entries of one value can be found
+without storing it; changing the secret changes the hashes recorded from then on.
+
+```php
+use DH\Auditor\Attribute\Auditable;
+use DH\Auditor\Attribute\Mask;
+use DH\Auditor\Masking\MaskStrategy;
+
+#[Auditable]
+class User
+{
+    #[Mask(strategy: MaskStrategy::KeyedHash)]
+    private string $email;
+
+    #[Mask]
+    private string $pin;
+}
+```
+
+As with `#[Ignore]`, the attribute can also be put on the class, repeated, with `field` naming the field:
+`#[Mask(field: 'email')]`.
+
+> [!WARNING]
+> Only the values of the field in the diffs are masked. A value written elsewhere is not, in particular the label of
+> the entity (its `__toString()` or a label resolver), recorded in the `source` of every entry.
+
+Providers replace the values through `DH\Auditor\Masking\Masker`:
+
+```php
+namespace DH\Auditor\Masking;
+
+final readonly class Masker
+{
+    public const string HIDDEN_VALUE = '***';
+
+    public function __construct(?string $secret = null);
+
+    // null stays null; a string is hashed as is, any other value as its JSON encoding
+    public function mask(MaskStrategy $strategy, mixed $value): ?string;
+}
+```
+
 ## 📋 Contracts
 
 ### DiffLabelResolverInterface

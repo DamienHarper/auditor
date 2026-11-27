@@ -59,7 +59,8 @@ $auditor->registerProvider($provider);
 
 Use the `#[Auditable]` attribute on any class you want tracked. `#[Ignore]` excludes
 individual fields; `#[Security]` restricts who can view the audit entries; `#[DiffLabel]`
-attaches a human-readable label to a property's raw value in the diff.
+attaches a human-readable label to a property's raw value in the diff; `#[Mask]` records that a field
+changed without storing its values.
 
 ```php
 <?php
@@ -69,13 +70,16 @@ namespace App\Entity;
 use DH\Auditor\Attribute\Auditable;
 use DH\Auditor\Attribute\DiffLabel;
 use DH\Auditor\Attribute\Ignore;
+use DH\Auditor\Attribute\Mask;
 use DH\Auditor\Attribute\Security;
+use DH\Auditor\Masking\MaskStrategy;
 
 #[Auditable]
 #[Security(view: ['ROLE_ADMIN'])]
 class User
 {
-    private string $email;
+    #[Mask(strategy: MaskStrategy::KeyedHash)]
+    private string $email;     // changes recorded as HMACs, never in clear
 
     #[Ignore]
     private string $password;  // this field will never appear in audit diffs
