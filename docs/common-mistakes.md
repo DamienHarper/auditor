@@ -1,5 +1,5 @@
 ---
-description: "Frequent mistakes when using auditor 5.x: where the Doctrine provider lives, decoding audit entries, LifecycleEvent payload keys and renamed fields."
+description: "Frequent mistakes when using auditor 5.x: where the Doctrine provider lives, decoding audit entries, LifecycleEvent payload keys, renamed fields and masked values."
 ---
 
 # Common mistakes
@@ -70,6 +70,13 @@ $entry->type === TransactionType::UPDATE;
 
 The Doctrine provider audits the changes flushed through the Doctrine ORM unit of work. Bulk DQL
 `UPDATE`/`DELETE` queries and raw SQL statements bypass it and are not recorded.
+
+## Hiding a secret with `#[Ignore]`, or leaking a masked one
+
+`#[Ignore]` drops the field from the audit: its changes are not recorded at all. To record that a sensitive field
+changed without storing its values, use `#[Mask]` (`"***"`, or an HMAC with `MaskStrategy::KeyedHash`, which needs the
+provider's mask secret). Only the values in the diffs are masked: the label of the entity (its `__toString()` or a
+label resolver) is stored in clear in every entry, so never build it from a masked field.
 
 ## Using DoctrineAuditBundle names
 

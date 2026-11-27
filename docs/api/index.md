@@ -1,5 +1,5 @@
 ---
-description: "API reference of the auditor core: Auditor, Configuration, Entry, attributes, history classes, LifecycleEvent, provider interfaces and exceptions."
+description: "API reference of the auditor core: Auditor, Configuration, Entry, attributes, masking, history classes, LifecycleEvent, provider interfaces and exceptions."
 ---
 
 # API Reference

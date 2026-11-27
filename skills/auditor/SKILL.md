@@ -1,6 +1,6 @@
 ---
 name: auditor
-description: "Use when writing or reviewing PHP code that depends on damienharper/auditor 5.x (the audit log core) — marking entities with #[Auditable], #[Ignore], #[Security], #[DiffLabel] or #[AuditRoot], reading Entry objects, listening to LifecycleEvent, adding extra data or blame contexts, building histories with HistoryGrouper and ChangeExtractor, or writing a custom provider. For the 5.x line only (schema v2); 4.x APIs differ."
+description: "Use when writing or reviewing PHP code that depends on damienharper/auditor 5.x (the audit log core) — marking entities with #[Auditable], #[Ignore], #[Mask], #[Security], #[DiffLabel] or #[AuditRoot], reading Entry objects, listening to LifecycleEvent, adding extra data or blame contexts, building histories with HistoryGrouper and ChangeExtractor, or writing a custom provider. For the 5.x line only (schema v2); 4.x APIs differ."
 ---
 
 # auditor 5.x (damienharper/auditor)
@@ -40,7 +40,9 @@ use DH\Auditor\Attribute\Auditable;
 use DH\Auditor\Attribute\AuditRoot;
 use DH\Auditor\Attribute\DiffLabel;
 use DH\Auditor\Attribute\Ignore;
+use DH\Auditor\Attribute\Mask;
 use DH\Auditor\Attribute\Security;
+use DH\Auditor\Masking\MaskStrategy;
 
 #[Auditable(maxAge: 'P1Y')]                    // not repeatable; plain #[Auditable] = no retention policy
 #[Security(view: ['ROLE_ADMIN'])]              // roles allowed to read this entity's audits (scope 'view')
@@ -49,6 +51,9 @@ class OrderLine
 {
     #[Ignore]                                  // never written in diffs
     private string $internalNote;
+
+    #[Mask(strategy: MaskStrategy::KeyedHash)] // change recorded, value stored as an HMAC (Hidden, the default: "***")
+    private string $customerEmail;
 
     #[DiffLabel(resolver: StatusLabelResolver::class)]  // stores {"value": 2, "label": "Shipped"}
     private int $status;
@@ -61,6 +66,12 @@ class OrderLine
 - `#[Ignore(field: ?string = null)]` and `#[DiffLabel(resolver: string, field: ?string = null)]`: on a property,
   omit `field`; on a class, `field` names the field and the attribute is repeatable (models without one property per
   column, e.g. Eloquent).
+- `#[Mask(strategy: MaskStrategy = MaskStrategy::Hidden, field: ?string = null)]` (`DH\Auditor\Masking\MaskStrategy`):
+  records that the field changed without its values. `Hidden` stores `"***"` (`Masker::HIDDEN_VALUE`), `KeyedHash`
+  an HMAC-SHA256 keyed with the provider's mask secret (equal values give equal hashes, so one value's entries can
+  be found without storing it). Null stays null. Unlike `#[Ignore]`, the change still shows in the history. Same
+  property/class `field` forms as `#[Ignore]`. Only the diff values are masked: the label of the entity (its `__toString()` or a label resolver) is written in clear in the `source` of every entry: never build it from a masked field.
+  Providers mask through `DH\Auditor\Masking\Masker($secret)->mask($strategy, $value)`.
 - `#[Security(view: array)]`, class only. It only declares roles: a **role checker** enforces them (the bundle's
   does; standalone, write one, see below). `Security::VIEW_SCOPE === 'view'`.
 - `#[AuditRoot(path: string)]`, class only, repeatable. `path` is association properties joined by dots
