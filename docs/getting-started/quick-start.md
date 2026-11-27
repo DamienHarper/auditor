@@ -1,3 +1,7 @@
+---
+description: "Set up the auditor core in plain PHP: create the Configuration and the Auditor, register a provider and mark entities with #[Auditable] and related attributes."
+---
+
 # Quick Start Guide
 
 > **Set up the auditor core and connect a provider**
@@ -53,7 +57,7 @@ $auditor->registerProvider($provider);
 
 | Provider | Package | Storage |
 |----------|---------|---------|
-| DoctrineProvider | [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/) | Doctrine ORM / DBAL |
+| DoctrineProvider | [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider) | Doctrine ORM / DBAL |
 
 ## 3️⃣ Mark Entities as Auditable
 

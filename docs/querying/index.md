@@ -1,3 +1,7 @@
+---
+description: "Querying audit log entries is provider-specific: the readers, queries and filters providers offer, with pointers to the Doctrine ORM provider reader."
+---
+
 # Querying Audits
 
 Querying audit entries is **provider-specific**: each provider implements its own reader and
@@ -19,7 +23,7 @@ Providers that implement a reader expose at minimum:
 The **auditor-doctrine-provider** package ships a full Reader and filter system backed by
 Doctrine DBAL.
 
-→ **[Querying Audits (auditor-doctrine-provider)](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/querying/)**
+→ **[Querying Audits (auditor-doctrine-provider)](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/querying)**
 
 Highlights:
 

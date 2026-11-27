@@ -1,3 +1,7 @@
+---
+description: "API reference of the auditor core: Auditor, Configuration, Entry, attributes, masking, history classes, LifecycleEvent, provider interfaces and exceptions."
+---
+
 # API Reference
 
 > **Complete API documentation for all public classes and interfaces**
@@ -161,7 +165,7 @@ interface ConfigurationInterface
 > [!WARNING]
 > All DoctrineProvider classes (`DoctrineProvider`, `Configuration`, `Reader`, `Query`, filters,
 > `SchemaManager`, `AuditingService`, `StorageService`) were **removed** from auditor core in v5.0.
-> See the [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/)
+> See the [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider)
 > documentation for the current API reference.
 
 ## 📦 Models

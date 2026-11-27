@@ -2,6 +2,7 @@
 id: index
 title: Introduction
 slug: /
+description: "Overview of auditor, a provider-based PHP audit log library: features, architecture and data flow, available providers, supported databases and versions."
 ---
 # auditor
 
@@ -107,7 +108,7 @@ flowchart TD
 
 | Provider | Package | Storage technology |
 |----------|---------|-------------------|
-| DoctrineProvider | [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/) | Doctrine ORM / DBAL |
+| DoctrineProvider | [auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider) | Doctrine ORM / DBAL |
 
 > Need a different backend? See [Building a Custom Provider](providers/custom-provider.md).
 

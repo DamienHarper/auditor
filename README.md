@@ -10,7 +10,36 @@
 [![Monthly Downloads](https://poser.pugx.org/damienharper/auditor/d/monthly)](https://packagist.org/packages/damienharper/auditor)
 [![Daily Downloads](https://poser.pugx.org/damienharper/auditor/d/daily)](https://packagist.org/packages/damienharper/auditor)
 
-The purpose of `auditor` is to provide an easy and standardized way to collect audit logs.
+The purpose of `auditor` is to provide an easy and standardized way to collect audit logs:
+who changed what, when, and how. It is the core of the auditor family: it defines the contracts
+and the audit entry model, and providers do the change tracking and the storage.
+
+
+## Which package do I need?
+| Your application                     | Install                                                   | Brings                                              |
+|:-------------------------------------|:----------------------------------------------------------|:----------------------------------------------------|
+| Symfony with Doctrine ORM            | `composer require damienharper/auditor-bundle`            | auditor + Doctrine provider + configuration + viewer |
+| Doctrine ORM without Symfony         | `composer require damienharper/auditor-doctrine-provider` | auditor + Doctrine provider                         |
+| Another persistence layer            | `composer require damienharper/auditor`                   | the core only: [write your own provider](docs/providers/custom-provider.md) |
+
+| Line | auditor | auditor-doctrine-provider | auditor-bundle | Status |
+|:-----|:--------|:--------------------------|:---------------|:-------|
+| Next | 5.x     | 2.x                       | 8.x            | Active development |
+| Latest stable | 4.x  | 1.x                       | 7.x            | Maintained |
+
+Since auditor 5.0 the Doctrine provider is no longer part of this package: it lives in
+`auditor-doctrine-provider` (in 4.x it is still bundled, deprecated). `auditor-bundle` was formerly
+known as `DoctrineAuditBundle`. See the [upgrade guides](https://damienharper.github.io/auditor-docs/auditor/upgrade).
+
+
+## Using an AI coding agent?
+Each package ships an [Agent Skill](https://agentskills.io) in its `skills/` folder (`vendor/damienharper/*/skills/`
+once installed) describing its API. The copy in `vendor/` matches your installed version; the marketplace serves the current major. With Claude Code:
+```
+/plugin marketplace add DamienHarper/auditor
+/plugin install auditor-bundle@auditor
+```
+The documentation is also available as [llms.txt](https://damienharper.github.io/auditor-docs/llms.txt).
 
 
 ## Architecture
@@ -51,7 +80,7 @@ You can also [build your own provider](docs/providers/custom-provider.md).
 | 2.x     | EOL                         | PHP >= 7.4, Symfony >= 4.4                                          | [![auditor 2.x CI](https://github.com/DamienHarper/auditor/actions/workflows/ci-2.x.yml/badge.svg)](https://github.com/DamienHarper/auditor/actions/workflows/ci-2.x.yml) <br/>[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=2.x)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=2.x) <br/>[![codecov](https://codecov.io/gh/DamienHarper/auditor/branch/master/graph/badge.svg)](https://app.codecov.io/gh/DamienHarper/auditor/branch/2.x)          |
 | 1.x     | EOL                         | PHP >= 7.2, Symfony >= 3.4                                          | [![auditor 1.x CI](https://github.com/DamienHarper/auditor/actions/workflows/ci-1.x.yml/badge.svg)](https://github.com/DamienHarper/auditor/actions/workflows/ci-1.x.yml) <br/>[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DamienHarper/auditor/badges/quality-score.png?b=1.x)](https://scrutinizer-ci.com/g/DamienHarper/auditor/?branch=1.x) <br/>[![codecov](https://codecov.io/gh/DamienHarper/auditor/branch/1.x/graph/badge.svg)](https://app.codecov.io/gh/DamienHarper/auditor/branch/1.x)             |
 
-Changelog is available in the [releases](https://github.com/DamienHarper/auditor/releases), and the upgrade guides in [UPGRADE-5.0.md](UPGRADE-5.0.md) and the [documentation](https://damienharper.github.io/auditor-docs/auditor/upgrade/).
+Changelog is available in the [releases](https://github.com/DamienHarper/auditor/releases), and the upgrade guides in [UPGRADE-5.0.md](UPGRADE-5.0.md) and the [documentation](https://damienharper.github.io/auditor-docs/auditor/upgrade).
 
 
 ## Contributing

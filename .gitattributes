@@ -5,6 +5,7 @@
 /CLAUDE.md              export-ignore
 /CONTRIBUTING.md        export-ignore
 /Makefile               export-ignore
+/context7.json          export-ignore
 /phpstan.neon           export-ignore
 /phpunit.xml            export-ignore
 /rector.php             export-ignore

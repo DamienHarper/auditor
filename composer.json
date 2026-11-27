@@ -1,9 +1,15 @@
 {
   "name": "damienharper/auditor",
   "type": "library",
-  "description": "The missing audit log library.",
-  "keywords": ["audit", "audit-log", "audit-trail"],
+  "description": "Provider-agnostic PHP audit log library: records who changed what and when through pluggable auditing and storage providers.",
+  "keywords": ["audit", "audit-log", "audit-trail", "auditing", "change-tracking", "entity-history", "history", "changelog", "activity-log", "php"],
   "license": "MIT",
+  "homepage": "https://damienharper.github.io/auditor-docs/auditor",
+  "support": {
+    "docs": "https://damienharper.github.io/auditor-docs/auditor",
+    "issues": "https://github.com/DamienHarper/auditor/issues",
+    "source": "https://github.com/DamienHarper/auditor"
+  },
   "authors": [
     {
       "name": "Damien Harper",

@@ -1,9 +1,13 @@
+---
+description: "Reference of the audit console commands shipped by auditor-doctrine-provider: schema update and migration, cleaning, snapshots, export and root indexing."
+---
+
 # Console Commands
 
 > **Manage audit data via the command line**
 
 > [!NOTE]
-> These commands are provided by **[auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/)** (not auditor core).
+> These commands are provided by **[auditor-doctrine-provider](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider)** (not auditor core).
 > For programmatic usage and standalone registration, see [Schema Management](https://damienharper.github.io/auditor-docs/auditor-doctrine-provider/providers/doctrine/schema).
 
 When using auditor-bundle or the standalone `auditor-doctrine-provider`, these console commands are available:

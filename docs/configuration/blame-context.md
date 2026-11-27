@@ -1,3 +1,7 @@
+---
+description: Record how a change was made (an import, a console command, a Messenger message) with BlameContext and BlameContextStack, written in the via key of the blame.
+---
+
 # Blame Context
 
 > **Record how a change was made, not only who made it**
