@@ -72,12 +72,13 @@ use DH\Auditor\Attribute\DiffLabel;
 use DH\Auditor\Attribute\Ignore;
 use DH\Auditor\Attribute\Mask;
 use DH\Auditor\Attribute\Security;
+use DH\Auditor\Masking\MaskStrategy;
 
 #[Auditable]
 #[Security(view: ['ROLE_ADMIN'])]
 class User
 {
-    #[Mask(strategy: Mask::KEYED_HASH)]
+    #[Mask(strategy: MaskStrategy::KeyedHash)]
     private string $email;     // changes recorded as HMACs, never in clear
 
     #[Ignore]
