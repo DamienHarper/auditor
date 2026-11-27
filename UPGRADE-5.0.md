@@ -41,6 +41,20 @@ use DH\Auditor\Transaction\NeedsConversionToAuditableType;
 use DH\Auditor\Provider\Doctrine\Transaction\NeedsConversionToAuditableType;
 ```
 
+## `TransactionInterface::getTransactionHash()` renamed
+
+`DH\Auditor\Model\TransactionInterface::getTransactionHash()` is renamed `getTransactionId()`, and returns the ULID
+that every entry of the transaction carries in `transaction_id`. `DH\Auditor\Model\Transaction` follows. Update a
+provider that implements the interface or calls the method:
+
+```php
+// Before (4.x)
+$transaction->getTransactionHash();
+
+// After (5.0)
+$transaction->getTransactionId();
+```
+
 ## Requirements
 
 | Requirement   | 4.x    | 5.0    |
