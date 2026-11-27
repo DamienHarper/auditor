@@ -90,7 +90,7 @@ null and 2 when missing):
 | `diffs` | JSON string: `source` + `changes` (+ `deep_diffs`), or `source` + `target` + `is_owning_side` + `join_table` for associations |
 | `extra_data` | JSON string or null |
 | `blame_id` | user identifier or null |
-| `blame` | JSON string (`username`, `user_fqdn`, `user_firewall`, `ip`, optional `via`) or null |
+| `blame` | JSON string (`username`, `user_fqdn`, `user_firewall`, `ip`, optional `impersonator` and `via`) or null |
 | `created_at` | creation date; the Doctrine provider sends a `Y-m-d H:i:s.u` string in the auditor timezone |
 
 The Doctrine provider also sends `entity` (FQCN), `table` (audit table name) and `roots` (audit roots) when
@@ -104,7 +104,9 @@ An auditing provider detects changes in its technology and dispatches one event 
 $this->getAuditor()->getEventDispatcher()->dispatch(new LifecycleEvent($payload, $entity));
 ```
 
-It should honour `$this->getAuditor()->getConfiguration()->enabled`, read the user from `getUserProvider()`, the
+It should honour `$this->getAuditor()->getConfiguration()->enabled` and `$this->getAuditor()->isAuditingEnabled($this)`
+(otherwise `disableAuditing()` has no effect), take the user of the current blame context
+(`getBlameContextStack()->current()?->user`) before the one of `getUserProvider()`, read the
 `[ip, firewall]` list from `getSecurityProvider()`, extra data from `getExtraDataProvider()` (an `?array` to
 JSON-encode) and the current blame context from `getBlameContextStack()->current()` (`toArray()` gives the `via`
 value). It reads entity configuration from the attributes in `DH\Auditor\Attribute\`. `DH\Auditor\Model\Transaction`
@@ -127,6 +129,9 @@ dispatched the event (with Doctrine, the flush fails and the transaction is roll
 ## Testing `persist()`
 
 ```php
+use DH\Auditor\Event\LifecycleEvent;
+use DH\Auditor\Model\TransactionType;
+
 $event = new LifecycleEvent([
     'type' => TransactionType::INSERT,
     'object_id' => '42',

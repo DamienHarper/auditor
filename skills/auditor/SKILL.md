@@ -71,15 +71,19 @@ class OrderLine
   an HMAC-SHA256 keyed with the provider's mask secret (equal values give equal hashes, so one value's entries can
   be found without storing it). Null stays null. Unlike `#[Ignore]`, the change still shows in the history. Same
   property/class `field` forms as `#[Ignore]`. Only the diff values are masked: the label of the entity (its `__toString()` or a label resolver) is written in clear in the `source` of every entry: never build it from a masked field.
-  Providers mask through `DH\Auditor\Masking\Masker($secret)->mask($strategy, $value)`.
+  Providers mask through `DH\Auditor\Masking\Masker($secret)->mask($strategy, $value)`. `KeyedHash` needs the
+  provider's secret (Doctrine: `mask_secret` option, 32 bytes min.); the Doctrine provider refuses `#[Mask]` on an
+  identifier or a collection.
 - `#[Security(view: array)]`, class only. It only declares roles: a **role checker** enforces them (the bundle's
   does; standalone, write one, see below). `Security::VIEW_SCOPE === 'view'`.
 - `#[AuditRoot(path: string)]`, class only, repeatable. `path` is association properties joined by dots
   (`'property'`, `'visit.property'`), validated on instantiation. A null value on the path is skipped. Indexing is
   not transitive. The provider indexes the entries; rebuilding the index of existing entries is a provider command.
 - A `#[DiffLabel]` resolver implements `DH\Auditor\Contract\DiffLabelResolverInterface`
-  (`__invoke(mixed $value): ?string`, null = no label). It runs during the flush: never flush or write to the
-  audited entity manager from it.
+  (`__invoke(mixed $value): ?string`, null = no label). Providers fetch it from a PSR-11 container: with the
+  Doctrine provider standalone, `$provider->setDiffLabelResolverLocator($container)` (the bundle wires it), otherwise
+  no label is written, silently. It runs while the provider writes the entries (Doctrine: at the commit of the
+  flush): never write through the audited entity manager from it. A masked field gets no label.
 
 ## Core configuration (plain PHP)
 
@@ -93,12 +97,14 @@ $configuration = new Configuration([
     'enabled' => true, 'timezone' => 'UTC',
     'user_provider' => null, 'security_provider' => null, 'role_checker' => null, 'extra_data_provider' => null,
 ]);
-$configuration->setUserProvider(fn (): ?User => $current ? new User((string) $current->getId(), $current->getEmail(), $current::class) : null);
-$configuration->setSecurityProvider(fn (): array => [$clientIp, $firewallName]); // a LIST [ip, firewall], each ?string
+// The callables run at every flush: read the current state inside them ($session, $request are your services;
+// an arrow function captures plain values once, at definition).
+$configuration->setUserProvider(fn (): ?User => ($u = $session->currentUser()) ? new User((string) $u->getId(), $u->getEmail(), $u::class) : null);
+$configuration->setSecurityProvider(fn (): array => [$request->clientIp(), 'main']); // a LIST [ip, firewall], each ?string
 $configuration->setRoleChecker(fn (string $entity, string $scope): bool => true); // false: readers throw AccessDeniedException
-$configuration->setExtraDataProvider(fn (): ?array => ['request_id' => $requestId]);
+$configuration->setExtraDataProvider(fn (): ?array => ['request_id' => $request->id()]);
 
-$auditor = new Auditor($configuration, new EventDispatcher());
+$auditor = new Auditor($configuration, new EventDispatcher()); // 3rd arg false: you register AuditEventSubscriber yourself (compiled dispatcher)
 $auditor->registerProvider($provider); // e.g. a DoctrineProvider from auditor-doctrine-provider
 ```
 
@@ -150,7 +156,8 @@ $entry->rootPath;        // ?string, set when read in the history of an audit ro
 
 $entry->getDiffs();      // v2 update/insert/remove: ['field' => ['old' => x, 'new' => y], ...]
                          // v2 associate/dissociate: whole diff (source, target, is_owning_side, join_table)
-$entry->getDiffSource(); // ?array ['id', 'class', 'label', 'table'] (null for v1)
+$entry->getDiffSource(); // ?array ['id', 'class', 'label', 'table'] (null for v1); a primary key not named id is
+                         // keyed by its name, with 'pkName'; association sources also carry 'field'
 $entry->getDiffTarget(); // ?array target of associate/dissociate (null otherwise or v1)
 $entry->isSnapshot();    // insert written by a snapshot of an existing entity
 $entry->isDeepDiff($f);  // getDiffs()[$f] is a JSON deep diff tree, not an {old, new} pair
@@ -165,8 +172,9 @@ association value as a summary (`class`, `id`, `label`, ...). Use `ChangeExtract
 ## `LifecycleEvent` (one per audit entry)
 
 `DH\Auditor\Event\LifecycleEvent`: `getPayload(): array`, `setPayload(array): self`, `$event->entity` (the audited
-object, or null). The core dispatches it to `AuditEventSubscriber` (priority `-1_000_000`), which calls `persist()`
-on every storage provider. Any listener with a higher priority can change the payload first.
+object, or null). An auditing provider dispatches it; the core's `AuditEventSubscriber` (priority `-1_000_000`)
+calls `persist()` on every storage provider whose storage is enabled. Any listener with a higher priority can change
+the payload first.
 
 Payload keys required by the core (schema v2): `type`, `object_id`, `discriminator`, `schema_version` (2),
 `transaction_id`, `diffs` (JSON string), `extra_data` (JSON string or null), `blame_id`, `blame` (JSON string or
@@ -181,7 +189,10 @@ string constants `INSERT`, `UPDATE`, ...). The 4.x keys `transaction_hash`, `bla
 Two ways, combinable; the listener runs after the provider callable:
 
 ```php
-$auditor->getConfiguration()->setExtraDataProvider(fn (): ?array => ['route' => $route]); // once per flush, returns ?array
+use DH\Auditor\Event\LifecycleEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+
+$auditor->getConfiguration()->setExtraDataProvider(fn (): ?array => ['route' => $router->currentRoute()]); // once per flush, returns ?array
 
 #[AsEventListener(event: LifecycleEvent::class, priority: 10)]
 final class OrderExtraData
@@ -200,7 +211,8 @@ final class OrderExtraData
 ```
 
 In the payload, `extra_data` is a JSON **string** (or null), never an array. Read it back with `$entry->extraData`.
-The listener runs inside the flush: read freely, never write through the audited entity manager.
+The listener runs while the provider writes the entries (Doctrine: at the commit of the flush): read freely, never
+write through the audited entity manager.
 
 ## Histories (`DH\Auditor\History\`)
 
@@ -255,7 +267,15 @@ error semantics and a test: [references/custom-provider.md](references/custom-pr
 - Returning `['ip' => ..., 'firewall' => ...]` from the security provider: it must be a list `[$ip, $firewall]`.
 - Expecting `#[Security]` to deny access with no role checker configured (null role checker = everyone reads).
 - Pushing a `BlameContext` without popping it (use `run()`), or not calling `reset()` in workers.
-- Flushing or writing to the audited entity manager from a `LifecycleEvent` listener or a `#[DiffLabel]` resolver.
+- Writing through the audited entity manager from a `LifecycleEvent` listener or a `#[DiffLabel]` resolver.
+- Comparing `$entry->type === TransactionType::Update` (always false: `type` is a string); use
+  `TransactionType::UPDATE` or `TransactionType::Update->value`.
+- Expecting DQL bulk `UPDATE`/`DELETE` or raw SQL to be audited: only changes flushed through the ORM are.
+- Upgrading from 4.x without migrating the audit tables (`audit:schema:migrate --force --convert-all`, then
+  `audit:schema:update --force`, no rollback), or keeping `TransactionInterface::getTransactionHash()` (now
+  `getTransactionId()`), the `DH\Auditor\Transaction\NeedsConversionToAuditableType` import (now in
+  `DH\Auditor\Provider\Doctrine\Transaction\`) or a `UserInterface` without `fqdn` / `impersonator`.
+- Catching `\InvalidArgumentException` for `DH\Auditor\Exception\InvalidArgumentException` (it extends `\Exception`).
 - Treating `getDiffs()` of an `associate`/`dissociate` entry as field changes, or a deep diff as `{old, new}`:
   check `$entry->type` and `isDeepDiff()`, or use `ChangeExtractor`.
 - Assuming `getDiffSource()` / `getDiffTarget()` are non-null: they are null for schema v1 rows.
